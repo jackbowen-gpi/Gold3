@@ -1,0 +1,4 @@
+Operations to perform:
+  Apply all migrations: accounts, address, admin, admin_log, archives, art_req, auth, auto_corrugated, auto_ftp, bev_billing, budget, calendar, carton_billing, color_mgt, contenttypes, draw_down, error_tracking, fedexsys, item_catalog, joblog, news, qad_data, qc, queues, sbo, sessions, sites, software, timesheet, workflow
+Running migrations:
+  No migrations to apply.

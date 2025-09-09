@@ -1,0 +1,82 @@
+{% extends "standard.html" %}
+
+{% block page_title %}Shipment Details{%endblock %}
+
+{% block extra_head %}
+  {% include "address/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+<h1>Ship Details: {{track_details.OtherIdentifiers.0.Value}} ({{track_details.TrackingNumber}})</h1>
+{% include "address/navbar_div.inc.html" %}
+<table>
+<tr>
+  <th>TrackingNumber:</th>
+  <td>{{track_details.TrackingNumber}}</td>
+  <th>Reference:</th>
+  {% if shipment.job %}
+  <td><a href="{{shipment.job.get_absolute_url}}">{{shipment.job}}</a></td>
+  {% else %}
+  <td>{{Reference}}</td>
+  {% endif %}
+</tr>
+<tr>
+  <th>Status</th>
+  <td>{{track_details.StatusDetail.Description|default:"Waiting to be shipped"}}</td>
+{% ifequal track_details.StatusDetail.Code "DL" %}
+  <th>Ship Date</th>
+  <td>{{track_details.ActualDeliveryTimestamp}}</td>
+{% else %}
+  <th>Est. Ship Date</th>
+  <td>{{track_details.EstimatedDeliveryTimestamp}}</td>
+{% endifequal %}
+</tr>
+<tr>
+  <th>Delivery Location</th>
+  <td colspan="3">
+    {{track_details.DestinationAddress.City}}
+    {{track_details.DestinationAddress.CountryCode}}
+  </td>
+</tr>
+{% ifequal track_details.StatusDetail.Code "DL" %}
+<tr>
+  <th>Service Type</th>
+  <td>{{track_details.ServiceInfo}}</td>
+  <th>Delivery Type</th>
+  <td>{{track_details.DeliveryLocationDescription}}</td>
+</tr>
+<tr>
+  <th>Deliver Data/Time</th>
+  <td>{{track_details.ActualDeliveryTimestamp}}</td>
+  <th>Signed For By</th>
+  <td>{{track_details.DeliverySignatureName}}</td>
+</tr>
+{% endifequal %}
+{% ifequal track_details.StatusDetail.Code "OC" %}
+<tr>
+  <td colspan="4" style="text-align:center;background-color:white;border:none">
+    <span style='font-weight:bold;color:red'>
+    If you created this shipment in error, you may
+    <a href="{% url "shipment_delete" shipment.tracking_num %}">cancel</a> it.
+    </span>
+  </td>
+</tr>
+{% endifequal %}
+</table>
+
+{% if event_list %}
+<h2>Shipping Events</h2>
+<table>
+<tr>
+  <th>Date</th>
+  <th>Event</th>
+</tr>
+{% for event in event_list %}
+<tr>
+  <td>{{event.timestamp}}</td>
+  <td>{{event.desc}} {{event.details}}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+{% endblock %}

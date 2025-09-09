@@ -1,0 +1,6 @@
+{% include "emails/email_header.txt" %}
+
+All items in job {{job}} have been approved (or cancelled).
+
+Please enter the job into SAP and then mark the job as complete in the Pending Carton SAP Entries list:
+http://gchub.graphicpkg.com/carton_billing/sap_entry/queue/

@@ -1,0 +1,3 @@
+Admin user exists: dev_admin
+Wrote admin session cookie to: C:\Dev\Gold\gchub_db\dev\admin_session_cookie.txt
+sessionid=33p0pv2aag7jtbxglp0j2e6xaxr6ynl3

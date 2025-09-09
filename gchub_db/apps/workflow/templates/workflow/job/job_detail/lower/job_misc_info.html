@@ -1,0 +1,201 @@
+	<div style="positon:relative;float:left;width:60%;">
+		<span class="sub_heading">
+		  <img src="{{MEDIA_URL}}img/icons/information.png"
+		       style="vertical-align: text-bottom" alt="MiscInfo" />
+		  Misc. {{job.workflow.name}} Job Information
+		</span>
+		<br />
+		{% ifequal job.workflow.name "Beverage" %}
+			<div class="info_block"><h2>Plates</h2>{{job.temp_platepackage}}</div>
+			<div class="info_block"><h2>Plant &amp; Press</h2>{{job.temp_printlocation}}</div>
+			<div class="info_block"><h2>Prepress</h2>{{job.get_prepress_supplier_display}}</div>
+			<br />
+			<div style="clear:left;">
+				<strong>Sales Service Rep:</strong> {{job.sales_service_rep}}
+				<br />
+				<strong>Customer PO#:</strong> {{job.customer_po_number}}
+				<br />
+				<strong>Billing:</strong> {{job.get_bill_to_type_display}}
+				<br />
+				<strong>Billing:</strong> {{job.get_business_type_display}}
+			</div>
+		{% endifequal %}
+		{% if job.archive_disc %}
+			<img src="{{MEDIA_URL}}img/icons/cd.png"
+			     style="vertical-align: text-bottom" height="16px"
+			     width="16px" alt="Archived" />
+			<strong>ARCHIVED</strong>
+			<span class='smtext'>({{job.archive_disc}})</span>
+			{% if perms.accounts.clemson_employee %}
+				<a href='javascript:remove_from_archive("{{ job.id }}")'>
+				  <img src="{{MEDIA_URL}}img/icons/cross.png"
+				       style="vertical-align: text-bottom"
+				       alt="Remove Archives" />
+				  Remove from Archives
+				</a>
+			{% endif %}
+			<br /><br />
+		{% endif %}
+	    {% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+			{% if job.workflow.name == "Carton" %}
+			<strong>Graphic Supplier:</strong> {{job.graphic_supplier}}
+			<br />
+			{% else %}
+			<strong>Ship-To State:</strong> {{job.ship_to_state}}
+			<br />
+			<strong>Art Submitted:</strong> {{job.get_art_rec_type_display}}
+			<br />
+			<strong>Anticipated Plant:</strong> {{job.anticipated_plant}}
+			{% endif %}
+			<br />
+		{% endif %}
+		{% if job.workflow.name == "Carton" %}
+			{% if perms.accounts.clemson_employee %}
+					<a href='javascript:load_div("bottom_view", job_ajax_url("{{ job.id }}", "extended_job_edit"))'>
+					  <img src="{{MEDIA_URL}}img/icons/cog_edit.png"
+					       style="vertical-align:text-bottom"
+					       alt="ChangePrintLocation" />
+					  Edit Extended Job Info
+					</a>
+					<br />
+					<br />
+					<a href='javascript:load_div("bottom_view", job_ajax_url("{{ job.id }}", "carton_invoice"))'>
+					  <img src="{{MEDIA_URL}}img/icons/money_dollar.png"
+					       style="vertical-align:text-bottom"
+					       alt="DownloadInvoices" />
+					  Download Invoices
+					</a>
+					<br />
+			{% endif %}
+		{% endif %}
+		{% if job.duplicated_from %}
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				{% if job.duplication_type == "carton_imp" %}
+					<strong>Duplicated From Job: </strong>
+				{% else %}
+					<strong>Press Change From Job: </strong>
+				{% endif %}
+			{% else %}
+				<strong>Duplicated From Job: </strong>
+			{% endif %}
+			<a href="/workflow/job/{{job.duplicated_from.id}}/">{{job.duplicated_from}}</a><br />
+		{% endif %}
+		<br />
+		{% ifequal job.workflow.name "Beverage" %}
+			{% if perms.accounts.clemson_employee %}
+				<a href='javascript:load_div("bottom_view", job_ajax_url("{{ job.id }}", "extended_job_edit"))'>
+				  <img src="{{MEDIA_URL}}img/icons/cog_edit.png"
+				       style="vertical-align:text-bottom"
+				       alt="ChangePrintLocation" />
+				  Edit Extended Job Info
+				</a>
+				<br />
+			 	<a href='javascript:load_div("bottom_view", job_ajax_url("{{ job.id }}", "change_printlocation"))'>
+			 	  <img src="{{MEDIA_URL}}img/icons/cog_edit.png"
+			 	       style="vertical-align:text-bottom"
+			 	       alt="ChangePrintLocation" />
+			 	  Change Print Location
+			 	</a>
+			 	(plant &amp; press)
+			 	<br />
+				<a href='javascript:load_div("bottom_view", job_ajax_url("{{ job.id }}", "change_platepackage"))'>
+				  <img src="{{MEDIA_URL}}img/icons/cog_edit.png"
+				       style="vertical-align:text-bottom"
+				       alt="ChangePlatePackage" />
+				  Change Plate Package
+				</a>
+				(platemaker &amp; platetype)
+				<br />
+			{% endif %}
+		{% endifequal %}
+		{% if perms.accounts.job_entry or perms.workflow.duplicate_job %}
+			{% if job.can_be_duplicated %}
+				{% ifequal job.workflow.name "Beverage" %}
+					<a href="/workflow/job/{{job.id}}/duplicate_job/default/">
+						<img src="{{MEDIA_URL}}img/icons/disk_multiple.png" style="vertical-align:text-bottom" alt="DuplicateJob" />
+							Duplicate Job
+					</a>
+				{% else %}
+					<a href="/workflow/job/{{job.id}}/duplicate_job/press_change/">
+						<img src="{{MEDIA_URL}}img/icons/disk_multiple.png" style="vertical-align:text-bottom" alt="DuplicateJob" />
+						Enter Press Change
+					</a>
+				{% endifequal %}
+				(This will create a new job in the database.)
+				<br />
+				{% ifequal job.carton_type "Prepress" %}
+					<br />
+					<a href="/workflow/job/{{job.id}}/duplicate_job/carton_imp/">
+						<img src="{{MEDIA_URL}}img/icons/layout.png" style="vertical-align:text-bottom" alt="DuplicateJob" />
+						Create Carton Imposition Job
+					</a>
+					(This will create a new job in the database.)
+					<br />
+					<br />
+					<a href="/workflow/job/{{job.id}}/duplicate_job/carton_prepress/">
+						<img src="{{MEDIA_URL}}img/icons/layout_add.png" style="vertical-align:text-bottom" alt="DuplicateJob" />
+						Duplicate Carton Prepress Job
+					</a>
+					(This will create a new job in the database.)
+					<br />
+				{% endifequal %}
+			{% endif %}
+		{% endif %}
+		<br />
+		{% if perms.accounts.clemson_employee %}
+			<a href='javascript:reset_permissions("{{job.id}}")'>
+				<img src="{{MEDIA_URL}}img/icons/folder_heart.png"
+				     style="vertical-align:text-bottom" alt="DuplicateJob" />
+				Reset Job Folder Permissions
+			</a>
+			<br />
+		{% endif %}
+		<br />
+		{% if perms.accounts.clemson_employee %}
+			<a href="/workflow/job/{{job.id}}/creative_shortcut/">
+				<img src="{{MEDIA_URL}}img/icons/link_go.png" style="vertical-align: text-bottom" alt="Creative Shortcut" />
+				Creative Shortcut
+			</a>
+			<br />
+		{% endif %}
+		<br />
+		<strong>Last Update: </strong>{{job.last_modified|date:"n-j-Y g:i"}}
+		<span class="smtext">({{job.last_modified_by}})</span>
+		<br />
+	</div>
+	<div class="outline_fancy" style="position:relative;width:380px;float:left;left:5px;">
+		<span class="sub_heading">
+		  <img src="{{MEDIA_URL}}img/icons/folder_page.png"
+		       style="vertical-align: text-bottom" alt="DatabaseDocs" />
+		  Database Documents
+		</span>
+		<br />
+		<br />
+		{% for doc in database_docs %}
+			- <a href="{% url "job_get_db_doc" job.id doc.file_name %}">
+			    {{doc.file_name}}
+			  </a>
+			<span class="smtext">
+			  [{{doc.last_modified_time|date:"n-j-Y"}} - {{doc.file_size|filesizeformat}}]
+			</span>
+			<br />
+		{% empty %}
+			<em>There are currently no documents available online for this job.</em><br />
+		{% endfor %}
+		<br />
+		{% if job.archive_disc %}
+			This job has been archived. No documents can be posted.
+			{% if perms.accounts.clemson_employee %}
+				<a href='javascript:remove_from_archive("{{ job.id }}")'>Remove job from archive</a> first.
+			{% else %}
+				Contact Clemson to have the job made active again.
+			{% endif %}
+		{% else %}
+		<a href='{% url "job_db_doc_upload" job.id %}'
+		   onclick="window.open(this.href, 'popupwindow', 'width=600,height=250');return false;">
+   	 		<img src="{{MEDIA_URL}}img/icons/database_add.png"
+   	 		     style="vertical-align: text-bottom" alt="File Upload" />
+   	   		Upload a file to Database Documents
+   	  	</a>
+   	  	{% endif %}
+	</div>

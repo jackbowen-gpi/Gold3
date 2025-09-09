@@ -1,0 +1,9 @@
+{% include "emails/email_header.txt" %}
+
+Marketing approval is required for Job: {{job_name}}
+
+Type(s): {% autoescape off %}{{type}}{% endautoescape %}
+Comments: {{comments}}
+
+Please follow the link to the marketing review page in GOLD
+{{site_link}}

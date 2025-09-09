@@ -1,0 +1,48 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/address/address.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/fedex/fedex.js"></script>
+	{% include "address/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+  <h1>Address Search Results</h1>
+  {% include "address/navbar_div.inc.html" %}
+
+  <p>{% include "pagination_bar.html" %}</p>
+  <p>
+		{% for contact in object_list %}
+			<div class="outline" style="width:420px; padding-left:8px;">
+				<strong>{{contact.first_name}} {{contact.last_name}}</strong> {% if contact.job_title %}- <em>{{contact.job_title}}</em>{% endif %}<br />
+				<div style="padding-left:8px;">
+					{{contact.company}}<br />
+					{{contact.address1}}<br />
+					{% if contact.address2 %}{{contact.address2}}<br />{% endif %}
+					{{contact.city}}, {{contact.state}} {{contact.zip_code}} {{contact.country}}<br /><br />
+					T: {{contact.phone}} {% if contact.ext %}Ext: {{contact.ext}}{% endif %}<br />
+					{% if contact.fax %}F: {{contact.fax}}<br />{% endif %}
+					{% if contact.email %}E: {{contact.email}}<br />{% endif %}
+					<br />
+					<a href="/address/edit/{{contact.id}}/">Edit</a> |
+					<a href='javascript:delete_address("{{contact.id}}")'>Delete</a> |
+					{% if perms.accounts.clemson_employee%}
+					<a href="/address/attach/{{contact.id}}/">Attach to Job</a>
+					<br />
+				    <a href="javascript:ship_to_contact('{{contact.id}}', 'STON')" alt="Fedex Std. Overnight">
+                      <img src="{{MEDIA_URL}}img/fedexbuttonstandard.png" style="padding:3px" />
+                    </a>
+                    <a href="javascript:ship_to_contact('{{contact.id}}', 'PRON')" alt="Fedex Prio. Overnight">
+                      <img src="{{MEDIA_URL}}img/fedexbuttonpriority.png" style="padding:3px" />
+                    </a>
+                    <a href="javascript:ship_to_contact('{{contact.id}}', 'TWOD')" alt="Fedex Two Day">
+                      <img src="{{MEDIA_URL}}img/fedexbutton2day.png" style="padding:3px" />
+                    </a>
+                    {% endif %}
+				</div>
+			</div>
+		{% endfor %}
+	</p>
+	<p>{% include "pagination_bar.html" %}</p>
+{% endblock %}

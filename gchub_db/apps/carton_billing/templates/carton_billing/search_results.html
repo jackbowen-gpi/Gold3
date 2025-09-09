@@ -1,0 +1,26 @@
+{% extends "standard.html" %}
+
+{% block body %}
+  <h1>Pending Carton SAP Entries</h1>
+	{% include "pagination_bar.html" %}
+	<table>
+		<tr>
+			<th>Job</th>
+			<th>Creation Date</th>
+		</tr>
+		{% for entry in object_list %}
+			<tr>
+				<td>
+					<a href="{{entry.job.get_absolute_url}}">{{entry.job}}</a>
+				</td>
+				<td>
+					{{entry.creation_date}}
+				</td>
+				<td>
+					<a href="/carton_billing/sap_entry/complete/{{entry.id}}/">Complete</a>
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+	{% include "pagination_bar.html" %}
+{% endblock %}

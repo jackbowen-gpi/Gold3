@@ -1,0 +1,6 @@
+{% include "emails/email_header.txt" %}
+
+A proof has been sent out for item {{item}} of job {{item.job}}.
+
+Click on the link below to view a PDF of the artwork:
+http://{{url}}{% url 'get_item_proof' item.job.id item.num_in_job %}

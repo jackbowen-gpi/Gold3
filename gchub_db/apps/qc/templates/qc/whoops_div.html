@@ -1,0 +1,10 @@
+{% if qcresponse.qcwhoops_set.all %}
+<div class="qc_whoops_div">
+  <strong>Whoops</strong>
+  <ul>
+  {% for whoops in qcresponse.qcwhoops_set.all %}
+    <li>{{ whoops.details }} (<a href="javascript:delete_whoops({{whoops.id}});">Delete</a>)</li>
+  {% endfor %}
+  </ul>
+</div>
+{% endif %}

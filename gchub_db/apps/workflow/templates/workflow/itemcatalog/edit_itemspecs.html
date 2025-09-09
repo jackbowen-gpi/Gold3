@@ -1,0 +1,32 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	{% include "workflow/itemcatalog/navbar_header.inc.html" %}
+	<style type="text/css">
+	  label { width:120px; }
+	</style>
+
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/item_catalog.js"></script>
+{% endblock %}
+
+{% block body %}
+
+<h1 class="inline">{{page_title}} {{spec}}</h1><br /><br />
+{% include "workflow/itemcatalog/navbar_div.inc.html" %}
+	{% if duplicate %}
+		<form id="itemspec" name="itemspec" onsubmit="dupe_itemspecs('{{spec.id}}');return false;">
+	{% else %}
+		<form id="itemspec" name="itemspec" onsubmit="edit_itemspecs('{{spec.id}}');return false;">
+	{% endif %}
+	<div class="form_p">
+	  	{{add_form.as_p}}
+	</div>
+	{% if duplicate %}
+		<input type="submit" value="Duplicate Specification" onclick="dupe_itemspecs('{{spec.id}}');return false;" />
+	{% else %}
+		<input type="submit" value="Edit Specification" onclick="edit_itemspecs('{{spec.id}}');return false;" /><br /><br />
+		<a href="{% url "new_itemspecs_dupe" spec.id %}"><img src="{{MEDIA_URL}}img/icons/disk_multiple.png" style="vertical-align:text-bottom" /> Duplicate Spec</a>
+	{% endif %}
+	</form>
+{% endblock %}

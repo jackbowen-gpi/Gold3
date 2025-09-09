@@ -1,0 +1,11 @@
+2025-09-01 18:48:50 DEBUG    2025-09-01 18:48:50 [DEBUG]          fsb_box.py:27
+                             gchub_db.apps.auto_corrugated.docume
+                             nts.fsb_box: Font file not found at:
+                             /mnt\Production\autocorr_elements\VA
+                             G Rounded BT.ttf
+Operations to perform:
+  Apply all migrations: accounts, address, admin, admin_log, archives, art_req, auth, auto_corrugated, auto_ftp, bev_billing, budget, calendar, carton_billing, color_mgt, contenttypes, draw_down, error_tracking, fedexsys, item_catalog, joblog, news, qad_data, qc, queues, sbo, sessions, sites, software, timesheet, workflow
+Running migrations:
+  No migrations to apply.
+  Your models in app(s): 'art_req' have changes that are not yet reflected in a migration, and so won't be applied.
+  Run 'manage.py makemigrations' to make new migrations, and then re-run 'manage.py migrate' to apply them.

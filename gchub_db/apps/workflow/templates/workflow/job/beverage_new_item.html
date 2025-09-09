@@ -1,0 +1,200 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/job_item_entry.js"></script>
+{% endblock %}
+
+{% block body %}
+<div style="min-height:735px;">
+	<h1 class="inline"><img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-center" /> Add Item to Beverage Job - <a href='{% url "job_detail" job.id %}'>{{job.id}} {{job.name}}</a></h1><br />
+			<form id="newitem" name="newitem">
+			<input type="hidden" name="item_status" id="id_item_status" value="Pending" />
+			<input type="hidden" name="job" id="id_job" value="{{job.id}}" />
+			<input type="hidden" name="workflow" id="id_workflow" value="{{job.workflow.id}}" />
+			<input type="hidden" name="printlocation" id="id_printlocation" value="{{job.temp_printlocation.id}}" />
+			<input type="hidden" name="platepackage" id="id_platepackage" value="{{job.temp_platepackage.id}}" />
+
+			<div class="outline" style="min-height:50px;background-color:#DDDDDD;float:left;width:99%;">
+				<h2 class="inline">Job Information</h2><br />
+				<strong>Plant &amp; Press: </strong>{{job.temp_printlocation}}<br />
+				<strong>Plate Package: </strong>{{job.temp_platepackage}}<br />
+				<strong>Due Date: </strong>{{job.due_date|date:"n-j-Y"}} {% ifequal rush "No Rush"%}{% else %} <strong>(NOTICE: A {{rush}} rush charge will be applied to each item.)</strong>{% endifequal %}<br />
+			</div>
+
+			<div class="outline" style="min-height:50px;background-color:#DDDDDD;float:left;width:99%;">
+				<h2 class="inline">Build Item Nomenclature</h2><br />
+				<table width="100%">
+					<tr>
+						<th>Size</th>
+				{% ifequal job.temp_printlocation.plant.name "Plant City" %}
+						<th>Plate Code</th>
+				{% else %}
+				{% ifequal job.temp_printlocation.press.name "BHS" %}
+						<th>Code (enter number here: ie. 11051)</th>
+				{% else %}
+						<th>Center Code</th>
+						<th>End Code</th>
+				{% endifequal %}
+				{% endifequal %}
+					</tr>
+					<tr>
+						<td>{{itemform.size}}</td>
+				{% ifequal job.temp_printlocation.plant.name "Plant City" %}
+						<td>{{itemform.bev_alt_code}}</td>
+					</tr>
+				{% else %}
+				{% ifequal job.temp_printlocation.press.name "BHS" %}
+						<td>{{itemform.bev_alt_code}}</td>
+					</tr>
+				{% else %}
+						<td>
+							{% if job.use_new_bev_nomenclature %}
+								{{itemform.bev_brand_code}}<br />
+								<a href='{% url "add_centercode" "brand" %}' onclick="window.open(this.href, 'popupwindow', 'width=600,height=250');return false;">
+									<img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" /> Create New Center Code
+								</a>
+							{% else %}
+								{{itemform.bev_center_code}}<br />
+								<a href='{% url "add_centercode" %}' onclick="window.open(this.href, 'popupwindow', 'width=600,height=250');return false;">
+									<img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" /> Create New Center Code
+								</a>
+							{% endif %}
+						</td>
+						<td>
+							{% if job.use_new_bev_nomenclature %}
+								{{itemform.bev_end_code}}<br />
+							{% else %}
+								{{itemform.bev_liquid_code}}<br />
+								<a href='{% url "add_endcode" %}' onclick="window.open(this.href, 'popupwindow', 'width=600,height=250');return false;">
+									<img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" /> Create New End Code
+								</a>
+							{% endif %}
+						</td>
+					</tr>
+					<!-- <tr>
+						<td>&nbsp;</td>
+						<td><a href=""><img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" /> Create New Center Code</a></td>
+						<td><a href=""><img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" /> Create New End Code</a></td>
+					</tr> -->
+				{% endifequal %}
+				{% endifequal %}
+				{% ifequal job.temp_printlocation.plant.name "Plant City" %}
+
+				{% else %}
+				{% ifequal job.temp_printlocation.press.name "BHS" %}
+
+				{% else %}
+					<tr>
+						<th colspan='3'>Panel Prefix (optional) - if blank, panel nomenclature will begin with platemaker code (i.e. HU, SV)</th>
+					</tr>
+					<tr>
+						<td colspan='3'>{{itemform.bev_alt_code}} (PANELS ONLY)<br />
+										 For example: Type just 'V479', not 'V479-2009-041L'.<br />
+										 In this example, you would select a center code of '2009' and an end code of '041L'</td>
+					</tr>
+				{% endifequal %}
+				{% endifequal %}
+				</table>
+			</div>
+
+			<div class="outline" style="min-height:185px;background-color:#DDDDDD;float:left;width:420px">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align: text-bottom" /> Item Information</h2><br />
+				<label for="id_description">Description:</label>{{itemform.description}}<br />
+				<label for="id_num_up">Number Up:</label>{{itemform.num_up}}<br />
+				<label for="id_num_up">Eco/Meco:</label>{{itemform.special_mfg}} <span class="smtext">(optional)</span><br />
+				<label for="id_upc_number">UPC Code:</label>{{itemform.upc_number}}<br />
+				<label for="id_upc_ink_color">UPC Plate:</label>{{itemform.upc_ink_color}}<br />
+				<label for="id_bom_number">BOM Number:</label>{{itemform.bom_number}}<br />
+				<label for="id_replaces">Replaces:</label>{{itemform.replaces}}<br />
+				{% ifequal job.temp_platepackage.platetype "Rub" %}
+					{% ifequal job.temp_printlocation.plant.name "Olmsted Falls" %}
+						<label for="id_uses_old_distortion">Legacy Distortion:</label>{{itemform.uses_old_distortion}}<span class="smtext">(Most jobs plated after February 2012 won't use this.)</span><br />
+					{% else %}
+						{% ifequal job.temp_printlocation.plant.name "Clinton" %}
+							<label for="id_uses_old_distortion">Legacy Distortion:</label>{{itemform.uses_old_distortion}}<span class="smtext">(Most jobs plated after February 2012 won't use this.)</span><br />
+						{% endifequal %}
+					{% endifequal %}
+				{% endifequal %}
+			</div>
+
+			<div class="outline" style="min-height:319px;background-color:#DDDDDD;float:right;position:relative;left:-4px;">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/color_wheel.png" style="vertical-align: text-bottom" /> Color Information</h2><br />
+				<table width="390px">
+					<tr>
+						<th>Seq.</th>
+						<th>Color</th>
+						<th>Screened</th>
+						<th>Plate End Code</th>
+						<th>Qty.</th>
+					</tr>
+					<tr>
+						<td>{{itemform.seq1}}</td>
+						<td>{{itemform.color1}}</td>
+						<td style="text-align:center">{{itemform.screened1}}</td>
+						<td>{{itemform.plate1}}</td>
+						<td>{{itemform.num_plates1}}</td>
+					</tr>
+					<tr>
+						<td>{{itemform.seq2}}</td>
+						<td>{{itemform.color2}}</td>
+						<td style="text-align:center">{{itemform.screened2}}</td>
+						<td>{{itemform.plate2}}</td>
+						<td>{{itemform.num_plates2}}</td>
+					</tr>
+					<tr>
+						<td>{{itemform.seq3}}</td>
+						<td>{{itemform.color3}}</td>
+						<td style="text-align:center">{{itemform.screened3}}</td>
+						<td>{{itemform.plate3}}</td>
+						<td>{{itemform.num_plates3}}</td>
+					</tr>
+					<tr>
+						<td>{{itemform.seq4}}</td>
+						<td>{{itemform.color4}}</td>
+						<td style="text-align:center">{{itemform.screened4}}</td>
+						<td>{{itemform.plate4}}</td>
+						<td>{{itemform.num_plates4}}</td>
+					</tr>
+					<tr>
+						<td>{{itemform.seq5}}</td>
+						<td>{{itemform.color5}}</td>
+						<td style="text-align:center">{{itemform.screened5}}</td>
+						<td>{{itemform.plate5}}</td>
+						<td>{{itemform.num_plates5}}</td>
+					</tr>
+					<tr>
+						<td>{{itemform.seq6}}</td>
+						<td>{{itemform.color6}}</td>
+						<td style="text-align:center">{{itemform.screened6}}</td>
+						<td>{{itemform.plate6}}</td>
+						<td>{{itemform.num_plates6}}</td>
+					</tr>
+				</table>
+			</div>
+
+			<div class="outline" style="min-height:126px;background-color:#DDDDDD;float:left;width:420px;clear:left;">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/money_dollar.png" style="vertical-align: text-bottom" /> Billing Information</h2><br />
+				<label for="id_description">Type:</label>{{itemform.type}}<br />
+			</div>
+
+			<div class="outline" style="background-color:#DDDDDD;float:left;width:420px;clear:left;">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/award_star_gold_2.png" style="vertical-align: text-bottom" /> Item Trackers</h2><br />
+				<label for="id_description">Label:</label>{{itemform.label_tracker}}<br /><br />
+				<label for="id_description">Fiber Indicator:</label>{{itemform.fiber_tracker}}<br /><br />
+				<label for="id_description">New Nutrition Facts:</label>{{itemform.nutrition_facts}}<br />
+			</div>
+
+			<div class="outline" style="background-color:#FFFF99;float:left;clear:both;width:99%">
+				<input type="submit" value="Add Item &amp; Add Another" onclick="add_beverage_job_item({{job.id}}, 'Yes');return false;" />
+				<input type="submit" value="Add Item &amp; Finish" onclick="add_beverage_job_item({{job.id}}, 'No');return false;" />
+			</div>
+		</form>
+</div>
+
+<div style="float:left;clear:both;width:756px">
+	<p>
+		<img src="{{MEDIA_URL}}img/icons/bullet_go.png" style="vertical-align: text-bottom" /> Go to job: <a href='{% url "job_detail" job.id %}'>{{job.id}} {{job.name}}</a>
+	</p>
+</div>
+{% endblock %}

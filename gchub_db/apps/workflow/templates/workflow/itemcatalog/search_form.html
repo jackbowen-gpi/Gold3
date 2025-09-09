@@ -1,0 +1,112 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+  {% include "workflow/itemcatalog/navbar_header.inc.html" %}
+
+  <script type="text/javascript">
+    // This focuses on the first search element.
+    function focus_on_searchbox() {
+        $('id_size').focus();
+	    }
+
+	    Event.observe(window, 'load', function() {
+	        // Focus on the first search element from the beginning.
+	        focus_on_searchbox();
+		});
+   </script>
+{% endblock %}
+
+{% block body %}
+
+{% ifequal type "catalog" %}
+<img src="{{MEDIA_URL}}img/icons/zoom.png" style="vertical-align:text-bottom" alt="Search" /> <h1 class="inline">Search Item Catalog</h1><br /><br />
+{% include "workflow/itemcatalog/navbar_div.inc.html" %}
+
+	{% if form.errors %}
+	  <span class="error">Please correct the error{{ form.errors|pluralize }} with your submission!</span>
+	{% endif %}
+	<form method="get" action="" name="job_search" enctype="multipart/form-data">
+	  <div class="outline_fancy" style="width:450px">
+	  	 <h2 class="inline">Search Parameters</h2><br />
+		  <label for="id_size">Size:</label>{{form.size}}<br />
+		  {% if form.size.errors %}<span class="field_error">{{ form.size.errors|join:", " }}</span>{% endif %}
+		  <label for="id_item_type">Item Type:</label>{{form.item_type}}<br />
+		  {% if form.item_type.errors %}<span class="field_error">{{ form.item_type.errors|join:", " }}</span>{% endif %}
+		  <label for="id_substrate">Proofing:</label>{{form.substrate}}<br />
+		  {% if form.substrate.errors %}<span class="field_error">{{ form.substrate.errors|join:", " }}</span>{% endif %}
+		  <label for="id_board">Board:</label>{{form.board}}<br />
+		  {% if form.board.errors %}<span class="field_error">{{ form.board.errors|join:", " }}</span>{% endif %}
+		  <label for="id_active">Only Active:</label>{{form.active}}<br />
+		  {% if form.active.errors %}<span class="field_error">{{ form.active.errors|join:", " }}</span>{% endif %}
+  </div>
+	  <div class="outline_fancy" style="width:450px">
+	  	  <h2 class="inline">Sorting Options</h2><br />
+		  <label for="id_sort_by">Sort By:</label>{{form.sort_by}}<br />
+		  {% if form.sort_by.errors %}<span class="field_error">{{ form.sort_by.errors|join:", " }}</span>{% endif %}
+		  <label for="id_sort_order">Sort Order:</label>{{form.sort_order}}<br />
+		  {% if form.sort_order.errors %}<span class="field_error">{{ form.sort_order.errors|join:", " }}</span>{% endif %}
+	  </div>
+
+	  <input type="submit" value="Search" />
+	</form>
+{% endifequal %}
+
+{% ifequal type "specs" %}
+<img src="{{MEDIA_URL}}img/icons/zoom.png" style="vertical-align:text-bottom" alt="Search" /> <h1 class="inline">{{page_title}}</h1><br /><br />
+{% include "workflow/itemcatalog/navbar_div.inc.html" %}
+	{% if form.errors %}
+	  <span class="get">Please correct the error{{ form.errors|pluralize }} with your submission!</span>
+	{% endif %}
+	<form method="get" action="" name="job_search" enctype="multipart/form-data">
+	  <div class="outline_fancy" style="width:450px">
+	  	  <h2 class="inline">Search Parameters</h2><br />
+		  <label for="id_size">Size:</label>{{form.size}}<br />
+		  {% if form.size.errors %}<span class="field_error">{{ form.size.errors|join:", " }}</span>{% endif %}
+		  <label for="id_plant">Plant:</label>{{form.plant}}<br />
+		  {% if form.plant.errors %}<span class="field_error">{{ form.plant.errors|join:", " }}</span>{% endif %}
+		  <label for="id_press">Press:</label>{{form.press}}<br />
+		  {% if form.press.errors %}<span class="field_error">{{ form.press.errors|join:", " }}</span>{% endif %}
+  </div>
+	  <div class="outline_fancy" style="width:450px">
+	  	  <h2 class="inline">Sorting Options</h2><br />
+		  <label for="id_sort_by">Sort By:</label>{{form.sort_by}}<br />
+		  {% if form.sort_by.errors %}<span class="field_error">{{ form.sort_by.errors|join:", " }}</span>{% endif %}
+		  <label for="id_sort_order">Sort Order:</label>{{form.sort_order}}<br />
+		  {% if form.sort_order.errors %}<span class="field_error">{{ form.sort_order.errors|join:", " }}</span>{% endif %}
+	  </div>
+
+	  <input type="submit" value="Search" />
+	</form>
+{% endifequal %}
+
+{% ifequal type "step" %}
+<img src="{{MEDIA_URL}}img/icons/zoom.png" style="vertical-align:text-bottom" alt="Search" /> <h1 class="inline">{{page_title}}</h1><br /><br />
+{% include "workflow/itemcatalog/navbar_div.inc.html" %}
+	{% if form.errors %}
+	  <span class="get">Please correct the error{{ form.errors|pluralize }} with your submission!</span>
+	{% endif %}
+	<form method="get" action="" name="step_search" enctype="multipart/form-data">
+	  <div class="outline_fancy" style="width:450px">
+	  	  <h2 class="inline">Search Parameters</h2><br />
+		  <label for="id_size">Size:</label>{{form.size}}<br />
+		  {% if form.size.errors %}<span class="field_error">{{ form.size.errors|join:", " }}</span>{% endif %}
+		  <label for="id_plant">Plant:</label>{{form.plant}}<br />
+		  {% if form.plant.errors %}<span class="field_error">{{ form.plant.errors|join:", " }}</span>{% endif %}
+		  <label for="id_press">Press:</label>{{form.press}}<br />
+		  {% if form.press.errors %}<span class="field_error">{{ form.press.errors|join:", " }}</span>{% endif %}
+		  <label for="id_special_mfg">Special Mfg.:</label>{{form.special_mfg}}<br />
+		  <label for="id_eng_num">Engineering #:</label>{{form.eng_num}}<br />
+  </div>
+	  <div class="outline_fancy" style="width:450px">
+	  	  <h2 class="inline">Sorting Options</h2><br />
+		  <label for="id_sort_by">Sort By:</label>{{form.sort_by}}<br />
+		  {% if form.sort_by.errors %}<span class="field_error">{{ form.sort_by.errors|join:", " }}</span>{% endif %}
+		  <label for="id_sort_order">Sort Order:</label>{{form.sort_order}}<br />
+		  {% if form.sort_order.errors %}<span class="field_error">{{ form.sort_order.errors|join:", " }}</span>{% endif %}
+	  </div>
+
+	  <input type="submit" value="Search" />
+	</form>
+{% endifequal %}
+
+{% endblock %}

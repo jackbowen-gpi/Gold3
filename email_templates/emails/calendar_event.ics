@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Microsoft Corporation//Entourage Mac 11.0 MIMEDIR//EN
+METHOD:REQUEST
+BEGIN:VEVENT
+ATTENDEE;ROLE=REQ-PARTICIPANT;RSVP=TRUE;PARTSTAT=NEEDS-ACTION:MAILTO:{{email}}
+LOCATION:Conference Room
+CREATED;VALUE=DATE:{{date}}T080000
+UID:{{email}}{{date}}
+DTSTAMP:{{date}}T080000
+DTSTART:{{date}}T{{time_start}}00
+DTEND:{{date}}T{{time_end}}00
+LAST-MODIFIED:{{date}}T100000
+SUMMARY:{{event_type}}
+DESCRIPTION: {{event_type}} \n{{event_descript}} \n
+SEQUENCE:1
+END:VEVENT
+END:VCALENDAR

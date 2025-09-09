@@ -1,0 +1,16 @@
+	<img src="{{MEDIA_URL}}img/icons/add.png">
+	<span class="sub_heading">Add Item to Job: {{job.id}} {{job.name}}</span>
+	<br /><br />
+	<form id="newitem" name="newitem" onsubmit="add_item('{{job.id}}');return false;">
+		<input type="hidden" name="job" id="id_job" value="{{job.id}}" />
+		<input type="hidden" name="item_status" id="id_item_status" value="Pending" />
+		<input type="hidden" name="workflow" id="id_workflow" value="{{job.workflow.id}}" />
+		<label for="id_size">Size:</label>
+		{{ itemform.size }}<br />
+
+		<label for="id_plant">Plant &amp; Press:</label>
+		{{ itemform.printlocation }}<br />
+
+		<br />
+		<input type="submit" value="Add Item" onclick="add_item('{{job.id}}');return false;" />
+	</form>

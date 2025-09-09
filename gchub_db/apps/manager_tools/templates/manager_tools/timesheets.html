@@ -1,0 +1,180 @@
+{% extends "standard.html" %}
+
+{% block extra_head %} 
+	<style type="text/css">
+		input {
+			border: none;
+			padding: 0;
+			margin: 0;
+			vertical-align: text-bottom;
+		}
+	</style>
+
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript"> 
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using 
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+		
+		//jQuery stuff.
+		$j(document).ready(function(){
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+			// Show busy indicator
+			$j( "#submit" ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("This can take a moment...");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+			});
+		});//End jQuery stuff.
+	</script>
+{% endblock %}
+
+{% block body %}
+<h1>{{page_title}}</h1>
+<hr />
+
+<!---Busy dialog-->
+<div id="busy_dialog">
+  <center>
+	  <p><div id="busy_dialog_text"></div></p>
+	  <img src="{{MEDIA_URL}}img/spinner.gif" />
+  <center>
+</div>
+
+<div style="width:80%">
+	<p>This page is an overview of logged artist hours. Click on an employee's name for more info.</p>
+	<p><strong>Note: </strong>Hour totals for artists exclude the "Break" and "Lunch" activities.</p>
+</div>
+
+<h3>
+	<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+	<a href="/manager_tools/" >Back</a>
+</h3>
+<br />
+{% load humanize %}
+
+<div class="grey_bordered">
+<!-- Hours Per Activity table -->	
+	<h2> 
+		<form method="post">
+			{% csrf_token %}
+			Hours Per Activity for {{timesheetform.month}} {{timesheetform.year}}
+		<input type="image" src="{{MEDIA_URL}}img/icons/arrow_refresh.png" alt="Submit" id="submit" />
+		</form>
+	</h2>
+	<table class="rowHover">
+		<tr>
+			<th>Employee</th>
+			<!-- Get the category hearder from the display list -->
+			{% for cat in category_display_list%}
+				<th> {{ cat }} </th>
+			{% endfor %}
+		</tr>
+
+	{% for employee_data in month_data %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+			{% for entry in employee_data %}
+				<!-- First entery is the name. Make it link to a detailed report. -->
+				{% ifequal entry employee_data.0 %}  
+					{% if entry.1 == "Total"%} 
+					<!-- No detailed report for Total -->
+						<th>
+							{{ entry.1 }}
+						</th>
+					{% else %}
+						<td>
+							<a href="/timesheet/{{entry.2}}/" >{{ entry.1 }}</a>
+						</td>
+					{% endif %}
+				{% else %}
+					<td>{{ entry.1|floatformat:2 }}</td>
+				{% endifequal %}
+			{% endfor %}
+		</tr>
+
+	{% endfor %}
+	</table>
+</div>
+
+<!-- Billable hours table -->	
+<div class="grey_bordered">
+	<h2> 
+		Billable Hours
+	</h2>
+	
+	<p>Billable hours are totaled from timesheet entries assigned to jobs.</p>
+	
+	<table class="rowHover">
+		<tr>
+			<th>Employee</th>
+			<th>Billable Hours</th>
+			<th>Total Hours</th>
+			<th>Percent</th>
+		</tr>
+
+	{% for employee in billable_data %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+			<td>{{ employee.0 }}</td>
+			<td>{{ employee.1|floatformat:2 }}</td>
+			<td>{{ employee.2|floatformat:2 }}</td>
+			<td>{{ employee.3 }}%</td>
+		</tr>
+
+	{% endfor %}
+	</table>
+</div>
+
+<!-- Weekly tables -->
+{% for header, data in weekly_data_w_headers%}
+	{% if data %}
+		<div class="grey_bordered">
+				<p><h2>{{ header }}</h2></p>
+				<table class="rowHover">
+					<tr>
+						<th>Employee</th>
+						<!-- Get the category hearder from the display list -->
+						{% for cat in category_display_list%}
+							<th> {{ cat }} </th>
+						{% endfor %}
+					</tr>
+			
+				{% for employee_data in data %}
+					<tr class="{% cycle 'rowA' 'rowB' %}">
+						{% for entry in employee_data %}
+							<!-- First entery is the name. Make it link to a detailed report. -->
+							{% ifequal entry employee_data.0 %}  
+								{% if entry.1 == "Total"%} 
+								<!-- No detailed report for Total -->
+									<th>
+										{{ entry.1 }}
+									</th>
+								{% else %}
+									<td>
+										<a href="/timesheet/{{entry.2}}/" >{{ entry.1 }}</a>
+									</td>
+								{% endif %}
+							{% else %}
+								<td>{{ entry.1|floatformat:2 }}</td>
+							{% endifequal %}
+						{% endfor %}
+					</tr>
+			
+				{% endfor %}
+				</table>
+			</div>
+		{% endif %}
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,18 @@
+{% include "emails/email_header.txt" %}
+
+This is an automated email with an attached xlsx spreadsheet of the Monthly Billing.
+{{report_name}}
+<table class="rowHover">
+    <tr>
+        {% for field in warning_fields %}
+        <th>{{field}}</th>
+        {% endfor %}
+    </tr>
+{% for warning in warnings %}
+    <tr class="{% cycle 'rowA' 'rowB' %}">
+        {% for value in warning %}
+        <td>{{value}}</td>
+        {% endfor %}
+    </tr>
+{% endfor %}
+</table>

@@ -1,0 +1,3 @@
+{% include "emails/email_header.txt" %}
+
+An error occurred with item {{item}} number {{item.num_in_job}} in job {{item.job}} when running Color Keys to Shelbyville.

@@ -1,0 +1,410 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Send Alert Notification{% endblock %}
+
+{% block extrahead %}
+<style>
+/* Dark mode compatible styling */
+:root {
+    --bg-primary: var(--body-bg, #ffffff);
+    --bg-secondary: var(--darkened-bg, #f8f9fa);
+    --text-primary: var(--body-fg, #333333);
+    --text-secondary: var(--body-quiet-color, #666666);
+    --border-color: var(--border-color, #dddddd);
+    --accent-color: #007cba;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-primary: #2b2b2b;
+        --bg-secondary: #3c3c3c;
+        --text-primary: #ffffff;
+        --text-secondary: #cccccc;
+        --border-color: #555555;
+    }
+}
+
+.alert-form-container {
+    max-width: 800px;
+    margin: 20px auto;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-color);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Specific styling for select dropdown to ensure full text visibility */
+select.form-control {
+    height: auto;
+    min-height: 40px;
+    padding: 10px 12px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Ensure option text is fully visible */
+select.form-control option {
+    padding: 8px 12px;
+    font-size: 14px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.form-control:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 124, 186, 0.3);
+}
+
+.help-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 5px;
+}
+
+.template-section {
+    background: var(--bg-secondary);
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.group-selection {
+    background: var(--bg-secondary);
+    padding: 15px;
+    border-radius: 5px;
+    border-left: 4px solid var(--accent-color);
+    border: 1px solid var(--border-color);
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    color: var(--text-primary);
+}
+
+.checkbox-item input {
+    margin-right: 8px;
+}
+
+.stats-info {
+    background: var(--bg-secondary);
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.submit-section {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 5px;
+    border-left: 4px solid #ffc107;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 0 5px;
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #006ba6;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.test-mode-warning {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+    border-left: 4px solid #bee5eb;
+    border: 1px solid var(--border-color);
+}
+
+.notification-preview {
+    background: #333;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    max-width: 400px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.notification-preview h4 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.notification-preview p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Error styling for dark mode */
+.error {
+    color: #ff6b6b;
+    background: var(--bg-secondary);
+    border: 1px solid #ff6b6b;
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+</style>
+
+<script>
+// Template messages from Django
+const templateMessages = {{ template_messages|safe }};
+
+function updateMessageFromTemplate(templateKey) {
+    const messageField = document.getElementById('id_message');
+    const titleField = document.getElementById('id_title');
+    
+    if (templateKey && templateMessages[templateKey]) {
+        messageField.value = templateMessages[templateKey];
+        
+        // Auto-generate title based on template
+        const titles = {
+            'server_maintenance': 'Server Maintenance Alert',
+            'urgent_update': 'Urgent System Update',
+            'production_alert': 'Production Alert',
+            'deadline_reminder': 'Deadline Reminder',
+            'system_slowdown': 'System Performance Notice',
+            'new_feature': 'New Feature Announcement',
+            'training_session': 'Training Session',
+            'holiday_schedule': 'Holiday Schedule Notice',
+            'backup_reminder': 'Backup Reminder',
+            'security_alert': 'Security Alert'
+        };
+        
+        if (titles[templateKey] && !titleField.value) {
+            titleField.value = titles[templateKey];
+        }
+        
+        updatePreview();
+    }
+}
+
+function updatePreview() {
+    const title = document.getElementById('id_title').value || 'Alert Title';
+    const message = document.getElementById('id_message').value || 'Alert message will appear here...';
+    
+    document.getElementById('preview-title').textContent = '[ADMIN ALERT] ' + title;
+    document.getElementById('preview-message').textContent = message;
+}
+
+function toggleTargetSelection() {
+    const allUsersCheckbox = document.getElementById('id_target_all_users');
+    const groupCheckboxes = document.querySelectorAll('input[name="target_groups"]');
+    
+    if (allUsersCheckbox.checked) {
+        groupCheckboxes.forEach(cb => {
+            cb.disabled = true;
+            cb.checked = false;
+        });
+    } else {
+        groupCheckboxes.forEach(cb => cb.disabled = false);
+    }
+}
+
+function updateTestModeWarning() {
+    const testMode = document.getElementById('id_test_mode').checked;
+    const warning = document.getElementById('test-mode-warning');
+    
+    if (testMode) {
+        warning.style.display = 'block';
+    } else {
+        warning.style.display = 'none';
+    }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners
+    document.getElementById('id_title').addEventListener('input', updatePreview);
+    document.getElementById('id_message').addEventListener('input', updatePreview);
+    document.getElementById('id_target_all_users').addEventListener('change', toggleTargetSelection);
+    document.getElementById('id_test_mode').addEventListener('change', updateTestModeWarning);
+    
+    // Initial setup
+    updatePreview();
+    toggleTargetSelection();
+    updateTestModeWarning();
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="alert-form-container">
+    <h1>📢 Send Alert Notification</h1>
+    <p>Send important notifications to users via Windows notifications. Users will see these as desktop notifications.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Template Selection -->
+        <div class="template-section">
+            <div class="form-group">
+                <label for="{{ form.template.id_for_label }}">Quick Templates</label>
+                {{ form.template }}
+                <div class="help-text">{{ form.template.help_text }}</div>
+            </div>
+        </div>
+        
+        <!-- Title and Message -->
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Alert Title</label>
+            {{ form.title }}
+            <div class="help-text">{{ form.title.help_text }}</div>
+            {% if form.title.errors %}
+                <div class="error">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.message.id_for_label }}">Alert Message</label>
+            {{ form.message }}
+            <div class="help-text">{{ form.message.help_text }}</div>
+            {% if form.message.errors %}
+                <div class="error">{{ form.message.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <!-- Preview -->
+        <div class="form-group">
+            <label>Notification Preview</label>
+            <div class="notification-preview">
+                <h4 id="preview-title">[ADMIN ALERT] Alert Title</h4>
+                <p id="preview-message">Alert message will appear here...</p>
+            </div>
+        </div>
+        
+        <!-- Target Selection -->
+        <div class="group-selection">
+            <h3>📋 Target Recipients</h3>
+            
+            <div class="form-group">
+                <div class="checkbox-item">
+                    {{ form.target_all_users }}
+                    <label for="{{ form.target_all_users.id_for_label }}">Send to All Active Users</label>
+                </div>
+                <div class="help-text">{{ form.target_all_users.help_text }}</div>
+            </div>
+            
+            <div class="form-group">
+                <label>Or Select Specific Groups:</label>
+                <div class="checkbox-group">
+                    {% for choice in form.target_groups %}
+                        <div class="checkbox-item">
+                            {{ choice.tag }}
+                            <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="stats-info">
+                    <strong>📊 System Statistics:</strong><br>
+                    Total Active Users: {{ total_users }}<br>
+                    Available Groups: {{ groups|length }}
+                </div>
+                {% if form.target_groups.errors %}
+                    <div class="error">{{ form.target_groups.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Settings -->
+        <div class="form-group">
+            <label for="{{ form.duration.id_for_label }}">Display Duration (seconds)</label>
+            {{ form.duration }}
+            <div class="help-text">{{ form.duration.help_text }}</div>
+            {% if form.duration.errors %}
+                <div class="error">{{ form.duration.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <div class="checkbox-item">
+                {{ form.test_mode }}
+                <label for="{{ form.test_mode.id_for_label }}">Test Mode (Send only to me)</label>
+            </div>
+            <div class="help-text">{{ form.test_mode.help_text }}</div>
+            
+            <div id="test-mode-warning" class="test-mode-warning" style="display: none;">
+                ⚠️ <strong>Test Mode Active:</strong> This notification will only be sent to you for testing purposes.
+            </div>
+        </div>
+        
+        <!-- Submit -->
+        <div class="submit-section">
+            <h4>⚠️ Ready to Send Alert?</h4>
+            <p>This will immediately send notifications to the selected users. Make sure your message is correct!</p>
+            
+            <button type="submit" class="btn btn-primary">
+                📤 Send Alert Notification
+            </button>
+            <a href="/admin/" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

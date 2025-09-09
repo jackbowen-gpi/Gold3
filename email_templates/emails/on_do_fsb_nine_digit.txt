@@ -1,0 +1,22 @@
+{% include "emails/email_header.txt" %}
+
+The nine digit number, SCC number, or UPC number has been updated for item {{item}} of job {{item.job}}
+
+GOLD Info
+-----------
+Nine Digit: {{item.fsb_nine_digit}}
+Plant: {{plant}}
+Press: {{press}}
+SCC Number: {{item.bom_number}}
+UPC Number: {{item.upc_number}}
+
+QAD Info
+-----------
+Case Pack: {{casepack}}
+Sleeve Count: {{sleevecount}}
+Weight: {{weight}}
+Tie x High: {{tihi}}
+Cube: {{cube}}
+Length: {{length}}
+Width: {{width}}
+Height: {{height}}

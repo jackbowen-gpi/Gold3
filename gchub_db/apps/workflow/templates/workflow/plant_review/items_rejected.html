@@ -1,0 +1,193 @@
+{% extends "standard.html" %}
+{% load item_links %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript">
+		function process_review(item_id, category, update_type) {
+	   /*
+	    * Fired when he user hits the Accept or Reject button. Calls the validator
+	    * and sends off an AJAX request if all is good.
+	    */
+	   if (update_type == "reject") {
+	   		var comment = window.prompt("Please enter explanation for rejection and/or instructions for correction.")
+	   } else if (update_type == "resub" && category == "market") {
+	   		var comment = window.prompt("Please enter explanation for resubmission.")
+	   } else if (update_type == "dismiss") {
+	   		var comment = window.prompt("Please enter explanation for dismissal.")
+	   } else {
+	   		var comment = ""
+	   }
+	   YAHOO.example.container.wait.show();
+	   new Ajax.Request('/workflow/item/'+ item_id +'/review/' + category + '/' + update_type +'/?comment='+ encodeURIComponent(comment), {
+	       method: 'GET',
+	       onSuccess: function(http_req) {
+	           // Get a JSON object from the response string (from the server).
+	           jsobj = http_req.responseText.evalJSON();
+	           // See if there was a form processing error.
+	           if (jsobj["is_error"] == false) {
+				  window.location = "/workflow/items_rejected/"
+	           } else {
+	               // Form validation error happened.
+	               hide_modal_wait();
+	               alert(jsobj["message"]);
+	           }
+	       },
+	       onComplete: function() {
+	          hide_modal_wait();
+	   }});
+	} // end process_review()
+	</script>
+{% endblock %}
+
+{% block body %}
+	<h1>{{page_title}}</h1>
+
+	<h2>Items with Demand Planning Refusals</h2>
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Size</th>
+			<th>Art</th>
+			<th>Qual.</th>
+			<th>Plant</th>
+			<th>Press</th>
+			<th nowrap colspan="2">Refusal Date</th>
+		</tr>
+		{% for item in dp_rejected_list %}
+		<tr>
+			<td nowrap><a href="/workflow/job/{{item.item.job.id}}/">{{item.item.job.id}} {{item.item.job.name}}</a></td>
+			<td>{{item.item.size}}</td>
+			<td>
+			  <a href="{% url "get_item_preview_art" item.item.job.id item.item.num_in_job %}">
+			    <img src="{{MEDIA_URL}}img/icons/picture_save.png" style="vertical-align:text-bottom" />
+			  </a>
+			</td>
+			<td>{{item.item.quality}}</td>
+			<td>{{item.item.printlocation.plant}}</td>
+			<td>{{item.item.printlocation.press}}{% if item.item.special_mfg %}-{{item.item.special_mfg}}{% endif %}</td>
+			<td colspan="2">
+				{{item.review_date|date:"n-j-Y"}}
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan="5">
+				<strong>Demand Planning Remarks:</strong> {{item.comments}}
+			</td>
+			<td>
+				{% if perms.accounts.clemson_employee %}
+					<form id="review_resub" onsubmit="process_review('{{item.id}}', 'demand', 'resub');return false;">
+						<input type="submit" value="Resubmit" onsubmit="process_review('{{item.id}}', 'demand', 'resub');return false;" />
+					</form>
+			</td>
+			<td>
+					<form id="review_dismiss" onsubmit="process_review('{{item.id}}', 'demand', 'dismiss');return false;">
+						<input type="submit" value="Dismiss" onsubmit="process_review('{{item.id}}', 'demand', 'dismiss');return false;" />
+					</form>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<hr />
+
+	<h2>Items with Plant Refusals</h2>
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Size</th>
+			<th>Art</th>
+			<th>Qual.</th>
+			<th>Plant</th>
+			<th>Press</th>
+			<th nowrap colspan="2">Refusal Date</th>
+		</tr>
+		{% for item in pr_rejected_list %}
+		<tr>
+			<td nowrap><a href="/workflow/job/{{item.item.job.id}}/">{{item.item.job.id}} {{item.item.job.name}}</a></td>
+			<td>{{item.item.size}}</td>
+			<td>
+			  <a href="{% url "get_item_preview_art" item.item.job.id item.item.num_in_job %}">
+			    <img src="{{MEDIA_URL}}img/icons/picture_save.png" style="vertical-align:text-bottom" />
+			  </a>
+			</td>
+			<td>{{item.item.quality}}</td>
+			<td>{{item.item.printlocation.plant}}</td>
+			<td>{{item.item.printlocation.press}}{% if item.item.special_mfg %}-{{item.item.special_mfg}}{% endif %}</td>
+			<td colspan="2">
+				{{item.review_date|date:"n-j-Y"}}
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan="5">
+				<strong>Plant Remarks:</strong> {{item.comments}}<br />
+			</td>
+			<td>
+				{% if perms.accounts.clemson_employee %}
+					<form id="review_resub" onsubmit="process_review('{{item.id}}', 'plant', 'resub');return false;">
+						<input type="submit" value="Resubmit" onsubmit="process_review('{{item.id}}', 'plant', 'resub');return false;" />
+					</form>
+			</td>
+			<td>
+					<form id="review_dismiss" onsubmit="process_review('{{item.id}}', 'plant', 'dismiss');return false;">
+						<input type="submit" value="Dismiss" onsubmit="process_review('{{item.id}}', 'plant', 'dismiss');return false;" />
+					</form>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<hr />
+
+	<h2>Items with Marketing Refusals</h2>
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Size</th>
+			<th>Art</th>
+			<th>Qual.</th>
+			<th>Plant</th>
+			<th>Press</th>
+			<th nowrap colspan="2">Refusal Date</th>
+		</tr>
+		{% for item in mkt_rejected_list %}
+		<tr>
+			<td nowrap><a href="/workflow/job/{{item.item.job.id}}/">{{item.item.job}}</a></td>
+			<td>{{item.item.size}}</td>
+			<td>
+			  <a href="{% url "get_item_proof" item.item.job.id item.item.num_in_job %}">
+			    <img src="{{MEDIA_URL}}img/icons/picture_save.png" style="vertical-align:text-bottom" />
+			  </a>
+			</td>
+			<td>{{item.item.quality}}</td>
+			<td>{{item.item.printlocation.plant}}</td>
+			<td>{{item.item.printlocation.press}}{% if item.item.special_mfg %}-{{item.item.special_mfg}}{% endif %}</td>
+			<td colspan="2">
+				{{item.review_date|date:"n-j-Y"}}
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan="5">
+				<strong>Marketing Remarks:</strong> {{item.comments}}<br />
+			</td>
+			<td>
+				{% if perms.accounts.clemson_employee %}
+					<form id="review_resub" onsubmit="process_review('{{item.id}}', 'market', 'resub');return false;">
+						<input type="submit" value="Resubmit" onsubmit="process_review('{{item.id}}', 'market', 'resub');return false;" />
+					</form>
+			</td>
+			<td>
+					<form id="review_dismiss" onsubmit="process_review('{{item.id}}', 'market', 'dismiss');return false;">
+						<input type="submit" value="Dismiss" onsubmit="process_review('{{item.id}}', 'market', 'dismiss');return false;" />
+					</form>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+{% endblock body %}

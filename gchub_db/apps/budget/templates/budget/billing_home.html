@@ -1,0 +1,100 @@
+{% extends "standard.html" %}
+
+{% load humanize %}
+
+{% block body %}
+<div>
+	<h1 class="inline">{{page_title}}</h1><br />
+		<div class="outline" style="width:720px;padding:4px;">
+			<span class="sub_heading">Current Month - {{current_month_report.month}} {{current_month_report.year}}:</span><br />
+			<table width="700px">
+				<tr>
+					<th>Workflow</th>
+					<th>Invoiced*</th>
+					<th>Billable*</th>
+					<th>Activity*</th>
+					<th>Potential*</th>
+					<th>{{month_name}} Budget</th>
+					<th>Budget Progress*</th>
+				</tr>
+				<tr>
+					<td style="text-align:right;">Foodservice</td>
+					<td style="text-align:right;">${{current_month_report.fsb_monthly_invoiced|floatformat:2|intcomma}} <a href="/budget/billing/{{year_num}}/{{month_num}}/Foodservice/Invoiced/"><img src="{{MEDIA_URL}}img/icons/application_view_list.png" style="vertical-align:text-bottom" /></a></td>
+					<td style="text-align:right;">${{current_month_report.fsb_billable_total|floatformat:2|intcomma}} <a href="/budget/billing/{{year_num}}/{{month_num}}/Foodservice/Billable/"><img src="{{MEDIA_URL}}img/icons/application_view_list.png" style="vertical-align:text-bottom" /></a></td>
+					<td style="text-align:right;">${{current_month_report.fsb_monthly_billing|floatformat:2|intcomma}}</td>
+					<td style="text-align:right;">${{current_month_report.fsb_potential|floatformat:2|intcomma}}</td>
+					<td style="text-align:right;">${{current_month_report.fsb_monthly_budget|floatformat:2|intcomma}}</td>
+					<td style="text-align:right;">{{current_month_report.fsb_budget_prog|floatformat:2}}&#37;</td>
+				</tr>
+				<tr>
+					<td style="text-align:right;">Beverage</td>
+					<td style="text-align:right;">${{current_month_report.bev_monthly_invoiced|floatformat:2|intcomma}} <a href="/budget/billing/{{year_num}}/{{month_num}}/Beverage/Invoiced/"><img src="{{MEDIA_URL}}img/icons/application_view_list.png" style="vertical-align:text-bottom" /></a></td>
+					<td style="text-align:right;">${{current_month_report.bev_billable_total|floatformat:2|intcomma}} <a href="/budget/billing/{{year_num}}/{{month_num}}/Beverage/Billable/"><img src="{{MEDIA_URL}}img/icons/application_view_list.png" style="vertical-align:text-bottom" /></a></td>
+					<td style="text-align:right;">${{current_month_report.bev_monthly_billing|floatformat:2|intcomma}}</td>
+					<td style="text-align:right;">${{current_month_report.bev_potential|floatformat:2|intcomma}}</td>
+					<td style="text-align:right;">${{current_month_report.bev_monthly_budget|floatformat:2|intcomma}}</td>
+					<td style="text-align:right;">{{current_month_report.bev_budget_prog|floatformat:2}}&#37;</td>
+				</tr>
+				<tr>
+					<td style="text-align:right;"><strong>Total Hub</strong></td>
+					<td style="text-align:right;"><strong>${{current_month_report.hub_monthly_invoiced|floatformat:2|intcomma}}</strong></td>
+					<td style="text-align:right;"><strong>${{current_month_report.hub_billable_total|floatformat:2|intcomma}}</strong></td>
+					<td style="text-align:right;"><strong>${{current_month_report.hub_monthly_billing|floatformat:2|intcomma}}</strong></td>
+					<td style="text-align:right;"><strong>${{current_month_report.hub_potential|floatformat:2|intcomma}}</strong></td>
+					<td style="text-align:right;"><strong>${{current_month_report.hub_monthly_budget|floatformat:2|intcomma}}</strong></td>
+					<td style="text-align:right;"><strong>{{current_month_report.hub_budget_prog|floatformat:2}}&#37;</strong></td>
+				</tr>
+			</table>
+			<div>
+				<strong>*Invoiced:</strong> Amount invoiced to plants/customers during given month.<br />
+				<strong>*Billable:</strong> Amount to be invoiced at the end of current billing cycle.<br />
+				<strong>*Activity:</strong> Total of charges applied during current month. Measure of workload.<br />
+				<strong>*Potential:</strong> Total of currently unbillable charges applied last 90 days.<br />
+				<strong>*Budget Progress:</strong> Invoiced/billable charge total divided by budget as a percentage.<br />
+			</div>
+		</div>
+		<br />
+		<div class="outline" style="width:720px;padding:4px;">
+			<span class="sub_heading">Previous Month - {{previous_month_report.month}} {{previous_month_report.year}}:</span><br />
+			<table width="450px">
+				<tr>
+					<th>Workflow</th>
+					<th>Invoiced*</th>
+					<th>{{previous_month_report.month}} Budget</th>
+					<th>Budget Progress</th>
+				</tr>
+				<tr>
+					<td style="text-align:right;">Foodservice</td>
+					<td style="text-align:right;">${{previous_month_report.fsb_monthly_invoiced|floatformat:2|intcomma}}</td>
+					<td style="text-align:right;">${{previous_month_report.fsb_monthly_budget|floatformat:2|intcomma}}</td>
+					<td style="text-align:right;">{{previous_month_report.fsb_budget_prog|floatformat:2}}&#37;</td>
+				</tr>
+				<tr>
+					<td style="text-align:right;">Beverage</td>
+					<td style="text-align:right;">${{previous_month_report.bev_monthly_invoiced|floatformat:2|intcomma}}</td>
+					<td style="text-align:right;">${{previous_month_report.bev_monthly_budget|floatformat:2|intcomma}}</td>
+					<td style="text-align:right;">{{previous_month_report.bev_budget_prog|floatformat:2}}&#37;</td>
+				</tr>
+				<tr>
+					<td style="text-align:right;"><strong>Total Hub</strong></td>
+					<td style="text-align:right;"><strong>${{previous_month_report.hub_monthly_invoiced|floatformat:2|intcomma}}</strong></td>
+					<td style="text-align:right;"><strong>${{previous_month_report.hub_monthly_budget|floatformat:2|intcomma}}</strong></td>
+					<td style="text-align:right;"><strong>{{previous_month_report.hub_budget_prog|floatformat:2}}&#37;</strong></td>
+				</tr>
+			</table>
+		</div>
+		<br />
+		<div class="outline" style="width:720px;padding:4px;">
+			<span class="sub_heading">Additional Reports</span><br />
+			{% for current_year in years_to_display %}
+				<!-- The first year will be YTD and the others Yearly Reports -->
+				{% ifequal forloop.counter 1 %}
+					<a href="{% url "yearly_report" current_year %}">{{current_year}} YTD Report</a><br />
+				{% else %}
+					<a href="{% url "yearly_report" current_year %}">{{current_year}} Yearly Report</a><br />
+				{% endifequal %}
+			{% endfor %}
+		</div>
+</div>
+
+{% endblock %}

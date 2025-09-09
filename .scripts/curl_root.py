@@ -1,0 +1,6 @@
+import requests
+
+resp = requests.get("http://127.0.0.1:8000/")
+print("status", resp.status_code)
+print("len", len(resp.text))
+print(resp.text[:400])

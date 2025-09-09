@@ -1,0 +1,26 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<script src="{{MEDIA_URL}}/video/flowplayer/flowplayer-3.2.12.min.js"></script>
+{% endblock %}
+
+{% block body %}
+	<p><h1>{{page_title}}</h1></p>
+	<p>
+	<div align="center">
+		<a
+			style="display:block;width:768px;height:480px;"
+			id="player">
+		</a>
+		<script language="JavaScript">
+			flowplayer("player", "{{MEDIA_URL}}/video/flowplayer/flowplayer-3.2.16.swf", {
+				clip: {
+					url: "{{MEDIA_URL}}/video/art_request_info.mp4",
+					autoPlay: false,
+				}
+			});
+		</script>
+		<p>After you hit "Play" please wait while the video loads. It may take
+		a few minutes. There's audio as well so check your speakers.</p>
+	</div>
+{% endblock %}

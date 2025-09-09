@@ -1,0 +1,149 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<style type="text/css">
+		#submit {
+			border: none;
+			padding: 0;
+			margin: 0;
+			vertical-align: text-bottom;
+		}
+	</style>
+
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<!-- This is used to make fancy "busy" indicators while prepping the excel 
+	downloads. Needs a special cookie in the http header to work. See the readme
+	in the js directory. --->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery.fileDownload.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript"> 
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using 
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+		
+		$j(document).ready(function(){
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+
+			// Show busy indicator for page loads.
+			$j( "#submit" ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("This can take a moment...");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+			});
+		});//End jQuery stuff.
+	</script>
+{% endblock %}
+
+{% load humanize %}
+
+{% block body %}
+<h1>{{page_title}}</h1>
+<hr />
+
+<!---Busy dialog-->
+<div id="busy_dialog">
+  <center>
+	  <p><div id="busy_dialog_text"></div></p>
+	  <img src="{{MEDIA_URL}}img/spinner.gif" />
+  <center>
+</div>
+
+<div style="width:50%">
+	<p>
+	Incoming Artwork status broken down by date and salesperson.
+    </p>
+</div>
+
+<h3>
+	<a href="/manager_tools/" >
+		<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+		Back
+	</a>
+</h3>
+<br />
+
+<!-- Data table -->
+<div class="grey_bordered">
+	<h2> 
+		<form method="post">
+			{% csrf_token %}
+			Artwork tracking date range: {{form.month}} {{form.year}}
+		<input type="image" src="{{MEDIA_URL}}img/icons/arrow_refresh.png" alt="Submit" id="submit" />
+		</form>
+	</h2>
+
+	<!-- welcome message is only shown on the quick initial page load.-->
+	{% if welcome_message %}
+		<p>{{welcome_message}}</p>
+	{% else %}
+		<a href="excel/{{ form.month.value }}/{{ form.year.value }}/sales/" >
+			<img src="{{MEDIA_URL}}img/icons/page_excel.png">
+			Download totals by salesperson.
+		</a>
+		<br />
+		<a href="excel/{{ form.month.value }}/{{ form.year.value }}/total/" >
+			<img src="{{MEDIA_URL}}img/icons/page_excel.png">
+			Download totals by type.
+		</a>
+		<br />
+		{% if totals_by_type %}
+			<br />
+			<h1>Totals by Type</h1>
+			<table class="rowHover">
+				<tr>
+					<th>Type</th> <!--Type-->
+					<th>Total</td> <!--Type-->
+				</tr>
+			{% for type, total  in totals_by_type.items %}
+				<!--Make a table for this all combined art tracking data-->
+				<tr class="{% cycle 'rowA' 'rowB' %}">
+					<td>{{type}}</td> <!--Type-->
+					<td>{{total}}</td> <!--Type-->
+				</tr>
+			{% endfor %}
+			</table>
+			
+			<br />
+			
+			<h1>Totals by Salesperson</h1>
+				<!--Make a table for this sales person's art tracking data-->
+				<table class="rowHover">
+					<tr>
+						<th></th>
+					<!-- make headers for the artwork types -->
+					{% for type, total  in totals_by_type.items %}
+						<th>{{type}}</th>
+					{% endfor %}
+					</tr>
+					
+					<!-- Iterate through each sales persons data -->
+					{% for sales_person, artwork  in totals_by_salesperson.items %}
+					<tr class="{% cycle 'rowA' 'rowB' %}">
+						<th>{{sales_person.first_name}} {{sales_person.last_name}}</th>
+						{% for type, total in artwork.items %}
+							<td>{{total}}</td>
+						{% endfor %}
+					</tr>
+					{% endfor %}
+				</table>			
+		{% else %}
+			<p>
+			No data to display. Please choose a different time period to query then hit the green refresh arrow to see data.
+			</p>
+		{% endif %}
+	{% endif %}
+</div>
+
+{% endblock %}

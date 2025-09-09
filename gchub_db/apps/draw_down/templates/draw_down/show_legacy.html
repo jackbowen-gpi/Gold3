@@ -1,0 +1,80 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+    {% include "yui_container_includes.html" %}
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/drawdown/drawdown.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/table-sorter/table-sorter.css" type="text/css" />
+    <script type="text/javascript" src="{{MEDIA_URL}}js/drawdown/drawdown.js"></script>
+
+{% endblock %}
+
+{% block body %}
+    <h1>{{ page_title }}</h1>
+    <div class="drawdown-nav">
+        <a href="../../">Add New Request</a> | <a href="../../search/">Search for a Request</a>
+    </div>
+
+<p>{% include "js_pagination.html" %}</p>
+
+    <table id="table" class="sortable">
+        <thead>
+            <tr>
+                <th>Customer Name</th>
+                <th>Job Number</th>
+                <th>Date In</th>
+                <th>Print Location</th>
+                <th>Date Needed</th>
+                <th>Requested By</th>
+                <th>Completed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in object_list %}
+            <tr>
+                <td><a href="/draw_down/view/{{entry.id}}/">{{ entry.customer_name }}</a></td>
+                {% if entry.job_number %}
+                <td><a href="/workflow/job/{{entry.job_number}}/">{{ entry.job_number }}</a></td>
+                {% else %}
+                <td>None</td>
+                {% endif %}
+                <td>{{ entry.creation_date|date:"n-j-Y" }}</td>
+                <td>{{ entry.print_location }}</td>
+                <td>{{ entry.date_needed|date:"n-j-Y" }}</td>
+                <td>{{ entry.requested_by }}</td>
+                <td>
+                    {% ifequal entry.request_complete 0 %}
+                    <img src="{{MEDIA_URL}}img/icons/cross.png" style="vertical-align:text-bottom" alt="Pending" />
+                        Pending
+                   	{% endifequal %}
+                    {% ifequal entry.request_complete 1 %}
+                    <img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" alt="Pending" />
+                        Complete
+                    {% endifequal %}
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+  </table>
+ <p>{% include "js_pagination.html" %}</p>
+<script type="text/javascript" src="{{MEDIA_URL}}js/table-sorter/sort-table2.js"></script>
+<script type="text/javascript">
+    var sorter = new TINY.table.sorter("sorter");
+    sorter.head = "head";
+    sorter.asc = "asc";
+    sorter.desc = "desc";
+    sorter.even = "rowB"; // was "evenrow"
+    sorter.odd = "rowA"; // was "oddrow"
+    sorter.evensel = "evenselected";
+    sorter.oddsel = "oddselected";
+    sorter.paginate = true;
+    sorter.currentid = "currentpage";
+    sorter.limitid = "pagelimit";
+    sorter.itemA = "pageItemA";
+    sorter.itemB = "pageItemB";
+    sorter.init("table");
+//    sorter.init("table", 0);
+</script>
+
+
+{% endblock %}

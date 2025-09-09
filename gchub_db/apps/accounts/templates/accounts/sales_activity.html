@@ -1,0 +1,60 @@
+<table width="99%" class="minimal_horizontal">
+  <caption>My Active Jobs</caption>
+  <thead>
+  <tr>
+    <th>Job</th>
+    <th>Due Date</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for job in user_job_list %}
+	  {% ifnotequal job.workflow_status "Complete" %}
+		<tr>
+			<td style="padding:2px">
+				<a href="/workflow/job/{{job.id}}/">{{job.id}} {{job.name}}</a>
+				({{job.items_in_job}})
+			</td>
+			<td>
+				{{job.due_date|date:"n-j-Y"}}
+			</td>
+			<td>
+				{{job.workflow_status}}
+				<!-- TD, OD, PR, FF, RV -->
+			</td>
+		</tr>
+	 {% endifnotequal %}
+  {% endfor %}
+  </tbody>
+</table>
+{% if perms.accounts.foodservice_access %}
+{% if user_approve_list %}
+<table width="99%" class="minimal_horizontal">
+  <caption>Approved Items, Awaiting Nine Digit/PO</caption>
+  <thead>
+  <tr>
+    <th>Job</th>
+    <th>Approval Date</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for job in user_job_list %}
+	  {% if job.latest_approval_no_ninedigit_date %}
+		  {% ifnotequal job.workflow_status "Complete" %}
+			<tr>
+				<td style="padding:2px">
+					<a href="/workflow/job/{{job.id}}/">{{job.id}} {{job.name}}</a>
+					({{job.items_in_job}})
+				</td>
+				<td>
+					{{job.latest_approval_no_ninedigit_date|date:"n-j-Y"}}
+				</td>
+			</tr>
+		 {% endifnotequal %}
+	 {% endif %}
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endif %}
+{% include "accounts/index_todo_bottom.html" %}

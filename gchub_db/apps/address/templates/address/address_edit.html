@@ -1,0 +1,25 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/address/address.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/fedex/fedex.js"></script>
+    {% include "address/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+  <h1>Edit Contact</h1>
+  {% include "address/navbar_div.inc.html" %}
+
+<form id="contactdata" name="contactdata" onsubmit="contact_save('{{contact.id}}');return false;">
+	<dl>
+	{% for field in contactform %}
+	    <dt>{{ field.label_tag }}</dt>
+	    <dd>{{ field }}</dd>
+	    {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
+	    {% if field.errors %}<dd>{{ field.errors }}</dd>{% endif %}
+	{% endfor %}
+	</dl>
+	<input type="submit" value="Edit Information" onclick="contact_save('{{contact.id}}');return false;" />
+</form>
+{% endblock %}

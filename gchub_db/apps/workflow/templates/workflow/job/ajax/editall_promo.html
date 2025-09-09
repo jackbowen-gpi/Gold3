@@ -1,0 +1,41 @@
+<img src="{{MEDIA_URL}}img/icons/award_star_gold_2.png"> <span class="sub_heading">Add Promotional Trackers to Items in {{job}}</span><br />
+	<br />
+<form id="addpromoallitemform" name="addpromoallitemform" onsubmit="add_job_trackers('{{job.id}}');return false;">
+	<table>
+		<tr>
+			<th class="rightalign">
+        		<label for="id_items">Items</label>
+    		</th>
+
+    		<td>
+    			<input type="checkbox" id="toggle_all_promo" checked="checked"/>
+			    Toggle All
+			    <br />
+			    <br />
+				{% for item in items %}
+					<input type="checkbox" name="items_checked" id="promo_item_{{item.id}}" checked="checked" value="{{item.id}}" />#{{item.num_in_job}}
+					{{item}}<br />
+				{% endfor %}
+    		</td>
+		</tr>
+		<tr>
+			<th class="rightalign">
+        		<label for="id_tracker_catagory">Tracker Types</label>
+    		</th>
+    		<td>
+        		{{ form.category }}
+        		<span class="smtext">Command+click to multi-select.</span>
+    		</td>
+
+		</tr>
+		<tr>
+			<th class="rightalign">
+        		<label for="id_addition_comments">Comments</label>
+    		</th>
+    		<td>
+        		{{ form.addition_comments }}
+    		</td>
+		</tr>
+	</table>
+	<input type="submit" value="Add to Selected Items"/>
+</form>

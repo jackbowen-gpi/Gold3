@@ -1,0 +1,26 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<h1>QAD PrintGroup Search</h1>
+	{% if form.errors %}
+	  <p><span class="error">Please correct the error{{ form.errors|pluralize }} with your submission!</span></p>
+	{% endif %}
+  <p>
+	<form method="get" action="" name="qad_search" enctype="multipart/form-data">
+	  <div class="outline" style="width:450px">
+	  	  <span class="sub_heading">Search Parameters</span>
+			<dl>
+			{% for field in form %}
+			    <dt>{{ field.label_tag }}</dt>
+			    <dd>{{ field }}</dd>
+			    {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
+			    {% if field.errors %}<dd>{{ field.errors }}</dd>{% endif %}
+			{% endfor %}
+			</dl>
+	  </div>
+
+	  <input type="submit" value="Search" />
+	</form>
+  </p>
+
+{% endblock %}

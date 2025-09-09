@@ -1,0 +1,10 @@
+{% include "emails/email_header.txt" %}
+
+{{reviewer}} Approval
+
+{{item_review}}
+
+Item Number: {{item_num}}
+
+Link to the marketing review:
+{{site_link}}

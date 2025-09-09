@@ -1,0 +1,53 @@
+{% extends "standard.html" %}
+
+{% block body %}
+{% ifequal archive "kenton" %}
+	<h1 class="inline">{{page_title}}</h1><br />
+	{% include "pagination_bar.html" %}
+	<table width="100%">
+			<tr>
+				<th>File</th>
+				<th>Art Reference</th>
+				<th>Job Name</th>
+				<th>CD#</th>
+				<th>Size</th>
+				<th>Item#</th>
+				<th>Doc#</th>
+			</tr>
+		{% for entry in object_list %}
+			<tr>
+				<td>{{entry.file}}</td>
+				<td>{{entry.art_reference}}</td>
+				<td>{{entry.job_name}}</td>
+				<td>{{entry.cd}}</td>
+				<td>{{entry.size}}</td>
+				<td>{{entry.item_number}}</td>
+				<td>{{entry.document_number}}</td>
+			</tr>
+		{% endfor %}
+	</table>
+	{% include "pagination_bar.html" %}
+	<br />
+	<a href='{% url "archive_search" "kenton" %}'>Search Kenton Archives Again</a><br />
+{% endifequal %}
+
+{% ifequal archive "renmark"%}
+	<h1 class="inline">{{page_title}}</h1>
+	{% include "pagination_bar.html" %}
+	<table width="100%">
+			<tr>
+				<th>Item</th>
+				<th>Folder Items</th>
+			</tr>
+		{% for entry in object_list %}
+			<tr>
+				<td>{{entry.item}}</td>
+				<td>{{entry.folder_items}}</td>
+			</tr>
+		{% endfor %}
+	</table>
+	{% include "pagination_bar.html" %}
+	<br />
+	<a href='{% url "archive_search" "renmark" %}'>Search RenMark Archives Again</a><br />
+{% endifequal %}
+{% endblock %}

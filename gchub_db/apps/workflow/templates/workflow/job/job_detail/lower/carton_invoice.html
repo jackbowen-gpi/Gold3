@@ -1,0 +1,25 @@
+<span class="sub_heading">
+  <img src="{{MEDIA_URL}}img/icons/information.png" 
+       style="vertical-align: text-bottom" alt="MiscInfo" />
+  Download invoices for {{job}}
+</span>
+<br />
+<br />
+<div class="outline_fancy" style="width: 450px">
+	<form action="/workflow/job/{{job.id}}/carton_invoice/" method="post">
+		<input type="checkbox" id="toggle_all_invoice" checked="checked"/>
+		Toggle All
+		<br />
+		<br />
+		{% for item in item_list %}
+			<input type="checkbox" name="items_checked" id="invoice_item_{{item.id}}" checked="checked" value="{{item.id}}" />#{{item.num_in_job}}
+			{{item}}<br />
+		{% endfor %}
+		<br />
+		<input type="submit" value="Download"/ id="invoice_download_btn">
+	</form>
+</div>
+<div class="outline" style="width: 450px"><img
+	src="{{MEDIA_URL}}img/icons/information.png"
+	style="vertical-align: text-bottom" /> Downloading an invoice PDF also saves
+	a copy in the job's 'Database Documents' folder. So please don't hammer it.</div>

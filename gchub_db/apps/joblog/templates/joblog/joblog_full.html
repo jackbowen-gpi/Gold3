@@ -1,0 +1,25 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<h1>Job Log View for: {{job}}</h1>
+<div style="padding:3px">Return to <a href="{{job.get_absolute_url}}">job detail page</a>.</div>
+
+<div class="grey_bordered">
+{% for joblog in joblog_list %}
+  <div class="joblog_entry list_entry_even">
+    <img src="{{joblog.get_icon_url}}" style="vertical-align: text-bottom"
+         alt="{{joblog.type}}" />
+      {{joblog.log_text|safe|linebreaksbr}}
+      <span class="smtext">
+        {{joblog.event_time|date:"n-j-Y g:i"}}
+        {% if joblog.user.username %}
+          ({{joblog.user.username}})
+        {% endif %}
+      </span>
+  </div>
+{% endfor %}
+</div>
+<div style="padding:3px">Return to <a href="{{job.get_absolute_url}}">job detail page</a>.</div>
+<hr />
+<em>Log generated on {% now "n-j-Y g:i a" %}</em>
+{% endblock %}

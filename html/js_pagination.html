@@ -1,0 +1,33 @@
+    <div id="controls">
+        <div id="perpage">
+            <select class="selectMenu" onchange="sorter.size(this.value)">
+                <option value="25">25</option>
+                <option value="50" selected="selected">50</option>
+                <option value="100">100</option>
+                <option value="150">150</option>
+                <option value="200">200</option>
+            </select>
+            <span>Entries Per Page</span>
+        </div>
+        <div id="navigation">
+            <a onclick="sorter.move(-1,true)">
+                <img src="{{MEDIA_URL}}img/icons/resultset_first.png" width="16" height="16" alt="First Page" />
+                <span>First</span>
+            </a>
+            <a onclick="sorter.move(-1)">
+                <img src="{{MEDIA_URL}}img/icons/resultset_previous.png" width="16" height="16" alt="First Page"  />
+                <span>Prev</span>
+            </a>
+            <a onclick="sorter.move(1)" >
+                <img src="{{MEDIA_URL}}img/icons/resultset_next.png" width="16" height="16" alt="First Page" />
+                <span>Next</span>
+            </a>
+            <a onclick="sorter.move(1,true)">
+                <img src="{{MEDIA_URL}}img/icons/resultset_last.png" width="16" height="16" alt="Last Page" />
+                <span>Last</span>
+            </a>
+        </div>
+<!--       <div id="text">Displaying Page <span id="currentpage"></span> of <span id="pagelimit"></span></div>   -->
+       <div id="text">Now showing items <span class="pageItemA"></span> - <span class="pageItemB"></span> out of <span>{{search_number}}</span> total (Page <span class="currentpage"></span> of <span class="pagelimit"></span>)</div>
+    <div class="clearfix"></div>
+    </div>

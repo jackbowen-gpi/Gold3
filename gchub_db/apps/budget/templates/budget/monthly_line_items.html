@@ -1,0 +1,32 @@
+{% extends "standard.html" %}
+
+{% load humanize %}
+
+{% block body %}
+	<span class="sub_heading">Line Item Breakdown for {{workflow}} - {{month_name}} {{year}}:</span><br /><br />
+	{% ifequal summary "Billable" %}
+		<strong>(Billable charges for month. Items filed out, but not yet invoiced.)</strong><br />
+	{% endifequal %}
+	<br />
+	<table width="225px">
+		<tr>
+			<th>Charge</th>
+			<th>Amount</th>
+			<th>Item</th>
+			<th>File Out Date</th>
+			<th>Plant</th>
+		</tr>
+		{% for charge in charge_set %}
+		<tr>
+			<td>{{charge.description}}</td>
+			<td>{{charge.amount}}</td>
+			<td>{{charge.item}}</td>
+			<td>{{charge.item.final_file_date}}</td>
+			<td>{{charge.item.printlocation.plant.name}}</td>
+		</tr>
+		{% endfor %}
+	<table>
+	<br />
+
+	<a href="{% url "billing_home" %}"><img src="{{MEDIA_URL}}img/icons/money_dollar.png"> Return to Billing Home</a>
+{% endblock %}

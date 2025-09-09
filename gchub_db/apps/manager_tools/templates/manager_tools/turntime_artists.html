@@ -1,0 +1,41 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<h1>{{page_title}}</h1>
+<hr />
+
+<h3>
+	<!-- Use the browser history to go back. Avoids re-calculating data. -->
+	<a href="javascript:history.back()">
+		<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+		Back
+	</a>
+</h3>
+<br />
+
+<!-- Data table -->
+<div class="grey_bordered">
+	<table class="rowHover" style="empty-cells: hide">
+		<tr>
+			<th>Name</th>
+			<th>Average Days</th>
+		</tr>
+		{% for artist in data %}
+			<tr class="{% cycle 'rowA' 'rowB' %}">
+				<td>
+					{% if artist.id%}
+						<!-- Make a link to the artists items -->
+						<a href="/manager_tools/turntime/items/{{month}}/{{year}}/{{workflow}}/{{artist.id}}/">
+							{{ artist.name }}
+						</a>
+					{% else %}
+						{{ artist.name }}
+					{% endif %}
+				</td>
+				<td>{{ artist.turn_time }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+</div>
+
+{% endblock %}

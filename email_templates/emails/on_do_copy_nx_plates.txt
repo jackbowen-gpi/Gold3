@@ -1,0 +1,11 @@
+The following NX plate files were copied to Perry for item {{item.job.id}}-{{item.num_in_job}}:
+{% for tiff in copied_tiffs %}
+    {{tiff}}
+{% endfor %}
+
+{% if duplicate_tiffs|length > 0 %}
+The following plate files WERE NOT copied because duplicates were found.
+{% for tiff in duplicate_tiffs %}
+    {{tiff}}
+{% endfor %}
+{% endif %}

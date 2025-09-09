@@ -1,0 +1,47 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<div class="">
+	<h1>{{page_title}}</h1>
+</div>
+
+<hr />
+<br />
+
+<div style="width:50%">
+	This page will load with the sick days currently used by an employee and the 
+	total sick days of that employee. Changing the number in the total sick box and clicking 
+	change will update the total sick for that employee.
+</div>
+<br />
+
+<h3>
+	<a href="/manager_tools/" >Back</a>
+</h3>
+<br />
+
+<table>
+	<tr>
+		<th>Employee</th>
+		<th>Sick Used</th>
+		<th>Total Sick</th>
+	</tr>
+
+{% for emp in clemson_employee_list %}
+	<tr>
+		<th>{{emp.last_name}}, {{emp.first_name}}</th>
+		<td style="text-align:right;">{{emp.profile.sick_days_taken}}</td>
+		<td>
+			<form style="float:right" method="post" action="/manager_tools/sick/">
+				<input type="hidden" name="user_id" value={{emp.id}}>
+				<input style="width:40px" type="input" name="new_total" value="{{emp.profile.total_sick}}">
+				<input type="submit" name="change" value="Change">
+			</form>
+		</td>
+	</tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}

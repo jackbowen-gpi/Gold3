@@ -1,0 +1,133 @@
+{% comment %}
+--------------------------------------------------------------------------------
+This is the base template which everything is derived. Never directly
+extend base.html from a view, go through standard.html or another layout
+template for the sake of maintainability and consistency.
+--------------------------------------------------------------------------------
+{% endcomment %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/base/base-min.css" /> 
+  <link rel="stylesheet" href="{{MEDIA_URL}}css/base.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="{{MEDIA_URL}}css/print.css" type="text/css" media="print" />
+  <title>GOLD v3 - {% block page_title %}{{page_title}}{% endblock %}</title>
+  <script type="text/javascript" src="{{MEDIA_URL}}js/prototype.js"></script>
+  <script type="text/javascript" src="{{MEDIA_URL}}js/general.js"></script>
+  
+  {% block extra_head %}{% endblock %}
+</head>
+<body onload="on_load()" id="entire_body" class="override">
+&nbsp;
+{% if user.is_authenticated %}
+  <div class="main_nav">
+  <div class="main_nav"> 
+    <div class="menu">
+	<ul>
+		<li>
+		  <img src="{{MEDIA_URL}}img/gold2logo_sm.png" style="vertical-align:text-bottom" alt="GOLD Logo"/>
+		</li>
+		<li>
+		  <a href="/">
+		    <img src="{{MEDIA_URL}}img/icons/house.png" style="vertical-align:text-bottom" height="14px" width="14px" alt="Home" />
+		    HOME
+		  </a>
+		</li>
+		<li>
+		  <a href="{% url 'job_search' %}">
+		    <img src="{{MEDIA_URL}}img/icons/zoom.png" style="vertical-align:text-bottom" height="14px" width="14px" alt="Search" />
+		    SEARCH
+		  </a>
+		</li>
+		<li>
+		  <a href="{% url 'list_reports' %}">
+		    <img src="{{MEDIA_URL}}img/icons/report.png" style="vertical-align:text-bottom" height="14px" width="14px" alt="Reports" />
+		    REPORTS
+		  </a>
+		</li>
+		{% if perms.accounts.in_artist_pulldown %}
+			<li>
+			  <a href="{% url 'todo_list' %}" title="To-Do List">
+			    <img src="{{MEDIA_URL}}img/icons/paste_plain.png" style="vertical-align:text-bottom" height="14px" width="14px" alt="To-Do List" />
+			    TO-DO LIST
+			  </a>
+			</li>
+		{% endif %}
+		{% if user.is_authenticated %}
+			<li>
+		      <a href="{% url 'preferences' %}">
+		        <img src="{{MEDIA_URL}}img/icons/user.png" style="vertical-align:text-bottom" height="14px" width="14px" alt="Admin" />
+		        USER PREFS
+		      </a>
+		    </li>
+				<li>
+				  <a href="{% url 'logout' %}" class="logout-link" data-logout-url="{% url 'logout' %}">
+				    <img src="{{MEDIA_URL}}img/icons/status_busy.png" style="vertical-align:text-bottom" height="14px" width="14px" alt="Logout" />
+				    LOGOUT
+				  </a>
+				</li>
+			<li id='logged_in_as'>
+			  <span style="color:#FFFFFF">
+			    &nbsp;<img src="{{MEDIA_URL}}img/icons/user_green.png" style="vertical-align:text-bottom" height="14px" width="14px" alt="Logged In As" />
+			    <strong>{{user.username}}</strong>
+			  </span>
+			</li>
+		{% endif %}
+	</ul>
+	{% if user.is_staff %}
+		<a href='/admin/'>
+			<img src="{{MEDIA_URL}}img/icons/database_key.png" style="vertical-align:text-bottom" alt="Admin" />
+		</a>
+	{% endif %}
+    </div>
+  </div>
+<br />
+{% endif %}
+
+{% block body_content %}
+{% endblock %}
+<div class="clearfix"></div>
+<script type="text/javascript">
+// Logout link: POSTs to logout URL with CSRF token from cookie to preserve POST-only behavior
+(function(){
+	function getCookie(name){
+		var value = "; " + document.cookie;
+		var parts = value.split('; ' + name + '=');
+		if (parts.length === 2) return parts.pop().split(';').shift();
+		return null;
+	}
+	function doLogout(e){
+		var el = e.currentTarget || this;
+		e.preventDefault();
+		var url = el.getAttribute('data-logout-url') || el.getAttribute('href');
+		var csrftoken = getCookie('csrftoken');
+		fetch(url, {
+			method: 'POST',
+			credentials: 'same-origin',
+			headers: {
+				'X-CSRFToken': csrftoken || ''
+			},
+			redirect: 'follow'
+		}).then(function(resp){
+			if (resp.redirected) {
+				window.location = resp.url;
+			} else if (resp.ok) {
+				window.location.reload();
+			} else {
+				resp.text().then(function(t){ alert('Logout failed (' + resp.status + '): ' + (t || resp.statusText)); });
+			}
+		}).catch(function(err){
+			alert('Logout request failed: ' + err);
+		});
+	}
+	document.addEventListener('DOMContentLoaded', function(){
+		var els = document.querySelectorAll('a.logout-link');
+		Array.prototype.forEach.call(els, function(el){ el.addEventListener('click', doLogout); });
+	});
+})();
+</script>
+</body>
+</html>

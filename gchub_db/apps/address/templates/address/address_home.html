@@ -1,0 +1,24 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+  {% include "address/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+<h1>Address Directory</h1>
+{% include "address/navbar_div.inc.html" %}
+ <p>
+  The directory contains contacts and addresses for customers, internal
+  employees, and other individuals or companies of interest. You may browse,
+  search, or add new addresses to the directory by following the links in the
+  navigation bar above.
+ </p>
+ {% if perms.accounts.clemson_employee %}
+ <p>
+  You may also print Fedex shipment labels from within the directory by
+  searching for the desired recipient and clicking the appropriate button
+  on their directory entry. If you'd like to see a running list of Fedex
+  shipments, check the Fedex Shipments tab.
+ </p>
+ {% endif %}
+{% endblock %}

@@ -1,0 +1,52 @@
+<div style="positon:relative;float:left;width:800px;">
+<span class="sub_heading">Beverage All Item Nomenclature</span><br />
+<table>
+	<tr>
+		<th>
+			Item
+		</th>
+		<th>
+			Nomenclature
+		</th>
+	</tr>
+	{% for item in job.item_set.all %}
+	<tr>
+		<th>
+			{{item.num_in_job}}: {{item.bev_nomenclature}}
+		</th>
+		<td>
+			{{item.description}}<br />
+			{% for color in item.itemcolor_set.all %}
+				{% ifequal item.printlocation.press.name 'BHS' %}
+					{{color.plate_code}}-{% ifequal color.color "Process Black" %}
+											PK
+										{% else %}
+										{% ifequal color.color "Process Yellow" %}
+											PY
+										{% else %}
+										{% ifequal color.color "Process Magenta" %}
+											PM
+										{% else %}
+										{% ifequal color.color "Process Cyan" %}
+											PC
+										{% else %}
+											{{color.color}}
+										{% endifequal %}
+										{% endifequal %}
+										{% endifequal %}
+										{% endifequal %}
+										-{{item.bev_nomenclature}}<br />
+				{% else %}
+					{{item.bev_nomenclature}}{{color.plate_code}} ({{color.sequence}}) {{color.color}}<br />
+				{% endifequal %}
+			{% endfor %}
+			UPC: {{item.upc_number}}<br />
+			Replaces: {{item.replaces}}<br />
+			BOM: {{item.bom_number}}<br />
+			Label: {{item.get_label_tracker.type}}<br />
+			Fiber Indicator: {{item.get_fiber_tracker.type}}<br />
+		</td>
+	</tr>
+	{% endfor %}
+</table>
+</div>

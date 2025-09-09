@@ -1,0 +1,40 @@
+<div class="pagination_controls">
+  <a href="{{request.PATH_INFO}}?page=1{{extra_link}}">
+    <img src="{{MEDIA_URL}}img/icons/resultset_first.png"
+         style="vertical-align:text-bottom" alt="First Page" />
+    First
+  </a>
+  {% if page_obj.has_previous %}
+  <a href="{{request.PATH_INFO}}?page={{page_obj.previous_page_number}}{{extra_link}}">
+    <img src="{{MEDIA_URL}}img/icons/resultset_previous.png"
+         style="vertical-align:text-bottom" alt="Previous Page" />
+    Prev
+  </a>
+  {% else %}
+  <img src="{{MEDIA_URL}}img/icons/resultset_previous.png"
+       style="vertical-align:text-bottom" alt="Previous Page" />
+  Prev
+  {% endif %}
+  &nbsp;
+  {% if page_obj.has_next %}
+  <a href="{{request.PATH_INFO}}?page={{page_obj.next_page_number}}{{extra_link}}">
+    Next
+    <img src="{{MEDIA_URL}}img/icons/resultset_next.png"
+         style="vertical-align:text-bottom" alt="Next Page" />
+  </a>
+  {% else %}
+    Next
+    <img src="{{MEDIA_URL}}img/icons/resultset_next.png"
+         style="vertical-align:text-bottom" alt="Next Page" />
+  {% endif %}
+  <a href="{{request.PATH_INFO}}?page={{paginator.num_pages}}{{extra_link}}">
+    Last
+    <img src="{{MEDIA_URL}}img/icons/resultset_last.png"
+         style="vertical-align:text-bottom" alt="Last Page" />
+  </a>
+  <span style="padding-left:15px">
+    Now showing items <strong>{{page_obj.start_index}}</strong> - <strong>{{page_obj.end_index}}</strong>
+    out of <strong>{{paginator.count}}</strong> total
+    (Page <strong>{{page_obj.number}}</strong> of <strong>{{paginator.num_pages}}</strong>)
+  </span>
+</div>

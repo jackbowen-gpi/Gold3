@@ -1,0 +1,8 @@
+{% include "emails/email_header.txt" %}
+
+An artist has been assigned for job {{job}}.
+Visit GOLD for additional information: http://gchub.graphicpkg.com
+
+Artist: {{job.artist.first_name}} {{job.artist.last_name}}
+Email: {{job.artist.email}}
+{% if job.artist.profile.phone_number %}Phone: {{job.artist.profile.phone_number}}{% endif %}

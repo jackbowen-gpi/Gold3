@@ -1,0 +1,21 @@
+{% extends "standard_popup.html" %}
+
+{% block page_title %}Create New End (Liquid) Code{% endblock %}
+
+{% block body_content %}
+<div class="outline_fancy" style="background-color:#FFFFFF;padding:6px;">
+<h1 class="inline">Create New End (Liquid) Code</h1>
+	
+	<form id="addendcode" name="addendcode" method="post" action="">
+		<dl>
+		{% for field in form %}
+		    <dt>{{ field.label_tag }}</dt>
+		    <dd>{{ field }}</dd>
+		    {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
+		    {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}
+		{% endfor %}
+		</dl>
+		<input type="submit" value="Add End Code" />
+	</form>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+  {% include "workflow/misc/trends/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+		{% include "workflow/misc/trends/navbar_div.inc.html" %}
+		<div style="float:left;">
+			<table width="250px">
+				<tr>
+					<th>Overall Items per Job</th>
+					<td>{{fsb_items_per_job|floatformat:1}}</td>
+				</tr>
+				<tr>
+					<th>Overall Colors per Item</th>
+					<td>{{fsb_colors_per_item|floatformat:1}}</td>
+				</tr>
+			</table>
+			<table width="350px">
+				<tr>
+					<th>Year</th>
+					<th>Items/Job</th>
+					<th>Colors/Item</th>
+					<th>No. Items</th>
+					<th>No. Jobs</th>
+				</tr>
+				{% for year, keys in fsb_by_year.items %}
+				<tr>
+					<th>{{year}}</th>
+					<td>{{keys.items_per_job|floatformat:2}}</td>
+					<td>{{keys.colors_per_item|floatformat:2}}</td>
+					<td>{{keys.num_items|floatformat:0}}</td>
+					<td>{{keys.num_jobs|floatformat:0}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+		<div style="float:left;margin:8px;">
+			<img src="http://chart.apis.google.com/chart?
+					chs=400x300
+					&amp;chd=t:{% for year, keys in fsb_by_year.items %}{{keys.num_items|floatformat:0}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}|{% for year, keys in fsb_by_year.items %}{{keys.num_jobs|floatformat:0}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}|{% for year, keys in fsb_by_year.items %}{{keys.num_Aquality_items|floatformat:0}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}|{% for year, keys in fsb_by_year.items %}{{keys.charges|floatformat:0}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}
+					&amp;chds=0,5000
+					&amp;cht=lc
+					&amp;chxt=y
+					&amp;chxr=0,0,5000
+					&amp;chco=76A4FB,883333,CCCC66,00CC33
+					&amp;chm=d,76A4FB,0,-1,6.0|d,883333,1,-1,6.0|d,CCCC66,2,-1,6.0|d,00CC33,3,-1,6.0
+					&amp;chls=2.0
+					&amp;chdl=Total%20Items|Total%20Jobs|A%20Qual.%20Items|Relative%20Billing*
+					&amp;chl={% for year, keys in fsb_by_year.items %}{{year}}{% if forloop.last  %}{% else %}|{% endif %}{% endfor %}"
+					alt="Items and Jobs by Year Chart" /><br />
+			<span class="smtext">* Total Invoiced divided by {{billing_scale_factor}}. Billing dollars not tracked before 2004.<br />
+			* Current year information not displayed until June of that year.</span>
+		</div>
+		<div class="clearfix"></div>
+{% endblock %}

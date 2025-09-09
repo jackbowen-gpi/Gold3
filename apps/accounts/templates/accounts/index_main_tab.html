@@ -1,0 +1,271 @@
+<div id="main_tabview" class="yui-navset">
+  {% if SHOW_ALL_LINKS %}
+  <div style="padding:6px; background:#fffbdd; border:1px solid #f0e6a8; margin-bottom:6px;">
+    <strong style="color:#a65a00;">DEV MODE</strong>
+    &nbsp;Logged in as: <em>{{ user.get_full_name|default:user.username }}</em>
+    &nbsp;(<code>{{ user.username }}</code>)
+  </div>
+  {% endif %}
+    <ul class="yui-nav">
+        <li class="selected">
+          <a href="#tab1"><em>Navigation</em></a>
+        </li>
+  {% if SHOW_ALL_LINKS or perms.accounts.clemson_employee %}
+        <li>
+          <a href="#tab2"><em>Clemson</em></a>
+        </li>
+  {% endif %}
+    </ul>
+    <div class="yui-content" style="min-height:255px; background: #FFFFFF; background: #FFFFFF url('/media/img/cup_mosiac.jpg') no-repeat bottom right;">
+      <div>
+        {# BEGIN: NAVIGATION TAB #}
+            <a href="{% url "job_search" %}" class="home_nav_button"
+               style="background-image: url('{{MEDIA_URL}}img/icons/zoom.png');">
+              SEARCH
+            </a>
+            <a href="{% url "job_search_results" %}" class="home_nav_button"
+               style="background-image: url('{{MEDIA_URL}}img/icons/folder_page.png');">
+              BROWSE JOBS
+            </a>
+      {% if SHOW_ALL_LINKS or perms.accounts.salesperson %}
+        {% if SHOW_ALL_LINKS or perms.accounts.beverage_access %}
+                    <a href="{% url "new_beverage_job" %}" class="home_nav_button"
+                       style="background-image: url('{{MEDIA_URL}}img/icons/add.png');">
+                      NEW BEV. JOB
+                    </a>
+        {% endif %}
+      {% endif %}
+      {% if SHOW_ALL_LINKS or perms.accounts.beverage_access %}
+                <a href="{% url "code_manager" %}" class="home_nav_button"
+                  style="background-image: url('{{MEDIA_URL}}img/icons/text_list_numbers.png');">
+                  BRAND CODES
+                </a>
+                {% if user.username != "James_Baxter" %}
+                <a href='{% url "misc_gen_doc_upload" %}' onclick="window.open(this.href, 'popupwindow', 'width=600,height=250');return false;"
+                   class="home_nav_button" style="background-image: url('{{MEDIA_URL}}img/icons/basket_add.png');">
+                  UPLOAD DOCS
+                </a>
+                {% endif %}
+            {% endif %}
+
+            {% if SHOW_ALL_LINKS or perms.accounts.clemson_employee %}
+                <a href='{% url "archive_search" "kenton" %}' class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/drive_magnify.png');">
+                  KENTON ARCH.
+                </a>
+            {% endif %}
+            {% if SHOW_ALL_LINKS or perms.accounts.beverage_access %}
+                <a href='{% url "archive_search" "renmark" %}' class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/drive_magnify.png');">
+                  RM ARCHIVE
+                </a>
+            {% endif %}
+            {% if SHOW_ALL_LINKS or perms.accounts.foodservice_access %}
+                <a href='{% url "qad_data-search_printgroup" %}' class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/table_refresh.png');">
+                  PRINT GROUPS
+                </a>
+            {% endif %}
+            <!-- Plant and Press Review -->
+      {% if SHOW_ALL_LINKS or perms.accounts.clemson_employee %}
+                <a href="{% url "review" "plant" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/pictures.png');">
+                  PLANT REVIEW
+                </a>
+      {% else %}
+        {% if SHOW_ALL_LINKS or perms.accounts.foodservice_access %}
+                    <a href="{% url "review" "plant" %}" class="home_nav_button"
+                       style="background-image: url('{{MEDIA_URL}}img/icons/pictures.png');">
+                      PLANT REVIEW
+                    </a>
+                {% endif %}
+            {% endif %}
+            {% if SHOW_ALL_LINKS or perms.accounts.demand_planning %}
+                <a href='{% url "review" "demand" %}' class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/pictures.png');">
+                  DEMAND REVIEW
+                </a>
+            {% endif %}
+            {% if SHOW_ALL_LINKS or perms.accounts.foodservice_marketing or perms.accounts.clemson_employee %}
+                    <a href='{% url "mkt_review" %}' class="home_nav_button"
+                        style="background-image: url('{{MEDIA_URL}}img/icons/pictures.png');">
+                        MKT. REVIEW
+                    </a>
+            {% endif %}
+            <!-- Platemaking Lists -->
+            {% if SHOW_ALL_LINKS or perms.accounts.clemson_employee %}
+                    <a href="{% url "platemaking" "All" %}" class="home_nav_button"
+                       style="background-image: url('{{MEDIA_URL}}img/icons/film_edit.png');">
+                      PLATEMAKING
+                    </a>
+            {% else %}
+                {% if perms.accounts.shelbyville_platemaking %}
+                    <a href="{% url "platemaking" "Shelbyville" %}" class="home_nav_button"
+                       style="background-image: url('{{MEDIA_URL}}img/icons/film_edit.png');">
+                      PLATEMAKING
+                    </a>
+                {% endif %}
+                {% if perms.accounts.kenton_platemaking %}
+                    <a href="{% url "platemaking" "Kenton" %}" class="home_nav_button"
+                       style="background-image: url('{{MEDIA_URL}}img/icons/film_edit.png');">
+                      PLATEMAKING
+                    </a>
+                {% endif %}
+            {% endif %}
+            {% if SHOW_ALL_LINKS or perms.accounts.beverage_access %}
+                <a href="{% url "plate_reorder_search" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/film_edit.png');">
+                  PLATE ORDER
+                </a>
+            {% endif %}
+            <a href="{% url "list_reports" %}" class="home_nav_button"
+               style="background-image: url('{{MEDIA_URL}}img/icons/report.png');">
+              REPORTS
+            </a>
+            {% if SHOW_ALL_LINKS or perms.accounts.foodservice_access %}
+                <a href="{% url "list_templates" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/page_white_acrobat.png');">
+                  TEMPLATES
+                </a>
+            {% endif %}
+            {% if SHOW_ALL_LINKS or perms.accounts.accounting_access %}
+                <a href="{% url "billing_home" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/money_dollar.png');">
+                  BILLING
+                </a>
+            {% endif %}
+            {% if SHOW_ALL_LINKS or perms.accounts.beverage_access %}
+                <a href="{% url "invoice_queue" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/money.png');">
+                  BEV. INVOICING
+                </a>
+            {% endif %}
+            {% if SHOW_ALL_LINKS or perms.accounts.clemson_employee %}
+                <a href="{% url "display_pricing_tables" "Foodservice" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/coins.png');">
+                  COST TABLES
+                </a>
+            {% endif %}
+            <a href="{% url "office_contacts" %}" class="home_nav_button"
+               style="background-image: url('{{MEDIA_URL}}img/icons/telephone.png');">
+              CONTACTS
+            </a>
+            <!--
+            {% if perms.accounts.foodservice_access %}
+                <a href="http://172.23.8.101/FMPro?-db=corrugated.fp6&amp;-format=foodservice/corrugated/default.html&amp;-view" target="_blank"
+                   class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/box.png');">
+                  AUTO CORR.
+                </a>
+            {% endif %}
+             -->
+            {% if SHOW_ALL_LINKS or perms.accounts.foodservice_access %}
+                <a href="{% url "auto_corrugated_pdf_generation_form" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/box.png');">
+                  AUTO CORR.
+                </a>
+            {% endif %}
+            {% if SHOW_ALL_LINKS or perms.draw_down.add_drawdown or perms.accounts.clemson_employee %}
+                <a href="/draw_down/show/" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/brush.png');">
+                  INK DRAWDOWN
+                </a>
+            {% endif %}
+            {% if SHOW_ALL_LINKS or perms.accounts.salesperson or perms.accounts.clemson_employee %}
+             	{% if SHOW_ALL_LINKS or perms.accounts.foodservice_access or perms.accounts.clemson_employee%}
+	            <a href="/art_req/home/" class="home_nav_button"
+	               style="background-image: url('{{MEDIA_URL}}img/icons/image_edit.png');">
+	              ART REQUESTS
+	            </a>
+	            {% endif %}
+            {% endif %}
+            {% if SHOW_ALL_LINKS or perms.accounts.clemson_employee %}
+                <a href="/workflow/color_warning/color_warning/" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/table_error.png');">
+                  COLOR WARNS
+                </a>
+				<a href="{% url "new_carton_job" %}" class="home_nav_button"
+				   style="background-image: url('{{MEDIA_URL}}img/icons/add.png');">
+				  NEW CART. JOB
+				</a>
+				<a href="/carton_billing/sap_entry/queue/" class="home_nav_button"
+					style="background-image: url('{{MEDIA_URL}}img/icons/database_edit.png');">
+					CART. BILLING
+				</a>
+			{% endif %}
+      </div>
+      {% if SHOW_ALL_LINKS or perms.accounts.clemson_employee %}
+      <div>
+        {# BEGIN: CLEMSON TAB #}
+            {% if SHOW_ALL_LINKS or perms.accounts.in_artist_pulldown %}
+                <a href="{% url "todo_list" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/page_white_paste.png');">
+                  TO-DO LIST
+                </a>
+            {% endif %}
+                <a href="{% url "items_rejected" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/flag_red.png');">
+                  REJECTIONS
+                </a>
+                <a href="/calendar/month/{% now "Y" %}/{% now "n" %}/" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/calendar.png');">
+                  CALENDAR
+                </a>
+                <a href="{% url "address_search" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/report_user.png');">
+                  DIRECTORY
+                </a>
+                {% ifnotequal user.username "James_Baxter" %}
+                <a href="http://music.clemson.gch/" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/music.png');">
+                  ROCKBOX
+                </a>
+                {% endifnotequal %}
+                <a href="http://wiki.na.graphicpkg.pri/" target="_new" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/server_database.png');">
+                  WIKI
+                </a>
+                <a href="{% url "data_trends_main" %}" target="_new" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/chart_curve.png');">
+                  TRENDS
+                </a>
+                <a href="{% url "error_tracking_home" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/error.png');">
+                  ERRORS
+                </a>
+                <a href="{% url "itemcatalog_home" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/chart_line_edit.png');">
+                  ITEM MGT.
+                </a>
+            {% if SHOW_ALL_LINKS or perms.accounts.clemson_manager %}
+                <a href="/manager_tools/" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/rainbow.png');">
+                  MANAGER TOOLS
+                </a>
+            {% endif %}
+                <a href="{% url "shipment_list" %}" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/fedex_truck.png');">
+                  FEDEX LIST
+                </a>
+               	<a href="/color_mgt/stats/" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/color_wheel.png');">
+                  COLOR DATA
+                </a>
+            {% if SHOW_ALL_LINKS or perms.accounts.foodservice_access %}
+                <a href="/draw_down/" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/brush.png');">
+                  DRAWDOWN MGT
+                </a>
+            {% endif %}
+            	 <a href="/sbo/home/" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/eye.png');">
+                  SBO
+                </a>
+            	 <a href="/timesheet/" class="home_nav_button"
+                   style="background-image: url('{{MEDIA_URL}}img/icons/clock.png');">
+                  TIMESHEETS
+                </a>
+      </div>
+      {% endif %}
+    </div>
+</div>

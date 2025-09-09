@@ -1,0 +1,11 @@
+[2025-09-07T17:27:44.680447] cwd added to sys.path
+[2025-09-07T17:27:44.680463] imported django
+[2025-09-07T17:27:44.680958] django.setup() ok
+[2025-09-07T17:27:44.680967] DEBUG=True
+[2025-09-07T17:27:44.680971] imported DevAutoLoginMiddleware
+[2025-09-07T17:27:44.681015] created RequestFactory request
+[2025-09-07T17:27:44.681037] session middleware attached
+[2025-09-07T17:27:44.681049] auth middleware attached
+[2025-09-07T17:27:44.681053] middleware instance created
+[2025-09-07T17:27:44.681379] middleware __call__ returned
+[2025-09-07T17:27:44.681407] DEV ADMIN NOT logged in; user repr: <SimpleLazyObject: <django.contrib.auth.models.AnonymousUser object at 0x000001E4AE7D4CD0>>

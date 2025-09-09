@@ -1,0 +1,61 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+  {% include "workflow/misc/trends/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+		{% include "workflow/misc/trends/navbar_div.inc.html" %}
+		<div style="float:left;min-height:500px">
+			<table width="350px">
+				<tr>
+					<th>Year</th>
+					<th>A</th>
+					<th>B</th>
+					<th>C</th>
+				</tr>
+				{% for year, keys in fsb_by_year.items %}
+				<tr>
+					<th>{{year}}</th>
+					<td>{{keys.A_quality_items}}</td>
+					<td>{{keys.B_quality_items}}</td>
+					<td>{{keys.C_quality_items}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+			<br />
+			Data consists of only items that:<br />
+			- were sent to platemaking<br />
+			- are cold cups<br />
+			- were not press changes<br />
+		</div>
+		<div style="float:left;margin:8px;">
+			<img src="http://chart.apis.google.com/chart?
+					chs=400x300
+					&amp;chd=t:{% for year, keys in fsb_by_year.items %}{{keys.perc_A|floatformat:0}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}|{% for year, keys in fsb_by_year.items %}{{keys.perc_B|floatformat:0}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}|{% for year, keys in fsb_by_year.items %}{{keys.perc_C|floatformat:0}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}
+					&amp;chds=0,100
+					&amp;cht=lc
+					&amp;chxt=y
+					&amp;chtt=Quality+as+a+Percentage+by+Year
+					&amp;chxr=0,0,100
+					&amp;chdl=A%20Quality|B%20Quality|C%20Quality
+					&amp;chco=76A4FB,CC6600,770011
+					&amp;chl={% for year, keys in fsb_by_year.items %}{{year}}{% if forloop.last  %}{% else %}|{% endif %}{% endfor %}"
+					alt="Quality Trends as a Percentage Chart" /><br />
+		</div>
+		<div style="float:left;margin:8px;">
+			<img src="http://chart.apis.google.com/chart?
+					chs=400x300
+					&amp;chd=t:{% for year, keys in fsb_by_year.items %}{{keys.A_quality_items|floatformat:0}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}|{% for year, keys in fsb_by_year.items %}{{keys.B_quality_items|floatformat:0}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}|{% for year, keys in fsb_by_year.items %}{{keys.C_quality_items|floatformat:0}}{% if forloop.last %}{% else %},{% endif %}{% endfor %}
+					&amp;chds=0,1500
+					&amp;cht=bvs
+					&amp;chxt=y
+					&amp;chtt=Total+Items+by+Quality+by+Year
+					&amp;chxr=0,0,1500
+					&amp;chdl=A%20Quality|B%20Quality|C%20Quality
+					&amp;chco=76A4FB,CC6600,770011
+					&amp;chl={% for year, keys in fsb_by_year.items %}{{year}}{% if forloop.last  %}{% else %}|{% endif %}{% endfor %}"
+					alt="Quality Trends by Total Chart" /><br />
+		</div>
+	    <div class="clearfix"></div>
+{% endblock %}

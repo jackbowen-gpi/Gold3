@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UserName</key>
+	<string>admin</string>
+	<key>KeepAlive</key>
+	<false/>
+	<key>Label</key>
+	<string>gch.script.thumbnailer</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/admin/gchub_db/bin/process_item_thumbnail_queue.py</string>
+	</array>
+	<key>StartInterval</key>
+	<integer>60</integer>
+</dict>
+</plist>

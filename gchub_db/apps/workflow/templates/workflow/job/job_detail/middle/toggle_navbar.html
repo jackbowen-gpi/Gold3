@@ -1,0 +1,48 @@
+<h2 class="inline">Item Summary</h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href='javascript:load_middleblock("{{ job.id }}", "timeline")'
+  {% ifequal view "timeline" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>TIMELINE</a>
+
+<a href='javascript:load_middleblock("{{ job.id }}", "production")'
+  {% ifequal view "production" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>PRODUCTION</a>
+
+{% ifnotequal job.workflow.name "Container" %}
+	<a href='javascript:load_middleblock("{{ job.id }}", "billing")'
+	  {% ifequal view "billing" %}
+	    class="togglenavlink-highlighted"
+	  {% else %}
+	    class="togglenavlink"
+	  {% endifequal %}>BILLING</a>
+{% endifnotequal %}
+
+{% if perms.accounts.clemson_employee %}
+<a href='javascript:load_middleblock("{{ job.id }}", "jdf")'
+  {% ifequal view "jdf" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>JDF</a>
+{% endif %}
+
+<a href='javascript:load_middleblock("{{ job.id }}", "plate_orders")'
+  {% ifequal view "plate_orders" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>PLATE ORDERS</a>
+
+{% if job.workflow.name == "Carton" %}
+<a href='javascript:load_middleblock("{{ job.id }}", "sap")'
+  {% ifequal view "sap" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>SAP</a>
+{% endif %}

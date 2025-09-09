@@ -1,0 +1,19 @@
+{% include "workflow/job/job_detail/upper_right/joblog_navbar.html" %}
+<iframe id="joblog_display" name="joblog_display" src="{% url "joblog_filtered_default" job_id=job.id %}">
+     Your browser does not support iframes.
+</iframe>
+
+<div style="padding:5px;">
+  <div style="float:left">
+	{% if perms.joblog.add_joblog or perms.accounts.clemson_employee %}
+	    <a href='javascript:load_iframe("joblog_display", "{% url "joblog_add_note" job.id %}")'>
+	      <img src="{{MEDIA_URL}}img/icons/comments_add.png" style="vertical-align: text-bottom" alt="Add Comment" />
+	      Add a comment
+	    </a>
+    {% endif %}
+  </div>
+  <div style="text-align:right">
+    <img src="{{MEDIA_URL}}img/icons/script.png" style="vertical-align: text-bottom" alt="Complete Log" />
+    <a href="{% url "joblog_fullview" job.id %}">View Complete Job Log</a>
+  </div>
+</div>

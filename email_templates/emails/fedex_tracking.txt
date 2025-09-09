@@ -1,0 +1,8 @@
+{% include "emails/email_header.txt" %}
+
+Hello,
+
+This is an automatic e-mail from Graphic Packaging International's Food Service Business to let you know we've sent you a proof for {{job}}. Click the link below to track the shipment. It may take 15 minutes for the tracking data to become available. If the tracking data is not available within 30 minutes or if you have any other questions about this proof please contact {{job.artist}} at {{job.artist.email}}{% if job.artist.profile.phone_number %} or {{job.artist.profile.phone_number}}{% endif %}.
+
+Fedex Tracking Number {{track_number}}:
+http://www.fedex.com/Tracking?tracknumbers={{track_number}}

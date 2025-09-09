@@ -1,0 +1,132 @@
+{% load item_links %}
+	<img src="{{MEDIA_URL}}img/icons/cog.png">
+	{% include "workflow/item/toggle_detail_navbar.html" %}
+
+	<form id="itemdata" name="itemdata" onsubmit="update_item('{{item.id}}','sap', '{{item.job.id}}');return false;">
+	<!--
+	Hiding this here because the javascript that looks up carton profiles in
+	job_detail.html needs the printlocation id.
+	-->
+	<input type="hidden" name="hidden_printlocation" id="id_hidden_printlocation" value="{{item.printlocation.id}}" />
+	<input type="hidden" name="carton_profile" id="id_carton_profile" value="{{item.carton_profile.id}}"/>
+
+	<div class="outline_fancy" style="float:left; width:60%;">
+		<table width="100%">
+			<tr>
+				<td colspan="2" style="margin-right:auto;margin-left:auto;">
+				{% if perms.workflow.can_edit_item_production %}
+					<span class="submit">
+						<input type="submit" name="itemdata" value="Update Item Info"  onclick="update_item('{{item.id}}','sap', '{{item.job.id}}');return false;" />
+					</span>
+				{% endif %}
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					GDD:<br />{{ itemform.grn }}
+				</td>
+				<td>
+					GDD Origin:<br />{{ itemform.gdd_origin }}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					One Up Die:<br />{{ itemform.one_up_die }}
+				</td>
+				<td>
+					Cust. Code:<br />{{ itemform.customer_code }}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Product Group:<br />{{itemform.product_group}}
+				</td>
+				<td>
+					Step Die:<br />{{ itemform.step_die }}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					UPC Number:<br />{{itemform.upc}}
+				</td>
+				<td>
+					Apply GCR:<br /> {{itemform.gcr}}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Apply ECG:<br /> {{itemform.ecg}}
+				</td>
+				<td>
+					Plate Thickness:<br />{{itemform.plate_thickness}}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Coating Pattern:<br />{{itemform.coating_pattern}}
+				</td>
+				<td>
+					Location:<br />{{itemform.location}}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Graphic Req #:<br />{{itemform.graphic_req_number}}
+				</td>
+				<td>
+					Distortion:<br />{{itemform.distortion}}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Graphic PO #:<br />{{itemform.graphic_po}}
+				</td>
+				<td>
+					Print Repeat:<br />{{itemform.print_repeat}}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Trap:<br />{{itemform.trap}}
+				</td>
+				<td>
+
+				</td>
+			</tr>
+		</table>
+		<table width="100%">
+			<tr>
+				<th>
+				Profile
+				</th>
+			</tr>
+			<tr>
+				<td>
+					Carton Workflow:<br />{{itemform.carton_workflow}}
+				</td>
+				<td>
+					Line Screen:<br />{{itemform.line_screen}}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Ink Set:<br />{{itemform.ink_set}}
+				</td>
+				<td>
+					Substrate:<br /> {{itemform.substrate}}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					Print Condition:<br />{{itemform.print_condition}}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<b>Color Profile:</b><br />{{itemform.carton_profile_display}}
+				</td>
+			</tr>
+		</table>
+	</div>
+	</form>

@@ -1,0 +1,32 @@
+	<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/container/assets/container.css" />
+	<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="{{YUI_URL}}build/animation/animation-min.js"></script>
+	<script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
+	<script type="text/javascript">
+		function hide_modal_wait() {
+		    setTimeout("YAHOO.example.container.wait.hide()",1250);
+		} // end hide_modal_wait()
+
+		function on_load() {
+	  	 	 /*
+	    	 * Perform some setup tasks once init() has ran and the page has
+	   		 * loaded.
+	 	     */
+	  		 // Initialize the temporary Panel to display while waiting for external content to load
+	   		 YAHOO.namespace("example.container");
+	    	 YAHOO.example.container.wait =
+	       	 new YAHOO.widget.Panel("wait", {
+	            width:"240px",
+	            fixedcenter:true,
+	            close:false,
+	            draggable:false,
+	            modal:true,
+	            visible:false,
+	            effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5}
+	         });
+	    	YAHOO.example.container.wait.setHeader("Updating, please wait...");
+	    	YAHOO.example.container.wait.setBody('<img src="{{MEDIA_URL}}img/rel_interstitial_loading.gif" />');
+	    	YAHOO.example.container.wait.render(document.body);
+	    	global_middleblock_tab = "timeline";
+		} // end on_load()
+	</script>

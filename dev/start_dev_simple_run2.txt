@@ -1,0 +1,29 @@
+[start_dev_simple] Repo root: C:\Dev\Gold\gchub_db
+[start_dev_simple] Starting local Postgres via docker-compose (best-effort)
+[start_dev_simple] Postgres container: fb690046e2b4643c335ceb7e0615291dee400d8cea0d47daeb8cc0839686ca07
+[start_dev_simple] Postgres ready
+[start_dev_simple] Ensuring dev DB user and database (dev\ensure_gchub.py)
+Connected to Postgres at 127.0.0.1:5432 as postgres
+Role 'gchub' already exists
+Updated password for role 'gchub'
+Database 'gchub_dev' already exists
+Granting privileges on database 'gchub_dev' to 'gchub'
+Privileges granted (best-effort)
+ensure_gchub completed successfully
+[start_dev_simple] Running migrations...
+Operations to perform:
+  Apply all migrations: accounts, address, admin, admin_log, archives, art_req, auth, auto_corrugated, auto_ftp, bev_billing, budget, calendar, carton_billing, color_mgt, contenttypes, draw_down, error_tracking, fedexsys, item_catalog, joblog, news, qad_data, qc, queues, sbo, sessions, sites, software, timesheet, workflow
+Running migrations:
+  No migrations to apply.
+[start_dev_simple] Ensuring dev admin and session...
+Admin user exists: dev_admin
+Wrote admin session cookie to: C:\Dev\Gold\gchub_db\dev\admin_session_cookie.txt
+sessionid=clp1p7met8tu5z7fr1jl21yb6p7v6hks
+[start_dev_simple] Creating/updating dev_admin using C:\Dev\Gold\gchub_db\dev\create_dev_admin.py
+dev_admin updated
+[start_dev_simple] Starting Django development server (background process)
+[start_dev_simple] Started runserver PID 8492, check logs or foreground output
+[start_dev_simple] Waiting for server to accept connections on 127.0.0.1:{0}
+[start_dev_simple] Performing automated dev login to capture session cookie
+Could not find CSRF token on login page; aborting.
+[start_dev_simple] Done.

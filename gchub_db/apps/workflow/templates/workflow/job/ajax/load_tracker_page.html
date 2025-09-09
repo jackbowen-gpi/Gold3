@@ -1,0 +1,29 @@
+<span class="sub_heading">Tracking Job Items
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+{% if perms.accounts.clemson_manager or perms.accounts.clemson_supervisor %}
+<a href='javascript:load_div("bottom_view", job_ajax_url("{{ job.id }}", "item_tracker_art"))'
+  {% ifequal view "item_tracker_art" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>ART TRACKING</a>
+{% endif %}
+
+{% if perms.accounts.clemson_employee %}
+<a href='javascript:load_div("bottom_view", job_ajax_url("{{ job.id }}", "item_tracker_promo"))'
+  {% ifequal view "item_tracker_promo" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>PROMO</a>
+{% endif %}
+
+{% if perms.accounts.clemson_employee %}
+<a href='javascript:load_div("bottom_view", job_ajax_url("{{ job.id }}", "item_tracker_mkt"))'
+  {% ifequal view "item_tracker_mkt" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>MARKETING REVIEW</a>
+{% endif %}

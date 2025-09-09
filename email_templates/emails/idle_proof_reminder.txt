@@ -1,0 +1,19 @@
+{% include "emails/email_header.txt" %}
+
+This is an automated email reminding you that there {{item_count|pluralize:"is an item,are items"}}
+on the job {{job.id}} {{job.name}} whose {{item_count|pluralize:"proof has,proofs have"}} been awaiting
+a response for over 15 days. The item{{item_count|pluralize}} in question are:
+
+{% for item in items %}{{job.id}}-{{item.num_in_job}} {{item.size.size}}
+{% endfor %}
+
+Please re-visit the item{{item_count|pluralize}} in GOLD and ensure that revisions or approvals
+have not already been filed. You may do so at the following URL:
+
+http://gchub.graphicpkg.com{{job.get_absolute_url}}
+
+Please contact the artist, {{job.artist.get_full_name}}, with any questions:
+Email: {{job.artist.email}}
+{% if job.artist.profile.phone_number %}Phone: {{job.artist.profile.phone_number}}{% endif %}
+
+This is a one-time reminder for th{{item_count|pluralize:"is,ese"}} item{{item_count|pluralize}}.

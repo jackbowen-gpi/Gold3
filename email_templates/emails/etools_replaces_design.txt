@@ -1,0 +1,13 @@
+{% include "emails/email_header.txt" %}
+
+An ETools request has been imported for {{job}}
+that has items replacing previous designs. These items are:
+
+{% for item in items %}
+{{item}}
+{% endfor %}
+
+Visit GOLD for additional information:
+http://gchub.graphicpkg.com/workflow/job/{{job.id}}/
+
+{% include "emails/email_footer.txt" %}

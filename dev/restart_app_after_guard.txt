@@ -1,0 +1,282 @@
+[restart_app] Repo root: C:\Dev\Gold\gchub_db
+[restart_app] Looking for processes listening on port 8000...
+[restart_app] No processes found on port 8000.
+[restart_app] Starting local Postgres via docker-compose (if not already running)...
+ Container dev-postgres-1  Running
+[restart_app] Postgres container id: 46758d11ed05b345164b704f36b280632ae824a353b6bab496790c279c227627
+[restart_app] Postgres ready
+[restart_app] Skipping destructive repo clean (pass -CleanRepo to enable).
+[restart_app] Removing .pyc files and __pycache__ directories...
+[restart_app] Attempting to clear Django cache...
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\gntp\core.py:22: SyntaxWarning: invalid escape sequence '\d'
+  'GNTP/(?P<version>\d+\.\d+) (?P<messagetype>REGISTER|NOTIFY|SUBSCRIBE|\-OK|\-ERROR)' +
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\gntp\core.py:29: SyntaxWarning: invalid escape sequence '\d'
+  'GNTP/(?P<version>\d+\.\d+) (?P<messagetype>REGISTER|NOTIFY|SUBSCRIBE|\-OK|\-ERROR)',
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\gntp\core.py:33: SyntaxWarning: invalid escape sequence '\w'
+  GNTP_HEADER = re.compile('([\w-]+):(.+)')
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\colormath\color_conversions.py:40: SyntaxWarning: invalid escape sequence '\*'
+  logger.debug("  \* Applying RGB conversion matrix: %s->%s",
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\colormath\color_conversions.py:488: SyntaxWarning: invalid escape sequence '\-'
+  logger.debug("  \- Target RGB space: %s", target_rgb)
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\colormath\color_conversions.py:490: SyntaxWarning: invalid escape sequence '\-'
+  logger.debug("  \- Target native illuminant: %s", target_illum)
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\colormath\color_conversions.py:491: SyntaxWarning: invalid escape sequence '\-'
+  logger.debug("  \- XYZ color's illuminant: %s", cobj.illuminant)
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\colormath\color_conversions.py:497: SyntaxWarning: invalid escape sequence '\*'
+  logger.debug("  \* Applying transformation from %s to %s ",
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\colormath\color_conversions.py:503: SyntaxWarning: invalid escape sequence '\*'
+  logger.debug("  \*   New values: %.3f, %.3f, %.3f",
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\colormath\color_objects.py:452: SyntaxWarning: invalid escape sequence '\-'
+  logger.debug("  \- Original illuminant: %s", self.illuminant)
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\colormath\color_objects.py:453: SyntaxWarning: invalid escape sequence '\-'
+  logger.debug("  \- Target illuminant: %s", target_illuminant)
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\colormath\color_objects.py:459: SyntaxWarning: invalid escape sequence '\*'
+  logger.debug("  \* Applying transformation from %s to %s ",
+C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\colormath\chromatic_adaptation.py:85: SyntaxWarning: invalid escape sequence '\*'
+  logger.debug("  \* Applying adaptation matrix: %s", adaptation)
+2025-09-01 17:57:00 DEBUG    2025-09-01 17:57:00 [DEBUG]          fsb_box.py:27
+                             gchub_db.apps.auto_corrugated.docume
+                             nts.fsb_box: Font file not found at:
+                             /mnt\Production\autocorr_elements\VA
+                             G Rounded BT.ttf
+cache cleared
+Test-Path: C:\Dev\Gold\gchub_db\scripts\restart_app.ps1:129:31
+Line |
+ 129 |      if (Test-Path $venvPython -and Test-Path (Join-Path $repoRoot 'de …
+     |                                ~~~~
+     | A parameter cannot be found that matches parameter name 'and'.
+
+[restart_app] Running migrations...
+2025-09-01 17:57:02 DEBUG    2025-09-01 17:57:02 [DEBUG]          fsb_box.py:27
+                             gchub_db.apps.auto_corrugated.docume
+                             nts.fsb_box: Font file not found at:
+                             /mnt\Production\autocorr_elements\VA
+                             G Rounded BT.ttf
+Operations to perform:
+  Apply all migrations: accounts, address, admin, admin_log, archives, art_req, auth, auto_corrugated, auto_ftp, bev_billing, budget, calendar, carton_billing, color_mgt, contenttypes, draw_down, error_tracking, fedexsys, item_catalog, joblog, news, qad_data, qc, queues, sbo, sessions, sites, software, timesheet, workflow
+Running migrations:
+  No migrations to apply.
+  Your models in app(s): 'art_req' have changes that are not yet reflected in a migration, and so won't be applied.
+  Run 'manage.py makemigrations' to make new migrations, and then re-run 'manage.py migrate' to apply them.
+[restart_app] Starting development server on 127.0.0.1:8000 (logs: C:\Dev\Gold\gchub_db\server_stdout.log, C:\Dev\Gold\gchub_db\server_stderr.log)
+[restart_app] Started runserver wrapper process id 61680
+[restart_app] Found 4 runserver processes, keeping newest and stopping the rest.
+[restart_app] Stopped duplicate runserver PID 65784
+[restart_app] Stopped duplicate runserver PID 41932
+[restart_app] Stopped duplicate runserver PID 70356
+[restart_app] Server probe failed (may still be starting or error): No connection could be made because the target machine actively refused it. (127.0.0.1:8000)
+[restart_app] Check logs: C:\Dev\Gold\gchub_db\server_stdout.log and C:\Dev\Gold\gchub_db\server_stderr.log
+[restart_app] --- Tail of dev\migrate_output.txt ---
+2025-09-01 17:57:02 DEBUG    2025-09-01 17:57:02 [DEBUG]          fsb_box.py:27
+                             gchub_db.apps.auto_corrugated.docume
+                             nts.fsb_box: Font file not found at:
+                             /mnt\Production\autocorr_elements\VA
+                             G Rounded BT.ttf
+Operations to perform:
+  Apply all migrations: accounts, address, admin, admin_log, archives, art_req, auth, auto_corrugated, auto_ftp, bev_billing, budget, calendar, carton_billing, color_mgt, contenttypes, draw_down, error_tracking, fedexsys, item_catalog, joblog, news, qad_data, qc, queues, sbo, sessions, sites, software, timesheet, workflow
+Running migrations:
+  No migrations to apply.
+  Your models in app(s): 'art_req' have changes that are not yet reflected in a migration, and so won't be applied.
+  Run 'manage.py makemigrations' to make new migrations, and then re-run 'manage.py migrate' to apply them.
+[restart_app] --- Tail of logs\gchub.log ---
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\contrib\auth\middleware.py", line 20, in get_user
+    request._cached_user = auth.get_user(request)
+                           ~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\contrib\auth\__init__.py", line 304, in get_user
+    user_id = _get_user_session_key(request)
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\contrib\auth\__init__.py", line 95, in _get_user_session_key
+    return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
+                                               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 55, in __getitem__
+    return self._session[key]
+           ^^^^^^^^^^^^^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 249, in _get_session
+    self._session_cache = self.load()
+                          ~~~~~~~~~^^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\contrib\sessions\backends\db.py", line 55, in load
+    s = self._get_session_from_db()
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\contrib\sessions\backends\db.py", line 34, in _get_session_from_db
+    return self.model.objects.get(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        session_key=self.session_key, expire_date__gt=timezone.now()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\models\query.py", line 629, in get
+    num = len(clone)
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\models\query.py", line 366, in __len__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\models\query.py", line 1949, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\db\backends\sqlite3\base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such table: django_session
+2025-09-01 02:20:06 [ERROR] django.server: "GET /favicon.ico HTTP/1.1" 500 196361
+2025-09-01 02:22:07 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:22:26 [WARNING] django.request: Not Found: /
+2025-09-01 02:22:26 [WARNING] django.server: "GET / HTTP/1.1" 404 2185
+2025-09-01 02:22:37 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:22:39 [WARNING] django.request: Not Found: /
+2025-09-01 02:22:39 [WARNING] django.server: "GET / HTTP/1.1" 404 2185
+2025-09-01 02:24:16 [INFO] django.utils.autoreload: C:\Dev\Gold\gchub_db\local_settings.py changed, reloading.
+2025-09-01 02:24:17 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:24:18 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2025-09-01 02:24:18 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:24:27 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:24:33 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:25:03 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:25:23 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:29:05 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:29:06 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:29:06 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2025-09-01 02:29:42 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:29:54 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:30:28 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:32:02 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:32:03 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:32:03 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2025-09-01 02:33:42 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:48:39 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:48:41 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:48:44 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:49:11 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 02:49:13 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:01:49 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:01:51 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:01:51 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2025-09-01 03:06:08 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:06:10 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:06:13 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:14:02 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:14:28 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:14:30 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:14:33 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:15:34 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:16:06 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:16:07 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:16:11 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:18:51 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:18:53 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:18:56 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:18:58 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:22:20 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:27:42 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:28:41 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:29:05 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:29:07 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:29:10 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:29:13 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:31:51 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:31:52 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:31:55 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:31:58 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:33:05 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:33:13 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:33:58 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:34:06 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:35:42 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:38:59 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:39:01 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:39:04 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:39:06 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:46:56 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:50:12 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:52:02 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:52:04 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:53:07 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:53:11 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:53:14 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:54:28 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:54:32 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:54:35 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:58:20 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:58:24 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 03:58:27 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 04:25:36 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 04:25:38 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 14:21:24 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 14:21:27 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:37:43 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:37:52 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:39:26 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:42:29 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:42:42 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:43:55 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:44:54 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:45:20 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:46:14 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:47:00 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:47:58 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:48:51 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:49:49 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:54:00 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:55:34 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:56:40 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:56:48 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 16:57:40 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:01:13 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:01:28 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:03:39 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:03:41 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:03:44 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:11:10 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:11:12 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:11:15 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:12:38 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:16:01 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:16:47 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:16:55 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:17:04 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:17:24 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:17:53 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:17:59 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:18:49 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:19:39 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:19:42 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:21:48 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:22:52 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:22:54 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:22:57 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:24:16 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:24:18 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:24:21 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:32:10 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:55:41 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:56:19 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:57:00 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:57:02 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+2025-09-01 17:57:06 [DEBUG] gchub_db.apps.auto_corrugated.documents.fsb_box: Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+[restart_app] Done. Tail logs with: Get-Content server_stdout.log -Wait

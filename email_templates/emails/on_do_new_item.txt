@@ -1,0 +1,3 @@
+{% include "emails/email_header.txt" %}
+
+Item {{item}} has been added to job {{item.job}}.

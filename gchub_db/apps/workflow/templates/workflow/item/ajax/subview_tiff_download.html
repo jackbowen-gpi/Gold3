@@ -1,0 +1,35 @@
+{% load item_links %}
+<span class="sub_heading">
+  <img src="{{MEDIA_URL}}img/icons/basket_put.png">
+  TIFF Download for: Item #{{item.num_in_job}} - {{item.size}}
+</span>
+<br />
+{% if item_tiffs %}
+<table width="650">
+	<tr>
+		<th>TIFF</th>
+		<th>Date</th>
+		<th>Dim. (WxL=Area)</th>
+		<th>File Size</th>
+	{% for tiff in item_tiffs %}
+	<tr>
+		<td><a href="{% url "get_single_tiff" item.id tiff.file_name %}">{{tiff.file_name}}</a></td>
+		<td>{{tiff.last_modified_time|date:"n-j-Y"}}</td>
+		<td>{{tiff.image_width|floatformat:2}}" x
+		{{tiff.image_length|floatformat:2}}" =
+		{{tiff.image_area|floatformat:2}}"
+		</td>
+		<td align="right">{{tiff.file_size|filesizeformat}}</td>
+	</tr>
+	{% endfor %}
+	<tr>
+		<td colspan="4">
+			<a href="{% url "get_zipfile_tiff" item.id %}">
+			<img src="{{MEDIA_URL}}img/icons/compress.png"> Download</a> all tiffs in ZIP format.
+		</td>
+	</tr>
+</table>
+{% else %}
+<p>No tiffs are currently available for this item. Please contact the
+artist.</p>
+{% endif %}

@@ -1,0 +1,36 @@
+Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+JOB_COUNT: 31
+BY_WORKFLOW:
+{"workflow__name": "Site_name_0", "cnt": 31}
+SAMPLE (up to 50):
+{"id": 31, "name": "Job_1", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 31 Job_1>>"}
+{"id": 30, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 30 Job_0>>"}
+{"id": 29, "name": "Job_4", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 29 Job_4>>"}
+{"id": 28, "name": "Job_3", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 28 Job_3>>"}
+{"id": 27, "name": "Job_2", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 27 Job_2>>"}
+{"id": 26, "name": "Job_1", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 26 Job_1>>"}
+{"id": 25, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 25 Job_0>>"}
+{"id": 24, "name": "Job_4", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 24 Job_4>>"}
+{"id": 23, "name": "Job_3", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 23 Job_3>>"}
+{"id": 22, "name": "Job_2", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 22 Job_2>>"}
+{"id": 21, "name": "Job_1", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 21 Job_1>>"}
+{"id": 20, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 20 Job_0>>"}
+{"id": 19, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 19 Job_0>>"}
+{"id": 18, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 18 Job_0>>"}
+{"id": 17, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 17 Job_0>>"}
+{"id": 16, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 16 Job_0>>"}
+{"id": 15, "name": "Job_1", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 15 Job_1>>"}
+{"id": 14, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 14 Job_0>>"}
+{"id": 13, "name": "Job_1", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 13 Job_1>>"}
+{"id": 12, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 12 Job_0>>"}
+{"id": 11, "name": "Job_1", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 11 Job_1>>"}
+{"id": 10, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 10 Job_0>>"}
+{"id": 9, "name": "Job_1", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 9 Job_1>>"}
+{"id": 8, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 8 Job_0>>"}
+{"id": 7, "name": "Job_2", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 7 Job_2>>"}
+{"id": 6, "name": "Job_1", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 6 Job_1>>"}
+{"id": 5, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 5 Job_0>>"}
+{"id": 4, "name": "Job_2", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 4 Job_2>>"}
+{"id": 3, "name": "Job_1", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 3 Job_1>>"}
+{"id": 2, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 2 Job_0>>"}
+{"id": 1, "name": "Job_0", "status": "Pending", "workflow": "Site_name_0", "artist": null, "salesperson": null, "items_in_job": "<bound method Job.items_in_job of <Job: 1 Job_0>>"}

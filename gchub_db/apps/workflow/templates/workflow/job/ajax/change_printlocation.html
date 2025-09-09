@@ -1,0 +1,9 @@
+	<img src="{{MEDIA_URL}}img/icons/cog_edit.png">
+	<span class="sub_heading">Change Print Location (currently {{job.temp_printlocation}})</span><br />
+	<form id="printlocation" name="printlocation" onsubmit="change_printlocation('{{job.id}}');return false;">
+		<div class="outline" style="width:350px; padding-left:8px;">
+			<label id="id_temp_printlocation">Print Location: </label>{{form.temp_printlocation}}<br />
+			<br />
+			<input type="submit" value="Change Print Location" onclick="change_printlocation('{{job.id}}');return false;" />
+		</div>
+	</form>

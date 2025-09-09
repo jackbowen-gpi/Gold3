@@ -1,0 +1,238 @@
+2025-09-01 18:23:40 DEBUG    2025-09-01 18:23:40 [DEBUG]          fsb_box.py:27
+                             gchub_db.apps.auto_corrugated.docume
+                             nts.fsb_box: Font file not found at:
+                             /mnt\Production\autocorr_elements\VA
+                             G Rounded BT.ttf
+accounts
+ [X] 0001_initial
+ [X] 0002_userprofile_total_sick
+ [X] 0003_userprofile_machine_name
+ [X] 0004_auto_20190118_1333
+ [X] 0005_auto_20190425_1344
+ [X] 0006_auto_20190923_1111
+ [X] 0007_auto_20200217_1052
+ [X] 0008_userprofile_growl_hear_new_carton_jobs
+ [X] 0009_auto_20200921_1359
+ [X] 0010_auto_20201015_1352
+ [X] 0011_auto_20201023_0815
+ [X] 0012_auto_20210121_0915
+ [X] 0013_alter_userprofile_id
+address
+ [X] 0001_initial
+ [X] 0002_auto_20190923_1111
+ [X] 0003_alter_contact_id
+admin
+ [X] 0001_initial
+ [X] 0002_logentry_remove_auto_add
+ [X] 0003_logentry_add_action_flag_choices
+admin_log
+ [X] 0001_initial
+ [X] 0002_auto_20190923_1111
+ [X] 0003_alter_adminlog_id
+archives
+ [X] 0001_initial
+ [X] 0002_auto_20190923_1111
+ [X] 0003_alter_kentonarchive_id_alter_renmarkarchive_id
+art_req
+ [X] 0001_initial
+ [X] 0002_product_case_pack
+ [X] 0003_auto_20180302_1702
+ [X] 0004_auto_20190522_1053
+ [X] 0005_partialartreq_is_completed
+ [X] 0005_auto_20190923_1111
+ [X] 0006_merge_20191002_1022
+ [X] 0007_product_render
+ [X] 0008_alter_additionalinfo_id_alter_artreq_id_and_more
+ [X] 0009_alter_product_ship_to_state
+ [X] 0010_alter_product_ship_to_state
+ [X] 0011_alter_product_ship_to_state
+ [X] 0012_alter_product_ship_to_state
+ [X] 0013_alter_product_ship_to_state
+ [X] 0014_alter_product_ship_to_state
+ [X] 0015_alter_product_ship_to_state
+ [X] 0016_alter_product_ship_to_state
+ [X] 0017_alter_product_ship_to_state
+ [X] 0018_alter_product_ship_to_state
+ [X] 0019_alter_product_ship_to_state
+ [X] 0020_alter_product_ship_to_state
+ [X] 0021_alter_product_ship_to_state
+ [X] 0022_alter_product_ship_to_state
+ [X] 0023_alter_product_ship_to_state
+ [X] 0024_alter_product_ship_to_state
+ [X] 0025_alter_product_ship_to_state
+ [X] 0026_alter_product_ship_to_state
+ [X] 0027_alter_product_ship_to_state
+ [X] 0028_alter_product_ship_to_state
+ [X] 0029_alter_product_ship_to_state
+ [X] 0030_alter_product_ship_to_state
+ [X] 0031_auto_fix_art_req
+ [X] 0032_alter_product_ship_to_state
+auth
+ [X] 0001_initial
+ [X] 0002_alter_permission_name_max_length
+ [X] 0003_alter_user_email_max_length
+ [X] 0004_alter_user_username_opts
+ [X] 0005_alter_user_last_login_null
+ [X] 0006_require_contenttypes_0002
+ [X] 0007_alter_validators_add_error_messages
+ [X] 0008_alter_user_username_max_length
+ [X] 0009_alter_user_last_name_max_length
+ [X] 0010_alter_group_name_max_length
+ [X] 0011_update_proxy_permissions
+ [X] 0012_alter_user_first_name_max_length
+auto_corrugated
+ [X] 0001_initial
+ [X] 0002_auto_20180302_1702
+ [X] 0003_generatedbox_plate_number
+ [X] 0004_auto_20190923_1111
+ [X] 0005_alter_boxitem_id_alter_boxitemspec_id_and_more
+auto_ftp
+ [X] 0001_initial
+ [X] 0002_auto_20180302_1702
+ [X] 0003_auto_20191121_0934
+ [X] 0004_auto_20200208_1021
+ [X] 0005_alter_autoftptiff_id
+bev_billing
+ [X] 0001_initial
+ [X] 0002_auto_20180302_1702
+ [X] 0003_auto_20190923_1111
+ [X] 0004_alter_bevinvoice_id
+budget
+ [X] 0001_initial
+ [X] 0002_alter_budget_id_alter_invoiceamt_id
+calendar
+ [X] 0001_initial
+ [X] 0002_auto_20190923_1111
+ [X] 0003_alter_event_id
+carton_billing
+ [X] 0001_initial
+ [X] 0002_alter_cartonsapentry_id
+catscanner
+ (no migrations)
+color_mgt
+ [X] 0001_initial
+ [X] 0002_auto_20190923_1111
+ [X] 0003_colordefinition_pantone_plus
+ [X] 0004_alter_colordefinition_id
+contenttypes
+ [X] 0001_initial
+ [X] 0002_remove_content_type_name
+django_su
+ (no migrations)
+draw_down
+ [X] 0001_initial
+ [X] 0002_auto_20180302_1702
+ [X] 0003_auto_20180905_1430
+ [X] 0004_auto_20180907_1601
+ [X] 0005_auto_20190923_1111
+ [X] 0006_alter_drawdown_id_alter_drawdownitem_id_and_more
+error_tracking
+ [X] 0001_initial
+ [X] 0002_auto_20180302_1702
+ [X] 0003_auto_20190923_1111
+ [X] 0004_alter_error_id
+fedexsys
+ [X] 0001_initial
+ [X] 0002_shipment_job
+ [X] 0003_auto_20190923_1111
+ [X] 0004_alter_shipment_id
+item_catalog
+ [X] 0001_initial
+ [X] 0002_auto_20190923_1111
+ [X] 0003_alter_productsubcategory_id
+joblog
+ [X] 0001_initial
+ [X] 0002_auto_20180302_1702
+ [X] 0003_auto_20190923_1111
+ [X] 0004_auto_20220518_0917
+ [X] 0005_auto_20220531_1104
+ [X] 0006_alter_joblog_id
+manager_tools
+ (no migrations)
+news
+ [X] 0001_initial
+ [X] 0002_auto_20190923_1111
+ [X] 0003_alter_codechange_id
+ [X] 0004_alter_codechange_creation_date
+qad_data
+ [X] 0001_initial
+ [X] 0002_qad_casepacks_size
+ [X] 0003_qad_casepacks_active
+ [X] 0004_alter_qad_casepacks_id_alter_qad_printgroups_id
+qc
+ [X] 0001_initial
+ [X] 0002_auto_20180302_1702
+ [X] 0003_auto_20190923_1111
+ [X] 0004_alter_qccategory_id_alter_qcquestiondefinition_id_and_more
+queues
+ [X] 0001_initial
+ [X] 0002_auto_20180302_1702
+ [X] 0003_auto_20190923_1111
+ [X] 0004_alter_colorkeyqueue_id_alter_tifftopdf_id
+sbo
+ [X] 0001_initial
+ [X] 0002_auto_20190923_1111
+ [X] 0003_alter_sbo_id
+sessions
+ [X] 0001_initial
+sites
+ [X] 0001_initial
+ [X] 0002_alter_domain_unique
+software
+ [X] 0001_initial
+ [X] 0002_alter_software_id
+timesheet
+ [X] 0001_initial
+ [X] 0002_alter_timesheet_id_alter_timesheetcategory_id
+video_player
+ (no migrations)
+workflow
+ [X] 0001_initial
+ [X] 0002_auto_20180525_1135
+ [X] 0003_auto_20180601_1533
+ [X] 0004_itemcatalog_product_board
+ [X] 0005_auto_20181024_1548
+ [X] 0006_auto_20190104_1658
+ [X] 0007_auto_20190208_1410
+ [X] 0008_itemcatalog_comments
+ [X] 0009_job_type
+ [X] 0010_jobcomplexity
+ [X] 0011_auto_20190625_1125
+ [X] 0012_auto_20191107_1639
+ [X] 0013_auto_20200208_1021
+ [X] 0014_prooftracker
+ [X] 0015_prooftracker_xml_filename
+ [X] 0016_prooftracker_proofer
+ [X] 0017_auto_20200528_1726
+ [X] 0018_auto_20200618_1408
+ [X] 0019_auto_20200629_1026
+ [X] 0020_auto_20200818_1326
+ [X] 0021_auto_20200825_1008
+ [X] 0022_auto_20201021_1348
+ [X] 0023_job_graphic_specialist
+ [X] 0024_auto_20210121_0915
+ [X] 0025_auto_20210126_1331
+ [X] 0026_item_kd_press
+ [X] 0027_colorwarning_notes
+ [X] 0028_job_carton_type
+ [X] 0029_auto_20220119_1012
+ [X] 0030_auto_20220119_1342
+ [X] 0031_substrate
+ [X] 0032_item_substrate
+ [X] 0033_item_gcr
+ [X] 0034_auto_20220215_0905
+ [X] 0035_auto_20220215_1042
+ [X] 0036_auto_20220217_1042
+ [X] 0037_auto_20220329_0929
+ [X] 0038_auto_20220524_1050
+ [X] 0039_item_proof_type_notes
+ [X] 0040_auto_20220714_1112
+ [X] 0041_auto_20220803_1325
+ [X] 0042_item_ecg
+ [X] 0043_job_duplication_type
+ [X] 0044_item_render
+ [X] 0045_auto_20250223_2048
+ [X] 0046_merge_0045_auto_20240611_1949_0045_auto_20250223_2048
+ [X] 0047_alter_beveragebrandcode_id_and_more
+xml_io
+ (no migrations)

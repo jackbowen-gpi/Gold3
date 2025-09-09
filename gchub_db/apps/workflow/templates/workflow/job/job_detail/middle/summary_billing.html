@@ -1,0 +1,59 @@
+	<img src="{{MEDIA_URL}}img/icons/money_dollar.png" style="vertical-align:text-bottom" />
+    {% include "workflow/job/job_detail/middle/toggle_navbar.html" %}
+
+	<div class="outline_fancy">
+	<table width="100%">
+		<tr>
+			<th width="10px">#</th>
+			<th>Size</th>
+			<th>Billing Totals</th>
+			<th>Invoicing - (Amt. Not Invoiced)</th>
+			<th># Line Items</th>
+			<th># Inks</th>
+			{% if perms.accounts.clemson_employee %}
+				<th>Add Billing Charges</th>
+			{% endif %}
+		</tr>
+		{% for item in itemsinjob %}
+		{% if item.item_situation and perms.accounts.clemson_employee %}
+			{% ifequal item.item_situation 11 %}
+			<tr class="rowLightGreen">
+			{% else %}
+			<tr class="rowStopped">
+			{% endifequal %}
+		{% else %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+		{% endif %}
+			<td>{{ item.num_in_job }}</td>
+			<td class="fakelink"><!-- Link to preview artwork -->
+			  <span onMouseOver="this.style.cursor='pointer';" onclick='load_div("bottom_view", item_ajax_url("{{ item.id }}", "billing_detail"))'>
+				{{item}}
+			  </span>
+			</td>
+			<td style="text-align:right;padding-right:12px;">
+			  ${{item.get_total_charges|floatformat:2}}
+			</td>
+			<td>
+			  {{item.invoicing_complete}} - (${{item.get_uninvoiced_total}})
+			</td>
+			<td>{{item.get_number_charges}}</td>
+			<td>{{item.itemcolor_set.count}}</td>
+			{% if perms.accounts.clemson_employee %}
+				<td>
+				  <a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "add_billing"))'>
+				    <img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align:text-bottom">
+				    Add Charges
+				  </a>
+				</td>
+			{% endif %}
+		</tr>
+		{% endfor %}
+		<tr>
+			<th colspan="2" class="rightalign">Job Total:</th>
+			<td style="text-align:right;padding-right:12px;">
+			  <strong>${{job.job_billing_charges|floatformat:2}}</strong>
+			</td>
+		</tr>
+	</table>
+	</div>
+	{% include "workflow/job/job_detail/middle/item_summary_footer.html" %}

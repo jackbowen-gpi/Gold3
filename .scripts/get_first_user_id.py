@@ -1,0 +1,11 @@
+import os
+import django
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+django.setup()
+from django.contrib.auth.models import User
+
+u = User.objects.filter(is_active=True).order_by("id").first()
+print(u.id if u else "NONE")

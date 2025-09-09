@@ -1,0 +1,988 @@
+{% extends "standard.html" %}
+
+{% block extra_extra_head %}
+<!-- jQuery and jQuery UI for date pickers -->
+<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+<script type="text/javascript">
+// Prototype.js is loaded in base.html and uses $ just like jQuery does.
+// Use jQuery.noConflict() to avoid conflicts
+var $j = jQuery.noConflict();
+</script>
+
+<!--CSS-->
+<style type="text/css">
+/* Reset and base styles to prevent conflicts */
+.search-form-container * {
+    box-sizing: border-box;
+}
+
+.search-form-container {
+    clear: both;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* Modern label styles - override any existing float styles */
+.search-form-container label {
+    font-size: 12px !important;
+    font-weight: bold !important;
+    color: #333 !important;
+    display: inline-block !important;
+    margin-right: 8px !important;
+    white-space: nowrap !important;
+    float: none !important;
+    clear: none !important;
+    width: auto !important;
+    text-align: left !important;
+}
+
+/* Phase 3: Enhanced UI/UX Styles */
+.search-section {
+    margin-bottom: 15px;
+    border: 1px solid #888888;
+    border-radius: 8px;
+    background: #EEEEEE;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    clear: both;
+    width: 100%;
+}
+
+.search-section-header {
+    background: linear-gradient(135deg, #663333, #441111);
+    color: white;
+    padding: 12px 15px;
+    cursor: pointer;
+    border-radius: 7px 7px 0 0;
+    user-select: none;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s ease;
+}
+
+.search-section-header:hover {
+    background: linear-gradient(135deg, #666666, #444444);
+}
+
+.search-section-content {
+    padding: 15px;
+    background: white;
+    border-radius: 0 0 7px 7px;
+    display: block;
+}
+
+.search-section.collapsed .search-section-content {
+    display: none;
+}
+
+.section-toggle {
+    font-size: 16px;
+    transition: transform 0.3s ease;
+}
+
+.search-section.collapsed .section-toggle {
+    transform: rotate(-90deg);
+}
+
+.universal-search {
+    background: linear-gradient(135deg, #f5f2f0, #e8e1dd);
+    border: 2px solid #663333;
+}
+
+.universal-search .search-section-header {
+    background: linear-gradient(135deg, #883333, #551111);
+    font-size: 16px;
+    padding: 15px;
+}
+
+.field-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.field-group.double {
+    grid-template-columns: 1fr 1fr;
+}
+
+.field-group.single {
+    grid-template-columns: 1fr;
+}
+
+.field-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    min-height: 28px;
+    width: 100%;
+}
+
+.field-item label {
+    width: 130px !important;
+    margin-right: 10px !important;
+    text-align: right !important;
+    flex-shrink: 0 !important;
+}
+
+.field-item input, .field-item select, .field-item textarea {
+    flex: 1;
+    min-width: 0;
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.help-text {
+    font-size: 11px;
+    color: #444444;
+    font-style: italic;
+    margin-left: 140px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+    clear: both;
+}
+
+.search-buttons {
+    text-align: center;
+    padding: 20px;
+    background: #F2F1A5;
+    border-radius: 8px;
+    margin-top: 15px;
+    clear: both;
+    width: 100%;
+}
+
+.search-btn {
+    background: linear-gradient(135deg, #663333, #441111);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    margin: 0 10px;
+}
+
+.search-btn:hover {
+    background: linear-gradient(135deg, #883333, #551111);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.reset-btn {
+    background: linear-gradient(135deg, #6c757d, #5a6268) !important;
+}
+
+.reset-btn:hover {
+    background: linear-gradient(135deg, #5a6268, #495057) !important;
+}
+</style>
+<script type="text/javascript">
+function on_load() {
+	// Select the universal search field by default.
+	if (document.getElementById('id_search_all')) {
+		document.getElementById('id_search_all').focus();
+	} else if (document.getElementById('id_job_num')) {
+		document.getElementById('id_job_num').focus();
+	}
+}
+
+// Phase 3: Collapsible sections functionality
+function toggleSection(sectionId) {
+	const section = document.getElementById(sectionId);
+	if (section) {
+		section.classList.toggle('collapsed');
+        
+		// Save state to localStorage
+		const isCollapsed = section.classList.contains('collapsed');
+		localStorage.setItem('search-section-' + sectionId, isCollapsed ? 'collapsed' : 'expanded');
+	}
+}
+
+function initializeSectionStates() {
+	// Restore saved section states
+	const sections = document.querySelectorAll('.search-section');
+	sections.forEach(section => {
+		const sectionId = section.id;
+		if (sectionId) {
+			const savedState = localStorage.getItem('search-section-' + sectionId);
+			if (savedState === 'collapsed') {
+				section.classList.add('collapsed');
+			}
+		}
+	});
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+	on_load();
+	initializeSectionStates();
+	initializeDatePickers();
+});
+
+function resetForm() {
+	// Clear all form fields
+	const form = document.querySelector('form');
+	if (form) {
+		form.reset();
+		// Focus on universal search after reset
+		setTimeout(() => {
+			if (document.getElementById('id_search_all')) {
+				document.getElementById('id_search_all').focus();
+			}
+		}, 100);
+	}
+}
+
+// Initialize date pickers for all date fields
+function initializeDatePickers() {
+	// Job search date fields
+	$j('#id_date_in_start, #id_date_in_end, #id_date_needed_start, #id_date_needed_end').datepicker({
+		dateFormat: 'mm/dd/yy',
+		changeMonth: true,
+		changeYear: true,
+		yearRange: '-20:+5',
+		showButtonPanel: true
+	});
+    
+	// Item search date fields
+	$j('#id_current_proof_date_start, #id_current_proof_date_end').datepicker({
+		dateFormat: 'mm/dd/yy',
+		changeMonth: true,
+		changeYear: true,
+		yearRange: '-20:+5',
+		showButtonPanel: true
+	});
+    
+	$j('#id_all_proof_date_start, #id_all_proof_date_end').datepicker({
+		dateFormat: 'mm/dd/yy',
+		changeMonth: true,
+		changeYear: true,
+		yearRange: '-20:+5',
+		showButtonPanel: true
+	});
+    
+	$j('#id_approval_date_start, #id_approval_date_end').datepicker({
+		dateFormat: 'mm/dd/yy',
+		changeMonth: true,
+		changeYear: true,
+		yearRange: '-20:+5',
+		showButtonPanel: true
+	});
+    
+	$j('#id_final_file_date_start, #id_final_file_date_end').datepicker({
+		dateFormat: 'mm/dd/yy',
+		changeMonth: true,
+		changeYear: true,
+		yearRange: '-20:+5',
+		showButtonPanel: true
+	});
+    
+	// Initialize autocomplete for universal search boxes
+	$j('#id_search_all').autocomplete({
+		source: function(request, response) {
+			// Determine which autocomplete endpoint to use based on current page
+			var autocompleteUrl = '';
+			if (window.location.pathname.includes('/job/search/')) {
+				autocompleteUrl = '/workflow/api/job_autocomplete/';
+			} else if (window.location.pathname.includes('/item/search/')) {
+				autocompleteUrl = '/workflow/api/item_autocomplete/';
+			}
+            
+			if (autocompleteUrl) {
+				$j.ajax({
+					url: autocompleteUrl,
+					data: { term: request.term },
+					dataType: 'json',
+					success: function(data) {
+						response(data);
+					},
+					error: function() {
+						response([]);
+					}
+				});
+			}
+		},
+		minLength: 2,
+		select: function(event, ui) {
+			// When user selects an item, fill the search box with the value
+			$j(this).val(ui.item.value);
+			return false;
+		}
+	});
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<img src="{{MEDIA_URL}}img/icons/zoom.png" style="vertical-align:text-bottom" alt="Search" /> <h1 class="inline">Search</h1>
+<div style="margin-top: 20px; max-width: 900px; margin-left: auto; margin-right: auto;">
+<div style="margin-left: 15px; display: inline-block;">
+<a href='{% url "job_search" %}'
+{% if type == "job" %}
+	class="togglenavlink-highlighted"
+  {% else %}
+	class="togglenavlink"
+  {% endif %}>JOBS</a>
+<a href='{% url "item_search" %}'
+{% if type == "item" %}
+	class="togglenavlink-highlighted"
+  {% else %}
+	class="togglenavlink"
+  {% endif %}>ITEMS</a>
+</div>
+</div>
+{% if form.errors %}
+<ul class="errorlist">
+  <li>Please correct the error{{ form.errors|pluralize }} with your submission!</li>
+</ul>
+{% endif %}
+
+{% if type == "job" %}
+<div class="search-form-container">
+ 	<form method="get" action="" name="job_search" enctype="multipart/form-data">
+  	  
+  	  <!-- Universal Search Section -->
+  	  <div class="search-section universal-search" id="universal-search">
+  	    <div class="search-section-header" onclick="toggleSection('universal-search')">
+  	      <span>🔍 Universal Search</span>
+  	      <span class="section-toggle">▾</span>
+  	    </div>
+  	    <div class="search-section-content">
+  	      <div class="field-group single">
+  	        <div class="field-item">
+  	          {{form.errors.search_all}}
+  	          <label for="id_search_all" style="color: #0066cc; font-weight: bold;">Search All Fields:</label>
+  	          {{form.search_all}}
+  	        </div>
+  	      </div>
+   	      <div class="help-text">
+   	        <strong>Smart Search:</strong> Find jobs or items by typing any combination of words from job name, brand, customer, PO#, comments, instructions, item description, UPC, etc.<br />
+   	        <strong>Example:</strong> "customer packaging rush" finds records containing all these words across multiple fields
+   	      </div>
+   	      
+   	      <!-- Search Preferences Information -->
+   	      <div class="preferences-info" style="margin-top: 15px; padding: 12px; background: linear-gradient(135deg, #f5f2f0, #e8e1dd); border: 1px solid #663333; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+   	        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+   	          <span style="color: #663333; font-weight: bold; font-size: 14px;">⚙️ Search Preferences</span>
+   	          <a href="{% url 'preferences_settings' %}" style="margin-left: auto; color: #663333; text-decoration: none; font-weight: bold; padding: 4px 8px; border: 1px solid #663333; border-radius: 4px; background: #F9F9F9; font-size: 12px;">
+   	            Change Settings
+   	          </a>
+   	        </div>
+   	        {% if request.session.job_search_brand == False or request.session.job_search_customer == False or request.session.job_search_po_number == False or request.session.job_search_comments == False or request.session.job_search_instructions == False or request.session.job_search_salesperson == False or request.session.job_search_artist == False %}
+   	          <div style="color: #cc6600; font-size: 12px; font-weight: bold;">
+   	            ⚠️ Some job search fields are disabled: 
+   	            {% if request.session.job_search_brand == False %}Brand {% endif %}
+   	            {% if request.session.job_search_customer == False %}Customer {% endif %}
+   	            {% if request.session.job_search_po_number == False %}PO# {% endif %}
+   	            {% if request.session.job_search_comments == False %}Comments {% endif %}
+   	            {% if request.session.job_search_instructions == False %}Instructions {% endif %}
+   	            {% if request.session.job_search_salesperson == False %}Salesperson {% endif %}
+   	            {% if request.session.job_search_artist == False %}Artist {% endif %}
+   	          </div>
+   	        {% else %}
+   	          <div style="color: #008800; font-size: 12px; font-weight: bold;">
+   	            ✅ All job search fields are enabled for comprehensive searching
+   	          </div>
+   	        {% endif %}
+   	      </div>
+  	    </div>
+  	  </div>
+
+  	  <!-- Basic Search Fields -->
+  	  <div class="search-section" id="basic-search">
+  	    <div class="search-section-header" onclick="toggleSection('basic-search')">
+  	      <span>📋 Basic Job Fields</span>
+  	      <span class="section-toggle">▾</span>
+  	    </div>
+  	    <div class="search-section-content">
+  	      <div class="field-group double">
+  	        <div class="field-item">
+  	          {{form.errors.job_num}}
+  	          <label for="id_job_num">Job #:</label>{{form.job_num}}
+  	        </div>
+  	        <div class="field-item">
+  	          {{form.errors.name}}
+  	          <label for="id_name">Job Name:</label>{{form.name}}
+  	        </div>
+  	      </div>
+  	      
+  	      {% if perms.accounts.beverage_access %}
+  	      <div class="field-group double">
+  	        <div class="field-item">
+  	          {{form.errors.brand_name}}
+  	          <label for="id_brand_name">Brand Name:</label>{{form.brand_name}}
+  	        </div>
+  	        <div class="field-item">
+  	          {{form.errors.po_number}}
+  	          <label for="id_po_number">PO Number:</label>{{form.po_number}}
+  	        </div>
+  	      </div>
+  	      {% endif %}
+  	      
+  	      <div class="field-group double">
+  	        <div class="field-item">
+  	          {{form.errors.customer}}
+  	          <label for="id_customer">Customer:</label>{{form.customer}}
+  	        </div>
+  	        {% if perms.accounts.carton_access %}
+  	        <div class="field-item">
+  	          {{form.errors.customer_id}}
+  	          <label for="id_customer_id">Customer ID #:</label>{{form.customer_id}}
+  	        </div>
+  	        {% endif %}
+  	      </div>
+  	      
+  	      <div class="field-group double">
+  	        <div class="field-item">
+  	          {{form.errors.status}}
+  	          <label for="id_status">Job Status:</label>{{form.status}}
+  	        </div>
+  	        {% if perms.accounts.foodservice_access %}
+  	        <div class="field-item">
+  	          {{form.errors.e_tools_id}}
+  	          <label for="id_e_tools_id">eTools ID #:</label>{{form.e_tools_id}}
+  	        </div>
+  	        {% endif %}
+  	      </div>
+  	    </div>
+  	  </div>
+
+  	  <!-- Date Ranges & People -->
+  	  <div class="search-section" id="dates-people">
+  	    <div class="search-section-header" onclick="toggleSection('dates-people')">
+  	      <span>📅 Dates & People</span>
+  	      <span class="section-toggle">▾</span>
+  	    </div>
+  	    <div class="search-section-content">
+  	      {% if perms.accounts.foodservice_access %}
+  	      <div class="field-group">
+  	        <div class="field-item">
+  	          {{form.errors.printgroup}}
+  	          <label for="id_printgroup">Print Group:</label>{{form.printgroup}}
+  	        </div>
+  	        <div></div>
+  	      </div>
+  	      {% endif %}
+  	      
+  	      <div class="help-text">Use both fields to search a date range (MM/DD/YY format)</div>
+  	      <div class="field-group double">
+  	        <div class="field-item">
+  	          {{form.errors.date_in_start}}
+  	          <label for="id_date_in_start">Date In (Start):</label>{{form.date_in_start}}
+  	        </div>
+  	        <div class="field-item">
+  	          {{form.errors.date_in_end}}
+  	          <label for="id_date_in_end">Date In (End):</label>{{form.date_in_end}}
+  	        </div>
+  	      </div>
+  	      
+  	      <div class="field-group double">
+  	        <div class="field-item">
+				{{form.errors.date_needed_start}}
+				<label for="id_date_needed_start">Date Needed (Start):</label>{{form.date_needed_start}}
+  	        </div>
+  	        <div class="field-item">
+				{{form.errors.date_needed_end}}
+				<label for="id_date_needed_end">Date Needed (End):</label>{{form.date_needed_end}}
+  	        </div>
+  	      </div>
+  	      
+  	      <div class="field-group double">
+  	        <div class="field-item">
+  	          {{form.errors.artist}}
+  	          <label for="id_artist">Artist:</label>{{form.artist}}
+  	        </div>
+  	        <div class="field-item">
+  	          {{form.errors.salesperson}}
+  	          <label for="id_salesperson">Salesperson:</label>{{form.salesperson}}
+  	        </div>
+  	      </div>
+  	      
+  	      {% if perms.accounts.foodservice_access %}
+  	      <div class="field-group">
+  	        <div class="field-item">
+  	          {{form.errors.csr}}
+  	          <label for="id_csr">CSR:</label>{{form.csr}}
+  	        </div>
+  	        <div></div>
+  	      </div>
+  	      {% endif %}
+  	    </div>
+  	  </div>
+
+  	  <!-- Additional Fields -->
+  	  <div class="search-section" id="additional-fields">
+  	    <div class="search-section-header" onclick="toggleSection('additional-fields')">
+  	      <span>🔧 Additional Fields</span>
+  	      <span class="section-toggle">▾</span>
+  	    </div>
+  	    <div class="search-section-content">
+  	      {% if perms.accounts.beverage_access %}
+  	      <div class="field-group">
+  	        <div class="field-item">
+  	          {{form.errors.prepress_supplier}}
+  	          <label for="id_prepress_supplier">Prepress:</label>{{form.prepress_supplier}}
+  	        </div>
+  	        <div></div>
+  	      </div>
+  	      {% endif %}
+  	      
+  	      <div class="field-group double">
+  	        <div class="field-item">
+  	          {{form.errors.keywords}}
+  	          <label for="id_keywords">Keywords:</label>{{form.keywords}}
+  	        </div>
+  	        {% if perms.accounts.carton_access %}
+  	        <div class="field-item">
+  	          {{form.errors.carton_type}}
+  	          <label for="id_carton_type">Carton Type:</label>{{form.carton_type}}
+  	        </div>
+  	        {% endif %}
+  	      </div>
+  	      
+  	      <div class="field-group">
+  	        <div class="field-item">
+  	          {{form.errors.workflow}}
+  	          <label for="id_workflow">Workflow:</label>{{form.workflow}}
+  	        </div>
+  	        <div></div>
+  	      </div>
+  	    </div>
+  	  </div>
+
+  	  <!-- Sorting Options -->
+  	  <div class="search-section" id="sorting-options">
+  	    <div class="search-section-header" onclick="toggleSection('sorting-options')">
+  	      <span>📊 Sorting Options</span>
+  	      <span class="section-toggle">▾</span>
+  	    </div>
+  	    <div class="search-section-content">
+  	      <div class="field-group double">
+  	        <div class="field-item">
+  	          <label for="id_sort_by">Sort By:</label>{{form.sort_by}}
+  	        </div>
+  	        <div class="field-item">
+  	          <label for="id_sort_order">Sort Order:</label>{{form.sort_order}}
+  	        </div>
+  	      </div>
+  	    </div>
+  	  </div>
+
+  	  <!-- Search Buttons -->
+  	  <div class="search-buttons">
+  	    <button type="submit" class="search-btn">🔍 Search Jobs</button>
+  	    <button type="button" class="search-btn reset-btn" onclick="resetForm()">🔄 Reset Form</button>
+  	  </div>
+
+  	</form>
+</div>
+{% endif %}
+
+{% if type == "item" %}
+<div class="search-form-container">
+	<form method="get" action="" name="item_search" enctype="multipart/form-data">
+	  
+	  <!-- Universal Search Section -->
+	  <div class="search-section universal-search" id="universal-search-item">
+	    <div class="search-section-header" onclick="toggleSection('universal-search-item')">
+	      <span>🔍 Universal Search</span>
+	      <span class="section-toggle">▾</span>
+	    </div>
+	    <div class="search-section-content">
+	      <div class="field-group single">
+	        <div class="field-item">
+	          {{form.errors.search_all}}
+	          <label for="id_search_all" style="color: #0066cc; font-weight: bold;">Search All Fields:</label>
+	          {{form.search_all}}
+	        </div>
+	      </div>
+	      <div class="help-text">
+	        📝 <strong>Smart Search:</strong> Find items by typing any combination of words from size, description, UPC, BOM, customer code, job details, etc.<br />
+	        💡 <strong>Example:</strong> "12oz bottle pepsi" finds items containing all these words across multiple fields
+	      </div>
+	      
+	      <!-- Search Preferences Information -->
+	      <div class="preferences-info" style="margin-top: 15px; padding: 12px; background: linear-gradient(135deg, #f5f2f0, #e8e1dd); border: 1px solid #663333; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+	        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+	          <span style="color: #663333; font-weight: bold; font-size: 14px;">⚙️ Search Preferences</span>
+	          <a href="{% url 'preferences_settings' %}" style="margin-left: auto; color: #663333; text-decoration: none; font-weight: bold; padding: 4px 8px; border: 1px solid #663333; border-radius: 4px; background: #F9F9F9; font-size: 12px;">
+	            Change Settings
+	          </a>
+	        </div>
+	        {% if request.session.item_search_description == False or request.session.item_search_upc == False or request.session.item_search_brand == False or request.session.item_search_customer == False or request.session.item_search_comments == False or request.session.item_search_specifications == False %}
+	          <div style="color: #cc6600; font-size: 12px; font-weight: bold;">
+	            ⚠️ Some item search fields are disabled: 
+	            {% if request.session.item_search_description == False %}Description {% endif %}
+	            {% if request.session.item_search_upc == False %}UPC {% endif %}
+	            {% if request.session.item_search_brand == False %}Brand {% endif %}
+	            {% if request.session.item_search_customer == False %}Customer {% endif %}
+	            {% if request.session.item_search_comments == False %}Comments {% endif %}
+	            {% if request.session.item_search_specifications == False %}Specifications {% endif %}
+	          </div>
+	        {% else %}
+	          <div style="color: #008800; font-size: 12px; font-weight: bold;">
+	            ✅ All item search fields are enabled for comprehensive searching
+	          </div>
+	        {% endif %}
+	      </div>
+	    </div>
+	  </div>
+
+	  <!-- Basic Item Fields -->
+	  <div class="search-section" id="basic-item-search">
+	    <div class="search-section-header" onclick="toggleSection('basic-item-search')">
+	      <span>📦 Basic Item Fields</span>
+	      <span class="section-toggle">▾</span>
+	    </div>
+	    <div class="search-section-content">
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.job_num}}
+	          <label for="id_job_num">Job #:</label>{{form.job_num}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.size}}
+	          <label for="id_size">Size/Item:</label>{{form.size}}
+	        </div>
+	      </div>
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.name}}
+	          <label for="id_name">Job Name:</label>{{form.name}}
+	        </div>
+	        {% if perms.accounts.beverage_access %}
+	        <div class="field-item">
+	          {{form.errors.brand_name}}
+	          <label for="id_brand_name">Brand Name:</label>{{form.brand_name}}
+	        </div>
+	        {% endif %}
+	      </div>
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.description}}
+	          <label for="id_description">Description:</label>{{form.description}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.upc_number}}
+	          <label for="id_upc_number">UPC Number:</label>{{form.upc_number}}
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+
+	  <!-- Product Codes & Numbers -->
+	  <div class="search-section" id="product-codes">
+	    <div class="search-section-header" onclick="toggleSection('product-codes')">
+	      <span>🏷️ Product Codes & Numbers</span>
+	      <span class="section-toggle">▾</span>
+	    </div>
+	    <div class="search-section-content">
+	      {% if perms.accounts.foodservice_access %}
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.fsb_nine_digit}}
+	          <label for="id_fsb_nine_digit">9 Digit #:</label>{{form.fsb_nine_digit}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.wrin_number}}
+	          <label for="id_wrin_number">WRIN #:</label>{{form.wrin_number}}
+	        </div>
+	      </div>
+	      
+	      <div class="field-group">
+	        <div class="field-item">
+	          {{form.errors.quality}}
+	          <label for="id_quality">Quality:</label>{{form.quality}}
+	        </div>
+	        <div></div>
+	      </div>
+	      {% endif %}
+	      
+	      {% if perms.accounts.beverage_access or perms.accounts.foodservice_access %}
+	      <div class="field-group">
+	        <div class="field-item">
+	          {{form.errors.bom_number}}
+	          <label for="id_bom_number">SCC/BOM Number:</label>{{form.bom_number}}
+	        </div>
+	        <div></div>
+	      </div>
+	      {% endif %}
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.case_pack}}
+	          <label for="id_case_pack">Case Pack:</label>{{form.case_pack}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.customer_code}}
+	          <label for="id_customer_code">Customer Code:</label>{{form.customer_code}}
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+
+	  <!-- Manufacturing & Production -->
+	  <div class="search-section" id="manufacturing">
+	    <div class="search-section-header" onclick="toggleSection('manufacturing')">
+	      <span>🏭 Manufacturing & Production</span>
+	      <span class="section-toggle">▾</span>
+	    </div>
+	    <div class="search-section-content">
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.plant}}
+	          <label for="id_plant">Plant:</label>{{form.plant}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.press}}
+	          <label for="id_press">Press:</label>{{form.press}}
+	        </div>
+	      </div>
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.specialmfg}}
+	          <label for="id_specialmfg">Special MFG:</label>{{form.specialmfg}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.workflow}}
+	          <label for="id_workflow">Workflow:</label>{{form.workflow}}
+	        </div>
+	      </div>
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.platemaker}}
+	          <label for="id_platemaker">Platemaker:</label>{{form.platemaker}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.platetype}}
+	          <label for="id_platetype">Platetype:</label>{{form.platetype}}
+	        </div>
+	      </div>
+	      
+	      {% if perms.accounts.beverage_access %}
+	      <div class="field-group">
+	        <div class="field-item">
+	          {{form.errors.prepress_supplier}}
+	          <label for="id_prepress_supplier">Prepress:</label>{{form.prepress_supplier}}
+	        </div>
+	        <div></div>
+	      </div>
+	      {% endif %}
+	    </div>
+	  </div>
+
+	  <!-- Colors & Design -->
+	  <div class="search-section" id="colors-design">
+	    <div class="search-section-header" onclick="toggleSection('colors-design')">
+	      <span>🎨 Colors & Design</span>
+	      <span class="section-toggle">▾</span>
+	    </div>
+	    <div class="search-section-content">
+	      <div class="help-text">Optimize search when using color number ranges</div>
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.color_num_low}}
+	          <label for="id_color_num_low"># Colors (Low):</label>{{form.color_num_low}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.color_num_high}}
+	          <label for="id_color_num_high"># Colors (High):</label>{{form.color_num_high}}
+	        </div>
+	      </div>
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.itemcolor}}
+	          <label for="id_itemcolor">Color:</label>{{form.itemcolor}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.coating_pattern}}
+	          <label for="id_coating_pattern">Coating Pattern:</label>{{form.coating_pattern}}
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+
+	  <!-- Date Ranges -->
+	  <div class="search-section" id="date-ranges">
+	    <div class="search-section-header" onclick="toggleSection('date-ranges')">
+	      <span>📅 Date Ranges</span>
+	      <span class="section-toggle">▾</span>
+	    </div>
+	    <div class="search-section-content">
+	      <div class="help-text">Use both fields to search a date range (MM/DD/YY format)</div>
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.date_in_start}}
+	          <label for="id_date_in_start">Date In (Start):</label>{{form.date_in_start}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.date_in_end}}
+	          <label for="id_date_in_end">Date In (End):</label>{{form.date_in_end}}
+	        </div>
+	      </div>
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.all_proof_date_start}}
+	          <label for="id_all_proof_date_start">Proof Out (Start):</label>{{form.all_proof_date_start}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.all_proof_date_end}}
+	          <label for="id_all_proof_date_end">Proof Out (End):</label>{{form.all_proof_date_end}}
+	        </div>
+	      </div>
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.approval_date_start}}
+	          <label for="id_approval_date_start">Approved (Start):</label>{{form.approval_date_start}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.approval_date_end}}
+	          <label for="id_approval_date_end">Approved (End):</label>{{form.approval_date_end}}
+	        </div>
+	      </div>
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.final_file_date_start}}
+	          <label for="id_final_file_date_start">File Out (Start):</label>{{form.final_file_date_start}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.final_file_date_end}}
+	          <label for="id_final_file_date_end">File Out (End):</label>{{form.final_file_date_end}}
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+
+	  <!-- People & Special Fields -->
+	  <div class="search-section" id="people-special">
+	    <div class="search-section-header" onclick="toggleSection('people-special')">
+	      <span>👥 People & Special Fields</span>
+	      <span class="section-toggle">▾</span>
+	    </div>
+	    <div class="search-section-content">
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.artist}}
+	          <label for="id_artist">Artist:</label>{{form.artist}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.salesperson}}
+	          <label for="id_salesperson">Salesperson:</label>{{form.salesperson}}
+	        </div>
+	      </div>
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.marketing}}
+	          <label for="id_marketing">Marketing:</label>{{form.marketing}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.nutrition}}
+	          <label for="id_nutrition">Nutrition:</label>{{form.nutrition}}
+	        </div>
+	      </div>
+	      
+	      {% if perms.accounts.foodservice_access %}
+	      <div class="field-group">
+	        <div class="field-item">
+	          {{form.errors.item_situation}}
+	          <label for="id_item_situation">Item Status:</label>{{form.item_situation}}
+	        </div>
+	        <div></div>
+	      </div>
+	      {% endif %}
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.promo}}
+	          <label for="id_promo">Promotional:</label>{{form.promo}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.grn}}
+	          <label for="id_grn">GDD:</label>{{form.grn}}
+	        </div>
+	      </div>
+	      
+	      <div class="field-group double">
+	        <div class="field-item">
+	          {{form.errors.graphic_req_number}}
+	          <label for="id_graphic_req_number">GREQ:</label>{{form.graphic_req_number}}
+	        </div>
+	        <div class="field-item">
+	          {{form.errors.one_up_die}}
+	          <label for="id_one_up_die">One Up Die:</label>{{form.one_up_die}}
+	        </div>
+	      </div>
+	      
+	      <div class="field-group">
+	        <div class="field-item">
+	          {{form.errors.step_die}}
+	          <label for="id_step_die">Step Die:</label>{{form.step_die}}
+	        </div>
+	        <div></div>
+	      </div>
+	    </div>
+	  </div>
+
+	  <!-- Sorting Options -->
+	  <div class="search-section" id="sorting-options-item">
+	    <div class="search-section-header" onclick="toggleSection('sorting-options-item')">
+	      <span>📊 Sorting Options</span>
+	      <span class="section-toggle">▾</span>
+	    </div>
+	    <div class="search-section-content">
+	      <div class="field-group double">
+	        <div class="field-item">
+	          <label for="id_sort_by">Sort By:</label>{{form.sort_by}}
+	        </div>
+	        <div class="field-item">
+	          <label for="id_sort_order">Sort Order:</label>{{form.sort_order}}
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+
+	  <!-- Search Buttons -->
+	  <div class="search-buttons">
+	    <button type="submit" class="search-btn">🔍 Search Items</button>
+	    <button type="button" class="search-btn reset-btn" onclick="resetForm()">🔄 Reset Form</button>
+	  </div>
+
+	</form>
+</div>
+{% endif %}
+
+<!-- Version Toggle -->
+<p style="margin-top: 20px; font-size: 11px; color: #666; text-align: center;">
+    {% if type == "job" %}
+        <a href="{% url 'job_search' %}?legacy=1">Switch to Legacy Search Interface</a>
+    {% else %}
+        <a href="{% url 'item_search' %}?legacy=1">Switch to Legacy Search Interface</a>
+    {% endif %}
+</p>
+
+{% endblock %}
+

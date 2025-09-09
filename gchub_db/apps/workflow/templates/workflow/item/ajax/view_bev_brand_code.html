@@ -1,0 +1,17 @@
+<div><h3>Item #{{item.num_in_job}}: {{item}}</h3></div>
+<form id="bev_brand_code" name="bev_brand_code" onsubmit="edit_bev_brand_code('{{job.id}}', '{{item.id}}');return false;">
+	<table width="70%">
+		<tr>
+			<th>Change Brand Code</th>
+		</tr>
+		<tr>
+			<td>Old Brand Code</td>
+			<td>{{old_bev_brand_code}}</td>
+		</tr>
+		<tr>
+			<td>New Brand Code</td>
+			<td>{{all_brand_codes_form.all_brand_codes}}</td>
+		</tr>
+	</table>
+	<input type="submit" value="Edit Brand Code" onsubmit="edit_bev_brand_code('{{job.id}}', '{{item.id}}');return false;" />
+</form>

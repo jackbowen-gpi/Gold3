@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+backups/
+*.py[cod]
+*$py.class
+
+# Virtualenv
+.venv/
+venv/
+ENV/
+env/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Pytest
+.pytest_cache/
+
+# Django
+*.log
+local_settings.py
+/media/
+/staticfiles/
+# db.sqlite3 (legacy) - project now defaults to Postgres for local development
+/media/
+/staticfiles/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# History
+.history/
+
+# Local diagnostic dumps and tool outputs
+resolver_dump_*.txt
+resolver_*.txt
+resolver_debug*.txt
+ruff_*.json
+ruff_*.txt
+ruff_report*.json
+urls_import_error.txt
+server_stdout.log
+server_stderr.log
+runserver*.log
+
+# Local scripts / debug output
+*.out
+*.dump
+
+*.misc

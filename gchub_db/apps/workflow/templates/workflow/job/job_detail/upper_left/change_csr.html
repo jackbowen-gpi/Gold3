@@ -1,0 +1,31 @@
+<div>
+  <h1>Change CSR for Job {{job.id}}</h1>
+  <p>
+    Select the new CSR from the drop-down box below and hit the 'Save'
+    button.
+  </p>
+  <form id="jobcsr" name="jobcsr"
+        onsubmit="change_job_via_form('{{job.id}}', 'jobcsr', '/workflow/job/{{job.id}}/change_csr/');return false;"
+        style="width:300px;margin:0 auto">
+    <hr />
+
+    <label for="change_job_csr">Current CSR:</label>
+    <input id="change_job_csr" disabled="disabled" value="{{job.csr}}" />
+    <br />
+
+    <label for="id_csr">New CSR:</label>
+    {{jobform.csr}}
+    <br />
+
+    <hr />
+    <div style='width:180px;padding-top:8px;margin:0 auto'>
+      <a class="button"
+         href='javascript:load_div("main_view", "/workflow/job/{{job.id}}/main/")'>
+        <span>Cancel</span>
+      </a>
+      <a class="button" href="javascript:change_job_via_form('{{job.id}}', 'jobcsr', '/workflow/job/{{job.id}}/change_csr/');">
+        <span>Save</span>
+      </a>
+   </div>
+  </form>
+</div>

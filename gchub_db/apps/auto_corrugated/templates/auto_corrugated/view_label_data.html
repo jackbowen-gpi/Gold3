@@ -1,0 +1,106 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+<!-- Load up jQuery -->
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery.fileDownload.js"></script>
+    <link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/auto_corrugated/generation_styles.css" />
+	{% include "yui_container_includes.html" %}
+	{% include "auto_corrugated/navbar_header.inc.html" %}
+
+	<!-- Javascript -->
+    <script type="text/javascript">
+       /*
+        * prototype is loaded in GOLD's base html and it uses $ just like jquery
+        * does. So we'll change $ to $j for the jQuery on this page using
+        * jQuery.noConflict()
+        */
+        var $j = jQuery.noConflict();
+
+        //jQuery to be fired when the document is ready.
+        $j(document).ready(function(){
+           /*
+            * This dialog asks the user what changes need to be made to a given
+            * box PDF. The dialog is displayed by the approve_box_changes
+            * funct further down.
+            */
+            // Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+        });//End jQuery to be fire when the document is ready.
+
+        // Show busy indicator while prepping PDF download
+		function PDFClick(label_id) {
+			// Set busy indicator text
+			$j("#busy_dialog_text").text("Please wait while GOLD creates this document for download");
+			// Open busy indicator
+			$j( "#busy_dialog" ).dialog( "open" );
+			// Prep download using jquery.fileDownload.js and assign to dlReq
+			dlReq = $j.fileDownload('/acs/generate_label/' + label_id + "/", {
+			    successCallback: function (url) {
+			    	// Hide busy indicator once download is ready.
+					$j( "#busy_dialog" ).dialog( "close" );
+			    },
+			    failCallback: function (responseHtml, url) {
+			    	alert("There was an error creating the Label PDF");
+			    	$j( "#busy_dialog" ).dialog( "close" );
+
+			    }
+			});
+		};
+	</script>
+
+{% endblock %}
+
+{% block page_title %}Label Input Data - {{label}}{% endblock %}
+
+{% block body %}
+<h1>Label Input Data - {{label}}</h1>
+{% include "auto_corrugated/navbar_div.inc.html" %}
+
+<div id="busy_dialog">
+  <center>
+	  <p><div id="busy_dialog_text"></div></p>
+	  <img src="{{MEDIA_URL}}img/spinner.gif" />
+  <center>
+</div>
+
+<p>
+	This label was first created on {{label.creation_date|date:"n-j-Y"}}.
+	You may download it here:
+	<a id="pdf_download" href='#' onClick="PDFClick({{label.id}})">
+		<img src="{{MEDIA_URL}}img/icons/arrow_refresh.png" style="vertical-align:text-bottom" />Download PDF
+	</a>
+</p>
+
+<table width="350px">
+	<tr>
+		<th>Nine Digit</th>
+		<td>{{label.nine_digit_num}}</td>
+	</tr>
+	<tr>
+		<th>Fourteen Digit (SCC)</th>
+		<td>{{label.fourteen_digit_num}}</td>
+	</tr>
+	<tr>
+		<th>Text Line #1</th>
+		<td>{{label.text_line_1}}</td>
+	</tr>
+	<tr>
+		<th>Text Line #2</th>
+		<td>{{label.text_line_2}}</td>
+	</tr>
+</table>
+
+<a id="pdf_download" href='#' onClick="PDFClick({{label.id}})">
+	<img src="{{MEDIA_URL}}img/icons/arrow_refresh.png" style="vertical-align:text-bottom" />Download PDF
+</a>
+
+{% endblock %}

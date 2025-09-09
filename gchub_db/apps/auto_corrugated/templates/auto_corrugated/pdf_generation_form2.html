@@ -1,0 +1,331 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	{% include "auto_corrugated/navbar_header.inc.html" %}
+    <script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="{{YUI_URL}}build/animation/animation-min.js"></script>
+    <script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/auto_corrugated/generation_styles.css" />
+    
+    <script type="text/javascript">    
+    var digit9;
+    var digit14;
+    var text1;
+    var text2;
+
+    function hide_modal_wait() {
+        setTimeout("YAHOO.example.container.wait.hide()",1250);
+    } // end hide_modal_wait()
+    
+      function update_form_from_simple_box() {
+         var chk = $('id_pdf_type').value;
+         digit9 = $('id_nine_digit_num').value;
+         digit14 = $('id_fourteen_digit_num').value;
+         text1 = $('id_text_line_1').value;
+         text2 = $('id_text_line_2').value;
+		
+         //Clear the values when changing to a blank label choice
+         if ((chk == 1) || (chk == 3)){
+            $('id_nine_digit_num').clear();
+            $('id_fourteen_digit_num').clear();
+            $('id_text_line_1').clear();
+            $('id_text_line_2').clear();
+       
+            
+            $('id_nine_digit_num').disabled = true;
+            YAHOO.util.Dom.addClass('id_nine_digit_num','disableClass');
+            $('id_fourteen_digit_num').disabled = true;
+            YAHOO.util.Dom.addClass('id_fourteen_digit_num','disableClass');
+            $('id_text_line_1').disabled = true;
+            YAHOO.util.Dom.addClass('id_text_line_1','disableClass');
+            $('id_text_line_2').disabled = true;
+            YAHOO.util.Dom.addClass('id_text_line_2','disableClass');
+         } else{
+            $('id_nine_digit_num').disabled = false;
+            YAHOO.util.Dom.removeClass('id_nine_digit_num','disableClass');
+            $('id_fourteen_digit_num').disabled = false;
+            YAHOO.util.Dom.removeClass('id_fourteen_digit_num','disableClass');
+            $('id_text_line_1').disabled = false;
+            YAHOO.util.Dom.removeClass('id_text_line_1','disableClass');
+            $('id_text_line_2').disabled = false;
+            YAHOO.util.Dom.removeClass('id_text_line_2','disableClass');
+            
+         }
+      }
+      
+      function update_form_from_plant_selection() {
+        var selected_plant = $('id_plant').getValue();
+        var selected_value = $('id_item').getValue();
+        new Ajax.Updater("id_spec", "{% url "auto_corrugated_json_get_boxitem_specs" %}", {
+             parameters: {'boxitem_id': selected_value, 'plant_id': selected_plant},
+             onComplete: function(request) {
+                 update_form_from_spec_selection();
+             }
+        });
+        if (selected_plant ==  1){
+            $('id_platepackage').value = "";
+            $('plateNum').style.setProperty("display", "block");
+        }
+        else{
+            // 49 is the value assigned to Shellbyville - Corr. (view the page source code to see this value)
+            $('id_platepackage').value = 49;
+            $('plateNum').style.setProperty("display", "none");
+            $('id_plate_number').value = "";
+        }
+      }
+      
+      /* Called when an item is selected from the Item dropdown. Update
+       * the Length/Width/Height and case count values from the defaults. */
+      function update_form_from_size_selection() {
+         var selected_value = $('id_item').getValue();
+         var selected_plant = $('id_plant').getValue();
+         new Ajax.Updater("id_spec", "{% url "auto_corrugated_json_get_boxitem_specs" %}", {
+             parameters: {'boxitem_id': selected_value, 'plant_id': selected_plant},
+             onComplete: function(request) {
+                 update_form_from_spec_selection();
+             }
+         });
+      }
+      
+      /* Called when a spec is selected. Populates the dimension fields. */
+      function update_form_from_spec_selection() {
+          var selected_value = $('id_spec').getValue();
+          new Ajax.Request("{% url "auto_corrugated_json_get_boxitem_dimensions" %}", {
+             parameters: {'boxitemspec_id': selected_value},
+             onSuccess: function(response) {
+                 var retval = response.responseText;
+                 // Only do something if we get a usable value back.
+                 // TODO: Check this against the split instead of string?
+                 if (retval.length > 0) {
+                     var dimensions = retval.split(' ')
+                     $('id_dim_width').value=dimensions[0];
+                     $('id_dim_length').value=dimensions[1];
+                     $('id_dim_height').value=dimensions[2];
+                 } else {
+                     $('id_dim_width').value='';
+                     $('id_dim_length').value='';
+                     $('id_dim_height').value='';
+                 }
+             }
+          });
+      }
+
+      function generate_label() {
+           /*
+            * Fired when he user hits the Generate Label button. Calls the validator
+            * and sends off an AJAX request if all is good.
+            */
+           YAHOO.example.container.wait.show();
+           new Ajax.Request('/acs/pdf_label_generation_form/', {
+               method: 'POST',
+               parameters: Form.serialize('pdf_form'),
+               onSuccess: function(http_req) {
+                  jsobj = http_req.responseText.evalJSON();
+                  if (jsobj["is_error"] == false) {
+                     // No error, send to box review page to download PDF.
+                     window.location = '/acs/view_label_data/' + jsobj['message'] + '/';
+                  } else {
+                     // Errors in form, correct and resubmit.
+                     hide_modal_wait();
+                     alert(jsobj["message"]);
+                  }
+               },
+               onComplete: function() {
+                  hide_modal_wait();
+            }});
+        } // end generate_label()
+
+      function generate_box() {
+           /*
+            * Fired when he user hits the Generate Box button. Calls the validator
+            * and sends off an AJAX request if all is good.
+            */
+	            
+           YAHOO.example.container.wait.show();
+           new Ajax.Request('/acs/pdf_generation_form/', {
+               method: 'POST',
+               parameters: Form.serialize('pdf_form'),
+               onSuccess: function(http_req) {
+                  jsobj = http_req.responseText.evalJSON();
+                  if (jsobj["is_error"] == false) {
+                     // No error, send to box review page to download PDF.
+                     window.location = '/acs/view_box_data/' + jsobj['message'] + '/';
+                  } else {
+                     // Errors in form, correct and resubmit.
+                     hide_modal_wait();
+                     alert(jsobj["message"]);
+                  }
+               },
+               onComplete: function() {
+                  hide_modal_wait();
+            }});
+        } // end generate_box()
+        
+        function edit_box(box_id) {
+           /*
+            * Fired when he user hits the Generate Box button. Calls the validator
+            * and sends off an AJAX request if all is good.
+        	*/
+            
+           YAHOO.example.container.wait.show();
+           new Ajax.Request('/acs/pdf_generation_form/edit/'+ box_id +'/', {
+               method: 'POST',
+               parameters: Form.serialize('pdf_form'),
+               onSuccess: function(http_req) {
+                  jsobj = http_req.responseText.evalJSON();
+                  if (jsobj["is_error"] == false) {
+                     // No error, send to box review page to download PDF.
+                     window.location = '/acs/view_box_data/' + box_id + '/';
+                  } else {
+                     // Errors in form, correct and resubmit.
+                     hide_modal_wait();
+                     alert(jsobj["message"]);
+                  }
+               },
+               onComplete: function() {
+                  hide_modal_wait();
+            }});
+        } // end edit_box()
+      
+      {% ifnotequal type "Label"  %}
+      /* Stuff to be done on page load. */
+      function on_load() { 
+          update_form_from_plant_selection();
+          update_form_from_size_selection();
+          update_form_from_simple_box();
+      }
+      {% endifnotequal %}
+      // When the Plant drop-down changes, update the list of available specs.
+      YAHOO.util.Event.addListener("id_plant", "change", 
+              update_form_from_plant_selection);
+      // When the Item drop-down changes, update the list of available specs.
+      YAHOO.util.Event.addListener("id_item", "change", 
+              update_form_from_size_selection);
+      // When the Spec drop-down changes, update the dimensions.
+      YAHOO.util.Event.addListener("id_spec", "change", 
+              update_form_from_spec_selection);
+      // When the Spec drop-down changes, update the dimensions.
+      YAHOO.util.Event.addListener("id_pdf_type", "change", 
+              update_form_from_simple_box);
+        // Initialize the temporary Panel to display while waiting for external content to load
+        YAHOO.namespace("example.container");
+        YAHOO.example.container.wait = 
+            new YAHOO.widget.Panel("wait", {  
+                width:"240px", 
+                fixedcenter:true, 
+                close:false, 
+                draggable:false, 
+                modal:true,
+                visible:false,
+                effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5} 
+            });
+        YAHOO.example.container.wait.setHeader("Updating, please wait...");
+        YAHOO.example.container.wait.setBody('<img src="{{MEDIA_URL}}img/rel_interstitial_loading.gif" />');
+        YAHOO.example.container.wait.render(document.body);
+    </script>
+
+{% endblock %}
+
+{% block page_title %}Generate {{type}} PDF{% endblock %}
+
+{% block body %}
+<h1>{{type}} Generation Form</h1>
+{% include "auto_corrugated/navbar_div.inc.html" %}
+
+<p>
+	<img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align:text-bottom" />
+	Report any errors or problems to <a href="{{EMAIL_SUPPORT}}">{{EMAIL_SUPPORT}}.</a>
+</p>
+<div class="" style="margin: 0 auto;">
+	{% if form.errors %}
+		<ul class="errorlist">
+		  <li>Please correct the error{{ form.errors|pluralize }} with your submission!</li>
+		</ul>
+	{% endif %}
+	   
+	<form id="pdf_form" name="pdf_form" class="ul_form" method="POST">
+
+{% ifequal type "Label"  %}
+       <dl style="width: 430px;">
+           <dt><label>Nine Digit Number:</label></dt>
+               <dd>{{form.nine_digit_num}}</dd>
+           <dt><label>Fourteen Digit Number:</label></dt>
+               <dd>{{form.fourteen_digit_num}}</dd>
+           <dt><label>Text Line 1:</label></dt>
+               <dd>{{form.text_line_1}}</dd>
+           <dt><label>Text Line 2:</label></dt>
+               <dd>{{form.text_line_2}}</dd>
+           
+           <!-- Hide this from view -->
+           <div id="pdfType" style="display: none;">
+               <dt><label>PDF_type:</label></dt>
+                   <dd>{{form.pdf_type}}</dd>
+           </div>
+           
+       </dl>
+       <!--  <input id="id_submit" class="submit" type="submit" value="Generate {{type}}" />  -->
+       <a class="button2" style="float: left;" href="javascript:generate_label()">Generate Label</a>
+{% else %}
+    <div class="form_p">
+       <dl style="float:left; width: 430px;">
+           <dt><label>Select a PDF Type:</label></dt>
+               <dd>{{form.pdf_type}}</dd>
+           <dt><label>Six Digit #:</label></dt>
+               <dd>{{form.six_digit_num}}</dd>
+           <dt><label>Replaces Six Digit #:</label></dt>
+               <dd>{{form.replaced_6digit}}</dd>
+           <dt><label>Nine Digit #:</label></dt>
+               <dd>{{form.nine_digit_num}}</dd>
+           <dt><label>Fourteen Digit #:</label></dt>
+               <dd>{{form.fourteen_digit_num}}</dd>
+           <dt><label>Text Line 1:</label></dt>
+               <dd>{{form.text_line_1}}</dd>
+           <dt><label>Text Line 2:</label></dt>
+               <dd>{{form.text_line_2}}</dd>
+           <dt><label>Board Spec:</label></dt>
+               <dd>{{form.board_spec}}</dd>
+           <dt><label>Case Color:</label></dt>
+               <dd>{{form.case_color}}</dd>
+       </dl>
+       <dl style="float:left; width: 430px;">
+           <dt><label>Plant:</label></dt>
+               <dd>{{form.plant}}</dd>
+           <dt><label>Item:</label></dt>
+               <dd>{{form.item}}</dd>
+           <dt><label>Case Pack:</label></dt>
+               <dd>{{form.spec}}</dd>
+           <dt><label>Box Length:</label></dt>
+               <dd>{{form.dim_length}}</dd>
+           <dt><label>Box Width:</label></dt>
+               <dd>{{form.dim_width}}</dd>
+           <dt><label>Box Height:</label></dt>
+               <dd>{{form.dim_height}}</dd>
+           <dt><label>Sleeve Count:</label></dt>
+               <dd>{{form.sleeve_count}}</dd>
+           <dt><label>Box Format:</label></dt>
+               <dd>{{form.box_format}}</dd>
+           <dt><label>Platemaking:</label></dt>
+               <dd>{{form.platepackage}}</dd>
+           <div id="plateNum">
+	           <dt><label>Plate #:</label></dt>
+	               <dd>{{form.plate_number}}</dd>
+           </div>
+           {% if edit %}
+             <a class="button2" style="float: right; margin: 5px" href='javascript:edit_box("{{box_id}}")'>Edit Box</a>
+           {% else %}
+             <a class="button2" style="float: right; margin: 5px" href="javascript:generate_box()">Generate Box</a>
+           {% endif %}
+        <dl>
+        
+    </div>
+      
+{% endifequal %}
+
+	<div style="clear: both;"></div>
+
+	</form>   
+</div>
+
+{% endblock %}

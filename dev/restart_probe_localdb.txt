@@ -1,0 +1,77 @@
+
+ComputerName             : 127.0.0.1
+RemoteAddress            : 127.0.0.1
+ResolvedAddresses        : {127.0.0.1}
+PingSucceeded            : True
+PingReplyDetails         : System.Net.NetworkInformation.PingReply
+TcpClientSocket          :
+TcpTestSucceeded         : False
+RemotePort               : 8000
+TraceRoute               :
+Detailed                 : False
+InterfaceAlias           : Loopback Pseudo-Interface 1
+InterfaceIndex           : 1
+InterfaceDescription     :
+NetAdapter               :
+NetRoute                 : MSFT_NetRoute (InstanceID = ";?A8:8:8;9??55;55:8:8:8:55;")
+SourceAddress            : 127.0.0.1
+NameResolutionSucceeded  : True
+BasicNameResolution      : {Microsoft.DnsClient.Commands.DnsRecord_PTR}
+LLMNRNetbiosRecords      : {}
+DNSOnlyRecords           : {Microsoft.DnsClient.Commands.DnsRecord_PTR}
+AllNameResolutionResults : Microsoft.DnsClient.Commands.DnsRecord_PTR
+IsAdmin                  : False
+NetworkIsolationContext  : Loopback
+MatchingIPsecRules       :
+
+
+ComputerName             : 127.0.0.1
+RemoteAddress            : 127.0.0.1
+ResolvedAddresses        : {127.0.0.1}
+PingSucceeded            : True
+PingReplyDetails         : System.Net.NetworkInformation.PingReply
+TcpClientSocket          :
+TcpTestSucceeded         : False
+RemotePort               : 8000
+TraceRoute               :
+Detailed                 : False
+InterfaceAlias           : Loopback Pseudo-Interface 1
+InterfaceIndex           : 1
+InterfaceDescription     :
+NetAdapter               :
+NetRoute                 : MSFT_NetRoute (InstanceID = ";?A8:8:8;9??55;55:8:8:8:55;")
+SourceAddress            : 127.0.0.1
+NameResolutionSucceeded  : True
+BasicNameResolution      : {Microsoft.DnsClient.Commands.DnsRecord_PTR}
+LLMNRNetbiosRecords      : {}
+DNSOnlyRecords           : {Microsoft.DnsClient.Commands.DnsRecord_PTR}
+AllNameResolutionResults : Microsoft.DnsClient.Commands.DnsRecord_PTR
+IsAdmin                  : False
+NetworkIsolationContext  : Loopback
+MatchingIPsecRules       :
+
+
+ComputerName             : 127.0.0.1
+RemoteAddress            : 127.0.0.1
+ResolvedAddresses        : {127.0.0.1}
+PingSucceeded            : True
+PingReplyDetails         : System.Net.NetworkInformation.PingReply
+TcpClientSocket          :
+TcpTestSucceeded         : False
+RemotePort               : 8000
+TraceRoute               :
+Detailed                 : False
+InterfaceAlias           : Loopback Pseudo-Interface 1
+InterfaceIndex           : 1
+InterfaceDescription     :
+NetAdapter               :
+NetRoute                 : MSFT_NetRoute (InstanceID = ";?A8:8:8;9??55;55:8:8:8:55;")
+SourceAddress            : 127.0.0.1
+NameResolutionSucceeded  : True
+BasicNameResolution      : {Microsoft.DnsClient.Commands.DnsRecord_PTR}
+LLMNRNetbiosRecords      : {}
+DNSOnlyRecords           : {Microsoft.DnsClient.Commands.DnsRecord_PTR}
+AllNameResolutionResults : Microsoft.DnsClient.Commands.DnsRecord_PTR
+IsAdmin                  : False
+NetworkIsolationContext  : Loopback
+MatchingIPsecRules       :

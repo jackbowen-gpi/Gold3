@@ -1,0 +1,9 @@
+	<img src="{{MEDIA_URL}}img/icons/cog_edit.png">
+	<span class="sub_heading">Change Plate Package (currently {{job.temp_platepackage}})</span><br />
+	<form id="platepackage" name="platepackage" onsubmit="change_platepackage('{{job.id}}');return false;">
+		<div class="outline" style="width:350px; padding-left:8px;">
+			<label id="id_temp_platepackage">Plate Package: </label>{{form.temp_platepackage}}<br />
+			<br />
+			<input type="submit" value="Change Plate Package" onclick="change_platepackage('{{job.id}}');return false;" />
+		</div>
+	</form>

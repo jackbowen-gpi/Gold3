@@ -1,0 +1,112 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+    {% include "yui_container_includes.html" %}
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/drawdown/drawdown.css" type="text/css" media="all" />
+    <script type="text/javascript" src="{{MEDIA_URL}}js/drawdown/drawdown.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/prototype.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/ckeditor/ckeditor.js"></script>
+{% endblock %}
+
+{% block body %}
+<div class="drawdownreq">
+<form method="post" id="drawdowndata" name="drawdowndata" onsubmit="drawdown_save('{{drawDownReqID}}');return false;">
+	<dd class="hide">{{ drawdownReqform.creation_date }}</dd>
+ 	<dd class="hide">{{ drawdownReqform.request_complete }}</dd>
+	<h1 style="text-align:center">{{page_title}}</h1>
+	<p style="text-align:center">This is the main job related information for the drawdown request.</p>
+ 	<br />
+	<table style="width:80%;margin: 0 auto">
+   		<tr>
+	    	<td>Requested By: {{ drawdownReqform.requested_by }}</td>
+	    	<td>Date Needed: {{ drawdownReqform.date_needed }}</td>
+	    </tr>
+	    <tr>
+	    	<td>Customer Name: {{ drawdownReqform.customer_name }}</td>
+	    	<td>Job #: {{ drawdownReqform.job_number }}</td>
+	    </tr>
+	    <tr>
+	    	<td>
+	           	Send Prints To:<br /><i style="font-size: 0.85em;">(250 characters)</i>
+	      		{{ drawdownReqform.send_prints_to }}
+			</td>
+			<td>
+				Comments/Notes:<br /><i style="font-size: 0.85em;">(500 characters)</i>
+				{{ drawdownReqform.comments }}
+			</td>
+		</tr>
+	</table>
+    
+    <h1 style="text-align:center">Drawdown Items</h1>
+    <p style="text-align:center">This is information related to each individual item in the draw down request.
+     Click the Edit Request button when you are finished editing this drawdown request</p>
+ 	<br />
+ 	
+    {{ drawdownItemForm.management_form }}
+    {% for drawdownItem in drawdownItemForm %}
+    {{ drawdownItem.id }}
+    <div class="drawdown">
+    	{% if drawdownItem.item_number.value %}
+    	<h3 style="text-align:center">Item {{drawdownItem.item_number.value}}</h3>
+    	{% else %}
+		<h3 style="text-align:center">Item</h3>
+    	{% endif %}
+	    <table style="width:80%;margin: 0 auto">
+	   		<tr>
+				<td>
+					Print Location:
+					{{ drawdownItem.print_location }}
+				</td>
+				<td>
+					Substrate:
+					{{ drawdownItem.substrate }}
+				</td>
+				<td>
+					<table>
+						<tr>
+					    	<td>
+					    	Item Number: {{ drawdownItem.item_number }}
+					    	</td>
+						</tr>
+						<tr>
+							<td>
+			    			Number of Copies: {{ drawdownItem.number_copies }}
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td>
+					    	Artwork Available: {{ drawdownItem.artwork }}
+					    	</td>
+					    </tr>
+						<tr>
+							<td>
+							Colors Needed:<br /><i style="font-size: 0.85em;">(250 characters)</i>
+							{{ drawdownItem.colors_needed }}
+							
+		
+							</td>
+						</tr>
+					</table>
+				</td>
+		    </tr>
+		 </table>
+	 </div>
+    {% endfor %}
+   
+	{% if drawdownform.help_text %}<dd>{{ drawdownform.help_text }}</dd>{% endif %}
+	{% if drawdownform.errors %}<dd class="myerrors">{{ drawdownform.errors }}</dd>{% endif %}
+	
+	<div class="clearfix centered-submit">
+	    <div class="submit">
+	       <div class="submit"><input type="submit" value="Edit Request" onclick="drawdown_save('{{drawDownReqID}}');return false;" /></div>
+	    </div>
+	    <div class="show-request">
+	        <a href="../../show/"><input value="Show Requests" /></a>
+	    </div>
+	</div>   
+	<div class="clearfix"></div>   
+</form>
+</p>
+</div>
+
+{% endblock %}

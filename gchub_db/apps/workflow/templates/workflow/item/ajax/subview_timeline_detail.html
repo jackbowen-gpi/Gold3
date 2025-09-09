@@ -1,0 +1,287 @@
+{% load log_links %}
+{% load item_links %}
+	<img src="{{MEDIA_URL}}img/icons/date.png">
+	{% include "workflow/item/toggle_detail_navbar.html" %}
+
+	<div class="outline_fancy" style="position:relative;float:left;width:99%;">
+		<table width="98%">
+			<tr>
+				<th class="rightalign">First Proof:</th>
+				<td width="120px">{{ item.first_proof_date|date:"n-j-Y" }}</td>
+				{% if perms.accounts.clemson_employee %}
+					<td>
+						<a href='javascript:delete_item("{{item.job.id}}", "{{item.id}}")'>
+						  <img src="{{MEDIA_URL}}img/icons/delete.png" style="vertical-align:text-bottom" alt="Delete Item" />
+						    Delete This Item
+						</a>
+					</td>
+					<td>
+						<a href='{% url "error_tracking_add" item.id %}'>
+						  <img src="{{MEDIA_URL}}img/icons/error.png" style="vertical-align:text-bottom" alt="Report Error" />
+						    Report an Error
+						</a>
+					</td>
+				{% endif %}
+			</tr>
+		</table>
+	</div>
+
+	<!-- If the user is allowed to perform any timeline edit tasks, display this div. -->
+	{% if perms.workflow.can_proof_item or perms.workflow.can_approve_item or perms.workflow.can_file_out_item %}
+	<div class="outline" style="position:relative;float:left;width:99%;">
+		<form action="/workflow/item/{{item.id}}/timeline/save/" id="itemdata" name="itemdata" onsubmit="update_item('{{item.id}}','timeline', '{{item.job.id}}');return false;">
+		<table width="98%">
+			<tr>
+				<th colspan="2">Actions:</th>
+				<th>Warnings</th>
+				<th>Notes:</th>
+			</tr>
+
+			{% if perms.accounts.clemson_employee %}
+
+					<tr>
+						<td class="rightalign"><img src="{{MEDIA_URL}}img/icons/magnifier.png" style="vertical-align:text-bottom" /> <strong>Preflight:</strong></td>
+						{% if item.can_preflight %}
+						<td>{{itemform.preflight}}</td>
+						<!-- Setup warnings if certain other timeline events have not occured. -->
+						<td>
+							&nbsp;
+						</td>
+						<td>
+							{{itemform.preflight_notes}}
+						</td>
+						{% else %}
+						<td><i>Item Preflighted...</i></td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						{% endif %}
+					</tr>
+				{% if perms.workflow.can_proof_item %}
+					<tr>
+						<td class="rightalign"><img src="{{MEDIA_URL}}img/icons/picture_go.png" style="vertical-align:text-bottom" /> <strong>Proof Out:</strong></td>
+						<td>
+							{% if item.can_proof %}
+								{{itemform.proof_out}}
+							{% endif %}
+						</td>
+						<!-- Setup warnings if certain other timeline events have not occured. -->
+
+							{% ifequal item.job.workflow.name "Beverage" %}
+								<td>
+									{% ifequal item.preflight_ok 0 %}
+										<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align:text-bottom" /> Preflight not completed!
+										<input type="hidden" name="proof_exception" value="Preflight not complete.">
+									{% endifequal %}
+								</td>
+								<td>
+									{{itemform.proof_notes}}
+								</td>
+							{% endifequal %}
+
+							{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+								<td>
+									{% ifnotequal item.review_status.status "OK" %}
+										<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align:text-bottom" /> Plant or Demand Planning has not OK'd artwork!
+										<input type="hidden" name="proof_exception" value="Plant or Demand Planning has not OK'd artwork.">
+									{% endifnotequal %}
+								</td>
+								<td>
+									{{itemform.proof_notes}}
+								</td>
+							{% endif %}
+
+					</tr>
+				{% endif %}
+			{% endif %} <!-- END PERMS CLEMSON EMPLOYEE -->
+
+			{% if perms.workflow.can_approve_item %}
+				<tr>
+					<td class="rightalign"><img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" /> <strong>Approve:</strong></td>
+					<td>
+						{% if item.can_approve %}
+							{{itemform.approve}}
+						{% endif %}
+					</td>
+					 <!-- Setup warnings if certain other timeline events have not occured. -->
+						<td>
+						{% ifequal item.current_proof_date "" %}
+							<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align:text-bottom" /> Item has not been proofed!
+							<input type="hidden" name="approve1_exception" value="Item not proofed.">
+						{% endifequal %}
+						{% if item.current_revision %}
+							<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align:text-bottom" /> Revision pending!
+							<input type="hidden" name="approve2_exception" value="Revision pending.">
+						{% endif %}
+					</td>
+					<td>
+						{{itemform.approve_notes}}
+					</td>
+				</tr>
+			{% endif %}
+
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+			<tr>
+				<td class="rightalign"><img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align:text-bottom" /> <strong>Item Number:</strong></td>
+				<td>{{itemform.fsb_nine_digit}}</td>
+				<td>&nbsp;</td>
+			</tr>
+			{% endif %}
+
+			{% if perms.workflow.can_file_out_item %}
+				{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+					<tr>
+						<td class="rightalign"><img src="{{MEDIA_URL}}img/icons/rainbow.png" style="vertical-align:text-bottom" /> <strong>Forecast:</strong></td>
+						<td>
+							{% if item.can_forecast %}
+								{% if perms.workflow.can_forecast_item %}
+									{{itemform.forecast}}
+								{% endif %}
+							{% endif %}
+						</td>
+						<!-- Setup warnings if certain other timeline events have not occured. -->
+						<td>&nbsp;</td>
+						<td>
+						{% if item.can_forecast %}
+							{% if perms.workflow.can_forecast_item %}
+								Forecast set as {{ itemform.forecast_notes }}
+							{% endif %}
+						{% endif %}
+						</td>
+					</tr>
+				{% endif %}
+				<tr>
+					<td class="rightalign"><img src="{{MEDIA_URL}}img/icons/printer.png" style="vertical-align:text-bottom" /> <strong>File Out:</strong></td>
+					<td>
+						{% if item.can_file_out %}
+							{{itemform.file_out}}
+						{% endif %}
+					</td>
+					<!-- Setup warnings if certain other timeline events have not occured. -->
+					{% ifequal item.approval_date "" %}
+					<td>
+						<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align:text-bottom" /> Item has not been approved!
+						<input type="hidden" name="fileout_exception" value="Item not approved.">
+					</td>
+					<td>
+						{{itemform.fileout_notes}}
+					</td>
+					{% endifequal %}
+					</td>
+				</tr>
+			{% endif %}
+
+		</table>
+		<span class="submit">
+			<input type="submit" value="Update Item Info"  onclick="update_item('{{item.id}}','timeline', '{{item.job.id}}');return false;" />
+		</span>
+		</form>
+	</div>
+	{% endif %}
+
+	{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+	<div class="outline" style="position:relative;float:left;width:99%;">
+		<h2>Review Notes:</h2>
+		{% for rev in item.demand_reviews %}
+			<strong>Demand Planning: </strong>{{rev.review_date|date:"n-j-Y" }}: {{rev.comments}}<br />
+		{% endfor %}
+		{% for rev in item.plant_reviews %}
+			<strong>Plant Review: </strong>{{rev.review_date|date:"n-j-Y" }}: {{rev.comments}}<br />
+		{% endfor %}
+		{% for rev in item.market_reviews %}
+			<strong>Marketing Review: </strong>{{rev.review_date|date:"n-j-Y" }}: {{rev.comments}}<br />
+		{% endfor %}
+	</div>
+	{% endif %}
+
+	<div class="outline_fancy" style="min-height:50px;position:relative;float:left;width:49%;">
+		<img src="{{MEDIA_URL}}img/icons/note_edit.png" style="vertical-align: text-bottom" /> <span class="sub_heading">Revision History</span>
+		<br />
+		{% for revision in revisions_entered %}
+			<table width="100%">
+				<tr>
+					<th width="100px">Entered:</th>
+					<td width="75px">{{revision.creation_date|date:"n-j-Y"}}</td>
+
+					<th width="100px">Due:</th>
+					{% if revision.complete_date %}
+						<td width="75px">{{revision.due_date|date:"n-j-Y"}}</td>
+					{% else %}
+						<td width="75px"><span class="warning">{{revision.due_date|date:"n-j-Y"}}</span></td>
+					{% endif %}
+
+					<th width="100px">Complete:</th>
+					<td width="75px">{{revision.complete_date|date:"n-j-Y"}}&nbsp;</td>
+
+				</tr>
+				<tr>
+					<td colspan="6" style="padding-bottom:10px">
+					<strong>Instructions: </strong>{{revision.comments}}
+					{% if perms.accounts.clemson_employee or user|hasgroup:"Evergreen Analyst" %}
+						{% if revision.complete_date %}
+							<!-- Revision complete, can not delete. -->
+						{% else %}
+							<br /><br />
+							<a href='javascript:load_div("bottom_view", "/workflow/item/{{item.id}}/edit_revision/{{revision.id}}/")'>
+								<img src="{{MEDIA_URL}}img/icons/shape_square_edit.png" style="vertical-align: text-bottom" /> Edit Revision
+							</a>
+							<br />
+							<a href='javascript:delete_revision("{{revision.id}}", "{{revision.item.job.id}}", "{{revision.item.id}}")'><img src="{{MEDIA_URL}}img/icons/delete.png" style="vertical-align: text-bottom" /> Delete Revision</a>
+						{% endif %}
+					{% endif %}
+					</td>
+				</tr>
+			</table>
+		{% empty %}
+			<br />
+			No Revisions have been entered for this item.
+			<br /><br />
+		{% endfor %}
+
+		{% if perms.accounts.clemson_employee or user|hasgroup:"Evergreen Analyst" %}
+			{% if item.can_enter_revision %}
+				<a href='javascript:load_div("bottom_view", "/workflow/item/{{item.id}}/enter_revision/")'>
+					<img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" /> Enter a Revision
+				</a>
+			{% else %}
+				<img src="/media/img/icons/exclamation.png" style="vertical-align:text-bottom"> Revisions can not be entered for this item at this time.</p>
+			{% endif %}
+		{% else %}
+			<br />
+			Revisions can not be entered for this item
+		{% endif %}
+	</div>
+
+	<div class="outline_fancy" style="min-height:50px;position:relative;float:left;width:49%;">
+		<img src="{{MEDIA_URL}}img/icons/time.png" style="vertical-align: text-bottom" />
+		<span class="sub_heading">Timeline History</span>
+		<br />
+		<table>
+		{% for event in proof_history %}
+			<tr>
+				<td style="padding:4px">
+					{% ifequal event.get_type_display "Proofed" %}
+						{{event|log_proof_link}}
+					{% endifequal %}
+					<strong>{{event.get_type_display}}:</strong>
+					{{event.event_time|date:"n-j-Y"}}
+					<span class="smtext">({{event.user}})</span>
+				</td>
+				{% if perms.accounts.clemson_employee %}
+				<td style="padding:4px">
+				  <a href='javascript:joblog_delete_log("{{event.id}}", "{{item.job.id}}", "{{item.id}}")'>
+				    <img src="{{MEDIA_URL}}img/icons/bin.png" style="vertical-align: text-bottom" />
+				    Delete {{event.get_type_display}}
+				  </a>
+				</td>
+				{% endif %}
+			</tr>
+		{% empty %}
+			<tr>
+				<td style="padding:4px">
+					Nothing has been done to this item yet.
+				</td>
+			</tr>
+		{% endfor %}
+		</table>
+		<br />
+	</div>

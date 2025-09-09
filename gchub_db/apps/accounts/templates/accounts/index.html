@@ -1,0 +1,70 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/tabview/assets/skins/sam/tabview.css" />
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/tabview-custom-skin.css" />
+
+<style type="text/css">
+  #body_wrap { background-color:transparent; border:none}
+  .home_left { width: 510px; min-height: 400px; float: left;}
+  .home_todo { background-color: #F2F3E5; padding: 5px; padding-top: 10px;
+             float: left; margin-left: 15px; margin-top:21px;
+             width:400px; background: #FFFFFF url('/media/img/notepad_bg.jpg') no-repeat top right;
+             border: 1px solid rgb(102,51,51); border-top: 6px solid rgb(102,51,51);}
+  #main_tabview { margin-bottom:15px; }
+  #bottom_tabview {clear:both; width: 507px; }
+</style>
+
+<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/element/element-min.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/tabview/tabview-min.js"></script>
+
+<script type="text/javascript">
+YAHOO.util.Event.onContentReady("bottom_tabview", function () {
+	var main_tabview = new YAHOO.widget.TabView("main_tabview");
+	{% if perms.accounts.clemson_employee %}
+    var bottom_tabview = new YAHOO.widget.TabView("bottom_tabview");
+    {% endif %}
+});
+</script>
+{% endblock extra_head %}
+
+{% block body %}
+<div id="outer_div" class="yui-skin-sam">
+     {% if perms.accounts.clemson_employee and not request.user.profile.phone_number%}
+     <div class="error_block">
+       No office phone number has been entered on your user profile. Please
+       take a moment to visit your
+       <a href='{% url "preferences_contact_info" %}'>contact info</a>
+       preferences and enter one.
+     </div>
+     {% endif %}
+
+	<div class="home_left">
+	  {% include "accounts/index_main_tab.html" %}
+	  {% if perms.accounts.clemson_employee %}
+	    {% include "accounts/index_bottom_tabs.html" %}
+	  {% endif %}
+    </div>
+
+	{% comment %}Should be if in Artists group{% endcomment %}
+	{% if perms.accounts.in_artist_pulldown %}
+		<div class="home_todo">
+		  {% include "accounts/artist_todo.html" %}
+		</div>
+	{% else %}
+	    {% comment %}Should be if in Analyst group{% endcomment %}
+		{% if perms.accounts.salesperson %}
+			<div class="home_todo">
+				{% include "accounts/sales_activity.html" %}
+			</div>
+		{% else %}
+			{% if perms.accounts.is_fsb_csr %}
+				<div class="home_todo">
+					{% include "accounts/csr_activity.html" %}
+				</div>
+			{% endif %}
+		{% endif %}
+	{% endif %}
+
+{% endblock %}

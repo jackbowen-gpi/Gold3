@@ -1,0 +1,370 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript">
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+
+		//jQuery stuff.
+		$j(document).ready(function(){
+			//Hides the submit buttons and info box unless the user came from
+			//the Art Request form.
+		    if("{{submit}}" !="True"){
+		    	$j( "#submit_buttons" ).hide();
+		    	$j( "#submit_div" ).hide();
+	    	}
+			//Make the back and submit links look like buttons why not.
+	        $j( "#process_artreq" ).button({
+	            icons: {
+	                secondary: "ui-icon-play"
+	            }
+		    });
+	        $j( "#back" ).button({
+	            icons: {
+	                primary: "ui-icon-circle-arrow-w"
+	            }
+		    });
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+			// Show busy indicator when submitting an art request.
+			$j( "#process_artreq" ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("Submitting Art Request...");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+			});
+		});//End jQuery stuff.
+	</script>
+{% endblock %}
+
+{% block body %}
+	<p><h1 class="inline">
+		<img src="{{MEDIA_URL}}img/icons/accept.png"
+		style="vertical-align:text-center" />
+		{{ page_title }}
+	</h1></p>
+
+	<!---Busy dialog-->
+	<div id="busy_dialog">
+	  <center>
+		  <p><div id="busy_dialog_text"></div></p>
+		  <img src="{{MEDIA_URL}}img/spinner.gif" />
+	  <center>
+	</div>
+
+	<div class="ui-widget" id="submit_div">
+		<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
+		<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+		<strong>Almost there! </strong>Here's your art request. Take one last
+		look and if everything's correct hit the "Submit" button at the bottom
+		of the page to complete your request.</p>
+		</div><br>
+	</div>
+
+ 	<h2>Job Info</h2>
+	<table>
+	    <tr>
+		    <th>Design Name: </th>
+		    <td>{{ artreq.design_name }}</td>
+	    </tr>
+	    <tr>
+	    	<th>Contact Name: </th>
+	    	<td>{{ artreq.contact_name }}</td>
+    	</tr>
+	    <tr>
+		    <th>Contact Email: </th>
+		    <td>{{ artreq.contact_email }}</td>
+	    </tr>
+	    <tr>
+		    <th>Sales Rep: </th>
+		    <td>{{ artreq.sales_rep }}</td>
+	    </tr>
+	    <tr>
+		    <th>CSR: </th>
+		    <td>{{ artreq.csr }}</td>
+	    </tr>
+	    <tr>
+	    <th>Channel: </th>
+		    <td>{{ artreq.get_channel_display }}</td>
+	    </tr>
+	    <th>Market Segment: </th>
+		    <td>{{ artreq.mkt_segment }}</td>
+	    </tr>
+	    <th>Print Type: </th>
+		    <td>{{ artreq.print_type }}</td>
+	    </tr>
+	    <th>Printgroup: </th>
+		    <td>{{ artreq.printgroup }}</td>
+	    </tr>
+    </table>
+
+ 	<h2>Customer Info</h2>
+	<table>
+	    <tr>
+		    <th>Customer Name: </th>
+		    <td>{{ artreq.ship_to_name }}</td>
+	    </tr>
+	    <tr>
+		    <th>Company: </th>
+		    <td>{{ artreq.ship_to_company }}</td>
+	    </tr>
+	    <tr>
+		    <th>Address 1: </th>
+		    <td>{{ artreq.ship_to_addy_1 }}</td>
+	    </tr>
+	    <tr>
+		    <th>Address 2: </th>
+		    <td>{{ artreq.ship_to_addy_2 }}</td>
+	    </tr>
+	    <tr>
+		    <th>City: </th>
+		    <td>{{ artreq.ship_to_city }}</td>
+	    </tr>
+	    <tr>
+		    <th>State: </th>
+		    <td>{{ artreq.ship_to_state }}</td>
+	    </tr>
+	    <tr>
+		    <th>Zip: </th>
+		    <td>{{ artreq.ship_to_zip }}</td>
+	    </tr>
+	    <tr>
+		    <th>Country: </th>
+		    <td>{{ artreq.ship_to_country }} </td>
+	    </tr>
+	    <tr>
+		    <th>Email: </th>
+		    <td>{{ artreq.ship_to_email }}</td>
+	    </tr>
+	    <tr>
+		    <th>Phone: </th>
+		    <td>{{ artreq.ship_to_phone }}</td>
+	    </tr>
+    </table>
+
+	<h2>Extra Proofs</h2>
+	{% for proof in extra_proofs %}
+		<table>
+			<tr>
+				<th>Name:</th>
+				<td>{{ proof.ship_to_name }}</td>
+			</tr>
+			<tr>
+				<th>Company:</th>
+				<td>{{ proof.ship_to_company }}</td>
+			</tr>
+			<tr>
+				<th>Address 1</th>
+				<td>{{ proof.ship_to_addy_1 }}</td>
+			</tr>
+			<tr>
+				<th>Address 2:</th>
+				<td>{{ proof.ship_to_addy_2 }}</td>
+			</tr>
+			<tr>
+				<th>City:</th>
+				<td>{{ proof.ship_to_city }}</td>
+			</tr>
+			<tr>
+				<th>State:</th>
+				<td>{{ proof.ship_to_state }}</td>
+			</tr>
+			<tr>
+				<th>Zip:</th>
+				<td>{{ proof.ship_to_zip }}</td>
+			</tr>
+			<tr>
+				<th>Country:</th>
+				<td>{{ proof.ship_to_country }}</td>
+			</tr>
+			<tr>
+				<th>Email:</th>
+				<td>{{ proof.ship_to_email }}</td>
+			</tr>
+			<tr>
+				<th>Phone:</th>
+				<td>{{ proof.ship_to_phone }}</td>
+			</tr>
+		</table>
+	{% endfor %}
+
+
+	<h2>Products</h2>
+	{% for product in products %}
+		<table>
+			<tr>
+				<th>Size:</th>
+				<td>{{ product.size }}</td>
+			</tr>
+			<tr>
+				<th>Case Pack:</th>
+				<td>{{ product.case_pack }}</td>
+			</tr>
+			<tr>
+				<th>Annual Usage:</th>
+				<td>{{ product.annual_usage }}</td>
+			</tr>
+			<tr>
+				<th>Order Quantity:</th>
+				<td>{{ product.order_quantity }}</td>
+			</tr>
+			<tr>
+				<th>Customer Number:</th>
+				<td>{{ product.customer_number }}</td>
+			</tr>
+			<tr>
+				<th>Wrap Proof:</th>
+				<td>{{ product.wrap_proof }}</td>
+			</tr>
+			<tr>
+				<th>Mock-Ups:</th>
+				<td>{{ product.mock_up }}</td>
+			</tr>
+			<tr>
+				<th>Ink Jet Promo:</th>
+				<td>{{ product.ink_jet_promo }}</td>
+			</tr>
+			<tr>
+				<th>Label Promo:</th>
+				<td>{{ product.label_promo }}</td>
+			</tr>
+			<tr>
+				<th>Plant / Press 1:</th>
+				<td>{{ product.plant1 }} / {{ product.press1 }}</td>
+			</tr>
+			<tr>
+				<th>Plant / Press 2:</th>
+				<td>{{ product.plant2 }} / {{ product.press2 }}</td>
+			</tr>
+			<tr>
+				<th>Plant / Press 3:</th>
+				<td>{{ product.plant3 }} / {{ product.press3 }}</td>
+			</tr>
+			<tr>
+				<th>Ship-to-State:</th>
+				<td>{{ product.ship_to_state }}</td>
+			</tr>
+			<tr>
+				<th>Corrugated Type:</th>
+				<td>{{ product.get_corr_type_display }}</td>
+			</tr>
+			<tr>
+				<th>Corrugated Only:</th>
+				<td>{{ product.corr_only }}</td>
+			</tr>
+			<tr>
+				<th>Label Color:</th>
+				<td>{{ product.label_color }}</td>
+			</tr>
+			<tr>
+				<th>Label Copy 1:</th>
+				<td>{{ product.label_copy_1 }}</td>
+			</tr>
+			<tr>
+				<th>Label Copy 2:</th>
+				<td>{{ product.label_copy_2 }}</td>
+			</tr>
+			<tr>
+				<th>Label Copy 3:</th>
+				<td>{{ product.label_copy_3 }}</td>
+			</tr>
+			<tr>
+				<th>Sleeve Count:</th>
+				<td>{{ product.sleeve_count }}</td>
+			</tr>
+			<tr>
+				<th>Print Color:</th>
+				<td>{{ product.print_color }}</td>
+			</tr>
+			<tr>
+				<th>Case Color:</th>
+				<td>{{ product.case_color }}</td>
+			</tr>
+			<tr>
+				<th>Corrugated Plant 1:</th>
+				<td>{{ product.corr_plant1 }}</td>
+			</tr>
+			<tr>
+				<th>Corrugated Plant 2:</th>
+				<td>{{ product.corr_plant2 }}</td>
+			</tr>
+			<tr>
+				<th>Corrugated Plant 3:</th>
+				<td>{{ product.corr_plant3 }}</td>
+			</tr>
+
+			</table>
+	{% endfor %}
+
+	<h2>Additional Info</h2>
+	<table>
+		<tr>
+			<th>Keep same UPC:</th>
+			<td>{{ info.keep_same_upc }}</td>
+		</tr>
+		<tr>
+			<th>Replaces Prev. Design:</th>
+			<td>{{ info.replaces_prev_design }}</td>
+		</tr>
+		<tr>
+			<th>Previous 9-Digit#</th>
+			<td>{{ info.prev_9_digit }}</td>
+		</tr>
+		<tr>
+			<th>Forecast:</th>
+			<td>{{ info.get_forecast_display }}</td>
+		</tr>
+		<tr>
+			<th>Incoming Art Format:</th>
+			<td>{{ info.get_incoming_art_format_display }}</td>
+		</tr>
+		<tr>
+			<th>Arrival Date:</th>
+			<td>{{ info.arrival_date }}</td>
+		</tr>
+		<tr>
+			<th>Sender:</th>
+			<td>{{ info.sender }}</td>
+		</tr>
+		<tr>
+			<th>Date Needed:</th>
+			<td>{{ info.date_needed }}</td>
+		</tr>
+		<tr>
+			<th>Special Instructions:</th>
+			<td>{{ info.special_instructions }}</td>
+		</tr>
+		<tr>
+			<th>Files Uploaded:</th>
+			<td>{% for filename in filelist %}
+			    {{ filename }}<br />
+			    {% endfor %}
+			</td>
+		</tr>
+	</table>
+<div id="submit_buttons">
+	<p>
+		<a href="/art_req/edit/{{ artreq.id }}/" id= "back">Back</a>
+		{% ifnotequal currentArt "None" %}
+		<a href="/art_req/process/{{ artreq.id }}/{{currentArt.id}}/" id= "process_artreq">Submit Art Request</a>
+		{% else %}
+		<a href="/art_req/process/{{ artreq.id }}/None/" id= "process_artreq">Submit Art Request</a>
+		{% endifnotequal %}
+		<!-- <input type="button" id= "back" value="Back" onClick="javascript:location.href = '/art_req/edit/{{ artreq.id }}/';" />
+		<input type="button" id= "process_artreq" value="Submit Art Request" onClick="javascript:location.href = '/art_req/process/{{ artreq.id }}/';" /> -->
+	</p>
+</div>
+{% endblock %}

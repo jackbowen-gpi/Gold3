@@ -1,0 +1,17 @@
+{% include "emails/email_header.txt" %}
+
+The item below has been flagged for you because it is a Wendy's SDR job.
+
+
+{% ifequal item.job.workflow.name "Foodservice" %}
+Nine Digit Number: {{item.fsb_nine_digit}}
+Item {{item}} of job {{item.job}} has been filed out.
+Print Location: {{item.printlocation}}
+Plate Package: {{item.platepackage}}
+SCC Number: {{item.bom_number}}
+UPC Number: {{item.upc_number}}
+{% else %}
+Item {{item}} of job {{item.job}} has been filed out.
+Print Location: {{item.printlocation}}
+Plate Package: {{item.platepackage}}
+{% endifequal %}

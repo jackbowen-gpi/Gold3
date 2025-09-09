@@ -1,0 +1,48 @@
+{% extends "standard_popup.html" %}
+{% load random_cute %}
+
+{% block page_title %}QC - {{qcdoc.job.id}} {{qcdoc.job.name}}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/button/assets/skins/sam/button.css" />
+
+<!-- Base Stuff -->
+<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/element/element-min.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/button/button-min.js"></script>
+
+
+<script type="text/javascript">
+  /*
+   * Once the page has loaded, perform setup work, register events, etc.
+   */
+  function close_popup() {
+    self.close();
+  }
+
+  YAHOO.util.Event.onContentReady("qc_wrapper", function () {
+	// Register buttons and click events.
+	new YAHOO.widget.Button("close_button", {onclick: {fn: close_popup}});
+  });
+</script>
+
+<style type="text/css">
+  #qc_wrapper {
+    width: 610px;
+    margin:0 auto;
+    text-align:center;
+    border:2px solid gray;
+  }
+</style>
+
+{% endblock %}
+
+{% block body_content %}
+<div id="qc_wrapper" class="yui-skin-sam outline_fancy" style="background-color:#FFFFFF;padding:6px;">
+  <h1>QC Submitted</h1>
+  <img src="{{qcdoc|random_cute_img_url}}" />
+  <p>Your QC has been finished and submitted.</p>
+  <input type="button" id="close_button" name="close" value="Close Window">
+</div>
+{% endblock %}

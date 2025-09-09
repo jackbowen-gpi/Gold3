@@ -1,0 +1,90 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/job_item_entry.js"></script>
+{% endblock %}
+
+{% block body %}
+<div style="min-height:480px;">
+	<h1 class="inline"><img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-center" /> Add Items to Container Job - <a href='{% url "job_detail" job.id %}'>{{job.id}} {{job.name}}</a></h1><br />
+			<form id="newitem" name="newitem">
+			<input type="hidden" name="item_status" id="id_item_status" value="Pending" />
+			<input type="hidden" name="job" id="id_job" value="{{job.id}}" />
+			<input type="hidden" name="workflow" id="id_workflow" value="{{job.workflow.id}}" />
+			<input type="hidden" name="printlocation" id="id_printlocation" value="{{job.temp_printlocation.id}}" />
+			<input type="hidden" name="platepackage" id="id_platepackage" value="{{job.temp_platepackage.id}}" />
+			<div class="outline" style="min-height:50px;background-color:#DDDDDD;float:left;width:756px">
+				<h2 class="inline">Job Information</h2><br />
+				<strong>Plant &amp; Press: </strong>{{job.temp_printlocation}}<br />
+				<strong>Plate Package: </strong>{{job.temp_platepackage}}<br />
+				<strong>Due Date: </strong>{{job.due_date|date:"n-j-Y"}}<br />
+			</div>
+
+			<div class="outline" style="min-height:341px;background-color:#DDDDDD;float:left;width:350px">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align: text-bottom" /> Item Information</h2><br />
+				<label for="id_die">Die:</label>{{itemform.die}}<br />
+				<label for="id_description">Description:</label>{{itemform.description}}<br />
+				<label for="id_upc_number">UPC Code:</label>{{itemform.upc_number}}<br />
+				<label for="id_length">Length:</label>{{itemform.length}}<br />
+				<label for="id_width">Width:</label>{{itemform.width}}<br />
+				<label for="id_height">Height:</label>{{itemform.height}}<br />
+				<label for="id_num_up">Number Out:</label>{{itemform.num_up}}<br />
+				<label for="id_material">Material:</label>{{itemform.material}}<br />
+				<label for="id_ect">ECT:</label>{{itemform.ect}}<br />
+			</div>
+
+			<div class="outline" style="min-height:150px;background-color:#DDDDDD;float:right;position:relative;left:-38px;width:400px">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/color_wheel.png" style="vertical-align: text-bottom" /> Color Information</h2><br />
+				<table width="390px">
+					<tr>
+						<th>Color 1:</th><td>{{itemform.color1}}</td>
+					</tr>
+					<tr>
+						<th>Color 2:</th><td>{{itemform.color2}}</td>
+					</tr>
+					<tr>
+						<th>Color 3:</th><td>{{itemform.color3}}</td>
+					</tr>
+					<tr>
+						<th>Color 4:</th><td>{{itemform.color4}}</td>
+					</tr>
+
+				</table>
+			</div>
+
+			<div class="outline" style="min-height:138px;background-color:#DDDDDD;float:right;position:relative;left:-38px;width:400px">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/calculator.png" style="vertical-align: text-bottom" /> Common Fraction to Decimal Conversions</h2><br />
+				<table width="100px">
+					<tr>
+						<td>7/8</td><td>0.875</td>
+					</tr>
+					<tr>
+						<td>3/4</td><td>0.75</td>
+					</tr>
+					<tr>
+						<td>5/8</td><td>0.625</td>
+					</tr>
+					<tr>
+						<td>1/2</td><td>0.5</td>
+					</tr>
+					<tr>
+						<td>3/8</td><td>0.375</td>
+					</tr>
+					<tr>
+						<td>1/4</td><td>0.25</td>
+					</tr>
+					<tr>
+						<td>1/8</td><td>0.125</td>
+					</tr>
+				</table>
+			</div>
+
+			<div class="outline" style="background-color:#FFFF99;float:left;clear:both;width:756px">
+				<input type="submit" value="Add Item &amp; Add Another" onclick="add_container_job_item({{job.id}}, 'Yes');return false;" />
+				<input type="submit" value="Add Item &amp; Finish" onclick="add_container_job_item({{job.id}}, 'No');return false;" />
+			</div>
+		</form>
+</div>
+Go to job: <a href='{% url "job_detail" job.id %}'>{{job.id}} {{job.name}}</a>
+{% endblock %}

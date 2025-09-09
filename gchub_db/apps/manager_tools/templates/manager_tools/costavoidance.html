@@ -1,0 +1,105 @@
+{% extends "standard.html" %}
+
+{% block extra_head %} 
+	<style type="text/css">
+		input {
+			border: none;
+			padding: 0;
+			margin: 0;
+			vertical-align: text-bottom;
+		}
+	</style>
+  
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript"> 
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using 
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+		
+		//jQuery stuff.
+		$j(document).ready(function(){
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+			// Show busy indicator
+			$j( "#submit, a" ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("This can take a moment...");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+			});
+		});//End jQuery stuff.
+	</script>
+{% endblock %}
+
+{% load humanize %}
+
+{% block body %}
+<h1>{{page_title}}</h1>
+<hr />
+
+<!---Busy dialog-->
+<div id="busy_dialog">
+  <center>
+	  <p><div id="busy_dialog_text"></div></p>
+	  <img src="{{MEDIA_URL}}img/spinner.gif" />
+  <center>
+</div>
+
+<div style="width:50%">
+	<p>
+	Total charges for cost avoidance jobs by month.
+    </p>
+
+	<p>
+    <strong>Note:</strong> This report keys off a charge's invoice date and that 
+	doesn't get filled in until we run month end billing. So, if the current 
+	month is zero then billing probably hasn't been run yet.
+    </p>
+</div>
+
+<h3>
+	<a href="/manager_tools/" >
+		<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+		Back
+	</a>
+</h3>
+<br />
+
+<!-- Data table -->
+<div class="grey_bordered">
+	<h2> 
+		<form method="post">
+			{% csrf_token %}
+			Total cost avoidance charges for {{costform.year}}
+		<input type="image" src="{{MEDIA_URL}}img/icons/arrow_refresh.png" alt="Submit" id="submit" />
+		</form>
+	</h2>
+	
+
+	<table class="rowHover">
+		<tr>
+			<th style="text-align:center;">Month</th>			
+			<th style="text-align:center;">Total</th>
+		</tr>
+	{% for month in costdata %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+			<td>{{month.name}}</td>	
+			<td style="text-align:right;">${{month.total|floatformat:2|intcomma}}</td>
+		</tr>
+	{% endfor %}
+	</table>
+
+</div>
+
+{% endblock %}

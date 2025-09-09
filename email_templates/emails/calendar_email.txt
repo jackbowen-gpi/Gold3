@@ -1,0 +1,6 @@
+<p>A new {{event}} event has been scheduled by {{user}} on {{ date|date:"l M d Y" }} for {{event_length}} day(s) for "{{ description }}"</p>
+
+<p>The following events are now scheduled for that {{ date|date:"l" }}:</p>
+
+<pre>{{statement}}</pre>
+<p>Additional details for {{ date|date:"M j" }} are on the <a href=http://gchub.graphicpkg.com/calendar/event/{{id}}/view/>calendar page</a>.

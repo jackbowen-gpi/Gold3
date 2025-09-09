@@ -1,0 +1,55 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+  {% include "workflow/misc/trends/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+		{% include "workflow/misc/trends/navbar_div.inc.html" %}
+		<div style="float:left;">
+			<table width="350px">
+				<tr>
+					<th>Type</th>
+					<th>Spring</th>
+					<th>Summer</th>
+					<th>Fall</th>
+					<th>Winter</th>
+				</tr>
+				<tr>
+					<th>Cold Cup</th>
+					<td>{{spring_cold}}</td>
+					<td>{{summer_cold}}</td>
+					<td>{{fall_cold}}</td>
+					<td>{{winter_cold}}</td>
+				</tr>
+				<tr>
+					<th>Hot Cup</th>
+					<td>{{spring_hot}}</td>
+					<td>{{summer_hot}}</td>
+					<td>{{fall_hot}}</td>
+					<td>{{winter_hot}}</td>
+				</tr>
+			</table>
+			<strong>Spring:</strong> March, April, May<br />
+			<strong>Summer:</strong> June, July, August<br />
+			<strong>Fall:</strong> September, October, November<br />
+			<strong>Winter:</strong> December, January, February<br />
+			<br />
+			Data includes only items that went to plate over the last 6 years.
+		</div>
+
+		<div style="float:left;margin:8px;">
+			<img src="http://chart.apis.google.com/chart?
+					chs=400x300
+					&amp;chd=t:{{spring_cold}},{{summer_cold}},{{fall_cold}},{{winter_cold}}|{{spring_hot}},{{summer_hot}},{{fall_hot}},{{winter_hot}}
+					&amp;chds=0,2000
+					&amp;cht=bvg
+					&amp;chxt=y
+					&amp;chxr=0,0,2000
+					&amp;chdl=Cold%20Cups|Hot%20Cups
+					&amp;chco=76A4FB,CC6600
+					&amp;chl=Spring|Summer|Fall|Winter"
+					alt="Cup Types by Season Chart" /><br />
+		</div>
+		<div class="clearfix"></div>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "standard.html" %}
+
+{% block page_title %}e-Tools Request: {{job.id}} {{job.name}}{% endblock %}
+
+{% block extra_head %}
+<!-- Dependencies -->
+<!-- Sam Skin CSS for TabView -->
+<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/tabview/assets/skins/sam/tabview.css" />
+
+<!-- JavaScript Dependencies for Tabview: -->
+<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/element/element-min.js"></script>
+
+<!-- Source file for TabView -->
+<script type="text/javascript" src="{{YUI_URL}}build/tabview/tabview-min.js"></script>
+
+<!-- Some jquery ui for the error message-->
+<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+<script type="text/javascript">
+YAHOO.util.Event.onContentReady("etools_tabview", function () {
+	var myTabs = new YAHOO.widget.TabView("etools_tabview");
+
+});
+</script>
+<style type="text/css">
+  .label_td {
+    border:1px solid white;
+    border-right:1px solid gray;
+    background-color:transparent;
+    text-align:right;
+    font-weight:bold;
+    width:18%;
+  }
+  .data_td {
+    border:1px solid gray;
+    background-color:white;
+    padding:4px;
+    width:30%;
+  }
+  table { width:95%; }
+</style>
+{% endblock %}
+
+{% block body %}
+<h1>GPS Connect Customer Info: {{job.customer_identifier}} {{data.Customer_Name.0}}</h1>
+<p>&larr; <a href='{% url "job_detail" job.id %}'>Back to Job detail page</a></p>
+
+<!-- Display an error if we couldn't connect to GPS Connect. -->
+{% if data == "bad_connect" %}
+<div class="ui-widget">
+	<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;">
+		<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+		<strong>Error:</strong> Couldn't connect to GPS Connect to retrieve customer info.</p>
+	</div>
+</div>
+</br>
+{% endif %}
+
+<!-- Display an error if the data was empty -->
+{% if not data %}
+<div class="ui-widget">
+	<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;">
+		<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+		<strong>Error:</strong> No customer with that ID found in GPS Connect.</p>
+	</div>
+</div>
+</br>
+{% endif %}
+
+<div class="yui-skin-sam">
+<div id="etools_tabview" class="yui-navset">
+    <ul class="yui-nav">
+        <li class="selected"><a href="#tab1"><em>Cust. Info</em></a></li>
+        <li><a href="#tab2"><em>Raw Data</em></a></li>
+    </ul>
+    <div class="yui-content">
+      <div>
+        {# BEGIN: JOB INFO TAB #}
+        <table class='etools_table'>
+          <caption>General Info</caption>
+          <tr>
+            <td class='label_td'>Customer Name</td>
+            <td class='data_td'>{{data.Customer_Name.0}}</td>
+
+            <td class='label_td'>Customer Number(s)</td>
+            <td class='data_td'>{{data.Customer_Number.0}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Proper Customer Name</td>
+            <td class='data_td'>{{data.Proper_Customer_Name.0}}</td>
+
+            <td class='label_td'>PCSS</td>
+            <td class='data_td'>{{data.Primary_PCSS.0}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Project Cooridinator(s)</td>
+            <td class='data_td'>
+				{% if data.Contacts_Project_Cooridinator_First_Last_Name|length > 1 %}
+					{% for row in data.Contacts_Project_Cooridinator_First_Last_Name%}
+						{{row}}</br>
+					{% endfor %}
+				{% else %}
+					{{data.Contacts_Project_Cooridinator_First_Last_Name.0}}
+				{% endif %}
+			</td>
+            <td class='label_td'>CSR(s)</td>
+            <td class='data_td'>
+				{% if data.Contacts_GPI_CSR_First_Last_Name|length > 1 %}
+					{% for row in data.Contacts_GPI_CSR_First_Last_Name%}
+						{{row}}</br>
+					{% endfor %}
+				{% else %}
+					{{data.Contacts_GPI_CSR_First_Last_Name.0}}
+				{% endif %}
+			</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Additional Contact(s)</td>
+            <td class='data_td'>
+				{% if data.Contacts_Addtional_Contact_First_Last_Name|length > 1 %}
+					{% for row in data.Contacts_Addtional_Contact_First_Last_Name%}
+						{{row}}</br>
+					{% endfor %}
+				{% else %}
+					{{data.Contacts_Addtional_Contact_First_Last_Name.0}}
+				{% endif %}
+			</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Notes</td>
+            <td class='data_td'>{{data.Notes.0}}</td>
+
+            <td class='label_td'>Shipping Notes</td>
+            <td class='data_td'>{{data.Shipping_Notes.0}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div>
+        {# BEGIN: RAW DATA TAB #}
+  	    <table class='etools_table'>
+  	      <caption>Raw Data from GPS Connect</caption>
+			<!--data.items here doesn't mean GOLD items. It's a term to display dictionaries in django templates.-->
+			{% for key, value in data.items %}
+				<tr>
+					<td class='label_td'>{{key}}</td>
+				 	<td class='data_td'>{{value}}</td>
+				</tr>
+			{% endfor %}
+        </table>
+      </div>
+    </div>
+</div>
+</div>
+
+<p>&larr; <a href='{% url "job_detail" job.id %}'>Back to Job detail page</a></p>
+{% endblock %}

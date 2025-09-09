@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, jb ]
+  pull_request:
+    branches: [ main, jb ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: gchub_test
+          POSTGRES_USER: gchub
+          POSTGRES_PASSWORD: gchub
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d gchub_test" \
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    strategy:
+      matrix:
+        python-version: ['3.11']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        env:
+          PIP_DISABLE_PIP_VERSION_CHECK: 1
+
+      - name: Run ruff (selective)
+        # In permissive dev mode we run ruff but don't fail the job on warnings;
+        # this prevents style/docstring noise from blocking PRs while we
+        # progressively clean the codebase. Critical failures (syntax/pyflakes)
+        # should still be caught by the later test steps.
+        run: |
+          python -m ruff check --select E711,E712,E721,B904,D100,D103,D205 . || true
+
+      - name: Configure test Postgres env
+        run: |
+          echo "TEST_PG_NAME=gchub_test" >> $GITHUB_ENV
+          echo "TEST_PG_USER=postgres" >> $GITHUB_ENV
+          echo "TEST_PG_PASSWORD=postgres" >> $GITHUB_ENV
+          echo "TEST_PG_HOST=127.0.0.1" >> $GITHUB_ENV
+          echo "TEST_PG_PORT=5432" >> $GITHUB_ENV
+
+      - name: Django makemigrations check
+        env:
+          DJANGO_SETTINGS_MODULE: gchub_db.test_settings
+          TEST_PG_NAME: ${{ env.TEST_PG_NAME }}
+          TEST_PG_USER: ${{ env.TEST_PG_USER }}
+          TEST_PG_PASSWORD: ${{ env.TEST_PG_PASSWORD }}
+          TEST_PG_HOST: ${{ env.TEST_PG_HOST }}
+          TEST_PG_PORT: ${{ env.TEST_PG_PORT }}
+        run: |
+          # wait for Postgres
+          for i in {1..30}; do pg_isready -h 127.0.0.1 -p 5432 -U postgres && exit 0 || sleep 2; done
+          python manage.py makemigrations --check --settings=gchub_db.test_settings
+
+      - name: Apply migrations
+        env:
+          DJANGO_SETTINGS_MODULE: gchub_db.test_settings
+          TEST_PG_NAME: ${{ env.TEST_PG_NAME }}
+          TEST_PG_USER: ${{ env.TEST_PG_USER }}
+          TEST_PG_PASSWORD: ${{ env.TEST_PG_PASSWORD }}
+          TEST_PG_HOST: ${{ env.TEST_PG_HOST }}
+          TEST_PG_PORT: ${{ env.TEST_PG_PORT }}
+        run: |
+          python manage.py migrate --settings=gchub_db.test_settings --noinput
+
+      - name: Run tests (pytest)
+        env:
+          DJANGO_SETTINGS_MODULE: gchub_db.test_settings
+          TEST_PG_NAME: ${{ env.TEST_PG_NAME }}
+          TEST_PG_USER: ${{ env.TEST_PG_USER }}
+          TEST_PG_PASSWORD: ${{ env.TEST_PG_PASSWORD }}
+          TEST_PG_HOST: ${{ env.TEST_PG_HOST }}
+          TEST_PG_PORT: ${{ env.TEST_PG_PORT }}
+        run: |
+          pytest -q --maxfail=1

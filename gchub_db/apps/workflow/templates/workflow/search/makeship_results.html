@@ -1,0 +1,104 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<!-- This is used to make fancy "busy" indicators while prepping big
+	downloads. Needs a special cookie in the http header to work. See the readme
+	in the js directory or look at inkcov_excel() in search_views. --->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery.fileDownload.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript">
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+
+		$j(function() {
+			// Used to cancel downloads.
+			var dlReq = null;
+
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+
+			// Show busy indicator while prepping excel download.
+			$j( "#excel_download" ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("Spreadsheets take a several minutes.");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+				// Prep download using jquery.fileDownload.js and assign to dlReq
+				dlReq = $j.fileDownload('/workflow/makeship_excel/', {
+				    successCallback: function (url) {
+				    	// Hide busy indicator once download is ready.
+						$j( "#busy_dialog" ).dialog( "close" );
+				    },
+				});
+			});
+		});
+	</script>
+{% endblock %}
+
+{% block body %}
+
+    <h1>{{page_title}}</h1>
+
+	<!---Busy dialog-->
+	<div id="busy_dialog">
+	  <center>
+		  <p><div id="busy_dialog_text"></div></p>
+		  <img src="{{MEDIA_URL}}img/spinner.gif" />
+	  <center>
+	</div>
+
+	<p>
+		<a id="excel_download" href='#'>
+			<img src="{{MEDIA_URL}}img/icons/page_excel.png">
+		  	Download this report as an Excel spreadsheet
+	  	</a>
+	  	(Warning: Slow.)
+  	</p>
+    {% include "pagination_bar.html" %}
+
+    <table width="100%">
+            <tr>
+                <th>Job</th>
+                <th>Size</th>
+                <th>Plant</th>
+                <th>Press</th>
+                <th>Approval Date</th>
+                <th>Item Num. Date</th>
+                <th>Final File Date</th>
+                <th>Artist</th>
+                <th>Salesperson</th>
+            </tr>
+        {% for entry in object_list %}
+            <tr class="{% cycle 'rowA' 'rowB' %}">
+                <td><a href="/workflow/job/{{entry.job.id}}/">{{entry.job}}</a></td>
+                <td>{{entry}}</td>
+                <td>{{entry.printlocation.plant}}</td>
+                <td>{{entry.printlocation.press}}</td>
+                <td>{{entry.approval_date|date:"n-j-Y"}}</td>
+                {% if entry.fsb_nine_digit_date %}
+                	<td>{{entry.fsb_nine_digit_date|date:"n-j-Y"}}</td>
+                {% else %}
+                	<td></td>
+                {% endif %}
+                <td>{{entry.final_file_date|date:"n-j-Y"}}</td>
+                <td>{{entry.job.artist}}</td>
+                <td>{{entry.job.salesperson}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% include "pagination_bar.html" %}
+    <br />
+    <a href="{% url "list_reports" %}">Back to Reports</a><br />
+{% endblock %}

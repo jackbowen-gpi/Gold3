@@ -1,0 +1,6 @@
+<img src="{{MEDIA_URL}}img/icons/disk_multiple.png">
+	<span class="sub_heading">Items Available for Duplication from Previous Job: <a href="/workflow/job/{{parent_job.id}}/">{{parent_job}}</a></span><br />
+	Click on an item to duplicate.<br />
+	{% for item in parent_items %}
+		<a href='{% url "dupe_beverage_item" job.id "dupe" item.id %}'>{{item.num_in_job}}- {% ifequal job.workflow.name "Beverage" %}{{item.bev_nomenclature}}{% else %}{{item.size}}{% endifequal %}</a><br />
+	{% endfor %}

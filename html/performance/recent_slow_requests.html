@@ -1,0 +1,97 @@
+{% extends "standard.html" %}
+
+{% block page_title %}Recent slow requests{% endblock %}
+
+{% block extra_extra_head %}
+<script>
+document.addEventListener('click', function(e){
+  var t = e.target;
+  if (t && t.classList && t.classList.contains('toggle-sql')){
+    e.preventDefault();
+    var id = t.getAttribute('data-target');
+    var row = document.getElementById(id);
+    if (!row) return;
+    if (row.style.display === 'none') { row.style.display = ''; t.textContent = 'hide SQL'; }
+    else { row.style.display = 'none'; t.textContent = 'show SQL'; }
+  }
+});
+</script>
+{% endblock %}
+
+{% block body %}
+
+<h1>Recent slow requests</h1>
+<!-- Controls container: clear previous floats and keep filters left-aligned above the table -->
+<div class="perf-controls" style="clear:both;margin-bottom:0.75rem;max-width:1200px;">
+  <form method="get" class="selector pretendform" style="width:100%;">
+    <!-- Top row: evenly-distributed filter fields -->
+    <div class="perf-filters" style="display:flex;gap:12px;align-items:center;">
+      <label style="flex:1;min-width:140px;">q: <input type="text" name="q" value="{{ query.q|default:'' }}" style="width:100%;box-sizing:border-box;"></label>
+      <label style="flex:1;min-width:120px;">min_ms: <input type="number" name="min_ms" value="{{ query.min_ms|default_if_none:'' }}" style="width:100%;box-sizing:border-box;"></label>
+      <label style="flex:1;min-width:120px;">max_ms: <input type="number" name="max_ms" value="{{ query.max_ms|default_if_none:'' }}" style="width:100%;box-sizing:border-box;"></label>
+      <label style="flex:0 0 100px;min-width:80px;">limit: <input type="number" name="limit" value="{{ query.limit|default:200 }}" style="width:100%;box-sizing:border-box;"></label>
+    </div>
+
+    <!-- Action row: buttons under the fields -->
+    <div class="perf-actions" style="margin-top:8px;display:flex;gap:12px;align-items:center;">
+      <button type="submit">Filter</button>
+      <a class="button-like" href="?format=csv" style="text-decoration:none;padding:6px 10px;border:1px solid #ccc;border-radius:4px;color:inherit;background:#f7f7f7;">Download CSV</a>
+    </div>
+  </form>
+</div>
+
+<table class="rowHover" style="clear:both;margin:0;margin-left:0;max-width:1200px;width:100%;">
+  <thead>
+    <tr>
+      <th>timestamp</th>
+      <th>path</th>
+      <th>duration_ms</th>
+      <th>db_queries</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in entries %}
+    <tr class="{% cycle 'rowA' 'rowB' %}">
+      <td>
+        {% if e.timestamp_str %}
+          {{ e.timestamp_str }}
+        {% else %}
+          {{ e.timestamp }}
+        {% endif %}
+      </td>
+      <td>{{ e.path }}</td>
+      <td>{{ e.duration_ms }}</td>
+      <td>
+        {{ e.db_queries }}
+        {% if e.sql %}
+          &nbsp;(<a href="#" class="toggle-sql" data-target="sql-{{ forloop.counter0 }}">show SQL</a>)
+        {% endif %}
+      </td>
+    </tr>
+    {% if e.sql %}
+      <tr class="sql-row" id="sql-{{ forloop.counter0 }}" style="display:none">
+        <td colspan="4"><pre style="white-space:pre-wrap;max-height:300px;overflow:auto">{% if e.sql|length > 0 %}{% for s in e.sql %}{{ s }}
+{% endfor %}{% else %}{{ e.sql }}{% endif %}</pre></td>
+      </tr>
+    {% endif %}
+    {% empty %}
+    <tr><td colspan="4">No entries</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% if pagination %}
+  <div class="pagination_controls">
+    <span>Showing page {{ pagination.page }} of {{ pagination.num_pages }} ({{ pagination.total_count }} total)</span>
+    <div style="float:right">
+      {% if pagination.page > 1 %}
+        <a href="?{{ pagination.base_qs }}&page={{ pagination.page|add:-1 }}">&laquo; Prev</a>
+      {% endif %}
+      {% if pagination.page < pagination.num_pages %}
+        <a href="?{{ pagination.base_qs }}&page={{ pagination.page|add:1 }}">Next &raquo;</a>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+{% endblock %}
+
+ 

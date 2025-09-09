@@ -1,0 +1,50 @@
+{% extends "standard.html" %}
+
+{% block page_title %}Preferences{% endblock %}
+
+{% block extra_head %}
+  {% include "preferences/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+<h1>Preferences - Account Overview</h1>
+{% include "preferences/navbar_div.inc.html" %}
+<p>
+  <table>
+    <tr>
+	  <th>Name:</th>
+      <td>{{request.user.first_name}} {{request.user.last_name}}</td>
+    </tr>
+    <tr>
+	  <th>Username:</th>
+	  <td>{{request.user.username}}</td>
+    </tr>
+    <tr>
+      <th>Email:</th>
+	  <td>{{request.user.email}}</td>
+    </tr>
+    <tr>
+	  <th>User Since:</th>
+	  <td>{{request.user.date_joined|date:"F j, Y"}}</td>
+    </tr>
+    <tr>
+      <th>Groups:</th>
+      <td>
+	    <ul>
+{% for group in request.user.groups.all %}
+		  <li>{{ group }}</li>
+{% empty %}
+          <li>
+            <em>
+              Your account has no groups assigned. Please contact the
+              system administrators at
+              <a href="mailto:{{EMAIL_SUPPORT}}">{{EMAIL_SUPPORT}}</a>
+            </em>
+          </li>
+{% endfor %}
+	    </ul>
+      </td>
+    </tr>
+  </table>
+</p>
+{% endblock %}

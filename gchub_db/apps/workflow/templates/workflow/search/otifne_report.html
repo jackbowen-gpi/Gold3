@@ -1,0 +1,19 @@
+{% extends "standard.html" %}
+
+{% block body %}
+
+<h1>{{page_title}}: {{year}}</h1>
+Total Items: {{num_items}}<br />
+
+<div class="outline_fancy" style="width:150px;">
+	<h2>Error Rate</h2>
+	<strong>{{error_percentage|floatformat:2}}%</strong>
+	<br />
+</div>
+<div class="outline_fancy" style="width:150px;">
+	<h2>On Time: Proofing</h2>
+	<strong>{{proof_percentage|floatformat:2}}%</strong>
+	<br />
+</div>
+
+{% endblock %}

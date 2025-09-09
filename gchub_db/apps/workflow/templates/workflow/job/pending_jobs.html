@@ -1,0 +1,27 @@
+{% extends "standard.html" %}
+
+{% block body %}
+
+<div class="home_view">
+	<h1 class="inline">Pending Jobs:</h1>
+	<table>
+		<tr>
+			<th>Job</th>
+			<th>Customer</th>
+			<th>Due Date</th>
+			<th>Date Created</th>
+			<th>Artist</th>
+		</tr>
+	{% for job in pending_list %}
+		<tr>
+			<td style="padding-right:15px;"><a href="/workflow/job/{{job.id}}/">{{job.id}} {{job.name}}</a></td>
+			<td>{{job.customer}}</td>
+			<td>{{job.due_date|date:"n-j-Y"}}</td>
+			<td>{{job.creation_date|date:"n-j-Y"}}</td>
+			<td>{{job.artist}}</td>
+		</tr>
+	{% endfor %}
+	</table>
+</div>
+
+{% endblock %}

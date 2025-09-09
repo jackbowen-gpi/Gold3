@@ -1,0 +1,183 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript">
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+
+		//jQuery stuff.
+		$j(document).ready(function(){
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+			// Show busy indicator.
+			$j( "#overview,#qc,#jobcatall,#todolistmanagertools,#timesheets,#loading" ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("This can take a moment...");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+			});
+		});//End jQuery stuff.
+	</script>
+{% endblock %}
+
+{% block body %}
+<div class="">
+	<h1>{{page_title}}</h1>
+</div>
+<hr />
+<br />
+
+<!---Busy dialog-->
+<div id="busy_dialog">
+  <center>
+	  <p><div id="busy_dialog_text"></div></p>
+	  <img src="{{MEDIA_URL}}img/spinner.gif" />
+  <center>
+</div>
+
+<div style="margin-left:20px;width:50%">
+	This page lists different tools available to managers.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		Monthly Billing
+	</h2>
+	<a href="monthly_billing/" id="monthly_billing">Email Monthly Report</a><br />
+	<a href="/" id="monthly_billing_run">Mark Invoice Jobs</a>
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="overview/" id="overview">Overview Tool</a> (slow)
+	</h2>
+	Year-to-date metrics for each employee.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="metrics/" >Employee Metrics Report</a>
+	</h2>
+	Detailed metrics and charts for each employee.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="qc/" id="qc">QC Report</a> (slow)
+	</h2>
+	QC error meterics for each employee.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="turntime/" >Turn Time Report</a>
+	</h2>
+	Turn time averages by year and workflow.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="jobcategory_all/" id="jobcatall">Job Category Report</a> (slow)
+	</h2>
+	Turn time averages based on job type, category, and complexity.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="{% url "todo_list_manager_tools" %}" id="todolistmanagertools">To-Do List | Manager View</a> (slow)
+	</h2>
+	The daily to-do list with added metrics from the Job Category Report. Adds
+	turn time averages based on job type, category, and complexity.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="timesheets/" id="timesheets">Timesheets Report</a> (slow)
+	</h2>
+	Timesheet information for each employee.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="loading/" id="loading">Artist Loading Report</a> (slow)
+	</h2>
+	Artist loading by hours for the next week.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="materials/" id="materials">Materials Report</a>
+	</h2>
+	Material and consumable usage info by year.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="stalecharges/" >Stale Charges by Salesperson Report</a>
+	</h2>
+	Totals up all the un-invoiced charges in a given year and breaks them out by
+	sales person and print group.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="costavoidance/" >Cost Avoidance Report</a>
+	</h2>
+	Total charges for cost avoidance jobs by month.
+</div>
+<br />
+
+<div style="margin-left:20px">
+	<h2>
+		<a href="vacation/" >Vacation Tool</a>
+	</h2>
+	Edit available vacation days for each employee.
+</div>
+<br />
+<div style="margin-left:20px">
+	<h2>
+		<a href="sick/" >Sick Tool</a>
+	</h2>
+	Edit available sick days for each employee.
+</div>
+<br />
+<div style="margin-left:20px">
+	<h2>
+		<a href="artworktracking/" >Artwork Tracking</a>
+	</h2>
+	Metrics for tracking incoming artwork
+</div>
+<br />
+<div style="margin-left:20px">
+	<h2>
+		<a href="hoursbyplant/" >Hours by Plant</a>
+	</h2>
+	How many timesheet hours we've logged in a given month by plant.
+</div>
+<br />
+{% endblock %}

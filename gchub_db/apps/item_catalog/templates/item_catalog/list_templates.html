@@ -1,0 +1,129 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<h1 class="inline"><img src="{{MEDIA_URL}}img/icons/page_white_acrobat.png" style="vertical-align:text-center" /> Foodservice Templates</h1><br /><br />
+	{% if perms.accounts.clemson_employee %}
+		<em>(Templates are located in {{pdf_location}}. PDFs saved in this folder with proper naming conventions will appear here.)</em></p>
+	{% endif %}
+	<strong>Right click the PDF icon and select &quot;Save Target As...&quot; to download a PDF to your computer.</strong><p />
+	<div class="outline_fancy" style="width:30%">
+	<strong>Download Press Specs:</strong><br />
+		<a href="{{MEDIA_URL}}files/Comco_Webtron_Kidder.pdf">Comco/Webtron/Kidder</a> |
+		<a href="{{MEDIA_URL}}files/FK.pdf">F&K</a> |
+		<a href="{{MEDIA_URL}}files/Plastic.pdf">Plastic</a> |
+		<a href="{{MEDIA_URL}}files/PMC.pdf">PMC</a> |
+		<a href="{{MEDIA_URL}}files/Uteco.pdf">Uteco</a>
+	</div>
+	<br />
+
+	<div class="outline_fancy" style="width:99%">
+			<a name="top"></a>
+			{% for cat in prod_main_categories %}
+				<strong>Jump to {{cat}}: </strong><br />
+				{% for category in prod_categories %}
+					{% ifequal category.get_main_category_display cat %}
+						<a href="#{{category}}">{{category.sub_category}}</a>
+						{% if forloop.last %}{% else %} | {% endif %}
+					{% endifequal %}
+				{% endfor %}
+				<p />
+			{% endfor %}
+			<strong>Jump to Uncategorized: </strong><a href='#uncategorized'>Uncategorized</a>
+	</div>
+	<br />
+
+	<table border="0" cellpadding="2" cellspacing="2" width="100%">
+		{% for category in prod_categories %}
+			<tr>
+				<th><a name="{{category}}">&nbsp;</a>{{category}}</th>
+				<th>PDF</th>
+				<th>Substrate</th>
+				<th>Available Plants/Presses</th>
+			</tr>
+			{% for size in category.itemcatalog_set.all %}
+				{% if size.active %}
+					<tr>
+						<td>
+							<strong>{{size}}</strong>
+							{% if perms.accounts.clemson_employee %}
+								<a href='{% url "itemcatalog_edit" size.id %}'>
+									<img src="{{MEDIA_URL}}img/icons/pencil.png" style="vertical-align:text-bottom" />
+								</a>
+							{% endif %}
+						</td>
+						<td>
+						{% if size.pdf_template_exists %}
+							<strong>
+								<a href='{% url "get_pdf_template" size.id %}'>
+									<img src="{{MEDIA_URL}}img/icons/page_white_acrobat.png" style="vertical-align:text-bottom" />
+									</a>
+							</strong>
+						{% endif %}
+						</td>
+						<td>
+							{{size.get_product_substrate_display}}
+						</td>
+						<td>
+							{% for spec in size.active_specs %}
+								{% if perms.accounts.clemson_employee %}
+									<a href='{% url "edit_itemspecs" spec.id %}'>{{spec.printlocation}}</a>
+									{% if forloop.last %}{% else %} | {% endif %}
+								{% else %}
+									{{spec.printlocation}}
+									{% if forloop.last %}{% else %} | {% endif %}
+								{% endif %}
+							{% endfor %}
+						</td>
+					</tr>
+				{% endif %}
+			{% endfor %}
+			<tr>
+				<td colspan='4'><a href="#top"><img src="{{MEDIA_URL}}img/icons/arrow_up.png" style="vertical-align:text-bottom" />Back to Top</a></td>
+			</tr>
+		{% endfor %}
+		<tr>
+			<th><a name="uncategorized">&nbsp;</a>Uncategorized</th>
+			<th>PDF</th>
+			<th>Substrate</th>
+			<th>Available Plants/Presses</th>
+		</tr>
+		{% for size in items_without_category %}
+			{% if size.active_specs %}
+			<tr>
+				<td>
+					<strong>{{size}}</strong>
+					{% if perms.accounts.clemson_employee %}
+						<a href='{% url "itemcatalog_edit" size.id %}'>
+							<img src="{{MEDIA_URL}}img/icons/pencil.png" style="vertical-align:text-bottom" />
+						</a>
+					{% endif %}
+				</td>
+				<td>
+				{% if size.pdf_template_exists %}
+					<strong>
+						<a href='{% url "get_pdf_template" size.id %}'>
+							<img src="{{MEDIA_URL}}img/icons/page_white_acrobat.png" style="vertical-align:text-bottom" />
+							</a>
+					</strong>
+				{% endif %}
+				</td>
+				<td>
+					{{size.get_product_substrate_display}}
+				</td>
+				<td>
+					{% for spec in size.active_specs %}
+						{% if perms.accounts.clemson_employee %}
+							<a href='{% url "edit_itemspecs" spec.id %}'>{{spec.printlocation}}</a>
+							{% if forloop.last %}{% else %} | {% endif %}
+						{% else %}
+							{{spec.printlocation}}
+							{% if forloop.last %}{% else %} | {% endif %}
+						{% endif %}
+					{% endfor %}
+				</td>
+			</tr>
+			{% endif %}
+		{% endfor %}
+	</table>
+
+{% endblock %}

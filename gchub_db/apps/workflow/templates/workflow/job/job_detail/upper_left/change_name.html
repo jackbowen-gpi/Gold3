@@ -1,0 +1,33 @@
+<div>
+  <h1>Change Name of Job {{job.id}}</h1>
+  <p>
+    Enter the new job name in the second field of the form below. It is
+    important to note that this will <strong>not</strong> change any folder
+    or file names. If you would like to do that, you will need to do it
+    manully, although it is not necessary to do so.
+  </p>
+  <form id="jobname" name="jobname"
+        onsubmit="change_job_name('{{job.id}}');return false;"
+        style="width:300px;margin:0 auto">
+    <hr />
+
+    <label for="rename_job_name">Current Name:</label>
+    <input id="rename_job_name" disabled="disabled" value="{{job.name}}" />
+    <br />
+
+    <label for="id_name">New Name:</label>
+    {{jobform.name}}
+    <br />
+
+    <hr />
+    <div style='width:180px;padding-top:8px;margin:0 auto'>
+      <a class="button"
+         href='javascript:load_div("main_view", "/workflow/job/{{job.id}}/main/")'>
+        <span>Cancel</span>
+      </a>
+      <a class="button" href="javascript:change_job_name('{{job.id}}')">
+        <span>Rename</span>
+      </a>
+   </div>
+  </form>
+</div>

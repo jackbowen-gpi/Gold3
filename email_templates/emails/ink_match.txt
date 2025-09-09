@@ -1,0 +1,1 @@
+<p>An ink on Job: {{job}} was matched to Color: {{color}} for Item: #{{item}} Size: {{size}} which the surplus ink can be used.</p>

@@ -1,0 +1,68 @@
+{% extends "standard.html" %}
+{% load item_links %}
+
+{% block extra_head %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<script type="text/javascript">
+
+	   /*
+		* prototype is loaded in GOLD's base html and it uses $ just like jquery
+		* does. So we'll change $ to $j for the jQuery on this page using
+		* jQuery.noConflict()
+		*/
+		var $j = jQuery.noConflict();
+
+		//jQuery to be fired when the document is ready.
+		$j(document).ready(function(){
+			//Make the back link look like a button why not.
+	        $j( "#back" ).button({
+	            icons: {
+	                primary: "ui-icon-circle-arrow-w"
+	            }
+		    });
+		});//End jQuery to be fire when the document is ready.
+	</script>
+{% endblock %}
+
+{% block body %}
+
+	<h1>{{page_title}}</h1>
+	<p><a href="/workflow/review/plant/" id= "back">Back to Plant Reviews</a></p>
+	{% include "pagination_bar.html" %}
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Size</th>
+			<th>Art</th>
+			<th>Plant</th>
+			<th>Press</th>
+			<th>Platemaker (Type)</th>
+			<th>Annual Use</th>
+			<th>Status</th>
+		</tr>
+		{% for review in object_list %}
+			<tr>
+				<td><a href="/workflow/job/{{review.item.job.id}}/">{{review.item.job.id}} {{review.item.job.name}} &nbsp;&nbsp;</a></td>
+				<td>{{review.item.size}}</td>
+				<td>
+				  {{review.item|item_preview_art_link:""}}
+				</td>
+				<td>{{review.item.printlocation.plant}}</td>
+				<td>{{review.item.printlocation.press}}{% if review.item.special_mfg %}-{{review.item.special_mfg}}{% endif %}</td>
+				<td>{{review.item.platepackage.platemaker}} ({{review.item.platepackage.platetype}})</td>
+				<td>{{review.item.annual_use}} ({{review.item.case_pack}}/cs)</td>
+				<td>
+					<img src="{{MEDIA_URL}}img/icons/{{review.status.icon}}.png"
+					style="vertical-align:text-bottom"
+					alt="{{review.status.status}}" />
+					{{review.status.status}}
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+	{% include "pagination_bar.html" %}
+{% endblock %}

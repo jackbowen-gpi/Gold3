@@ -1,0 +1,8 @@
+{% include "emails/email_header.txt" %}
+
+Item {{item}} of job {{item.job}} has been approved by the customer.
+
+{% if item.fsb_nine_digit %}
+A nine digit number was created prior to approval.
+Nine Digit: {{item.fsb_nine_digit}}
+{% endif %}

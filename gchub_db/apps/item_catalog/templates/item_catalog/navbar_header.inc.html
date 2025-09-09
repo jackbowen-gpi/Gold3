@@ -1,0 +1,17 @@
+<script type="text/javascript">
+
+ /*
+      Initialize and render the MenuBar when its elements are ready
+      to be scripted.
+ */
+function setup_menu() {
+  YAHOO.util.Event.onContentReady("itemmgt_nav", function () {
+     var oMenuBar = new YAHOO.widget.MenuBar("itemmgt_nav", {
+                                                 autosubmenudisplay: true,
+                                                 hidedelay: 750,
+                                                 lazyload: true });
+     oMenuBar.render();
+
+  });
+}
+</script>

@@ -1,0 +1,124 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<style type="text/css">
+		.warningButton {
+			background-color:lightgrey;
+			color:black;
+			margin-left:28px;
+			border-radius:9px;
+			width:90px;
+		}
+		.warningButton:hover {
+			background-color:darkgrey;
+		}
+	</style>
+
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript"> 
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using 
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+		
+		//jQuery stuff.
+		$j(document).ready(function(){
+			
+			// Hide dismisal notes on load.
+			$j('#notes_row').hide()
+
+			// Show/hide deactivation notes at active is toggled.
+			// Also make deactivation notes required when it's visible
+			$j( "#id_dismissed" ).click(function() {
+				$j( "#notes_row" ).toggle("fade");
+			});
+			
+		});//End jQuery stuff.
+		
+	</script>
+{% endblock %}
+
+{% block body %}
+<div style="background-color:#666666">
+<table style="background-color:transparent;border: none;margin: 0px auto;">
+	<tr>
+	    <td style="text-align: center;background-color:inherit;border:inherit">
+			<h1 style="color:white">**Warning: Press change jobs will ignore color warnings**</h1>
+		</td>
+	</tr>
+	<tr>
+	    <td style="color:white;text-align:center;background-color:inherit;border:inherit">
+			<h1 style="color:white; text-align:center">Please makes changes to your color warning preferences and then click save</h1>
+		</td>
+	</tr>
+</table>
+</div>
+
+<form method="post" action="/workflow/color_warning/edit_warning/{{ warning.id }}">		
+	<div style="text-align: center;background-color:#666666">
+		<table style="background-color: transparent;margin: 0px auto;border:none">
+			<tr>
+				<td style="background-color:inherit;border:inherit">
+				<!-- Pantone color is being swapped for definition but not in the model, so we are changing in the templates -->
+					<label style="color:white;text-align:center">Pantone Color:</label>
+					{{ form.definition }}
+				</td>
+			</tr>
+			<tr>
+				<td style="background-color:inherit;border:inherit">
+					<label style="color:white;text-align:center">QPO#:</label>
+					{{ form.qpo_number }}
+				</td>
+			</tr>
+			<tr>
+				<td style="background-color:inherit;border:inherit">
+					<label style="color:white;text-align:center">Notes:</label>
+					{{ form.notes }}
+				</td>
+			</tr>
+			<tr>
+				<td style="background-color:inherit;border:inherit">
+					<label style="color:white;text-align:center">Active:</label>
+					{{ form.active }} <span style="color:white">(Deactivated items will re-activate overnight.)</span>
+				</td>
+			</tr>
+			<tr>
+				<td style="background-color:inherit;border:inherit">
+					<label style="color:white;text-align:center">Dismiss:</label>
+					{{ form.dismissed }} <span style="color:white">(Permanently deactivates this color warning.)</span>
+				</td>
+			</tr>
+			<tr id="notes_row">
+				<td style="background-color:inherit;border:inherit">
+					<label style="color:white;text-align:center">Dismissal Notes:</label>
+					{{ form.dismissal_notes }}
+				</td>
+			</tr>
+			<tr>
+				<td style="background-color:inherit;border:inherit">
+					<input class="warningButton" type="submit" value="Save Changes" />
+				</td>
+			</tr>
+		</table>
+	</div>	
+	<div style="background-color:white">
+		<h2>
+		   <a href="/workflow/color_warning/color_warning/" >Back to Home</a>
+		</h2>
+	</div>		
+</form>
+
+
+{% if errors %}
+	<h1 style="color:red; text-align:center">Please correct the following:</h1>
+	{% for error in errors %}
+		<h1 style="color:red; text-align:center">{{ error }}</h1>
+	{% endfor %}
+{% endif %}
+
+{% endblock %}

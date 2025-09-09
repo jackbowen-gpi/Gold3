@@ -1,0 +1,57 @@
+<img src="{{MEDIA_URL}}img/icons/money_dollar.png"> <span class="sub_heading">Apply Billing for Items in {{job}}</span><br />
+	<br />
+	<div class="outline_fancy" style="width: 450px">
+
+		<form id="allitemcharge" name="allitemcharge" onsubmit="add_job_charges('{{job.id}}');return false;">
+			<label for="id_artist">Artist:</label>
+				<select name="artist" id="id_artist">
+				{% for artist in artists %}
+				   <option value="{{artist.id}}" {% ifequal artist current_artist %}selected="selected"{% endifequal %}>{{artist.first_name}} {{artist.last_name}}</option>
+				{% endfor %}
+				</select><br />
+
+			<label for="id_charge_type">Charge Type:</label>
+				{{form.charge_type}}
+				<br />
+
+			<label for="id_rush_days">Rush Days:</label>
+				<select name="rush_days" id="id_rush_days">
+				<option value="" selected="selected">--</option>
+				<option value="0">0</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				</select><br>
+
+		    <br />
+            <label for="items_checked">Item : </label>
+            <div style="height: auto; margin: 0 0 10px 98px;">
+
+            <input type="checkbox" id="toggle_all_billing" checked="checked"/>
+		    Toggle All
+		    <br />
+		    <br />
+
+
+			{% for item in items %}
+			  <div style="height:auto;">
+			  <input type="checkbox" name="items_checked" checked="checked" id="billing_item_{{item.id}}" value="{{item.id}}" />#{{item.num_in_job}}
+			  {{item}}
+			  </div>
+			{% endfor %}
+			</div>
+
+			<input type="submit" value="Add Charges to All Items" />
+		</form>
+	</div>
+<div class="outline" style="width: 450px"><img
+	src="{{MEDIA_URL}}img/icons/information.png"
+	style="vertical-align: text-bottom" /> Billing selected will apply to
+every item in the job, regardless of invoice or file out status. Because
+many billing activities are dependent on number of colors, a preview of
+the charge cost cannot be displayed.</div>

@@ -1,0 +1,127 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{{MEDIA_URL}}/css/drawdown/drawdown.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/table-sorter/table-sorter.css" type="text/css" />
+
+{% endblock %}
+
+{% block body %}
+
+    <h1>{{page_title}}</h1>
+    {% include "js_pagination.html" %}
+
+{% ifequal type "job" %}
+    <table width="100%" id="table" class="sortable">
+        <thead>
+            <tr>
+                <th>Job (# items)</th>
+                <th>Date In</th>
+                <th>Status</th>
+                <th>Date Needed</th>
+                <th>Artist</th>
+                <th>Salesperson</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for entry in object_list %}
+            <tr class="{% cycle 'rowA' 'rowB' %}">
+                <td>
+                    {% ifequal entry.status "Cancelled" %}<strike>{% endifequal %}
+                    <a href="{{entry.get_absolute_url}}">{{entry}} ({{entry.items_in_job}}) </a>
+                    {% if entry.duplicated_from %}
+                        <img src="{{MEDIA_URL}}img/icons/arrow_refresh_small.png" style="vertical-align:text-bottom" alt="Duplicated" />
+                    {% endif %}
+                </td>
+                    {% ifequal entry.status "Cancelled" %}</strike>{% endifequal %}
+                <td>{{entry.creation_date|date:"n-j-Y"}}</td>
+                <td>{% ifequal entry.status "Pending"%}
+                        <img src="{{MEDIA_URL}}img/icons/help.png" style="vertical-align:text-bottom" alt="Pending" />
+                    {% endifequal %}
+                    {% ifequal entry.status "Active"%}
+                        <img src="{{MEDIA_URL}}img/icons/arrow_right.png" style="vertical-align:text-bottom" alt="Active" />
+                    {% endifequal %}
+                    {% ifequal entry.status "Hold"%}
+                        <img src="{{MEDIA_URL}}img/icons/stop.png" style="vertical-align:text-bottom" alt="Hold" />
+                    {% endifequal %}
+                    {% ifequal entry.status "Complete"%}
+                        <img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" alt="Complete" />
+                    {% endifequal %}
+                    {% ifequal entry.status "Complete & Billed"%}
+                        <img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" alt="Complete and Billed" />
+                    {% endifequal %}
+                    {% ifequal entry.status "Cancelled"%}
+                        <img src="{{MEDIA_URL}}img/icons/cross.png" style="vertical-align:text-bottom" alt="Cancelled" />
+                    {% endifequal %}
+                {{entry.status}}</td>
+                <td>{{entry.due_date|date:"n-j-Y"}}</td>
+                <td>{{entry.artist}}</td>
+                <td>{{entry.salesperson}}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% include "js_pagination.html" %}
+    <br />
+    <a href="{% url "job_search" %}">Search Jobs Again</a><br />
+{% endifequal %}
+
+{% ifequal type "item"%}
+    <table width="100%" id="table" class="sortable">
+        <thead>
+            <tr>
+                <th>Job</th>
+                <th>Size</th>
+                <th>Plant</th>
+                <th>Press</th>
+                <th>Latest Proof</th>
+                <th>Item Num.</th>
+                <th>File Out Date</th>
+                <th>Artist</th>
+                <th>Salesperson</th>
+                <th># Inks</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for entry in object_list %}
+            <tr class="{% cycle 'rowA' 'rowB' %}">
+                <td><a href="/workflow/job/{{entry.job.id}}/">{{entry.job}}</a></td>
+                <td>{{entry}}</td>
+                <td>{{entry.printlocation.plant}}</td>
+                <td>{{entry.printlocation.press}}</td>
+                <td>{{entry.current_proof_date|date:"n-j-Y"}}</td>
+                <td>{{entry.fsb_nine_digit}}</td>
+                <td>{{entry.final_file_date|date:"n-j-Y"}}</td>
+                <td>{{entry.job.artist}}</td>
+                <td>{{entry.job.salesperson}}</td>
+                <td>{{entry.itemcolor_set.count}}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% include "js_pagination.html" %}
+    <br />
+    <a href="{% url "item_search" %}">Search Items Again</a><br />
+{% endifequal %}
+
+<script type="text/javascript" src="{{MEDIA_URL}}js/table-sorter/sort-table2.js"></script>
+<script type="text/javascript">
+    var sorter = new TINY.table.sorter("sorter");
+    sorter.head = "head";
+    sorter.asc = "asc";
+    sorter.desc = "desc";
+    sorter.even = "rowB"; // was "evenrow"
+    sorter.odd = "rowA"; // was "oddrow"
+    sorter.evensel = "evenselected";
+    sorter.oddsel = "oddselected";
+    sorter.paginate = true;
+    sorter.currentid = "currentpage";
+    sorter.limitid = "pagelimit";
+    sorter.itemA = "pageItemA";
+    sorter.itemB = "pageItemB";
+    sorter.init("table", 4);
+</script>
+
+{% endblock %}

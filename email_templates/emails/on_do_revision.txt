@@ -1,0 +1,4 @@
+{% include "emails/email_header.txt" %}
+
+A revision has been entered for item {{item}} of job {{item.job}}
+Instructions: {{note|safe}}

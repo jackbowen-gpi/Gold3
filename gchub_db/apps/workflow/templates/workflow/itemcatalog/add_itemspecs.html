@@ -1,0 +1,24 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	{% include "workflow/itemcatalog/navbar_header.inc.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/item_catalog.js"></script>
+{% endblock %}
+
+{% block body %}
+
+<h1 class="inline">Add Specification for Product</h1><br /><br />
+{% include "workflow/itemcatalog/navbar_div.inc.html" %}
+	<form id="itemspec" name="itemspec" onsubmit="add_itemspecs();return false;">
+		<dl>
+		{% for field in add_form %}
+		    <dt>{{ field.label_tag }}</dt>
+		    <dd>{{ field }}</dd>
+		    {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
+		    {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}
+		{% endfor %}
+		</dl>
+		<input type="submit" value="Add Specification" onclick="add_itemspecs();return false;" />
+	</form>
+{% endblock %}

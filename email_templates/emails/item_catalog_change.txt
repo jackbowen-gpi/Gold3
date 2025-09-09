@@ -1,0 +1,19 @@
+<p>
+{% if type == "add" %}
+{{product_name}} has been added to the Item Catalog by: {{user}}
+{% else %}
+{{product_name}} in the Item Catalog was edited by: {{user}}
+{% endif %}
+</p>
+
+<p>
+Please follow this link to view the product in the Item Catalog.
+
+http://gchub.graphicpkg.com/workflow/itemcatalog/edit/{{id}}/
+</p>
+
+
+<p>
+This email was automatically generated and sent by GOLD.
+Please direct any technical questions, comments, or suggestions to clemson.support@graphicpkg.com.
+</p>

@@ -1,0 +1,58 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<h1>{{page_title}}</h1>
+<hr />
+<br />
+
+<div style="width:80%">
+	This page is an overview of several statistics for each employee.
+</div>
+<br />
+
+<h3>
+	<a href="/manager_tools/" >Back</a>
+</h3>
+<br />
+{% load humanize %}
+
+<div class="grey_bordered">
+	<h2>Data for {% now "Y" %}</h2>
+	<table class="rowHover">
+		<tr>
+			<th>Employee</th>
+			<th>Vacation Used</th>
+			<th>Sick Days</th>
+			<th>Assign. Items (Errors)*</th>
+			<th>Amt. Charged**</th>
+			<th>On-Time %</th>
+			<th>QCs</th>
+			<th>QC Reviews</th>
+		</tr>
+
+	{% for emp in clemson_employee_list %}
+		<tr>
+			<th>{{emp.last_name}}, {{emp.first_name}}</th>
+			<td style="text-align:right;">{{emp.profile.vacation_used}}</td>
+			<td style="text-align:right;">{{emp.profile.sick_days_taken}}</td>
+			<td style="text-align:right;">{{emp.profile.items_assigned}} ({{emp.profile.errors_committed}})</td>
+			<td style="text-align:right;">${{emp.profile.amount_billed|floatformat:2|intcomma}}</td>
+			<td style="text-align:right;">{{emp.profile.on_time_percentage|floatformat:2}}%</td>
+			<td style="text-align:right;">{{emp.profile.number_qcs}}</td>
+			<td style="text-align:right;">{{emp.profile.number_qc_reviews}}</td>
+		</tr>
+
+	{% endfor %}
+
+
+	</table>
+
+    <h2>Total On-time Percentage: {{ totalPercentage|floatformat:2 }}%***</h2>
+    <h2>Total Error Percentage: {{ totalErrorPercentage|floatformat:2 }}%***</h2>
+    <p>* Calculated from the item creation date. In other words, all the items
+    created this year that were assigned to that artists.</p>
+    <p>** Calculated from the date charges were applied. In other words, all the
+    charges that were applied this year to items assigned to that artist.</p>
+    <p>*** These figures are calculated as a year-to-date based on past & present employees within the current year.</p>
+</div>
+{% endblock %}

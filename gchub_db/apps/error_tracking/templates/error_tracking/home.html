@@ -1,0 +1,78 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+  {% include "error_tracking/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+
+<img src="{{MEDIA_URL}}img/icons/error.png" alt="Error Tracking" /><h1 class="inline"> Error Tracking</h1><br /><br />
+{% include "error_tracking/navbar_div.inc.html" %}
+
+	<div class="outline_fancy" style="width:55%;">
+		<h2>{{year}} Error Statistics</h2>
+		<table>
+			<tr>
+				<th></th>
+				<th width="80px">Foodservice</th>
+				<th width="80px">Beverage</th>
+				<th width="80px">Container</th>
+				<th width="80px">Totals</th>
+			</tr>
+			<tr>
+				<th>Errors</th>
+				<td>{{fsb_errors_reported}}</td>
+				<td>{{bev_errors_reported}}</td>
+				<td>{{con_errors_reported}}</td>
+				<td>{{errors_reported}}</td>
+			</tr>
+			<tr>
+				<th>File Outs</th>
+				<td>{{fsb_file_outs}}</td>
+				<td>{{bev_file_outs}}</td>
+				<td>{{con_file_outs}}</td>
+				<td>{{num_file_outs}}</td>
+			</tr>
+			<tr>
+				<th>Error-Free</th>
+				<td>{{fsb_error_percentage|floatformat:2}}%</td>
+				<td>{{bev_error_percentage|floatformat:2}}%</td>
+				<td>{{con_error_percentage|floatformat:2}}%</td>
+				<td>{{error_percentage|floatformat:2}}%</td>
+			</tr>
+		</table>
+
+	{% if error_list %}
+		{% for error in error_list %}
+			<div class="outline_fancy">
+				<h2>{{error.job.workflow}}: <a href="{% url "job_detail" error.job.id %}">{{error.job}}</a>: {{error.item}}</h2>
+				<strong>Stage:</strong> {{error.get_stage_display}}<br />
+				<strong>Reported By:</strong> {{error.reported_by}}<br />
+				<strong>Date Reported:</strong> {{error.reported_date|date:"n-j-Y"}}<br />
+				<strong>Description:</strong> {{error.description}}<br /><br />
+				{% if perms.error_tracking.delete_error %}
+					<a href="{% url "error_tracking_delete" error.id %}"><img src="{{MEDIA_URL}}img/icons/error_delete.png" style="vertical-align:text-bottom" alt="Dismiss Error" /> Permanently Dismiss Error</a>
+				{% endif %}
+			</div>
+		{% endfor %}
+	{% else %}
+		Hooray! No errors reported!
+	{% endif %}
+	</div>
+<br />
+<hr />
+		<div class="outline" style="width:55%;padding:4px;">
+			<span class="sub_heading">Additional Reports</span><br />
+			<!-- The first year will be YTD and the others Yearly Reports -->
+			{% for current_year in years_to_display %}
+				{% ifequal forloop.counter 1 %}
+					<a href="{% url "annual_error_report" current_year %}">{{current_year}} YTD Report</a><br />
+				{% else %}
+					<a href="{% url "annual_error_report" current_year %}">{{current_year}} Yearly Report</a><br />
+				{% endifequal %}
+			{% endfor %}
+		</div>
+
+(Error tracking is only visible to Clemson employees.)
+
+{% endblock %}

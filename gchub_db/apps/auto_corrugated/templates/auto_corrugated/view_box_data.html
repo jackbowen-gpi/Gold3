@@ -1,0 +1,437 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/auto_corrugated/generation_styles.css" />
+    {% include "yui_container_includes.html" %}
+    {% include "auto_corrugated/navbar_header.inc.html" %}
+
+    <!-- Load up jQuery -->
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery.fileDownload.js"></script>
+    <link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+    <!-- Load up YUI -->
+    <script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="{{YUI_URL}}build/animation/animation-min.js"></script>
+    <script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
+	
+    <!-- Javascript -->
+    <script type="text/javascript">
+       /*
+        * prototype is loaded in GOLD's base html and it uses $ just like jquery
+        * does. So we'll change $ to $j for the jQuery on this page using 
+        * jQuery.noConflict()
+        */
+        var $j = jQuery.noConflict();
+        
+        //jQuery to be fired when the document is ready.
+        $j(document).ready(function(){
+           /*
+            * This dialog asks the user what changes need to be made to a given
+            * box PDF. The dialog is displayed by the approve_box_changes 
+            * funct further down.
+            */ 
+         // Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+			
+            $j('#pdf_approval_form #id_approvalSubmit').attr('checked', false);
+            $j('#pdf_approval_form #id_approvalSubmit').hide();
+            $j('#pdf_changes_form #id_approvalSubmit').hide();
+            $j( "#approve_dialog" ).dialog({
+                autoOpen: false,
+                width: 400,
+                show: "fade",
+                hide: "fade",
+                modal: true,
+                buttons: {
+                    Cancel: function() {
+                        $j( this ).dialog( "close" );
+                    },
+                    Submit: function() {
+                        $j( this ).dialog( "close" );
+                        YAHOO.example.container.wait.show();
+                        $j("#pdf_approval_form").submit();
+                    },
+                },//End buttons
+            });//End dialog()
+           
+           /*
+            * This dialog asks the user what changes need to be made to a given
+            * box PDF. The dialog is displayed by the approve_box_changes 
+            * funct further down.
+            */ 
+            $j( "#changes_dialog" ).dialog({
+                autoOpen: false,
+                width: 400,
+                show: "fade",
+                hide: "fade",
+                modal: true,
+                buttons: {
+                    Cancel: function() {
+                        $j( this ).dialog( "close" );
+                    },
+                    Submit: function() {
+                        $j( this ).dialog( "close" );
+                        YAHOO.example.container.wait.show();
+                        $j("#pdf_changes_form").submit();
+                    },
+                },//End buttons
+            });//End dialog()
+            
+            // If there are form validation errors open the dialog on page load
+            // so the user can see the errors.
+            if (val_error) {
+                console.log("Inside if val_error");
+                $j( "#changes_dialog" ).dialog( "open" );
+            }
+            if (val_error_ap) {
+                console.log("Inside if val_error");
+                $j( "#approve_dialog" ).dialog( "open" );
+            }
+            // Change the look of the add buttons.
+            $j('button[id^="add_"]').button({
+                icons: {
+                    primary: "ui-icon-plusthick"
+                },
+                text: false
+            });
+            
+            //Runs cloneMore() when add button in the changes dialog is clicked.
+            $j('#add_file1').click(function() {
+                cloneMore('div.file_field1:last');
+            });
+            $j('#add_file2').click(function() {
+                cloneMore('div.file_field2:last');
+            });  
+            
+        });//End jQuery to be fire when the document is ready.
+
+        val_error=false;
+        val_error_ap=false;
+        
+     	// Show busy indicator while prepping the PDF download
+		function PDFClick(box_id, method) {
+			// Set busy indicator text
+			$j("#busy_dialog_text").text("Please wait while GOLD creates this document for download");
+			// Open busy indicator
+			$j( "#busy_dialog" ).dialog( "open" );
+			// Prep download using jquery.fileDownload.js and assign to dlReq
+			dlReq = $j.fileDownload('/acs/generate_box/' + box_id + "/" + method + "/", {
+			    successCallback: function (url, error) {
+					$j( "#busy_dialog" ).dialog( "close" );
+			    },
+			    failCallback: function (responseHtml, url) {
+			    	alert("There was an error creating the PDF");
+			    	$j( "#busy_dialog" ).dialog( "close" );
+			    	
+			    }
+			});
+		};
+        
+        // Add additional file upload fields to the changes dialog.
+        function cloneMore(selector) {
+            //Find out how many fields we're starting with.
+            var total = parseInt($j("[id$='TOTAL_FORMS']").val());
+            //Create a clone of the selected form.
+            var newElement = $j(selector).clone();
+            //Increase the field's name and IDs by 1.
+            //ID
+            var head = newElement.children('input').attr('id').split(total-1)[0];
+            var tail = newElement.children('input').attr('id').split(total-1)[1];
+            newElement.children('input').attr({'id': head + total + tail});
+            //Name
+            var head = newElement.children('input').attr('name').split(total-1)[0];
+            var tail = newElement.children('input').attr('name').split(total-1)[1];
+            newElement.children('input').attr({'name': head + total + tail});
+            //Increate the formset's total form count by 1.     
+            total++;
+            $j("[id$='TOTAL_FORMS']").val(total);
+            //Put the newly cloned form after the original.
+            $j(selector).after(newElement);
+            //This clears all the values from the newly cloned form.
+            $j(selector + " input[type=file]").val("");
+        }// End cloneMore()
+
+        function hide_modal_wait() {
+            setTimeout("YAHOO.example.container.wait.hide()",1250);
+        } // end hide_modal_wait()
+        
+        function approve_box(box_id) {
+           /*
+            * Fired when he user hits the Approve button. Calls the validator
+            * and sends off an AJAX request if all is good.
+            */  
+
+            $j("#approve_dialog" ).dialog( "open" );
+            
+        } // end approve_box()
+    
+
+        function approve_box_changes(box_id) {
+           /*
+            * Fired when he user hits the Change by Artist button. Displays a 
+            * dialog asking what changes should be made to the box PDF.
+            */  
+            $j( "#changes_dialog" ).dialog( "open" );
+        } // end approve_box_changes()
+    </script>
+{% endblock %}
+
+{% block page_title %}Corrugated Box - {{box}}{% endblock %}
+
+{% block body %}
+<h1>Corrugated Box - {{box}} {{box.item}}</h1>
+{% include "auto_corrugated/navbar_div.inc.html" %}
+
+<div id="busy_dialog">
+  <center>
+	  <p><div id="busy_dialog_text"></div></p>
+	  <img src="{{MEDIA_URL}}img/spinner.gif" />
+  <center>
+</div>	 
+
+<!-- This div is the contents of the pop-up dialog when a PDF is approved with
+changes. The jQuery in the header handles showing and hiding it.-->
+<div id="approve_dialog" title="PDF Approval Notes">
+    <p>What notes do have have for the artist?</p>
+    <form id="pdf_approval_form" method="post" enctype="multipart/form-data">
+        {{ approvalform.changes.errors }} 
+        {{ approvalform.changes }}
+        {{ approvalform.approvalSubmit }}
+        <p>If you have a reference file for the artist upload it here.</p>
+        {{ fileformsetApproval.management_form }}
+        {% for form in fileformsetApproval.forms %}
+            {{ form.id }}
+            {% for field in form %}
+                <div class="file_field1">
+                    {{ field.errors }} 
+                    {{ field }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <p><button type="button" id="add_file1">Add Another File</button><i> &nbsp; Click to add more files.</i></p>
+    </form>
+    <!-- If there are validation errors in this form we want it to show on page 
+    load so the user can see the errors. This might be a poor way to trigger it
+    though.-->
+    {% if approvalform.errors %}
+        <script type="text/javascript">
+            var val_error_ap = true;
+            console.log("val_error_ap = true");
+        </script>
+    {% endif %}
+</div>
+<!-- This div is the contents of the pop-up dialog when a PDF is approved with
+changes. The jQuery in the header handles showing and hiding it.-->
+<div id="changes_dialog" title="PDF Changes">
+    <p>What changes need to be made to this PDF?</p>
+    <form id="pdf_changes_form" method="post" enctype="multipart/form-data">
+        {{ changeform.changes.errors }} 
+        {{ changeform.changes }}
+        {{ changeform.approvalSubmit }}
+        <p>If you have a reference file for the artist upload it here.</p>
+        {{ fileformset.management_form }}
+        {% for form in fileformset.forms %}
+            {{ form.id }}
+            {% for field in form %}
+                <div class="file_field2">
+                    {{ field.errors }} 
+                    {{ field }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <p><button type="button" id="add_file2">Add Another File</button><i> &nbsp; Click to add more files.</i></p>
+    </form>
+    <!-- If there are validation errors in this form we want it to show on page 
+    load so the user can see the errors. This might be a poor way to trigger it
+    though.-->
+    {% if changeform.errors %}
+        <script type="text/javascript">
+            var val_error = true;
+            console.log("val_error = true");
+        </script>
+    {% endif %}
+</div>
+
+<table width="85%">
+    <tr>
+        <td>
+            <h3>Box Information</h3>
+            <table width="450px">
+{% comment %}
+                <tr>
+                    <th>PDF Type</th>
+                    <td>{{box.pdf_type}}</td>
+                </tr>
+{% endcomment %}
+
+                <tr>
+                    <th>Six Digit</th>
+                    <td>{{box.six_digit_num}}</td>
+                </tr>
+                <tr>
+                    <th>Nine Digit</th>
+                    <td>{{box.nine_digit_num}}</td>
+                </tr>
+                <tr>
+                    <th>Fourteen Digit (SCC)</th>
+                    <td>{{box.fourteen_digit_num}}</td>
+                </tr>
+                <tr>
+                    <th>Replaces Part</th>
+                    <td>{{box.replaced_6digit}}</td>
+                </tr>
+                <tr>
+                    <th>Plant</th>
+                    <td>{{box.plant}}</td>
+                </tr>
+                <tr>
+                    <th>Item</th>
+                    <td>{{box.item}}</td>
+                </tr>
+                <tr>
+                    <th>Case Count</th>
+                    <td>{{box.spec.case_count}}</td>
+                </tr>
+                <tr>
+                    <th>Sleeve Count</th>
+                    <td>{{box.sleeve_count}}</td>
+                </tr>
+                <tr>
+                    <th>Dimensions (L x W x H)</th>
+                    <td>{{box.dim_length}}" x {{box.dim_width}}" x {{box.dim_height}}"</td>
+                </tr>
+                <tr>
+                    <th>Box Format</th>
+                    <td>{{box.get_box_format_display}}</td>
+                </tr>
+                <tr>
+                    <th>Text Line #1</th>
+                    <td>{{box.text_line_1}}</td>
+                </tr>
+                <tr>
+                    <th>Text Line #2</th>
+                    <td>{{box.text_line_2}}</td>
+                </tr>
+                <tr>
+                    <th>Board Spec</th>
+                    <td>{{box.board_spec}}</td>
+                </tr>
+                <tr>
+                    <th>Case Color</th>
+                    <td>{{box.case_color}}</td>
+                </tr>
+                <!-- <tr>
+                    <th>SFI Content Stamp Used?</th>
+                    <td>{{box.sfi_stamp_cup}}</td>
+                </tr> -->
+                <tr>
+                    <th>Create Slugs?</th>
+                    <td>{{box.make_slugs}}</td>
+                </tr>
+                <tr>
+                    <th>Platemaking</th>
+                    <td>{{box.platepackage}}</a></td>
+                </tr>
+                <tr>
+                    <th>Created By</th>
+                    <td>{{box.entered_by}} ({{box.creation_date|date:"n-j-Y"}})</td>
+                </tr>
+                <tr>
+                    <th>Job</th>
+                    <td><a href="{{box.job.get_absolute_url}}">{{box.job}}</a></td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table width="300px" align="center">
+                <tr height="60px">
+                    <td style="text-align:center;">
+                        {% if box.approved and perms.accounts.in_artist_pulldown %}
+                            <strong><a id="pdf_download" href='#' onClick="PDFClick({{box.id}}, 'automationEngine')">
+								<img src="{{MEDIA_URL}}img/icons/page_white_acrobat.png" style="vertical-align:text-bottom" />Download PDF
+                            </a></strong>
+                            <p>(PDF is suitable for production.)</p>
+                        {% else %}
+                        	<!---Busy dialog-->
+							<strong><a id="pdf_download" href='#' onClick="PDFClick({{box.id}}, 'reportlab')">
+								<img src="{{MEDIA_URL}}img/icons/page_white_acrobat.png" style="vertical-align:text-bottom" />Download Preview PDF
+                            </a></strong>
+					  		<p>(PDF is encrypted and watermarked.)</p>
+  	
+  							<!--
+                             <strong><a href='javascript:generate_box({{box.id}}, "reportlab")'>
+                            <img src="{{MEDIA_URL}}img/icons/page_white_acrobat.png" style="vertical-align:text-bottom" /> Download PDF
+                            </a></strong>
+                            <br />
+                            <p>(PDF is encrypted and watermarked.)</p>
+                             -->
+                        {% endif %}
+                        
+                        <span class="pdf_type">
+                        {% ifequal box.pdf_type 0 %}
+                          PDF Type: Box Graphics with Label
+                        {% endifequal %}
+                        
+                        {% ifequal box.pdf_type 1 %}
+                          PDF Type: Box Graphics with NO Label
+                        {% endifequal %}
+                        
+                        {% ifequal box.pdf_type 2 %}
+                          PDF Type: NO Box Graphics with Label
+                        {% endifequal %}
+                        
+                        {% ifequal box.pdf_type 3 %}
+                          PDF Type: NO Box Graphics with NO Label
+                        {% endifequal %}
+                        </span>
+                    </td>
+                </tr>
+                {% if box.approved %}
+                
+                {% else %}
+                    <tr height="60px">
+                        <td style="text-align:center;">
+                            <strong><a href='javascript:approve_box("{{box.id}}")'>
+                            <img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" /> Approve PDF</a>
+                            </strong><br />
+                            (Creates job in GOLD for additional QC and Final File process.)
+                        </td>
+                    </tr>
+                    <tr height="60px">
+                        <td style="text-align:center;">
+                            <strong><a href='javascript:approve_box_changes("{{box.id}}")'>
+                            <img src="{{MEDIA_URL}}img/icons/wrench_orange.png" style="vertical-align:text-bottom" /> PDF Requires Changes by Artist</a>
+                            </strong><br />
+                            (Creates job in GOLD for artist.)
+                        </td>
+                    </tr>
+                <tr height="60px">
+                    <td style="text-align:center;">
+                        <strong><a href='{% url "auto_corrugated_pdf_generation_form_edit" box.id %}'>
+                        <img src="{{MEDIA_URL}}img/icons/pencil.png" style="vertical-align:text-bottom" /> Edit Box Information</a>
+                        </strong><br />
+                        (Edit information for this box.)
+                    </td>
+                </tr>
+                {% endif %}
+                <tr height="60px">
+                    <td style="text-align:center;">
+                        <strong><a href='{% url "auto_corrugated_pdf_generation_form_remake" box.id %}'>
+                        <img src="{{MEDIA_URL}}img/icons/shape_square_edit.png" style="vertical-align:text-bottom" /> Create Variant</a>
+                        </strong><br />
+                        (Create new box starting with this information.)
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{% endblock %}

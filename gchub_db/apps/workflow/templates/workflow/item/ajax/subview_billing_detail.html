@@ -1,0 +1,88 @@
+	<img src="{{MEDIA_URL}}img/icons/money_dollar.png">
+	{% include "workflow/item/toggle_detail_navbar.html" %}
+	<div class="outline_fancy">
+		{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+			{% if perms.accounts.clemson_employee %}
+				{% if item.check_too_few_charges %}
+					<span class="warning">Too few charges applied to item.</span><br />
+				{% endif %}
+				{% if item.check_too_few_revision_charges %}
+					<span class="warning">This item has more revisions entered than revision charges.</span><br />
+				{% endif %}
+				{% if item.check_fileout_post_production %}
+					<span class="warning">This item has been filed out without a Post Production charge.</span><br />
+				{% endif %}
+				{% if item.check_prepress_charges %}
+					<span class="warning">A Prepress Package charge has not been applied.</span><br />
+				{% endif %}
+				{% if item.check_color_keys %}
+					<span class="warning">This item prints in Shelbyville, and Color Keys have not been charged.</span><br />
+				{% endif %}
+			{% endif %}
+		{% endif %}
+		<table>
+			<tr>
+				<th>Charge</th>
+				<th>Amount</th>
+				<th>Date Charged</th>
+				<th>Invoice Date</th>
+				<th>Invoice Num</th>
+				<th>Rush Days</th>
+				<th>Artist</th>
+				{% if perms.accounts.clemson_employee %}<th>Manage</th>{% endif %}
+			</tr>
+			{% for charge in item.charge_set.all %}
+			<tr>
+				<td>{{ charge.description }}</td>
+				<td style="text-align:right;">${{ charge.amount|floatformat:2 }}</td>
+				<td style="text-align:right;">{{ charge.creation_date|date:"n/j/Y" }}</td>
+				<td style="text-align:right;">
+					{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+						{% if charge.invoice_date %}
+							{{ charge.invoice_date|date:"n/j/Y" }}
+						{% endif %}
+					{% else %}
+						{% if charge.bev_invoice %}
+							{{charge.bev_invoice.invoice_entry_date|date:"n/j/Y"}}
+						{% endif %}
+					{% endif %}
+				</td>
+				<td style="text-align:right;">
+					{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+						{{charge.invoice_number}}
+					{% else %}
+						{% if charge.bev_invoice %}
+							<a href="{% url "view_invoice" charge.bev_invoice.id %}">{{charge.bev_invoice}}</a>
+						{% endif %}
+					{% endif %}
+				</td>
+				<td style="text-align:right;">
+					{{charge.rush_days}}
+				</td>
+				<td style="text-align:right;">
+					{{charge.artist}}
+				</td>
+				{% if perms.accounts.clemson_employee %}
+					<td>
+					{% if charge.invoice_number or charge.bev_invoice %}
+						&nbsp;
+					{% else %}
+							<a href='javascript:load_div("bottom_view", charge_ajax_url("{{charge.id}}", "edit"))'><img src="{{MEDIA_URL}}img/icons/page_white_edit.png"></a>
+							<a href='javascript:load_div("bottom_view", delete_charge("{{charge.id}}", "{{charge.item.job.id}}", "{{charge.item.id}}"))'><img src="{{MEDIA_URL}}img/icons/delete.png"></a>
+					{% endif %}
+					</td>
+				{% endif %}
+			</tr>
+			{% endfor %}
+			<tr>
+				<th class="rightalign">Item Total:</th>
+				<td style="text-align:right;padding-left:12px;"><strong>${{item.get_total_charges|floatformat:2}}</strong></td>
+			</tr>
+			{% if perms.accounts.clemson_employee %}
+			<tr>
+				<th>Add Charge</th>
+				<td><a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "add_billing"))'><img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align:text-bottom"> Add</a></td>
+			</tr>
+			{% endif %}
+		</table>
+	</div>

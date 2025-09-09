@@ -1,0 +1,29 @@
+import os
+import sys
+
+# Ensure the repository root is on sys.path so the top-level settings module is
+# importable when running this script directly.
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if repo_root not in sys.path:
+    sys.path.insert(0, repo_root)
+
+os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
+import django
+
+try:
+    print("calling django.setup()")
+    django.setup()
+    print("django.setup() ok")
+except Exception as e:
+    print("django.setup() failed:", repr(e))
+    raise
+
+import importlib
+
+mod = importlib.import_module("gchub_db.apps.accounts.views")
+print("imported accounts.views as", type(mod))
+print("has index:", hasattr(mod, "index"))
+urls = importlib.import_module("gchub_db.apps.accounts.urls")
+print(
+    "imported accounts.urls, urlpatterns_len =", len(getattr(urls, "urlpatterns", []))
+)

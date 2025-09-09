@@ -1,0 +1,168 @@
+{% extends "standard.html" %}
+
+{% block page_title %}Contact Info{% endblock %}
+
+{% block extra_head %}
+  {% include "preferences/navbar_header.inc.html" %}
+{% endblock %} 
+
+{% block body %}
+<h1>Preferences - Contact Info</h1>
+{% include "preferences/navbar_div.inc.html" %}
+
+{% if form.errors %}
+    <div class="warning">
+        <p>Please correct the errors below:</p>
+        <ul>
+        {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+                <li>{{ field }}: {{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<p>Please keep your contact info up to date using the form below.</p>
+
+<form id="contact_info_form" action="{% url 'preferences_contact_info' %}" method="post">
+  {% csrf_token %}
+  
+  <table class="contact-form">
+    <tr>
+        <td class="label-cell">Username:</td>
+        <td class="input-cell">
+            <span class="readonly-field">{{ user.username }}</span>
+            <input type="hidden" name="username" value="{{ user.username }}" />
+        </td>
+    </tr>
+    <tr>
+        <td class="label-cell">First Name:</td>
+        <td class="input-cell">
+            <input type="text" name="first_name" value="{{ form.first_name.value|default:user.first_name|default:'' }}" maxlength="150" />
+            {% if form.first_name.errors %}
+                <span class="error">{{ form.first_name.errors.0 }}</span>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td class="label-cell">Last Name:</td>
+        <td class="input-cell">
+            <input type="text" name="last_name" value="{{ form.last_name.value|default:user.last_name|default:'' }}" maxlength="150" />
+            {% if form.last_name.errors %}
+                <span class="error">{{ form.last_name.errors.0 }}</span>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td class="label-cell">Email Address:</td>
+        <td class="input-cell">
+            <input type="email" name="email" value="{{ form.email.value|default:user.email|default:'' }}" required />
+            {% if form.email.errors %}
+                <span class="error">{{ form.email.errors.0 }}</span>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td class="label-cell">Phone Number:</td>
+        <td class="input-cell">
+            <input type="text" name="phone_number" value="{{ form.phone_number.value|default:user.profile.phone_number|default:'' }}" maxlength="50" />
+            {% if form.phone_number.errors %}
+                <span class="error">{{ form.phone_number.errors.0 }}</span>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td class="button-cell" colspan="2">
+            <div class="button-container">
+                <a class="button" href="{% url 'preferences' %}">
+                  <span>Cancel</span>
+                </a>
+                <a class="button" href="javascript:document.getElementById('contact_info_form').submit();">
+                  <span>Save Changes</span>
+                </a>
+            </div>
+        </td>
+    </tr>
+  </table>
+</form>
+
+<style>
+.contact-form {
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: white;
+}
+
+.contact-form td {
+    padding: 8px 12px;
+    vertical-align: top;
+}
+
+.contact-form tr:not(:last-child) td {
+    border-bottom: 1px solid #eee;
+}
+
+.label-cell {
+    background-color: #f0f0f0;
+    font-weight: bold;
+    text-align: right;
+    width: 150px;
+    white-space: nowrap;
+    border-right: 1px solid #ccc;
+}
+
+.input-cell {
+    width: 350px;
+    background-color: white;
+}
+
+.button-cell {
+    background-color: #f0f0f0;
+    padding: 12px;
+}
+
+.button-container {
+    text-align: right;
+}
+
+.contact-form input[type="text"], 
+.contact-form input[type="email"] {
+    width: 300px;
+    padding: 4px 6px;
+    border: none;
+    font-size: 12px;
+    background: transparent;
+    outline: none;
+}
+
+.contact-form input[type="text"]:focus, 
+.contact-form input[type="email"]:focus {
+    background-color: #fffacd;
+}
+
+.readonly-field {
+    display: inline-block;
+    padding: 4px 6px;
+    background-color: #e8e8e8;
+    font-size: 12px;
+    color: #666;
+    width: 300px;
+}
+
+.error {
+    color: red;
+    font-size: 11px;
+    display: block;
+    margin-top: 2px;
+}
+
+.warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 8px;
+    margin-bottom: 15px;
+}
+</style>  
+{% endblock %}

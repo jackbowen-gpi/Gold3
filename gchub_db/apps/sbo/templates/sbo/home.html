@@ -1,0 +1,380 @@
+{% extends "standard.html" %} 
+
+{% block extra_head %}    
+
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Load up YUI -->
+	<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="{{YUI_URL}}build/animation/animation-min.js"></script>
+	<script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
+	{% include "yui_container_includes.html" %}
+	
+	<meta charset="utf-8">
+	
+	<!--CSS-->
+	<style type="text/css">
+		label { width:150px; }
+		#product_table{ empty-cells:hide; }
+		#tabs-1{ empty-cells:hide; }
+		#report_tabs-1{ empty-cells:hide; }
+		#corr_help{ line-height:normal; }
+		#print_type_dialog{ line-height:normal; }
+	    alnright{ text-align: right; }
+		tr.corrigated th{ background-color: #A0A0A0; }		
+		tr.corrigated_all th{ background-color: #A0A0A0; }
+		tr.corrigated_preprint_field th{ background-color: #A0A0A0; }
+		tr.selector_corrigated th{ background-color: #A0A0A0; }
+		.ui-autocomplete {
+			max-height: 150px;
+			overflow-y: auto;
+			/* prevent horizontal scrollbar */
+			overflow-x: hidden;
+		}
+		
+		.saveButton {
+			margin-left:28px;
+			border-radius:9px;
+			width:110px;
+		}
+		.saveButton:hover {
+			background-color:darkgrey;
+		}
+		
+		.refreshButton {
+			background-color:lightgrey;
+			margin-left:10px;
+			border-radius:9px;
+			padding-left:5px;
+			padding-right:5px;
+		}
+		
+		.refreshButton:hover {
+			background-color:darkgrey;
+		}
+		
+		.searchButton {
+			margin-left:28px;
+			border-radius:9px;
+			width:60px;
+		}
+		.searchButton:hover {
+			background-color:darkgrey;
+		}
+		
+		.ui-widget-content a {
+			color: #883333;
+		}
+		.ui-widget-content a:hover {
+			color: black;
+		}
+	</style>
+	
+	<!-- Javascript happens here. -->
+	<script type="text/javascript"> 	
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using 
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+		
+		//jQuery document ready stuff.
+		$j(document).ready(function(){
+
+			var $_GET = {};
+
+			document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
+			    function decode(s) {
+			        return decodeURIComponent(s.split("+").join(" "));
+			    }
+			
+			    $_GET[decode(arguments[1])] = decode(arguments[2]);
+			});
+			
+			if($_GET["page"]){
+				$j( "#tabs" ).tabs({active:1});
+			}else{
+				$j( "#tabs" ).tabs({active:{{focus}}});
+			}
+	        
+	        $j( "#report_tabs" ).tabs({active:0});
+	        
+	        //Date pickers
+			$j( "#id_date_observed" ).datepicker({
+	            showOn: "button",
+	            beforeShowDay: $j.datepicker.noWeekends
+			}).next().button({
+	            icons: {
+	                primary: "ui-icon-calendar",
+	                secondary: "ui-icon-triangle-1-s"
+	            },
+	            text: false
+	        });//End date pickers.
+	        
+	        var bool = $j( "#id_communication" ).change(function() {
+	        	var box = $j( "#id_describe_communication" );
+	        	if($j(this)[0].checked == true){
+	        		box.show();
+	        	}else{
+	        		box.hide();
+	        		box.val("");
+	        	}
+	        });
+	        $j( "#id_communication" ).trigger('change');
+	 
+		})
+	</script>
+	
+{% endblock %}
+
+{% block body %}
+	<p>
+	<h1 class="inline">
+		Behavior Based Safety Program	
+	</h1>
+	</p>
+	<p>What is a behavior?</p>
+	<p>It is an observable act or action.</p>
+	<p></p>
+	<p>By first determining what behavior or condition is safe or unsafe, then 
+			correcting the unsafe, we can eliminate all causes of injury.</p>
+	<!-- warning tab -->
+	{% if errors %}
+	<div class="ui-widget">
+		<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;">
+			<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+			<strong>Error:</strong> Something was entered incorrectly on Tab {{tab_error_num}}:</p>
+			{% for error in errors %}
+				<p>{{ error }}</p>
+			{% endfor %}
+		</div>
+	</div>
+	{% endif %}
+	
+	<!-- Start of tabs -->
+	<div id="tabs">
+	    <ul>
+	    	<li><a href="#tabs-1"><h3>Home</h3></a></li>
+	        <li><a href="#tabs-2"><h3>Search</h3></a></li>
+	        <li><a href="#tabs-3"><h3>New SBO</h3></a></li>
+	        {% if manager %}
+	        	<li><a href="#tabs-4"><h3>{{year}} Reports</h3></a></li>
+	        {% else %}	
+	        	<li style="display:none"><a href="#tabs-4"><h3>Reports</h3></a></li>
+	        {% endif %}
+	    </ul>
+		
+		<!-- Home-->
+		<div id="tabs-1">
+			<p>Please note that behaviors below are listed as examples. Behaviors are not limited to items on this list.</p>
+			<p></p>
+			<p><h1>Personal Protection Equipment (PPE).</h1></p>
+			<p>-Hearing protection.</p>
+			<p>-Eye/Face protection.</p>
+			<p>-Hand/Fingers protection.</p>
+			<p>-Feet (no open toed shoes).</p>
+			<br/>
+			<p><h1>Work Practices – Body Use and Movement.</h1></p>
+			<p>-Lifting/turning technique (lift using your knees, not back).</p>
+			<p>-Consistent work pace (not rushing, not straining).</p>
+			<p>-Body Placement (any action in which the body is in awkward position).</p>
+			<p>-Over-Extended (over stretching body, excessive leaning from work area).</p>
+			<p>-Using the correct tools for the job (do not use broken or damaged tools).</p>
+			<p>-Housekeeping behavior (clutter/working areas clear of hazards).</p>
+			<p>-Eye/Monitor safe distance (avoid leaning too close to monitors).</p>
+			<p>-Eye Coordination (look away from monitor once every hour to adjust to distant objects).</p>
+			<p>-Posture (sit with back straight).</p>
+			<p>-Stretching (stand up and walk around at least once every hour).</p>
+		</div>
+	
+		<!-- Search-->
+		<div id="tabs-2">
+			<form method="get" action="/sbo/search/" enctype="multipart/form-data">
+	  			<div class="outline_fancy" style="width:800px">
+	  			<h2 class="inline">Search Parameters</h2><br />
+	  				<table>
+	  					<tr>
+		  					<td>
+					  			<label for="id_risky">Behavior Type:</label>
+					  		</td>
+					  		<td>
+					  			{{search_form.status}}
+					  		</td>
+				  		</tr>
+				  		<tr>
+					  		<td>
+					  			<label for="id_start_date">Date Range:</label>
+					  		</td>
+					  		<td>
+						  		{{search_form.start_date}}
+						  		thru
+						  		{{search_form.end_date}} 
+					  		</td>
+				  		</tr>
+				  		{% if manager %}
+							<tr>
+								<td>
+					  				<label for="id_observer">Person Observed</label>
+					  			</td>
+					  			{% if manager %}
+									<td>
+										{{search_form.observed}}
+									</td>
+								{% endif %}
+							</tr>
+						{% endif %}
+			  		</table>
+			  		<input type="submit" class="searchButton" value="Search" />
+	  			</div>
+	  		</form>
+  			<p></p>
+  			or choose from the following:
+  			<p></p>
+  			<div class="outline_fancy" style="width:800px">
+  				{% include "pagination_bar.html" %}
+  					<table width="100%">
+					{% if object_list %}
+						<tr>
+					        <th>Date</th>
+					        <th>Type</th>
+					    </tr>
+						{% for entry in object_list %}
+						    <tr class="{% cycle 'rowA' 'rowB' %}">
+						        <td><a href="/sbo/sbo_detail/{{entry.id}}/">{{entry.date_observed|date:"n-j-Y"}}</a></td>
+						        <td>{{entry.get_behavior_type_display}}</td>
+						    </tr>
+						{% endfor %}
+					{% else %}
+						<td><h2>No search results found</h2></td>
+					{% endif %}
+					</table>
+			    {% include "pagination_bar.html" %}
+  			</div>
+		</div>
+		
+		<!-- New SBO-->
+		<div id="tabs-3">
+			<p><h1>Enter a new Safety Based Observation</h1></p>
+			<p>To keep records anonymous, only managers will be able to see the Person Observed field.</p>
+			<form method="post" action="/sbo/home/" enctype="multipart/form-data">
+			<table>
+                {% for field in newSBOform %}
+	                <tr>
+	                    <th>{{ field.label_tag }}</th> 
+	                    <td>
+	                        {{ field.errors }}
+	                        {% ifequal field.label "Communication" %}
+	                        	{{ field }} Did you speak to the individual?
+	                        {% else %}
+	                        	{% ifequal field.label "Person Observed" %}
+	                        		{{ field }} Leave blank for potential risks.
+		                        {% else %}	
+		                        	{{ field }}
+		                        {% endifequal %}
+	                        {% endifequal %}	                      
+	                        {{ field.help_text }}
+	                    </td>
+	                </tr>
+                {% endfor %}
+             </table>
+			<input class="saveButton" type="submit" value="Add New SBO" />
+			</form>
+		</div>
+		
+		<!-- Reports-->
+		<div id="tabs-4">
+			<div id="report_tabs">
+				{% if sbo_annual_form %}
+			    <ul>
+			    	{% for outer_array in sbo_annual_form %}
+				    	{% for header_month, header_value in outer_array.items %}
+				    	<li><a href="#report_tabs-{{forloop.parentloop.counter}}"><h3>{{header_month}}</h3></a></li>
+				    	{% endfor %}
+			    	{% endfor %}
+			    </ul>
+				
+				{% for outer_array in sbo_annual_form %}
+				<div id="report_tabs-{{forloop.counter}}">
+				{% for month, month_value in outer_array.items %}
+					{% if month_value %}
+						{% ifnotequal month_value.total_count 0 %}
+						<table>
+							<tr>
+								<th>Total SBOs</th>
+								<td>{{month_value.total_count}}</td>
+							</tr>
+							<tr>
+								<th>Total At Risk SBO</th>
+								<td>{{month_value.risky_count}}</td>
+							</tr>
+							<tr>
+								<th style="padding-left:15px">Communicated</th>
+								<td>{{month_value.risky_communicated}} of {{month_value.risky_count}}</td>
+							</tr>
+							<tr>
+								<th>Total Safe SBO</th>
+								<td>{{month_value.safe_count}}</td>
+							</tr>
+							<tr>
+								<th style="padding-left:15px">Communicated</th>
+								<td>{{month_value.safe_communicated}} of {{month_value.safe_count}}</td>
+							</tr>
+							<tr>
+								<th>Total User Participation</th>
+								<td>{{month_value.user_completion}}%</td>
+							</tr>
+						</table>
+						
+						<p>Total User Participation % above is broken down further to the number of SBOs each person has submitted each month below.</p>
+						<table>
+							<tr>
+								<th>User Participation Breakdown</th>
+							</tr>
+							{% for user, user_value in month_value.user_check.items %}
+							<tr>
+								<th>{{user}}</th>
+								{% ifequal value 1 %}
+								<td>{{user_value}} SBO</td>
+								{% else %}
+								<td>{{user_value}} SBOs</td>
+								{% endifequal %}
+							</tr>
+							{% endfor %}
+						</table>
+						{% else %}
+							<td><h3>No data for this month.</h3></td>
+						{% endifnotequal %}
+					{% else %}
+						<p><h1>Error gathering report data.</h1></p>
+					{% endif %}
+				{% endfor %}
+				</div> <!-- End of report_tab-# -->
+				{% endfor %}
+			</div> <!-- End of reports_tab -->
+			{% else %}
+				<p><h1>Error loading the page.</h1></p>
+			{% endif %}
+			<div class="outline" style="width:55%;padding:4px;">
+			<span class="sub_heading">Additional Reports</span><br />
+				<!-- The first year will be YTD and the others Yearly Reports -->
+				{% for current_year in years_to_display %}
+					{% ifequal forloop.counter 1 %}
+						<a href="{% url "annual_sbo_report" current_year %}">{{current_year}} YTD Report</a><br />
+					{% else %}
+						<a href="{% url "annual_sbo_report" current_year %}">{{current_year}} Yearly Report</a><br />
+					{% endifequal %}
+				{% endfor %}
+			</div>
+		</div><!-- End of tab 4 -->
+	</div><!-- End of tabs -->
+	
+{% endblock %}
+
+
+
+
+
+
+

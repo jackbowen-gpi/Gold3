@@ -1,0 +1,62 @@
+{% extends "standard.html" %}
+{% load item_links %}
+
+{% block body %}
+
+	<h1>{{page_title}}</h1>
+	<br>
+	<div class="outline_fancy" style="width:375px">
+		{% ifequal type 'trackedart'%}
+		  	<a href='/workflow/mkt_review_excel/{{tracked_art_type}}/'>
+				<img src="{{MEDIA_URL}}img/icons/page_excel.png">
+			  	Download this report as an Excel spreadsheet
+		  	</a>
+		  	<br>
+	  	{% endifequal %}
+	  	<a href='/workflow/mkt_review/'>
+			<img src="{{MEDIA_URL}}img/icons/arrow_left.png">
+		  	Back to Marking Review Summary
+	  	</a>
+	</div>
+	<br>
+	{% include "pagination_bar.html" %}
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Print Group</th>
+			<th>Size</th>
+			<th>Art</th>
+			<th>Comments</th>
+			<th>Added By</th>
+		</tr>
+		{% for item in object_list %}
+		<tr>
+			<td nowrap><a href="/workflow/job/{{item.item.job.id}}/">{{item.item.job.id}} {{item.item.job.name}} &nbsp;&nbsp;</a></td>
+			<td nowrap>{{item.item.job.printgroup.description}}</td>
+			<td nowrap>{{item.item.size}}</td>
+			<td>
+			  {{item.item|item_proof_link:""}}
+			</td>
+			<td>
+				{{item.entry_comments}}
+				{% ifequal type 'trackedart'%}
+					{{item.addition_comments}}
+				{% endifequal %}
+			</td>
+			<td>
+				{{item.reviewer}}
+				<span class="smtext">
+					{{item.review_date|date:"n-j-Y"}}
+				</span>
+				{% ifequal type 'trackedart'%}
+					{{item.edited_by}}
+					<span class="smtext">
+						{{item.addition_date|date:"n-j-Y"}}
+					</span>
+				{% endifequal %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% include "pagination_bar.html" %}
+{% endblock %}

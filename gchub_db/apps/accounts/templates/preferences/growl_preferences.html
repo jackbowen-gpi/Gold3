@@ -1,0 +1,174 @@
+{% extends "standard.html" %}
+{% load static %}
+
+{% block page_title %}Notification Preferences{% endblock %}
+
+{% block extra_head %}
+  {% include "preferences/navbar_header.inc.html" %}
+  <!-- Dynamic CSS -->
+  <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/preferences-dynamic.css' %}" />
+  
+  <!-- Legacy fallback for older browsers -->
+  <style type="text/css">
+  /* Fallback styles for browsers that don't support CSS custom properties */
+  @supports not (color: var(--primary-color)) {
+    .notification-card {
+      background: #FFFFFF;
+      border: 2px solid #663333;
+      padding: 30px;
+      margin: 20px auto;
+      border-radius: 8px;
+      max-width: 600px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .notification-header {
+      text-align: center;
+      margin-bottom: 25px;
+      padding: 20px;
+      background: linear-gradient(135deg, #663333, #441111);
+      color: #f5f5f5;
+      border-radius: 8px;
+      border: 2px solid #665555;
+    }
+    
+    .save-button {
+      background: linear-gradient(135deg, #663333, #441111);
+      color: #f5f5f5;
+      padding: 12px 30px;
+      border: 2px solid #665555;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    
+    .save-button:hover {
+      background: #CCCC66;
+      color: #333333;
+    }
+  }
+  /* New styles for notification preferences */
+  .preference-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 5px;
+    background: var(--card-background, #f9f9f9);
+  }
+  
+  .preference-section h4 {
+    margin: 0 0 15px 0;
+    color: var(--primary-color, #663333);
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .help-text {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--text-muted, #666);
+    font-style: italic;
+  }
+  
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .checkbox-container input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+  }
+  </style>
+  </style>
+{% endblock %} 
+
+{% block body %}
+<h1>Preferences - Notifications</h1>
+{% include "preferences/navbar_div.inc.html" %}
+
+{% if form.errors %}
+    <p class="warning">Please correct the errors below.</p>
+{% endif %}
+
+<div class="notification-card" data-card-type="preferences">
+    <div class="notification-header">
+        <h3>🔔 Desktop Notifications</h3>
+    </div>
+    
+    <form id="notification_preferences_form" action="{% url 'preferences_growl_preferences' %}" method="post">
+      {% csrf_token %}
+      
+      <!-- Notifications Section -->
+      <div class="preference-section">
+        <h4>Notifications</h4>
+        <div class="checkbox-container">
+          {{ form.notifications_enabled }} 
+          <label for="id_notifications_enabled">{{ form.notifications_enabled.label }}</label>
+          <small class="help-text">{{ form.notifications_enabled.help_text }}</small>
+        </div>
+      </div>
+      
+      <div class="button-container">
+        <button type="submit" class="save-button">
+          Save Preferences
+        </button>
+      </div>
+    </form>
+</div>
+
+<!-- Load dynamic theme controller -->
+<script src="{% static 'accounts/js/preferences-theme.js' %}"></script>
+
+<!-- Page-specific dynamic behaviors -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add form validation feedback
+    const form = document.getElementById('notification_preferences_form');
+    const button = form.querySelector('.save-button');
+    
+    form.addEventListener('submit', function() {
+        button.textContent = 'Saving...';
+        button.disabled = true;
+        
+        // Re-enable after a delay (in case of errors)
+        setTimeout(() => {
+            button.textContent = 'Save Preferences';
+            button.disabled = false;
+        }, 3000);
+    });
+    
+    // Real-time preview for notifications
+    const checkbox = document.getElementById('id_notifications_enabled');
+    const previewArea = document.createElement('div');
+    previewArea.className = 'preview-area';
+    previewArea.style.cssText = `
+        margin-top: 15px;
+        padding: 10px;
+        background: var(--card-background);
+        border: 1px dashed var(--secondary-color);
+        border-radius: 4px;
+        font-size: 14px;
+        color: var(--text-medium);
+        text-align: center;
+    `;
+    
+    const updatePreview = () => {
+        previewArea.textContent = checkbox.checked ? 
+            '✓ Notifications will be shown' : 
+            '✗ Notifications will be disabled';
+        previewArea.style.color = checkbox.checked ? 
+            'var(--primary-color)' : 
+            'var(--text-medium)';
+    };
+    
+    checkbox.parentElement.appendChild(previewArea);
+    checkbox.addEventListener('change', updatePreview);
+    updatePreview(); // Initial state
+});
+</script>
+{% endblock %}

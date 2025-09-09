@@ -1,0 +1,49 @@
+{% extends "standard.html" %}
+
+{% block extra_extra_head %}
+{% endblock %}
+
+{% block body %}
+<img src="{{MEDIA_URL}}img/icons/zoom.png" style="vertical-align:text-bottom" alt="Search" /> <h1 class="inline">Search</h1>
+&nbsp;&nbsp;&nbsp;&nbsp;
+{% if form.errors %}
+<ul class="errorlist">
+  <li>Please correct the error{{ form.errors|pluralize }} with your submission!</li>
+</ul>
+{% endif %}
+
+{% ifequal archive 'kenton' %}
+	<form method="get" action="" name="archive_search" enctype="multipart/form-data">
+	  <div class="outline" style="width:550px">
+	  	  <span class="sub_heading">Search Parameters</span><br />
+	  	  {{form.errors.file}}
+		  <label for="id_file">File:</label>{{form.file}}<br />
+		  {{form.errors.cd}}
+		  <label for="id_cd">CD #:</label>{{form.cd}}<br />
+		  {{form.errors.status}}
+		  <label for="id_art_reference">Art Reference:</label>{{form.art_reference}}<br />
+		  <label for="id_job_name">Job Name:</label>{{form.job_name}}<br />
+		  <label for="id_size">Size:</label>{{form.size}}<br />
+		  <label for="id_item_number">Item#:</label>{{form.item_number}}<br />
+		  <label for="id_document_number">Doc#:</label>{{form.document_number}}<br />
+	  </div>
+
+	  <input type="submit" value="Search" />
+	</form>
+{% endifequal %}
+
+{% ifequal archive 'renmark' %}
+	<form method="get" action="" name="archive_search" enctype="multipart/form-data">
+	  <div class="outline" style="width:550px">
+	  	  <span class="sub_heading">Search Parameters</span><br />
+	  	  {{form.errors.item}}
+		  <label for="id_item">Item:</label>{{form.item}}<br />
+		  {{form.errors.folder_items}}
+		  <label for="id_status">Folder Items:</label>{{form.folder_items}}<br />
+	  </div>
+
+	  <input type="submit" value="Search" />
+	</form>
+{% endifequal %}
+
+{% endblock %}

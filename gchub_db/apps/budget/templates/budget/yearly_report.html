@@ -1,0 +1,266 @@
+{% extends "standard.html" %}
+
+{% load humanize %}
+
+{% block body %}
+<div>
+	<h1 class="inline">{{page_title}}</h1><br />
+		<div class="outline" style="width:690px;min-height:360px;">
+			<span class="sub_heading">Graphics Hub {{year_num}} Report:</span><br /><br />
+			<div style="float:left;padding-right:15px">
+				<table>
+					<tr>
+						<th>Month</th>
+						<th>Invoiced</th>
+						<th>Budget</th>
+						<th>Budget Progress</th>
+						<th>Foodservice</th>
+						<th>Beverage</th>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.1.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.1.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.1.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.1.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.1.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.1.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.2.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.2.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.2.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.2.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.2.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.2.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.3.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.3.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.3.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.3.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.3.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.3.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.4.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.4.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.4.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.4.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.4.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.4.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.5.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.5.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.5.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.5.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.5.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.5.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.6.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.6.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.6.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.6.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.6.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.6.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.7.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.7.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.7.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.7.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.7.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.7.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.8.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.8.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.8.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.8.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.8.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.8.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.9.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.9.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.9.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.9.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.9.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.9.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.10.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.10.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.10.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.10.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.10.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.10.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.11.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.11.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.11.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.11.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.11.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.11.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;">
+							{{yearly_report.12.month}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.12.hub_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.12.hub_monthly_budget|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							{{yearly_report.12.hub_budget_prog|floatformat:2}}&#37;
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.12.fsb_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+						<td style="text-align:right;">
+							${{yearly_report.12.bev_monthly_invoiced|floatformat:0|intcomma}}
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+</div>
+
+	<a href="{% url "billing_home" %}"><img src="{{MEDIA_URL}}img/icons/money_dollar.png"> Return to Billing Home</a>
+{% endblock %}

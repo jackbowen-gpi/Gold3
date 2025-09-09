@@ -1,0 +1,38 @@
+{% extends "standard.html" %}
+
+{% block body %}
+	<H1>Color Data</H1>
+	<a href="/color_mgt/sorted/">
+	Sort
+	<img alt="Sort" style="vertical-align: text-bottom;"
+	src="/media/img/icons/report_go.png">
+	</a>
+	<table width="50%">
+		<tr>
+			<th>Color</th>
+			<th>Times Measured</th>
+			<th>Average Delta-E</th>
+		</tr>
+		{% for item in data %}
+			<tr class="{% cycle 'rowA' 'rowB' %}">
+				<td>
+					{{ item }} {{ item.coating }}
+				</td>
+				<td>
+					{{ item.fsb_usage_count }}
+				</td>
+				<td>
+					{{ item.avg_delta|floatformat:2 }}
+					{% if item.avg_delta_warning %}
+   						<img width="14px" height="14px" style="vertical-align:
+   						text-bottom;" src="/media/img/icons/exclamation.png">
+   					{% endif %}
+				</td>
+				<td width ="25%" style="background-color: {{ item.hexvalue }};">
+					&nbsp;&nbsp;
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<!-- This is used to make fancy "busy" indicators while prepping big
+	downloads. Needs a special cookie in the http header to work. See the readme
+	in the js directory or look at inkcov_excel() in search_views. --->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery.fileDownload.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript">
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+
+		$j(function() {
+			// Used to cancel downloads.
+			var dlReq = null;
+
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+
+			// Show busy indicator while prepping excel download.
+			$j( "#excel_download" ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("Spreadsheets take a couple of minutes.");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+				// Prep download using jquery.fileDownload.js and assign to dlReq
+				dlReq = $j.fileDownload('/workflow/inkcov_excel/' + "{{plant}}" + '/', {
+				    successCallback: function (url) {
+				    	// Hide busy indicator once download is ready.
+						$j( "#busy_dialog" ).dialog( "close" );
+				    },
+				});
+			});
+
+			// Show busy indicator while prepping next page.
+			$j( '[id^=plant_page_], .pagination_controls' ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("One moment...");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+			});
+
+		});
+	</script>
+{% endblock %}
+
+{% block body %}
+	<h1>
+		<img src="{{MEDIA_URL}}img/icons/color_wheel.png" />
+		{{page_title}}: {{plant}}
+	</h1>
+
+	<!---Busy dialog-->
+	<div id="busy_dialog">
+	  <center>
+		  <p><div id="busy_dialog_text"></div></p>
+		  <img src="{{MEDIA_URL}}img/spinner.gif" />
+	  <center>
+	</div>
+
+	<p>
+	  	<a id="excel_download" href='#'>
+			<img src="{{MEDIA_URL}}img/icons/page_excel.png">
+		  	Download this report as an Excel spreadsheet
+	  	</a>
+  	</p>
+	<p>
+		<div class="outline_fancy" style="width:300px">
+			{% for plant in bev_plants %}
+				<a id="plant_page_{{plant}}" href="{% url "inkcov_report" plant %}">
+					{{plant}}
+				</a> |
+			{% endfor %}
+		</div>
+	</p>
+	{% include "pagination_bar.html" %}
+	<table width="50%">
+		<tr>
+			<th>Job</th>
+			<th>Item</th>
+			<th colspan="2">Color</th>
+			<th>Coverage (sq in)</th>
+		</tr>
+		{% for color in object_list %}
+			<tr class="{% cycle 'rowA' 'rowB' %}">
+				<td>
+					<a href="{% url "job_detail" color.item.job.id %}">
+						{{color.item.job.id}}
+					</a>
+				</td>
+				<td>{{color.item}}</td>
+				<td style="background-color:{{color.hexvalue}}">&nbsp;&nbsp;&nbsp;</td>
+				<td>{{color.fsb_display_name}}</td>
+				<td>{{color.coverage_sqin}}</td>
+			</tr>
+		{% endfor %}
+	</table>
+	{% include "pagination_bar.html" %}
+{% endblock %}

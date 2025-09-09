@@ -1,0 +1,56 @@
+{% extends "standard.html" %}
+
+{% block page_title %}Shipment Listing{%endblock %}
+
+{% block extra_head %}
+  {% include "address/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+   <h1>Fedex Shipment List</h1>
+   {% include "address/navbar_div.inc.html" %}
+   <p>Below is a listing of Fedex shipments. To view the details of
+   or to delete a particular shipment, click on the tracking number. You may
+   page through the entries by using the 'Next' and 'Prev' links below.</p>
+   <p>To print a new Fedex label or create a shipment, find an address in
+   the address directory or within the Ship Manager on a Job Detail page and
+   hit the purple Fedex button.</p>
+
+   {% include "pagination_bar.html" %}
+   <br />
+   <table>
+   <tr>
+      <th>Created</th>
+      <th>Recipient</th>
+      <th>Job</th>
+      <th>Tracking #</th>
+   </tr>
+   {% for shipment in object_list %}
+   <tr style="background-color:{%if shipment.date_shipped|date:"j"|divisibleby:2 %}#E6EEFF{% else %}#E6FFF8{% endif %}">
+      <td>{{shipment.date_shipped|date:"g:i A, N j"}}</td>
+      <td>
+         {% if shipment.address.name %}
+            {{shipment.address.name|default:"<em>Unknown</em>"}}
+         {% else %}
+            {{shipment.address.company|default:"<em>Unknown</em>"}}
+         {% endif %}
+      </td>
+      <td class="centered">
+         {% if shipment.job %}
+            <a href="{{shipment.job.get_absolute_url}}">{{shipment.job}}</a>
+         {% else %}
+            N/A
+         {% endif %}
+      </td>
+      <td>
+         {% if shipment.tracking_num %}
+            <a href="{% url 'shipment_track' shipment.tracking_num %}">{{shipment.tracking_num}}</a>
+         {% else %}
+            N/A
+         {% endif %}
+      </td>
+   </tr>
+   {% endfor %}
+   </table>
+   {% include "pagination_bar.html" %}
+{% endblock %}

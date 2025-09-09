@@ -1,0 +1,94 @@
+{% extends "standard_popup.html" %}
+
+{% block page_title %}QC - {{qcdoc.job.id}} {{qcdoc.job.name}}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/button/assets/skins/sam/button.css" />
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/qc/qc_viewer.css" />
+
+<!-- Base Stuff -->
+<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/element/element-min.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/button/button-min.js"></script>
+
+<script type="text/javascript" src="{{MEDIA_URL}}js/qc/qc_viewer.js"></script>
+
+<script type="text/javascript">
+  YAHOO.util.Event.onContentReady("qc_wrapper", function () {
+    // Register buttons and click events.
+    new YAHOO.widget.Button("close_button", {onclick: {fn: close_popup}});
+  });
+</script>
+
+<style type="text/css">
+</style>
+
+{% endblock %}
+
+{% block body_content %}
+<div id="qc_wrapper" class="yui-skin-sam outline_fancy" style="background-color:#FFFFFF;padding:6px;">
+  <h1>{{qcdoc.job.id}} {{qcdoc.job.name}} reviewed by {{qcdoc.reviewer}}</h1>
+  {% for qcresponse in qcdoc.qcresponse_set.all %}
+  <div id="qcresponse_{{qcresponse.id}}" class="qcresponse_div response_{{qcresponse.response}}_bg response_{{qcresponse.response}}_border">
+    <div class="qcresponse_title_div">
+      <img id="tab_status_img_{{forloop.counter0}}"
+           src="{{MEDIA_URL}}{{qcresponse.get_response_icon_filename}}"
+           class="tab_status_img"
+           alt="Status Icon" />
+      {{qcresponse.category.title}}
+    </div>
+    {% if qcresponse.comments %}
+    <div class="qcresponse_comment_div">
+      <p>
+        This QC category was approved, with the following comments from the
+        reviewer.
+      </p>
+	  <div class="comment_box">
+	    {{qcresponse.comments}}
+	  </div>
+	  <div class="comment_footer">Comment by {{qcdoc.reviewer.get_full_name}}</div>
+    </div>
+    {% endif %}
+    {% if qcresponse.qcwhoops_set.all %}
+    <div class="qcresponse_whoops_div">
+      <p>
+        The following problems were found by {{qcdoc.reviewer.get_full_name}}.
+        Please either mark the Whoops as invalid, or fix the problem and click
+        on the resolved button.
+      </p>
+      {% for whoops in qcresponse.qcwhoops_set.all %}
+        <div id="whoops_entry_{{whoops.id}}" class="whoops_entry">
+          <div class="whoops_details_div {% if whoops.resolution_date %}whoops_color_div_resolved{% endif %}">
+            <p style="margin-top:3px">{{ whoops.details }}</p>
+              {% if whoops.resolution_date %}
+                {% if whoops.is_valid %}
+                  <p class="whoops_status_text whoops_resolved_text">Issue resolved</p>
+                {% else %}
+                  {% ifequal whoops.artist_comments "" %}
+                  <p class="whoops_status_text whoops_invalid_text">Issue marked as Invalid</p>
+                  {% else %}
+                  <p class="whoops_status_text whoops_invalid_text">Issue marked as Invalid with the following comments:</p>
+                  <p class="whoops_status_text">{{whoops.artist_comments}}</p>
+                  {% endifequal %}
+                {% endif %}
+              {% else %}
+              <p>
+                <a class="whoops_resolution_link" href="{% url "qc_view_qc" qcdoc.id %}?resolve={{whoops.id}}">
+                  <img src="{{MEDIA_URL}}img/icons/accept.png" alt="Resolve" /> Resolve
+                </a>
+                <a class="whoops_resolution_link" href="javascript:invalidate_qc_response('{% url "qc_view_qc" qcdoc.id %}', {{whoops.id}});">
+                  <img src="{{MEDIA_URL}}img/icons/cancel.png" alt="Invalidate" /> Invalidate
+                </a>
+              </p>
+              {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+	{% endif %}
+  </div>
+  {% endfor %}
+  <input type="button" id="close_button" name="close" value="Close Window" />
+</div>
+{% endblock %}

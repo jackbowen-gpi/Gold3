@@ -1,0 +1,26 @@
+	<img src="{{MEDIA_URL}}img/icons/book_edit.png">
+	<span class="sub_heading">Add Shipping Address</span><br />
+	<form id="contactdata" name="contactdata" onsubmit="jobaddress_add_save('{{job.id}}');return false;">
+		<div class="outline" style="width:350px; padding-left:8px;">
+		<input type="hidden" name="job" id="id_job" value="{{job.id}}" />
+			<span class="smtext">* - required fields</span>
+				<br />
+			<label id="id_name">*Name: </label>{{jobaddressform.name}}<br />
+			<label id="id_title">Job Title: </label>{{jobaddressform.title}}<br />
+			<label id="id_company">*Company: </label>{{jobaddressform.company}}<br />
+			<label id="id_address1">*Address 1: </label>{{jobaddressform.address1}}<br />
+			<label id="id_address2">Address 2: </label>{{jobaddressform.address2}}<br />
+			<label id="id_city">*City: </label>{{jobaddressform.city}}<br />
+			<label id="id_state">*State: </label>{{jobaddressform.state}}<br />
+			<label id="id_zip">*Zip Code: </label>{{jobaddressform.zip}}<br />
+			<label id="id_country">*Country: </label>
+				<select id="id_country" name="country" style="width:168px;">
+				{% include "address/countrylist.txt" %}<br />
+			<label id="id_phone">*Phone: </label>{{jobaddressform.phone}}<br />
+			<label id="id_ext">Ext: </label>{{jobaddressform.ext}}<br />
+			<label id="id_cell_phone">Cell: </label>{{jobaddressform.cell_phone}}<br />
+			<label id="id_email">Email: </label>{{jobaddressform.email}}<br />
+			<br />
+			<input type="submit" value="Add Address" onclick="jobaddress_add_save('{{job.id}}');return false;" />
+		</div>
+	</form>

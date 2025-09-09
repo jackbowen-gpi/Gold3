@@ -1,0 +1,404 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/job_item_entry.js"></script>
+	
+	<style>
+		/* Modern responsive layout for beverage job form */
+		.beverage-job-container {
+			min-height: 450px;
+			max-width: 1000px;
+			margin: 0 auto;
+			padding: 15px;
+		}
+
+		.job-form-grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 15px;
+			margin-bottom: 15px;
+		}
+
+		.form-section {
+			background-color: #DDDDDD;
+			border: 1px solid #888888;
+			border-radius: 6px;
+			padding: 15px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
+
+		.form-section h2 {
+			margin: 0 0 12px 0;
+			color: #663333;
+			font-size: 16px;
+			border-bottom: 2px solid #663333;
+			padding-bottom: 4px;
+		}
+
+		.form-section label {
+			display: inline-block;
+			width: 110px;
+			font-weight: bold;
+			color: #333;
+			text-align: right;
+			margin-right: 8px;
+			vertical-align: top;
+			font-size: 12px;
+		}
+
+		.form-section input,
+		.form-section select,
+		.form-section textarea {
+			width: 220px;
+			padding: 3px;
+			border: 1px solid #888888;
+			border-radius: 3px;
+			font-size: 12px;
+			box-sizing: border-box;
+		}
+
+		/* Date picker specific styling */
+		.form-section input[type="date"] {
+			width: 220px;
+			padding: 3px;
+			border: 1px solid #888888;
+			border-radius: 3px;
+			font-size: 12px;
+			font-family: Arial, sans-serif;
+			box-sizing: border-box;
+		}
+
+		.form-section textarea {
+			height: 150px;
+			resize: vertical;
+			font-family: Arial, sans-serif;
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		.form-row {
+			margin-bottom: 8px;
+			display: flex;
+			align-items: flex-start;
+			clear: both;
+		}
+
+		.form-row label {
+			flex-shrink: 0;
+		}
+
+		.form-group {
+			margin-bottom: 15px;
+		}
+
+		.form-group:last-child {
+			margin-bottom: 0;
+		}
+
+		.submit-section {
+			background-color: #FFFF99;
+			border: 1px solid #888888;
+			border-radius: 6px;
+			padding: 12px;
+			text-align: center;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			grid-column: 1 / -1;
+		}
+
+		.submit-section input[type="submit"] {
+			background: #663333;
+			color: white;
+			border: 2px solid #663333;
+			padding: 10px 20px;
+			border-radius: 6px;
+			font-size: 14px;
+			font-weight: bold;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
+
+		.submit-section input[type="submit"]:hover {
+			background: #441111;
+			border-color: #441111;
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+		}
+
+		.submit-section p {
+			margin: 8px 0 0 0;
+			color: #666;
+			font-style: italic;
+			font-size: 12px;
+		}
+
+		.page-header {
+			margin-bottom: 15px;
+			color: #663333;
+			font-size: 22px;
+			font-weight: bold;
+			display: flex;
+			align-items: center;
+		}
+
+		.page-header img {
+			margin-right: 8px;
+		}
+
+		/* Responsive design for smaller screens */
+		@media (max-width: 768px) {
+			.beverage-job-container {
+				padding: 10px;
+			}
+
+			.job-form-grid {
+				grid-template-columns: 1fr;
+				gap: 10px;
+			}
+
+			.form-section {
+				padding: 12px;
+			}
+
+			.form-section label {
+				width: 100%;
+				text-align: left;
+				margin-right: 0;
+				margin-bottom: 3px;
+			}
+
+			.form-section input,
+			.form-section select,
+			.form-section input[type="date"] {
+				width: 100%;
+				max-width: none;
+			}
+
+			.form-row {
+				flex-direction: column;
+				align-items: stretch;
+				margin-bottom: 10px;
+			}
+
+			.page-header {
+				font-size: 18px;
+				flex-direction: column;
+				text-align: center;
+			}
+
+			.page-header img {
+				margin-right: 0;
+				margin-bottom: 5px;
+			}
+		}
+
+		@media (max-width: 480px) {
+			.beverage-job-container {
+				padding: 8px;
+			}
+
+			.form-section {
+				padding: 10px;
+			}
+
+			.page-header {
+				font-size: 16px;
+			}
+
+			.submit-section input[type="submit"] {
+				width: 100%;
+				padding: 12px;
+			}
+		}
+
+		/* Special handling for checkbox */
+		.checkbox-row {
+			display: flex;
+			align-items: center;
+			margin-bottom: 8px;
+		}
+
+		.checkbox-row label {
+			width: 110px;
+			text-align: right;
+			margin-right: 8px;
+		}
+
+		.checkbox-row input[type="checkbox"] {
+			width: auto;
+			margin-right: 5px;
+		}
+
+		.checkbox-row .checkbox-text {
+			font-size: 11px;
+			color: #666;
+		}
+
+		/* Instructions section specific */
+		.instructions-section {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.instructions-section .form-row {
+			flex-direction: column;
+		}
+
+		.instructions-section label {
+			width: auto;
+			text-align: left;
+			margin-bottom: 5px;
+			margin-right: 0;
+		}
+
+		/* Mobile responsive */
+		@media (max-width: 768px) {
+			.job-form-grid {
+				grid-template-columns: 1fr;
+				gap: 12px;
+			}
+
+			.beverage-job-container {
+				padding: 10px;
+			}
+
+			.form-section label {
+				width: 90px;
+			}
+
+			.form-section input,
+			.form-section select,
+			.form-section textarea {
+				width: calc(100% - 105px);
+			}
+		}
+
+		@media (max-width: 480px) {
+			.form-row {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			.form-section label {
+				width: 100%;
+				text-align: left;
+				margin-bottom: 3px;
+			}
+
+			.form-section input,
+			.form-section select,
+			.form-section textarea {
+				width: 100%;
+				max-width: none;
+			}
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+<div class="beverage-job-container">
+	<h1 class="page-header">
+		<img src="{{MEDIA_URL}}img/icons/add.png" alt="New Job" />
+		{% if duplicate %}Duplicate{% else %}New{% endif %} Beverage Job
+	</h1>
+
+	{% if duplicate %}
+		<form id="dupejob" name="dupejob" class="job-form-grid">
+	{% else %}
+		<form id="newjob" name="newjob" onsubmit="add_beverage_job();return false;" class="job-form-grid">
+	{% endif %}
+		<input type="hidden" name="status" id="id_status" value="Pending" />
+		<input type="hidden" name="workflow" id="id_workflow" value="{{workflow.id}}" />
+
+		<!-- Left Column: Job Details -->
+		<div class="form-section">
+			<h2>📋 Job Details</h2>
+			
+			<div class="form-group">
+				<div class="form-row">
+					<label for="id_brand_name">Brand Name:</label>
+					{{jobform.brand_name}}
+				</div>
+				<div class="form-row">
+					<label for="id_name">Customer:</label>
+					{{jobform.name}}
+				</div>
+				<div class="form-row">
+					<label for="id_customer_po_number">Customer PO:</label>
+					{{jobform.customer_po_number}}
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="form-row">
+					<label for="id_due_date">Due Date:</label>
+					<input type="date" id="id_due_date" name="due_date" 
+						   value="{% if jobform.due_date.value %}{{ jobform.due_date.value|date:'Y-m-d' }}{% endif %}"
+						   class="date-picker">
+				</div>
+				<div class="form-row">
+					<label for="id_bill_to_type">Bill To:</label>
+					{{jobform.bill_to_type}}
+				</div>
+				<div class="form-row">
+					<label for="id_business_type">Bus. Type:</label>
+					{{jobform.business_type}}
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="form-row">
+					<label for="id_salesperson">Analyst:</label>
+					{{jobform.salesperson}}
+				</div>
+				<div class="form-row">
+					<label for="id_sales_service_rep">SSR:</label>
+					{{jobform.sales_service_rep}}
+				</div>
+				<div class="form-row">
+					<label for="id_prepress_supplier">Prepress:</label>
+					{{jobform.prepress_supplier}}
+				</div>
+				<div class="form-row">
+					<label for="id_temp_printlocation">Plant & Press:</label>
+					{{jobform.temp_printlocation}}
+				</div>
+				<div class="form-row">
+					<label for="id_temp_platepackage">Plates:</label>
+					{{jobform.temp_platepackage}}
+				</div>
+			</div>
+
+			<div class="form-row">
+				<label for="id_use_new_bev_nomenclature">New Naming:</label>
+				{{jobform.use_new_bev_nomenclature}} (Checked will use new nomenclature)
+			</div>
+		</div>
+
+		<!-- Right Column: Instructions -->
+		<div class="form-section">
+			<h2>
+				<img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align: text-bottom" alt="Instructions" />
+				Instructions
+			</h2>
+			<div class="form-row">
+				<label for="id_instructions" style="vertical-align: top;">Instructions:</label>
+				{{jobform.instructions}}
+			</div>
+		</div>
+
+		<!-- Submit Section -->
+		<div class="submit-section">
+			{% if duplicate %}
+				<input type="submit" value="Complete Duplication" onclick="dupe_existing_job({{job_original.id}}, 'default');return false;" />
+			{% else %}
+				<input type="submit" value="Enter New Job" onclick="add_beverage_job();return false;" />
+			{% endif %}
+			<p style="margin: 10px 0 0 0; color: #666; font-style: italic;">
+				You will enter items after this screen.
+			</p>
+		</div>
+	</form>
+</div>
+{% endblock %}

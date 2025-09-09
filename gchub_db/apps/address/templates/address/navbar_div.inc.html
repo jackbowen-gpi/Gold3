@@ -1,0 +1,16 @@
+<div class="yui-skin-sam">
+<div id="address_nav" class="yuimenubar yuimenubarnav">
+    <div class="bd">
+        <ul class="first-of-type">
+            <li class="yuimenubaritem first-of-type"><a class="yuimenubaritemlabel" href="{% url "address_home" %}">Directory Home</a></li>
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="{% url "address_browse" %}">Browse Addresses</a></li>
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="{% url "address_search" %}">Search Addresses</a></li>
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="{% url "address_new" %}">Create Address</a></li>
+            {% if perms.accounts.clemson_employee%}
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="{% url "shipment_list" %}">Fedex Shipments</a></li>
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="http://fedex.com">Fedex.com</a></li>
+        	{% endif %}
+        </ul>
+    </div>
+</div>
+</div>

@@ -1,0 +1,51 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	{% include "bev_billing/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+  <h1>Pending Invoices</h1>
+  {% include "bev_billing/navbar_div.inc.html" %}
+	{% include "pagination_bar.html" %}
+	<table>
+		<tr>
+			<th>ID#</th>
+			<th>Job</th>
+			<th>Plant</th>
+			<th>Creation Date</th>
+			<th>QAD</th>
+			<th>Inv. #</th>
+			<th>Total Charges</th>
+		</tr>
+		{% for invoice in object_list %}
+			<tr>
+				<td>
+					<a href="{% url "view_invoice" invoice.id %}">{{invoice.id}}</a>
+				</td>
+				<td>
+					{{invoice.job}}
+				</td>
+				<td>
+					{{invoice.job.temp_printlocation.plant}}
+				</td>
+				<td>
+					{{invoice.creation_date|date:"M d, Y"}}
+				</td>
+				<td style="text-align:center;">
+					{% if invoice.qad_entry_date %}
+						<img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" alt="Complete" />
+					{% endif %}
+				</td>
+				<td>
+					{{invoice.invoice_number}}
+				</td>
+				<td style="text-align:right;">
+					${{invoice.total_amount|floatformat:2}}
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+	{% include "pagination_bar.html" %}
+{% endblock %}

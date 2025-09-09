@@ -1,0 +1,62 @@
+{% load item_links %}
+	<img src="{{MEDIA_URL}}img/icons/table_gear.png" style="vertical-align:text-bottom" />
+    {% include "workflow/job/job_detail/middle/toggle_navbar.html" %}
+
+	<div class="outline_fancy">
+	<table width="100%">
+		<tr>
+			<th width="10px">#</th>
+			<th>Size</th>
+			<!-- <th>Floor Stock</th>
+			<th>Order In-House</th>
+			<th>PO #</th> -->
+			<th>Customer Approval</th>
+			<th>9 Digit Number</th>
+		</tr>
+		{% for item in itemsinjob %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+			<td>{{ item.num_in_job }}</td>
+			<td>
+				{{item|item_preview_art_link:""}}<span>{{ item.size }}</span>
+			</td>
+			{% comment %}
+			<!--
+			<td>{% if item.floor_stock %}
+					<img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" /> Yes
+				{% else %}
+					<img src="{{MEDIA_URL}}img/icons/cross.png" style="vertical-align:text-bottom" /> No
+				{% endif %}
+			</td>
+			<td>{% if item.floor_stock %}
+					<img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" /> Yes
+				{% else %}
+					<img src="{{MEDIA_URL}}img/icons/cross.png" style="vertical-align:text-bottom" /> No
+				{% endif %}
+			</td>
+			<td>{% if item.po_number %}
+					<img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" />
+					{{ item.po_number }}
+				{% else %}
+					<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align:text-bottom" />
+				{% endif %}
+			</td> -->
+			{% endcomment %}
+			<td>{% if item.approval_date %}
+					<img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" />
+					{{ item.approval_date|date:"n-j-Y" }}
+				{% else %}
+					<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align:text-bottom" />
+				{% endif %}
+			</td>
+			<td>{% if item.fsb_nine_digit %}
+					<img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" />
+					{{ item.fsb_nine_digit }} ({{item.fsb_nine_digit_date|date:"n-j-Y"}})
+				{% else %}
+					<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align:text-bottom" />
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	</div>
+	{% include "workflow/job/job_detail/middle/item_summary_footer.html" %}

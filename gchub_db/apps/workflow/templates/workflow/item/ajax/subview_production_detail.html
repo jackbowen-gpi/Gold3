@@ -1,0 +1,438 @@
+{% block extrahead %}
+<style>
+	#id_proof_type_notes {
+		width: 320px;
+	}
+</style>
+{% endblock %}
+
+{% load item_links %}
+	<img src="{{MEDIA_URL}}img/icons/cog.png">
+	{% include "workflow/item/toggle_detail_navbar.html" %}
+	{% load misc_tags %}
+
+	<form id="itemdata" name="itemdata" onsubmit="update_item('{{item.id}}','production', '{{item.job.id}}');return false;">
+	<div class="outline_fancy" style="float:left; width:60%;">
+		<table width="100%">
+			<tr>
+				<td colspan="2" style="margin-right:auto;margin-left:auto;">
+				{% if perms.workflow.can_edit_item_production %}
+					<span class="submit">
+						<input type="submit" name="itemdata" value="Update Item Info"  onclick="update_item('{{item.id}}','production', '{{item.job.id}}');return false;" />
+					</span>
+				{% endif %}
+				</td>
+			</tr>
+			{% ifequal job.workflow.name "Container" %}
+				<tr>
+					<td>Length:<br />{{ itemform.length }}</td>
+					<td>Width:<br />{{ itemform.width }}</td>
+					<td>Height:<br />{{ itemform.height }}</td>
+				</tr>
+			{% endifequal %}
+			<tr>
+				<td colspan="2">Description:<br />{{itemform.description}}</td>
+			</tr>
+			<tr>
+				<td colspan="2">Size:<br />{{ itemform.size }}</td>
+			</tr>
+			{% ifequal job.workflow.name "Beverage" %}
+				{% ifequal item.size.item_type 'Panel' %}
+					<tr>
+						<td colspan="2">Panel Prefix (optional - defaults to platemaker code):<br />{{ itemform.bev_alt_code }}</td>
+					</tr>
+				{% endifequal %}
+				{% ifequal item.size.item_type 'PN' %}
+					<tr>
+						<td colspan="2">Panel Prefix:<br />{{ itemform.bev_alt_code }}</td>
+					</tr>
+				{% endifequal %}
+				{% ifequal item.printlocation.plant.name 'Plant City' %}
+					<tr>
+						<td colspan="2">Code:<br />{{ itemform.bev_alt_code }}</td>
+					</tr>
+				{% else %}
+					{% ifequal item.printlocation.press.name 'BHS' %}
+					<tr>
+						<td colspan="2">Code:<br />{{ itemform.bev_alt_code }}</td>
+					</tr>
+					{% else %}
+						{% if item.job.use_new_bev_nomenclature %}
+							<tr>
+								<td colspan="2">
+									<span class='warning'>NOTICE: This item is using new nomenclature.</span>
+									<br />
+									<p>
+									Brand Code: {{ item.bev_brand_code }} {{ itemform.bev_brand_code }}
+									</p>
+									<a href='{% url "add_centercode" "brand" %}' onclick="window.open(this.href, 'popupwindow', 'width=600,height=250');return false;">
+										<img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" /> Add Brand Code
+									</a>
+									{% if item.bev_brand_code %}
+									<a href='/workflow/item/{{item.id}}/{{item.bev_brand_code.id}}/view/' onclick='load_div("bottom_view", this.href);return false;'>
+										<img src="{{MEDIA_URL}}img/icons/page_add.png" style="vertical-align: text-bottom" /> Edit Brand Code
+									</a>
+									{% else %}
+									<!-- If there is no brand code then use 001 as a default # for the page to load -->
+									<a href='/workflow/item/{{item.id}}/001/view/' onclick='load_div("bottom_view", this.href);return false;'>
+										<img src="{{MEDIA_URL}}img/icons/page_add.png" style="vertical-align: text-bottom" /> Edit Brand Code
+									</a>
+									{% endif %}
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">End Code:<br />{{ itemform.bev_end_code }}</td>
+							</tr>
+						{% else %}
+							<tr>
+								<td colspan="2">Center Code:<br />{{ itemform.bev_center_code }}</td>
+							</tr>
+							<tr>
+								<td colspan="2">Liquid Fill/End Code:<br />{{ itemform.bev_liquid_code }}</td>
+							</tr>
+						{% endif %}
+					{% endifequal %}
+				{% endifequal %}
+			{% endifequal %}
+			{% ifnotequal job.workflow.name "Beverage" %}
+				<tr>
+					<td>Print Location:<br />{{ itemform.printlocation }}</td>
+					<td>Plant Code:<br />{{ item.printlocation.plant.code }}</span></td>
+				</tr>
+			{% endifnotequal %}
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<tr>
+					<td colspan="2">Special Manufacturing Configuration:<br />{{ itemform.special_mfg }}</td>
+				</tr>
+			{% endif %}
+			{% ifequal job.workflow.name "Beverage" %}
+				<tr>
+					<td>Special Manufacturing Configuration:<br />{{ itemform.special_mfg }}</td>
+					<td>Replaces:<br />{{ itemform.replaces }}</td>
+				</tr>
+			{% endifequal %}
+			{% ifnotequal job.workflow.name "Beverage" %}
+				<tr>
+					<td colspan="2">Plate Package:<br />{{ itemform.platepackage }}</td>
+				</tr>
+			{% endifnotequal %}
+			<tr>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<td>
+					Graphics Quality:<br />{{ itemform.quality }}
+				</td>
+				{% if item.size.size|slice:"-2:" == "KD" %}
+					<td>
+						KD Press:<br />{{ itemform.kd_press }}
+					</td>
+				{% else %}
+					<td></td>
+				{% endif %}
+			{% endif %}
+			{% ifequal job.workflow.name "Beverage" %}
+				<td>
+					Num Up:<br />{{ itemform.num_up}}
+				</td>
+				<td>
+					BOM Number:<br />{{itemform.bom_number}}
+				</td>
+			{% endifequal %}
+			{% ifequal job.workflow.name "Container" %}
+				<td>
+					Num Out:<br />{{ itemform.num_up}}
+				</td>
+				<td>
+					Material:<br />{{itemform.material}}
+				</td>
+			{% endifequal %}
+			</tr>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<tr>
+					<td>Case Pack:<br />{{itemform.case_pack}}</td>
+					<td>Annual Use:<br />{{itemform.annual_use}}</td>
+				</tr>
+				<tr>
+					<td>Item Num.: ({{item.fsb_nine_digit_date|date:"n-j-Y"}})<br />{{itemform.fsb_nine_digit}} {% if item.fsb_nine_digit_date %}{% endif %}</td>
+					<td>WRIN Num.:<br />{{itemform.wrin_number}}</td>
+				</tr>
+			{% endif %}
+			<tr>
+				<td>UPC Number:<br />{{itemform.upc_number}}</td>
+				{% ifequal job.workflow.name "Beverage" %}
+					<td>UPC Ink Color:<br />{{itemform.upc_ink_color}}</td>
+				{% endifequal %}
+				{% ifequal job.workflow.name "Container" %}
+					<td>
+						ECT:<br />{{itemform.ect}}
+					</td>
+				{% endifequal %}
+				{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+					<td>
+						SCC Number:<br />{{itemform.bom_number}}
+					</td>
+				{% endif %}
+			</tr>
+			{% if item.legacy_distortion_check %}
+				<tr>
+					<td colspan="2">
+						Use Legacy Distortion: {{itemform.uses_old_distortion}}<br />
+						<span class="smtext">Most (but not all) of the items
+						like this one that were plated prior to February 2012
+						use legacy distortion.
+						</span>
+					</td>
+				</tr>
+			{% endif %}
+			{% ifequal job.workflow.name "Beverage" %}
+			<tr>
+				<td>Label:<br />{{itemform.label_tracker}}</td>
+				<td>Fiber Indicator:<br />{{itemform.fiber_tracker}}</td>
+			</tr>
+			<tr>
+				<td colspan="2">New Nutrition Facts: {{itemform.nutrition_facts}}</td>
+			</tr>
+			{% endifequal %}
+			<tr>
+				<td colspan="2">
+					Steps With:<br />{{itemform.steps_with}}
+				</td>
+			</tr>
+		</table>
+		Notes on <strong>edits</strong> to Production data: <br />
+		<span class="smtext">(This will be saved in the Job Log
+			along with any changes you make to the production settings.)
+		</span>
+		<br />
+		{{itemform.production_edit_notes}}
+
+		{% if item.bev_imported_item_name %}
+			<br />Item was imported as: {{item.bev_imported_item_name}}
+		{% endif %}
+
+	</div>
+
+	<div class="outline_fancy" style="position:relative;float:left;width:35%;">
+		<table width="100%">
+			<tr>
+				{% ifequal job.workflow.name "Beverage"%}
+					<th>
+						Seq.
+					</th>
+				{% endifequal %}
+				{% if item.job.workflow.name == "Carton" %}
+					<th>
+						Seq.
+					</th>
+				{% endif %}
+				<th colspan="2" width="80px">Color</th>
+				{% ifequal job.workflow.name "Beverage" %}
+					<th>Plate End Code</th>
+					<th>Qty.</th>
+				{% endifequal %}
+				{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+					<th>Color Map</th>
+					<th>Cov.*</th>
+				{% endif %}
+			</tr>
+			{% for itemcolor in inks_used %}
+				<tr>
+					{% ifequal job.workflow.name "Beverage" %}
+						<td>
+							{{itemcolor.sequence}}
+						</td>
+					{% endifequal %}
+					{% if item.job.workflow.name == "Carton" %}
+						<td>
+							{{itemcolor.sequence}}
+						</td>
+					{% endif %}
+					<td style="background-color:{{itemcolor.hexvalue}}">&nbsp;&nbsp;</td>
+					{% ifequal job.workflow.name "Beverage" %}
+						{% if perms.accounts.clemson_employee %}
+							<td><a href='javascript:load_div("bottom_view", "{% url "change_itemcolor" itemcolor.id %}")'>{{ itemcolor.color }}</a> {{itemcolor|pantone_plus_mark}}</td>
+						{% else %}
+							{% if perms.accounts.salesperson and item.can_edit_itemcolor %}
+								<td><a href='javascript:load_div("bottom_view", "{% url "change_itemcolor" itemcolor.id %}")'>{{ itemcolor.color }}</a> {{itemcolor|pantone_plus_mark}}</td>
+							{% else %}
+								<td>{{ itemcolor.color }} {{itemcolor|pantone_plus_mark}}</td>
+							{% endif %}
+						{% endif %}
+					{% else %}
+						{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+							{% if itemcolor.item.job.workflow.name == "Carton" %}
+								<td><a id=editCartonColor href='javascript:load_div("bottom_view", "{% url "change_itemcolor" itemcolor.id %}")'>{{ itemcolor.definition.name }}</a> {{itemcolor|pantone_plus_mark}}</td>
+							{% else %}
+								<td>{{ itemcolor.fsb_display_name }} {{itemcolor|pantone_plus_mark}}</td>
+							{% endif %}
+						{% else %}
+							<td>{{ itemcolor.color }} {{itemcolor|pantone_plus_mark}}</td>
+						{% endif %}
+					{% endifequal %}
+					{% ifequal job.workflow.name "Beverage" %}
+							<td>{{itemcolor.plate_code}}</td>
+							<td>{{itemcolor.num_plates}}</td>
+					{% endifequal %}
+					{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+						{% if itemcolor.item.job.workflow.name == "Carton" %}
+							<td>{{ itemcolor.color }}</td>
+						{% else %}
+							<td>########</td>
+						{% endif %}
+						<td>{{ itemcolor.coverage_sqin }}</td>
+					{% endif %}
+				</tr>
+			{% empty %}
+				<tr>
+					<td>No inks yet!</td>
+				</tr>
+			{% endfor %}
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				{% if item.job.workflow.name != "Carton" %}
+				<tr>
+					<td colspan="7">
+						<span class="smtext">*Ink coverage data in square inches.</span><br /><br />
+						<a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "ink_data"))'>
+							<img src="{{MEDIA_URL}}img/icons/color_wheel.png" style="vertical-align: text-bottom" /> View color accuracy data.
+						</a>
+					</td>
+				</tr>
+				{% endif %}
+			{% endif %}
+			{% ifequal job.workflow.name "Beverage" %}
+				{% if perms.accounts.clemson_employee %}
+					<tr>
+						<td colspan="7" style="text-align:center;">
+							<a href='javascript:load_div("bottom_view", "{% url "add_itemcolor" item.id %}")'>
+							<img src="{{MEDIA_URL}}img/icons/color_wheel.png" style="vertical-align: text-bottom" /> Add Color to Item
+							</a>
+						</td>
+					</tr>
+				{% endif %}
+			{% endifequal %}
+			{% if item.job.workflow.name == "Carton" %}
+				{% if perms.accounts.clemson_employee %}
+					<tr>
+						<td colspan="7" style="text-align:center;">
+							<a id=addCartonColor href='javascript:load_div("bottom_view", "{% url "add_itemcolor" item.id %}")'>
+							<img src="{{MEDIA_URL}}img/icons/color_wheel.png" style="vertical-align: text-bottom" /> Add Color to Item
+							</a>
+						</td>
+					</tr>
+				{% endif %}
+			{% endif %}
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<tr>
+					<td colspan="7">
+						Inkbook: {{itemform.inkbook}}<br />
+						Proof Type: {{itemform.proof_type}}<br />
+						{{itemform.proof_type_notes}}<br />
+						</div>
+					</td>
+				</tr>
+			{% endif %}
+
+
+		<!-- LINKS TO FILES & ACTIONS TO PERFORM ON ITEM -->
+			<tr>
+				<td colspan="7">
+					<h2>Links</h2>
+					{% ifnotequal job.workflow.name "Beverage" %}
+						{{item|item_preview_art_link}}<br />
+					{% endifnotequal %}
+					{% if 'Plastic' in item.size.get_item_type_display %}
+						{{item|item_print_seps_link}}<br />
+					{% endif %}
+					{% if item.current_proof_date %}
+						{{item|item_proof_link}}<br />
+						{% ifequal job.workflow.name "Beverage" %}
+							{{item|item_stepped_proof_link}}<br />
+							{{item|item_finalfile_link}}<br />
+						{% endifequal %}
+					{% endif %}
+					{% if item.approval_date %}
+						{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+	                        {{item|item_approval_link}}<br />
+						{% endif %}
+					{% endif %}
+					{% if item.final_file_date %}
+						<a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "tiff_download"))'>
+						  <img src='{{MEDIA_URL}}img/icons/basket_put.png' style='vertical-align:text-bottom'>
+						  TIFFs
+						</a><br />
+					{% endif %}
+				</td>
+				{% if perms.accounts.clemson_employee %}
+				    <tr>
+						<td colspan="7">
+							<h2>Actions</h2>
+						{% if not job.archive_disc %}
+				    	{% ifequal job.workflow.name "Beverage" %}
+						    <a href='javascript:do_item_tiff_to_pdf("{{item.job.id}}", "{{item.num_in_job}}")'>
+						      <img src="{{MEDIA_URL}}img/icons/page_white_paint.png" style='vertical-align:text-bottom'>
+						      Remake PDFs
+						    </a><br />
+						    <a href='javascript:do_item_make_bev_die("{{item.job.id}}", "{{item.num_in_job}}")'>
+						      <img src="{{MEDIA_URL}}img/icons/page_white_swoosh.png" style='vertical-align:text-bottom'>
+						      Make Template
+						    </a><br />
+						{% else %}
+							<a href='javascript:do_copy_fsb_production_template("{{item.job.id}}", "{{item.id}}")'>
+						      <img src="{{MEDIA_URL}}img/icons/page_copy.png" style='vertical-align:text-bottom'>
+						      Copy Production Template to Item Folder
+						    </a><br />
+							<a href='javascript:do_copy_master_template("{{item.job.id}}", "{{item.id}}")'>
+						      <img src="{{MEDIA_URL}}img/icons/page_go.png" style='vertical-align:text-bottom'>
+						      Copy Master Template to Item Folder
+						    </a><br />
+						    <a href='javascript:do_copy_fsb_create_rectangle("{{item.job.id}}", "{{item.id}}")'>
+						      <img src="{{MEDIA_URL}}img/icons/page_white_horizontal.png" style='vertical-align:text-bottom'>
+						      Create Art Rectangle in Item Folder
+						    </a><br />
+							<a href='javascript:do_item_import_qad("{{item.job.id}}", "{{item.id}}")'>
+						      <img src="{{MEDIA_URL}}img/icons/database_link.png" style='vertical-align:text-bottom'>
+						      UPC &amp; SCC Numbers from QAD
+						    </a><br />
+						    {% if item.is_master_stepped_item %}
+						    <a href='javascript:do_copy_qad_data("{{item.job.id}}", "{{item.id}}")'>
+						      <img src="{{MEDIA_URL}}img/icons/database_connect.png" style='vertical-align:text-bottom'>
+						      Copy 9 digit, SCC &amp; UPC to Linked Items
+						    </a><br />
+						    {% endif %}
+						    {% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+							<a href='javascript:do_copy_misregistration_pdf("{{item.job.id}}", "{{item.id}}")'>
+						      <img src="{{MEDIA_URL}}img/icons/book_open.png" style='vertical-align:text-bottom'>
+						      Copy Misregistration PDF to Job Folder
+						    </a><br />
+						    {% endif %}
+				    	{% endifequal %}
+				    	{% endif %}
+				    	{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+						    <a href='javascript:do_copy_nx_plates("{{item.id}}")'>
+						      <img src="{{MEDIA_URL}}img/icons/folder_go.png" style='vertical-align:text-bottom'>
+						      Copy NX Plate Files to Perry
+						    </a><br />
+						{% endif %}
+						<a href='javascript:do_load_tiff_rip("{{item.id}}")'>
+					      <img src="{{MEDIA_URL}}img/icons/page_white_magnify.png" style='vertical-align:text-bottom'>
+					      RIP Info
+					    </a><br />
+					    {% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+					    <a href='javascript:do_transfer_files_to_concord("{{item.id}}")'>
+					      <img src="{{MEDIA_URL}}img/icons/folder_go.png" style='vertical-align:text-bottom'>
+					      Transfer Files to Concord
+					    </a><br />
+					    {% endif %}
+				    	</td>
+					</tr>
+				{% endif %}
+				{% if item.disclaimer_text %}
+				<tr>
+					<td colspan="7">
+						<h2>Item Disclaimer</h2>
+						{{item.disclaimer_text}}
+					</td>
+				</tr>
+				{% endif %}
+		</table>
+	</div>
+	</form>

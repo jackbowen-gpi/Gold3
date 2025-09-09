@@ -1,0 +1,652 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/job_item_entry.js"></script>
+
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<style>
+		/* Modern responsive layout for carton job form */
+		.carton-job-container {
+			min-height: 640px;
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 15px;
+		}
+
+		.job-form-grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 15px;
+			margin-bottom: 15px;
+		}
+
+		.form-section {
+			background-color: #DDDDDD;
+			border: 1px solid #888888;
+			border-radius: 6px;
+			padding: 15px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
+
+		.form-section h2 {
+			margin: 0 0 10px 0;
+			color: #663333;
+			font-size: 16px;
+			border-bottom: 2px solid #663333;
+			padding-bottom: 3px;
+			display: flex;
+			align-items: center;
+		}
+
+		.form-section h2 img {
+			margin-right: 8px;
+		}
+
+		.form-section label {
+			display: inline-block;
+			width: 120px;
+			font-weight: bold;
+			color: #333;
+			text-align: right;
+			margin-right: 10px;
+			vertical-align: top;
+			font-size: 12px;
+		}
+
+		.form-section input,
+		.form-section select,
+		.form-section textarea {
+			width: 220px;
+			padding: 3px;
+			border: 1px solid #888888;
+			border-radius: 3px;
+			font-size: 12px;
+			margin-bottom: 6px;
+			box-sizing: border-box;
+		}
+
+		.form-section textarea {
+			height: 150px;
+			resize: vertical;
+			font-family: Arial, sans-serif;
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		.form-row {
+			margin-bottom: 6px;
+			display: flex;
+			align-items: center;
+			clear: both;
+		}
+
+		.form-row label {
+			flex-shrink: 0;
+		}
+
+		.form-group {
+			margin-bottom: 10px;
+		}
+
+		.customer-search-btn {
+			background: none;
+			border: none;
+			padding: 2px 5px;
+			margin-left: 5px;
+			cursor: pointer;
+			border-radius: 3px;
+			transition: background-color 0.2s;
+		}
+
+		.customer-search-btn:hover {
+			background-color: #f0f0f0;
+		}
+
+		.customer-search-btn img {
+			vertical-align: middle;
+		}
+
+		.instructions-section {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.instructions-section .form-row {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.instructions-section label {
+			width: auto;
+			text-align: left;
+			margin-bottom: 3px;
+			margin-right: 0;
+		}
+
+		.submit-section {
+			background-color: #FFFF99;
+			border: 1px solid #888888;
+			border-radius: 6px;
+			padding: 12px;
+			text-align: center;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			grid-column: 1 / -1;
+			margin-top: 8px;
+		}
+
+		.submit-section input[type="submit"] {
+			background: #663333;
+			color: white;
+			border: 2px solid #663333;
+			padding: 10px 20px;
+			border-radius: 6px;
+			font-size: 15px;
+			font-weight: bold;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
+
+		.submit-section input[type="submit"]:hover {
+			background: #441111;
+			border-color: #441111;
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+		}
+
+		.submit-section p {
+			margin: 8px 0 0 0;
+			color: #666;
+			font-style: italic;
+			font-size: 13px;
+		}
+
+		.page-header {
+			margin-bottom: 15px;
+			color: #663333;
+			font-size: 22px;
+			font-weight: bold;
+			display: flex;
+			align-items: center;
+		}
+
+		.page-header img {
+			margin-right: 8px;
+		}
+
+		/* Date picker specific styling */
+		.form-section input[type="date"] {
+			width: 220px;
+			padding: 3px;
+			border: 1px solid #888888;
+			border-radius: 3px;
+			font-size: 12px;
+			font-family: Arial, sans-serif;
+			box-sizing: border-box;
+		}
+
+		/* Ship To section styling */
+		.ship-to-section {
+			background-color: #DDDDDD;
+		}
+
+		.ship-to-section .form-row {
+			margin-bottom: 5px;
+		}
+
+		/* Responsive design for smaller screens */
+		@media (max-width: 768px) {
+			.carton-job-container {
+				padding: 10px;
+			}
+
+			.job-form-grid {
+				grid-template-columns: 1fr;
+				gap: 10px;
+			}
+
+			.form-section {
+				padding: 12px;
+			}
+
+			.form-section label {
+				width: 100%;
+				text-align: left;
+				margin-right: 0;
+				margin-bottom: 3px;
+			}
+
+			.form-section input,
+			.form-section select,
+			.form-section input[type="date"] {
+				width: 100%;
+				max-width: none;
+			}
+
+			.form-row {
+				flex-direction: column;
+				align-items: stretch;
+				margin-bottom: 8px;
+			}
+
+			.page-header {
+				font-size: 18px;
+				flex-direction: column;
+				text-align: center;
+			}
+
+			.page-header img {
+				margin-right: 0;
+				margin-bottom: 5px;
+			}
+
+			.customer-search-btn {
+				align-self: flex-start;
+				margin-top: 5px;
+				margin-left: 0;
+			}
+		}
+
+		@media (max-width: 480px) {
+			.carton-job-container {
+				padding: 8px;
+			}
+
+			.form-section {
+				padding: 10px;
+			}
+
+			.page-header {
+				font-size: 16px;
+			}
+
+			.submit-section input[type="submit"] {
+				width: 100%;
+				padding: 12px;
+			}
+		}
+
+		/* Hidden fields styling */
+		input[type="hidden"] {
+			display: none;
+		}
+
+		/* Mobile responsive */
+		@media (max-width: 1024px) {
+			.job-form-grid {
+				grid-template-columns: 1fr;
+				gap: 15px;
+			}
+
+			.carton-job-container {
+				padding: 15px;
+			}
+		}
+
+		@media (max-width: 768px) {
+			.form-section label {
+				width: 100px;
+			}
+
+			.form-section input,
+			.form-section select,
+			.form-section textarea {
+				width: calc(100% - 115px);
+			}
+
+			.form-section input[type="date"] {
+				width: calc(100% - 115px);
+			}
+		}
+
+		@media (max-width: 480px) {
+			.form-row {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			.form-section label {
+				width: 100%;
+				text-align: left;
+				margin-bottom: 5px;
+			}
+
+			.form-section input,
+			.form-section select,
+			.form-section textarea {
+				width: 100%;
+				max-width: none;
+			}
+
+			.form-section input[type="date"] {
+				width: 100%;
+			}
+		}
+	</style>
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript">
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+
+		//jQuery stuff.
+		$j(document).ready(function(){
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+
+			// Customer not found dialog
+			$j( "#not_found_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Not Found",
+				buttons: {
+					Ok: function() {
+						$j(this).dialog( "close" );
+					}
+				}
+			});
+
+			// Connection error dialog
+			$j( "#connection_error_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Connection Error",
+				buttons: {
+					Ok: function() {
+						$j(this).dialog( "close" );
+					}
+				}
+			});
+
+			// Used to limit choices in drop down lists
+			function narrow_choices(choices, field) {
+				$j(field + " > option").each(function() { //Iterate over each choice
+					var salesperson_name = this.text.toString().replace("_", " "); //Remove the underscores in the name.
+					if (!choices.includes(salesperson_name)){ //If choices doesn't include this salespersons name...
+						if (this.text != "---------"){
+							$j(this).hide();
+						}
+					}
+				});
+			}
+
+			// Look up and autofill customer info.
+			$j("#cust_search").click(function() {
+				// Open busy indicator
+				$j("#busy_dialog_text").text("Looking up customer info...");
+				$j("#busy_dialog").dialog( "open" );
+				// Look up the customer info
+				var cust_id = $j('#id_job-customer_identifier').val();
+				$j.get("/workflow/job/gps_connect/customer_info_json/"+cust_id+"/", function(customer_info) {
+					if (customer_info == "bad_connect"){
+						// Close busy indicator
+						$j( "#busy_dialog" ).dialog( "close" );
+						// Open connection error dialog
+						$j("#connection_error_dialog").dialog( "open" );
+					}
+					else if (customer_info){
+
+						//Salesperson
+						if (customer_info.hasOwnProperty("Contacts_Sales_First_Last_Name")){
+							var salespeople = customer_info["Contacts_Sales_First_Last_Name"]
+							if (salespeople.length > 1){ // Multiple salespeople. Narrow down the options.
+								narrow_choices(salespeople, '#id_job-salesperson');
+							} else { // Only one salespseron. Just select them.
+								var salesperson_name = salespeople.toString().replace(" ", "_"); //The names have underscores between first and last.
+								$j("#id_job-salesperson option:contains(" + salesperson_name + ")").attr('selected', 'selected');
+							}
+							$j('#id_job-salesperson').effect("highlight", {color:"#12F333"}, 2000);
+						} else{ //No salespseron info in data.
+							$j('#id_job-salesperson').effect("highlight", {color:"#12F333"}, 2000);
+						}
+
+						//CSR
+						if (customer_info.hasOwnProperty("Contacts_GPI_CSR_First_Last_Name")){
+							var csr = customer_info["Contacts_GPI_CSR_First_Last_Name"]
+							if (csr.length > 1){ // Multiple CSRs. Narrow down the options.
+								narrow_choices(csr, '#id_job-csr');
+							} else { // Only one CSR. Just select them.
+								var csr_name = csr.toString().replace(" ", "_"); //The names have underscores between first and last.
+								$j("#id_job-csr option:contains(" + csr_name + ")").attr('selected', 'selected');
+							}
+							$j('#id_job-csr').effect("highlight", {color:"#12F333"}, 2000);
+						} else{ //No CSR info in data.
+							$j('#id_job-csr').effect("highlight", {color:"#12F333"}, 2000);
+						}
+
+						// Customer name
+						if (customer_info.hasOwnProperty("Customer_Name")){
+							$j('#id_job-customer_name').val(customer_info["Customer_Name"])
+							$j('#id_job-customer_name').effect("highlight", {color:"#12F333"}, 2000);
+						} else{ //No customer name info in data.
+							$j('#id_job-customer_name').effect("highlight", {color:"#12F333"}, 2000);
+						}
+
+						//Graphic SPC
+						if (customer_info.hasOwnProperty("Contacts_Project_Cooridinator_First_Last_Name")){
+							var spc_name = customer_info["Contacts_Project_Cooridinator_First_Last_Name"]
+							spc_name = spc_name.toString().replace(" ", "_"); //The names have underscores between first and last.
+							$j("#id_job-graphic_specialist option:contains(" + spc_name + ")").attr('selected', 'selected');
+							$j('#id_job-graphic_specialist').effect("highlight", {color:"#12F333"}, 2000);
+						} else{ //No graphic SPC info in data.
+							$j('#id_job-graphic_specialist').effect("highlight", {color:"#12F333"}, 2000);
+						}
+
+						// Supplier (prepress only)
+						var carton_type = $j('select[id$="id_job-carton_type"]').val();
+						if (carton_type == "Prepress"){
+							$j('#id_job-graphic_supplier').val("GPS Clemson")
+							$j('#id_job-graphic_supplier').effect("highlight", {color:"#12F333"}, 2000);
+						}
+
+						// Close busy indicator
+						$j( "#busy_dialog" ).dialog( "close" );
+					}
+					// No customer found. Open the no results dialog.
+					else{
+						// Close busy indicator
+						$j( "#busy_dialog" ).dialog( "close" );
+						// Open not found dialog
+						$j("#not_found_dialog").dialog( "open" );
+					}
+				});
+			});
+
+		});//End jQuery stuff.
+	</script>
+{% endblock %}
+
+{% block body %}
+<!---Busy dialog-->
+<div id="busy_dialog">
+	<center>
+		<p><div id="busy_dialog_text"></div></p>
+		<img src="{{MEDIA_URL}}img/spinner.gif" />
+	<center>
+</div>
+<!---Not found dialog-->
+<div id="not_found_dialog">
+	<center>
+		<p>
+			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span>
+			No customer with that ID found in GPS Connect.
+		</p>
+	<center>
+</div>
+<!--- Connection error-->
+<div id="connection_error_dialog">
+	<center>
+		<p>
+			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span>
+			Couldn't connect to GPS Connect to retrieve customer info.
+		</p>
+	<center>
+</div>
+
+<div class="carton-job-container">
+	<h1 class="page-header">
+		<img src="{{MEDIA_URL}}img/icons/add.png" alt="New Job" />
+		{% if duplicate %}Duplicate{% else %}New{% endif %} Carton Job
+	</h1>
+	
+	{% if duplicate %}
+		<form id="dupejob" name="dupejob">
+	{% else %}
+		<form id="newcartjob" name="newcartjob" onsubmit="add_carton_job();return false;">
+	{% endif %}
+		<input type="hidden" name="job-status" id="id_job-status" value="Pending" />
+		<input type="hidden" name="job-workflow" id="id_job-workflow" value="4" />
+
+		<div class="job-form-grid">
+			<div class="form-section">
+				<h2>
+					<img src="{{MEDIA_URL}}img/icons/book_edit.png" alt="Job Details" />
+					Job Details
+				</h2>
+
+				<div class="form-group">
+					<div class="form-row">
+						<label for="id_carton_type">Carton Type:</label>
+						{{jobform.carton_type}}
+					</div>
+					<div class="form-row">
+						<label for="id_customer_identifier">Customer ID:</label>
+						{{jobform.customer_identifier}}
+						<a id="cust_search" href="#" class="customer-search-btn">
+							<img src="{{MEDIA_URL}}img/icons/magnifier.png" alt="Search">
+						</a>
+					</div>
+					<div class="form-row">
+						<label for="id_name">Job Name:</label>
+						{{jobform.name}}
+					</div>
+					<div class="form-row">
+						<label for="id_pcss">PCSS:</label>
+						{{jobform.pcss}}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<div class="form-row">
+						<label for="id_salesperson">Salesperson:</label>
+						{{jobform.salesperson}}
+					</div>
+					<div class="form-row">
+						<label for="id_csr">CSR:</label>
+						{{jobform.csr}}
+					</div>
+					<div class="form-row">
+						<label for="id_due_date">Due Date:</label>
+						<input type="date" id="id_due_date" name="due_date" 
+							   value="{% if jobform.due_date.value %}{{ jobform.due_date.value|date:'Y-m-d' }}{% endif %}"
+							   class="date-picker">
+					</div>
+					<div class="form-row">
+						<label for="id_customer_name">Customer:</label>
+						{{jobform.customer_name}}
+					</div>
+					<div class="form-row">
+						<label for="id_graphic_specialist">Graphic SPC:</label>
+						{{jobform.graphic_specialist}}
+					</div>
+					<div class="form-row">
+						<label for="id_graphic_supplier">Supplier:</label>
+						{{jobform.graphic_supplier}}
+					</div>
+				</div>
+
+				<div class="form-group ship-to-section">
+					<h2>
+						<img src="{{MEDIA_URL}}img/icons/book_edit.png" alt="Ship To" />
+						Ship To
+					</h2>
+					<div class="form-row">
+						<label for="id_name">Name:</label>
+						{{jobaddressform.name}}
+					</div>
+					<div class="form-row">
+						<label for="id_title">Job Title:</label>
+						{{jobaddressform.title}}
+					</div>
+					<div class="form-row">
+						<label for="id_company">Company:</label>
+						{{jobaddressform.company}}
+					</div>
+					<div class="form-row">
+						<label for="id_address1">Address 1:</label>
+						{{jobaddressform.address1}}
+					</div>
+					<div class="form-row">
+						<label for="id_address2">Address 2:</label>
+						{{jobaddressform.address2}}
+					</div>
+					<div class="form-row">
+						<label for="id_city">City:</label>
+						{{jobaddressform.city}}
+					</div>
+					<div class="form-row">
+						<label for="id_state">State:</label>
+						{{jobaddressform.state}}
+					</div>
+					<div class="form-row">
+						<label for="id_zip">Zip Code:</label>
+						{{jobaddressform.zip}}
+					</div>
+					<div class="form-row">
+						<label for="id_country">Country:</label>
+						<select id="id_address-country" name="address-country" style="width:168px;">
+							{% include "address/countrylist.txt" %}
+						</select>
+					</div>
+					<div class="form-row">
+						<label for="id_phone">Phone:</label>
+						{{jobaddressform.phone}}
+					</div>
+					<div class="form-row">
+						<label for="id_ext">Ext:</label>
+						{{jobaddressform.ext}}
+					</div>
+					<div class="form-row">
+						<label for="id_cell_phone">Cell:</label>
+						{{jobaddressform.cell_phone}}
+					</div>
+					<div class="form-row">
+						<label for="id_email">Email:</label>
+						{{jobaddressform.email}}
+					</div>
+				</div>
+			</div>
+
+			<div class="form-section instructions-section">
+				<h2>
+					<img src="{{MEDIA_URL}}img/icons/information.png" alt="Instructions" />
+					Instructions
+				</h2>
+				<div class="form-row">
+					<label for="id_instructions">Instructions:</label>
+					{{jobform.instructions}}
+				</div>
+			</div>
+		</div>
+
+		<div class="submit-section">
+			<input type="submit" value="Enter New Job" onclick="add_carton_job();return false;" />
+			<p>You will enter items after this screen.</p>
+		</div>
+	</form>
+</div>
+{% endblock %}

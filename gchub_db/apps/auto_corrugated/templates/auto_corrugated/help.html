@@ -1,0 +1,124 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/auto_corrugated/generation_styles.css" />
+	{% include "yui_container_includes.html" %}
+	{% include "auto_corrugated/navbar_header.inc.html" %}
+ 	<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="{{YUI_URL}}build/animation/animation-min.js"></script>
+ 	<script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
+	<script type="text/javascript">
+		function hide_modal_wait() {
+	    	setTimeout("YAHOO.example.container.wait.hide()",1250);
+		} // end hide_modal_wait()
+
+		function approve_box(box_id) {
+		   /*
+		    * Fired when he user hits the Approve button. Calls the validator
+		    * and sends off an AJAX request if all is good.
+		    */
+		   YAHOO.example.container.wait.show();
+		   new Ajax.Request('/acs/approve/'+ box_id +'/', {
+		       onSuccess: function(http_req) {
+		           // Get a JSON object from the response string (from the server).
+	               box_id = http_req.responseText.evalJSON();
+	               window.location = '/acs/view_box_data/' + box_id['message'] + '/';
+		       },
+		       onComplete: function() {
+		           hide_modal_wait();
+		   }});
+		} // end approve_box()
+
+		function approve_box_changes(box_id) {
+			   /*
+			    * Fired when he user hits the Approve button. Calls the validator
+			    * and sends off an AJAX request if all is good.
+			    */
+			   YAHOO.example.container.wait.show();
+			   new Ajax.Request('/acs/approve/'+ box_id +'/', {
+			       onSuccess: function(http_req) {
+			           // Get a JSON object from the response string (from the server).
+		               box_id = http_req.responseText.evalJSON();
+		               window.location = '/workflow/job/' + box_id['message'] + '/';
+			       },
+			       onComplete: function() {
+			           hide_modal_wait();
+			   }});
+			} // end approve_box()
+	</script>
+{% endblock %}
+
+{% block page_title %}{{page_title}}{% endblock %}
+
+{% block body %}
+<h1>{{page_title}}</h1>
+{% include "auto_corrugated/navbar_div.inc.html" %}
+<div class="outline" style="width:75%;padding:10px;">
+	<h3>Step by Step Instructions</h3>
+	<ol>
+		<li><strong>Form Entry: </strong>Enter all corrugated information into the
+		<a href="{% url "auto_corrugated_pdf_generation_form" %}">Box Form</a>. Click on the button 'Generate Box'.
+			<ul>
+				<li><strong>Nine Digit Number: </strong>FSB part number</li>
+				<li><strong>Fourteen Digit Number: </strong>SCC number</li>
+				<li><strong>Box Dimensions: </strong>The dimensions of the box are outer
+				dimensions pulled from the QAD system. They are populated automatically
+				after selecting the case count.</li>
+				<li><strong>Box Format: </strong>Left places the large panel on the far left.
+				Right handed places the small panel on the far left.</li>
+				<li><strong>SFI Content Stamp: </strong>If the box contents (cups) are
+				SFI certified, check this to apply the SFI content stamp.</li>
+				<li><strong>Create Slugs: </strong>Separates graphic elements into
+				smaller slugs for platemaking purposes. Will not be generated
+				in Preview PDF -- only in the approved PDF.</li>
+				<li><strong>Platemaking: </strong>Select "None/Outsourced" if an
+				outside vendor is going to make the plates. Otherwise, select the
+				appropriate platemaker. If a platemaker is selected, a graphic artist
+				in Clemson will produce the files needed to send for platemaking.</li>
+			</ul>
+		</li>
+		<li><strong>Confirm Information: </strong>This will redirect you to a screen where you will see all the information
+		you just entered, along with several choices down the right side:
+			<ul>
+				<li><img src="{{MEDIA_URL}}img/icons/page_white_acrobat.png" style="vertical-align:text-bottom" />
+				<strong>Download Preview PDF - </strong>Downloads a PDF
+				that is both watermarked and locked. This is for approval
+				purposes only, and cannot be used for production.</li>
+				<li><img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" />
+				<strong>Approve PDF - </strong>The preview PDF looks acceptable.
+				Approving the preview creates a job in GOLD, and will bill the appropriate
+				plant $100. Once approved, a production-quality PDF may be downloaded.</li>
+				<li><img src="{{MEDIA_URL}}img/icons/wrench_orange.png" style="vertical-align:text-bottom" />
+				<strong>PDF Requires Changes by Artist - </strong>Most of the
+				information on the PDF is correct, but some changes need to be made
+				by a graphic artist. This will create a job in GOLD. Changes to be made
+				should be entered into the upper right of the job page as a comment.<br />
+				<img src="{{MEDIA_URL}}img/acs_comment.png" /></li>
+				<li><img src="{{MEDIA_URL}}img/icons/pencil.png" style="vertical-align:text-bottom" />
+				<strong>Edit Information - </strong>Edit the current box information.
+				Unavailable once the box is approved.
+				</li>
+				<li><img src="{{MEDIA_URL}}img/icons/shape_square_edit.png" style="vertical-align:text-bottom" />
+				<strong>Create Variant - </strong>Create a new corrugated box,
+				starting with the form filled out with the information of the current box.
+				</li>
+			</ul>
+		</li>
+		<li><strong>Review PDF: </strong>Start by clicking on Download Preview PDF. This will allow you to open
+		a locked and watermarked PDF for review. Inspect the information entered,
+		and the elements placed onto the graphic.<br />
+		<img src="{{MEDIA_URL}}img/acs_preview.png" /></li>
+		<li><strong>Make Selection: </strong>Once you have inspected the content, make your selection from one of the
+		other options. (Approve, Requires Changes, Edit Information, or Create Variant.)</li>
+		<li><strong>Production: </strong>Once you have approved the PDF generated
+		by the automated corrugated system, you may download a production-ready PDF
+		that can be used to make plates. If you have checked that slugs should be made,
+		a graphic artist in Clemson will use those slugs to prepare files that will
+		be sent to platemaking in Shelbyville. Otherwise, the PDF can be sent to
+		the plate vendor of your choosing.</li>
+	</ol>
+	<img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align:text-bottom" />
+	If you need further assistance, or would like to report a problem you are having,
+	please email <a href="{{EMAIL_SUPPORT}}">{{EMAIL_SUPPORT}}.</a>
+</div>
+{% endblock %}

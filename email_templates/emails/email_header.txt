@@ -1,0 +1,6 @@
+========================================================
+DO NOT REPLY TO THIS EMAIL
+This email was automatically generated.
+If you have any questions please contact the production artist: {% if item %}{{item.job.artist.email}}{% else %}{{job.artist.email}}{% endif %}
+Please direct any technical questions, comments, or suggestions to clemson.support@graphicpkg.com.
+========================================================

@@ -1,0 +1,145 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/platemaking.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js//workflow/job_detail.js"></script>
+	{% include "workflow/platemaking/navbar_header.inc.html" %}
+
+	<style type="text/css">
+	</style>
+{% endblock %}
+
+{% block body %}
+	<h1>Platemaking System - {{platemaker}}</h1>
+	{% include "workflow/platemaking/navbar_div.inc.html" %}
+	{% include "pagination_bar.html" %}
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Item</th>
+			<th>Plant</th>
+			<th>Press</th>
+			<th>Type</th>
+			{% if pending %}
+				{% if perms.accounts.shelbyville_platemaking or perms.accounts.kenton_platemaking %}
+					<th colspan="3">Action</th>
+				{% endif %}
+			{% else %}
+				<th colspan="3">Completed</th>
+			{% endif %}
+		</tr>
+		{% for order in object_list %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+			<td>
+				<a href="/workflow/job/{{order.item.job.id}}/">{{order.item.job.id}} {{order.item.job.name}}</a>
+				<br />
+				<em>
+				  {% if order.new_order %}
+				    New
+				  {% else %}
+				    Reorder - <strong>Due: </strong>
+				    {{order.date_needed|date:"n-j-Y"}}
+				  {% endif %}
+				</em>
+			</td>
+			<td>{% ifequal order.item.job.workflow.name "Foodservice"%}
+					<strong>{{order.item.fsb_nine_digit}} - {{order.item.size}}</strong>
+				{% endifequal %}
+				{% ifequal order.item.job.workflow.name "Beverage"%}
+					<strong>{{order.item.bev_nomenclature}}</strong>
+				{% endifequal %}
+				{% ifequal order.item.job.workflow.name "Container"%}
+					<strong>{{order.item.size}}</strong>
+				{% endifequal %}
+			</td>
+			<td>
+				{% if order.send_to_plant %}
+					{{order.send_to_plant}}
+				{% else %}
+					{{order.item.printlocation.plant}}
+				{% endif %}
+			</td>
+			<td>
+			     {{order.item.printlocation.press}}
+			</td>
+			<td>
+				<a href='javascript:load_div("body_wrap", item_ajax_url("{{ order.item.id }}", "tiff_download"))'>
+				  <img src="{{MEDIA_URL}}img/icons/basket_put.png" style="vertical-align:text-bottom" />
+				</a>
+				{{order.item.platepackage.platetype}}
+			</td>
+			{% if pending %}
+				{% if perms.accounts.shelbyville_platemaking or perms.accounts.kenton_platemaking %}
+						{% ifequal order.item.plate_type.name "Conv" %}
+							<td>
+								<form id="plate_order_1" onsubmit="plate_order_step('{{order.id}}', '1');return false;">
+									{% if order.stage1_complete_date %}
+										<img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" />
+									{% else %}
+										<img src="{{MEDIA_URL}}img/icons/cross.png" style="vertical-align:text-bottom" />
+									{% endif %}
+									<input type="submit" value="Films Done" onsubmit="plate_order_step('{{order.id}}', '1');return false;" />
+								</form>
+							</td>
+						{% else %}
+							<td>
+								&nbsp;
+							</td>
+						{% endifequal %}
+						<td>
+							<form id="plate_order_2" onsubmit="plate_order_step('{{order.id}}', '2');return false;">
+								{% if order.stage2_complete_date %}
+									<img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" />
+								{% else %}
+									<img src="{{MEDIA_URL}}img/icons/cross.png" style="vertical-align:text-bottom" />
+								{% endif %}
+								<input type="submit" value="Plates Done" onsubmit="plate_order_step('{{order.id}}', '2');return false;" />
+							</form>
+						</td>
+						<td>
+							<form id="plate_order_cancel" onsubmit="plate_order_cancel('{{order.id}}');return false;">
+								<img src="{{MEDIA_URL}}img/icons/thumb_down.png" style="vertical-align:text-bottom" />
+								<input type="submit" value="Cancel Order" onsubmit="plate_order_cancel('{{order.id}}');return false;" />
+							</form>
+						</td>
+				{% endif %}
+			{% else %}
+				<td>
+					{{order.stage2_complete_date|date:"n-j-Y"}}
+				</td>
+			{% endif %}
+		</tr>
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+			<td></td>
+			<td>
+				{% for plate in order.plateorderitem_set.all %}
+					{% ifnotequal plate.quantity_needed  0 %}
+						{% ifequal order.item.job.workflow.name "Beverage"%}
+							{{plate.color.sequence}}: {{order.item.bev_nomenclature}} {{plate.color.plate_code}} -
+						{% endifequal %}
+						{{plate.color.color}} <em>(x{{plate.quantity_needed}})</em><br />
+					{% endifnotequal %}
+				{% endfor %}
+			</td>
+			<td colspan="{% if pending %}6{% else %}5{% endif %}">
+				{% ifequal order.item.job.workflow.name "Beverage"%}
+					<strong>Replaces:</strong>{{order.item.replaces}}<br />
+				{% endifequal %}
+				<strong>Instructions: </strong>{{order.instructions}}<br />
+				<strong>Artist: </strong>{{order.item.job.artist}}<br />
+				{% if order.new_order %}
+
+				{% else %}
+					{% if order.requested_by %}
+						<strong>Ordered by:</strong> {{order.requested_by}}<br />
+					{% endif %}
+				{% endif %}
+
+				<span class="smtext">(Entered: {{order.date_entered|date:"n-j-Y"}})</span>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% include "pagination_bar.html" %}
+{% endblock %}

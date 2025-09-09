@@ -1,0 +1,92 @@
+<img src="{{MEDIA_URL}}img/icons/book_edit.png">
+<span class="sub_heading">Job Shipping Manager</span><br />
+{% for contact in addresses %}
+    <div class="jobaddress_block">
+        <table class="jobaddres_table" style='width:100%;margin-bottom:0px'>
+        <tr>
+        <td style='width:40%'>
+	        <strong>{{contact.name}}</strong>
+	        {% if contact.title %}- <em>{{contact.title}}</em>{% endif %}<br />
+	        {{contact.company}}<br />
+	        {{contact.address1}}
+	        {% if contact.address2 %}
+	          <br />{{contact.address2}}
+	        {% endif %}
+	        <br />
+	        {{contact.city}}, {{contact.state}} {{contact.zip}} {{contact.country}}
+	    </td>
+
+	    <td style='width:15%'>
+	        <strong>Contact Info</strong>
+	        <br />
+	        T: {{contact.phone}} {% if contact.ext %}Ext: {{contact.ext}}{% endif %}
+	        {% if contact.cell_phone %}
+	          <br />
+	          C: {{contact.cell_phone}}
+	        {% endif %}
+	        {% if contact.fax %}
+	          <br />
+	          F: {{contact.fax}}
+	        {% endif %}
+	        {% if contact.email %}
+	          <br />
+	          E: {{contact.email}}
+	        {% endif %}
+	    </td>
+
+        <td style='width:33%'>
+            <strong>Tracked Shipments</strong>
+            {% for shipment in contact.get_shipments %}
+              <br /><a href='{{shipment.get_absolute_url}}' target='_blank'>{{shipment.tracking_num}}</a>
+              ({{shipment.date_shipped|date:"n/d/y P"}})
+            {% empty %}
+              <br /><em>None</em>
+            {% endfor %}
+        </td>
+        </tr>
+
+        <tr>
+        <td colspan='3'>
+          {% if perms.accounts.clemson_employee %}
+	          <a href="javascript:ship_to_jobaddress('{{contact.id}}', 'STON')" alt="Fedex Std. Overnight">
+	            <img src="{{MEDIA_URL}}img/fedexbuttonstandard.png" style="padding:2px" />
+	          </a>
+	          &nbsp;&nbsp;&nbsp;&nbsp;
+	          <a href="javascript:ship_to_jobaddress('{{contact.id}}', 'PRON')" alt="Fedex Priority Overnight">
+	            <img src="{{MEDIA_URL}}img/fedexbuttonpriority.png" style="padding:2px" />
+	          </a>
+	          &nbsp;&nbsp;&nbsp;&nbsp;
+	          <a href="javascript:ship_to_jobaddress('{{contact.id}}', 'TWOD')" alt="Fedex Two-Day">
+	            <img src="{{MEDIA_URL}}img/fedexbutton2day.png" style="padding:2px" />
+	          </a>
+	          &nbsp;&nbsp;&nbsp;&nbsp;
+	          <a href='javascript:load_div("bottom_view", jobaddress_ajax_url("{{contact.id}}", "edit"))' style='vertical-align:60%'>
+	            <img src="{{MEDIA_URL}}img/icons/pencil.png" style="vertical-align:text-bottom" />
+	            Edit
+	          </a>
+	          &nbsp;&nbsp;&nbsp;&nbsp;
+	          <a href='javascript:jobaddress_delete("{{contact.id}}", "{{job_id}}")' style='vertical-align:60%'>
+	            <img src="{{MEDIA_URL}}img/icons/delete.png" style="vertical-align:text-bottom" />
+	            Delete
+	          </a>
+	          &nbsp;&nbsp;&nbsp;&nbsp;
+	          <a href='javascript:jobaddress_copy("{{contact.id}}", "{{job_id}}")' style='vertical-align:60%'>
+	            <img src="{{MEDIA_URL}}img/icons/book_go.png" style="vertical-align:text-bottom" />
+	            Copy to Directory
+	          </a>
+          {% endif %}
+        </td>
+        </tr>
+        </table>
+    </div>
+{% endfor %}
+<br />
+{% if perms.accounts.clemson_employee %}
+<div style="clear:both;">
+    <hr />
+    <a href='javascript:load_div("bottom_view", job_ajax_url("{{job_id}}", "add_jobaddress"))'>
+      <img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align:text-bottom" />
+      Add Another Address
+    </a>
+</div>
+{% endif %}

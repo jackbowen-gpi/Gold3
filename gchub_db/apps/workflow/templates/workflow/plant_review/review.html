@@ -1,0 +1,598 @@
+{% extends "standard.html" %}
+{% load item_links %}
+
+{% block extra_head %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	{% include "yui_container_includes.html" %}
+
+	<!--CSS-->
+	<style type="text/css">
+		#review_search label {
+			width: auto;
+			float: none;
+			text-align: left;
+			display: inline;
+		}
+		#review_search ul li {
+			list-style-type: none;
+		}
+		#review_search ul li label{
+			font-weight: normal;
+		}
+	</style>
+
+	<script type="text/javascript">
+
+	   /*
+		* prototype is loaded in GOLD's base html and it uses $ just like jquery
+		* does. So we'll change $ to $j for the jQuery on this page using
+		* jQuery.noConflict()
+		*/
+		var $j = jQuery.noConflict();
+
+		//jQuery to be fired when the document is ready.
+		$j(document).ready(function(){
+		   /*
+		    * This dialog asks the user what changes need to be made to a given
+		    * box PDF. The dialog is displayed by the approve_box_changes
+			* funct further down.
+		    */
+			$j( "#review_search" ).dialog({
+	            autoOpen: false,
+				width: 400,
+	            show: "fade",
+	            hide: "fade",
+				modal: true,
+				buttons: {
+					Search: function() {
+						$j( this ).dialog( "close" );
+						$j("#review_search_form").submit();
+					},
+					Cancel: function() {
+						$j( this ).dialog( "close" );
+					},
+				},//End buttons
+			});//End dialog()
+
+			// Opens the search dialog when the "Search" button is clicked.
+			$j( "#search_opener" ).click(function() {
+				$j( "#review_search" ).dialog( "open" );
+			});
+
+		    //Changes the look of some buttons via jquery ui.
+		    	//Search Old Reviews button.
+			$j( "#search_opener" ).button({
+			    icons: {
+			        primary: "ui-icon-search"
+			    },
+			});
+
+			var bool = $j('input:radio[name="plant_reports"]').change(function(){
+			    for(var x=0; x<13; x+=3){
+			    	if(x%3 == 0){
+			    	console.log("hiding", x);
+			    		var table = $j( "#"+x );
+			    		table.hide();
+			    	}
+			    }
+			    console.log("showing", "#"+$j(this).val());
+			    var table1 = $j( "#"+$j(this).val() );
+			    table1.show();
+			});
+
+
+		});//End jQuery to be fire when the document is ready.
+
+		function process_review(item_id, category, update_type) {
+	   /*
+	    * Fired when he user hits the Accept or Reject button. Calls the validator
+	    * and sends off an AJAX request if all is good.
+	    */
+	   if (update_type == "reject") {
+	   		var comment = window.prompt("Please enter explanation for rejection and/or instructions for correction.", "")
+	   } else if (update_type == "accept") {
+	   		var comment = window.prompt("If you have comments for the artist enter them here. Or just hit OK.", "")
+	   }else if (update_type == "resub" && category == "market") {
+	   		var comment = window.prompt("Please enter explanation for resubmission.", "")
+	   } else {
+	   		var comment = ""
+	   }
+	   YAHOO.example.container.wait.show();
+	   new Ajax.Request('/workflow/item/'+ item_id +'/review/' + category + '/' + update_type +'/?comment='+ encodeURIComponent(comment), {
+	       method: 'GET',
+	       onSuccess: function(http_req) {
+	           // Get a JSON object from the response string (from the server).
+	           jsobj = http_req.responseText.evalJSON();
+	           // See if there was a form processing error.
+	           if (jsobj["is_error"] == false) {
+				  window.location = "/workflow/review/" + category + "/"
+	           } else {
+	               // Form validation error happened.
+	               hide_modal_wait();
+	               alert(jsobj["message"]);
+	           }
+	       },
+	       onComplete: function() {
+	          hide_modal_wait();
+	   }});
+	} // end process_review()
+	</script>
+{% endblock %}
+
+{% block body %}
+	<h1><span style="text-transform: capitalize">{{category}}</span> Review Summary</h1>
+	<ul>
+	  <li><a href="#plant_report">Plant Report</a></li>
+	  <li><a href="#items_resubmitted">Items Resubmitted</a></li>
+	  <li><a href="#items_for_review">Items for Review</a></li>
+	  <li><a href="#items_with_refusals">Items with Refusals</a></li>
+	  {% if expired_list %}
+		<li><a href="#items_expired">Expired Reviews</a></li>
+	  {% endif %}
+	</ul>
+
+	{% ifequal category 'plant' %}
+		<p><button id="search_opener">Search Old Reviews</button></p>
+	{% endifequal %}
+
+	<!-- This div is the dialog that pops up when the user hits the search
+	button.-->
+	<div id="review_search" title="Search for Reviews">
+		<p>What type of review are you looking for?</p>
+		<form id="review_search_form" method="get">
+			{{ form.as_p }}
+		</form>
+	</div>
+
+	{% if perms.accounts.clemson_employee %}
+		<a name="plant_report"><h2>Plant Report</h2></a>
+		{% for time in time_arr %}
+			<span><input type="radio" name="plant_reports" value="{{time}}">Last {{time}} months </span>
+		{% endfor %}
+		<br/>
+		{% for time, plants in plant_obj.items %}
+			<table style='display:none;width:100%' id='{{time}}'>
+				<tr>
+					<th>Plant</th>
+					<th>Accepted/Rejected</th>
+					<th>Accepted/Rejected %</th>
+					<th>Expired</th>
+					<th>Expired %</th>
+				</tr>
+				{% for plant, obj in plants.items %}
+				<tr>
+					<td>{{ plant }}</td>
+					<td>{{ obj.accepted_rejected }}</td>
+					<td>{{ obj.accepted_rejected_percent }}%</td>
+					<td>{{ obj.expired }}</td>
+					<td>{{ obj.expired_percent }}%</td>
+				</tr>
+				{% endfor %}
+			</table>
+		{% endfor %}
+	{% endif %}
+	<br/>
+
+	<a name="items_resubmitted"><h2>Items Resubmitted</h2></a>
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Size</th>
+			{% ifequal category 'plant' %}
+			<th>Expires</th>
+			{% endifequal%}
+			<th>Art</th>
+
+			{% ifnotequal category 'market' %}
+				<th>Plant</th>
+				<th>Press</th>
+				<th>Platemaker (Type)</th>
+				<th>Annual Use</th>
+			{% endifnotequal %}
+			{% ifequal category 'demand' %}
+				<th>Salesperson</th>
+			{% endifequal %}
+			{% ifequal category 'market' %}
+				<th>Why?</th>
+			{% endifequal %}
+
+			{% ifequal category 'plant' %}
+				{% if perms.accounts.kenton_art_approval or perms.accounts.shelbyville_art_approval or perms.accounts.visalia_art_approval %}
+					<th colspan="2">Action</th>
+				{% endif %}
+			{% endifequal %}
+
+			{% ifequal category 'demand' %}
+				{% if perms.accounts.demand_planning %}
+					<th colspan="2">Action</th>
+				{% endif %}
+			{% endifequal %}
+
+			{% ifequal category 'market' %}
+				{% if perms.accounts.foodservice_marketing %}
+					<th colspan="2">Action</th>
+				{% endif %}
+			{% endifequal %}
+
+		</tr>
+		{% for item in resub_list %}
+		<tr>
+			<td><a href="/workflow/job/{{item.item.job.id}}/">{{item.item.job.id}} {{item.item.job.name}} &nbsp;&nbsp;</a></td>
+			<td>{{item.item.size}}</td>
+			{% ifequal category 'plant' %}
+			<td>{{item.expires|date:"n-j-Y"}}</td>
+			{% endifequal%}
+			<td>
+			  {% ifequal category 'market'%}
+				  {{item.item|item_proof_link:""}}
+			  {% else %}
+			      {{item.item|item_preview_art_link:""}}
+			  {% endifequal %}
+			</td>
+
+			{% ifnotequal category 'market' %}
+				<td>{{item.item.printlocation.plant}}</td>
+				<td>{{item.item.printlocation.press}}{% if item.item.special_mfg %}-{{item.item.special_mfg}}{% endif %}</td>
+				<td>{{item.item.platepackage.platemaker}} ({{item.item.platepackage.platetype}})</td>
+				<td>{{item.item.annual_use}} ({{item.item.case_pack}}/cs)</td>
+			{% endifnotequal %}
+
+			{% ifequal category 'market' %}
+				<td>
+					{{item.entry_comments}}
+				</td>
+			{% endifequal %}
+
+			{% ifequal category 'demand' %}
+				<td>
+					{{item.item.job.salesperson}}
+				</td>
+			{% endifequal %}
+
+			{% ifequal category 'plant' %}
+				{% if perms.accounts.kenton_art_approval or perms.accounts.shelbyville_art_approval or perms.accounts.visalia_art_approval or perms.accounts.pittston_art_approval or perms.accounts.clarksville_art_approval%}
+					<td>
+						<form id="review_accept" onsubmit="process_review('{{item.id}}', '{{category}}', 'accept');return false;">
+							<button type="submit">
+								<img src="{{MEDIA_URL}}img/icons/tick.png" alt="Accept">
+							</button>
+						</form>
+					</td>
+					<td>
+						<form id="review_reject" onsubmit="process_review('{{item.id}}', '{{category}}', 'reject');return false;">
+							<button type="submit">
+								<img src="{{MEDIA_URL}}img/icons/cross.png" alt="Reject">
+							</button>
+						</form>
+					</td>
+				{% endif %}
+			{% endifequal %}
+
+			{% ifequal category 'demand' %}
+				{% if perms.accounts.demand_planning %}
+					<td>
+						<form id="review_accept" onsubmit="process_review('{{item.id}}', '{{category}}', 'accept');return false;">
+							<input type="submit" value="Accept" onsubmit="process_review('{{item.id}}', '{{category}}', 'accept');return false;" />
+						</form>
+					</td>
+					<td>
+						<form id="review_reject" onsubmit="process_review('{{item.id}}', '{{category}}', 'reject');return false;">
+							<input type="submit" value="Reject" onsubmit="process_review('{{item.id}}', '{{category}}', 'reject');return false;" />
+						</form>
+					</td>
+				{% endif %}
+			{% endifequal %}
+
+			{% ifequal category 'market' %}
+				{% if perms.accounts.foodservice_marketing %}
+					<td>
+						<form id="review_accept" onsubmit="process_review('{{item.id}}', '{{category}}', 'accept');return false;">
+							<input type="submit" value="Accept" onsubmit="process_review('{{item.id}}', '{{category}}', 'accept');return false;" />
+						</form>
+					</td>
+					<td>
+						<form id="review_reject" onsubmit="process_review('{{item.id}}', '{{category}}', 'reject');return false;">
+							<input type="submit" value="Reject" onsubmit="process_review('{{item.id}}', '{{category}}', 'reject');return false;" />
+						</form>
+					</td>
+				{% endif %}
+			{% endifequal %}
+		</tr>
+
+		{% ifequal category 'market' %}
+			<tr>
+				<td colspan="6">
+					<strong>Comments:</strong>
+				</td>
+			</tr>
+			{% if item.resub_comments %}
+				<tr>
+					<td colspan="6">
+						{{item.resub_comments}} <span class="smtext">{{item.review_date}} ({{item.reviewer}})</span>
+					</td>
+				</tr>
+			{% endif %}
+		{% endifequal %}
+		{% for refusal in rejected_list %}
+			{% ifequal refusal.item.job.id item.item.job.id %}
+			{% ifequal refusal.item.size item.item.size %}
+			{% ifequal category 'market' %}
+			{% if refusal.resubmitted %}
+				<tr>
+					<td colspan="6">
+						{{refusal.comments}} <span class="smtext">{{refusal.review_date}} ({{refusal.reviewer}})</span>
+					</td>
+				</tr>
+				{% if refusal.resub_comments %}
+					<tr>
+						<td colspan="6">
+							{{refusal.resub_comments}} <span class="smtext">{{item.review_date}} ({{item.reviewer}})</span>
+						</td>
+					</tr>
+				{% endif %}
+			{% endif %}
+			{% endifequal %}
+			{% endifequal %}
+			{% endifequal %}
+		{% endfor %}
+
+		{% endfor %}
+	</table>
+
+    <hr />
+
+	<a name="items_for_review"><h2>Items for Review</h2></a>
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Size</th>
+			{% ifequal category 'plant' %}
+			<th>Expires</th>
+			{% endifequal %}
+			<th>Art</th>
+
+			{% ifnotequal category 'market' %}
+				<th>Plant</th>
+				<th>Press</th>
+				<th>Platemaker (Type)</th>
+				<th>Annual Use</th>
+			{% endifnotequal %}
+
+			{% ifequal category 'demand' %}
+				<th>Salesperson</th>
+			{% endifequal %}
+
+			{% ifequal category 'market' %}
+				<th>Why?</th>
+			{% endifequal %}
+
+			{% ifequal category 'plant' %}
+				{% if perms.accounts.kenton_art_approval or perms.accounts.shelbyville_art_approval or perms.accounts.visalia_art_approval or perms.accounts.pittston_art_approval or perms.accounts.clarksville_art_approval%}
+					<th colspan="2">Action</th>
+				{% endif %}
+			{% endifequal %}
+
+			{% ifequal category 'demand' %}
+				{% if perms.accounts.demand_planning %}
+					<th colspan="2">Action</th>
+				{% endif %}
+			{% endifequal %}
+
+			{% ifequal category 'market' %}
+				{% if perms.accounts.foodservice_marketing %}
+					<th colspan="2">Action</th>
+				{% endif %}
+			{% endifequal %}
+
+		</tr>
+		{% for item in review_list %}
+		<tr>
+			<td><a href="/workflow/job/{{item.item.job.id}}/">{{item.item.job.id}} {{item.item.job.name}}</a></td>
+			<td>{{item.item.size}}</td>
+			{% ifequal category 'plant' %}
+			<td>{{item.expires|date:"n-j-Y"}}</td>
+			{% endifequal %}
+			<td>
+			  {% ifequal category 'market'%}
+				  {{item.item|item_proof_link:""}}
+			  {% else %}
+				  {{item.item|item_preview_art_link:""}}
+			  {% endifequal %}
+
+			</td>
+
+			{% ifnotequal category 'market' %}
+				<td>{{item.item.printlocation.plant}}</td>
+				<td>{{item.item.printlocation.press}}{% if item.item.special_mfg %}-{{item.item.special_mfg}}{% endif %}</td>
+				<td>{{item.item.platepackage.platemaker}} ({{item.item.platepackage.platetype}})</td>
+				<td>{{item.item.annual_use}} ({{item.item.case_pack}}/cs)</td>
+			{% endifnotequal %}
+
+			{% ifequal category 'market' %}
+				<td>
+					{{item.entry_comments}}
+				</td>
+			{% endifequal %}
+
+			{% ifequal category 'demand' %}
+				<td>
+					{{item.item.job.salesperson}}
+				</td>
+			{% endifequal %}
+
+			{% ifequal category 'plant' %}
+				{% if perms.accounts.kenton_art_approval or perms.accounts.shelbyville_art_approval or perms.accounts.visalia_art_approval or perms.accounts.pittston_art_approval or perms.accounts.clarksville_art_approval%}
+					<td>
+						<form id="review_accept" onsubmit="process_review('{{item.id}}', '{{category}}', 'accept');return false;">
+							<button type="submit">
+								<img src="{{MEDIA_URL}}img/icons/tick.png" alt="Accept">
+							</button>
+						</form>
+					</td>
+					<td>
+						<form id="review_reject" onsubmit="process_review('{{item.id}}', '{{category}}', 'reject');return false;">
+							<button type="submit">
+								<img src="{{MEDIA_URL}}img/icons/cross.png" alt="Reject">
+							</button>
+						</form>
+					</td>
+				{% endif %}
+			{% endifequal %}
+
+			{% ifequal category 'demand' %}
+				{% if perms.accounts.demand_planning %}
+					<td>
+						<form id="review_accept" onsubmit="process_review('{{item.id}}', '{{category}}', 'accept');return false;">
+							<input type="submit" value="Accept" onsubmit="process_review('{{item.id}}', '{{category}}', 'accept');return false;" />
+						</form>
+					</td>
+					<td>
+						<form id="review_reject" onsubmit="process_review('{{item.id}}', '{{category}}', 'reject');return false;">
+							<input type="submit" value="Reject" onsubmit="process_review('{{item.id}}', '{{category}}', 'reject');return false;" />
+						</form>
+					</td>
+				{% endif %}
+			{% endifequal %}
+
+			{% ifequal category 'market' %}
+				{% if perms.accounts.foodservice_marketing %}
+					<td>
+						<form id="review_accept" onsubmit="process_review('{{item.id}}', '{{category}}', 'accept');return false;">
+							<input type="submit" value="Accept" onsubmit="process_review('{{item.id}}', '{{category}}', 'accept');return false;" />
+						</form>
+					</td>
+					<td>
+						<form id="review_reject" onsubmit="process_review('{{item.id}}', '{{category}}', 'reject');return false;">
+							<input type="submit" value="Reject" onsubmit="process_review('{{item.id}}', '{{category}}', 'reject');return false;" />
+						</form>
+					</td>
+				{% endif %}
+			{% endifequal %}
+
+		</tr>
+		{% endfor %}
+	</table>
+
+    <hr />
+
+	<a name="items_with_refusals"><h2>Items with Refusals</h2></a>
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Size</th>
+			<th>Art</th>
+
+			{% ifnotequal category 'market' %}
+				<th>Plant</th>
+				<th>Press</th>
+			{% endifnotequal %}
+
+			{% ifequal category 'market' %}
+				<th>Why?</th>
+			{% endifequal %}
+
+			{% ifequal category 'demand' %}
+				<th>Salesperson</th>
+			{% endifequal %}
+
+			<th nowrap>Refusal Date (Refused By)</th>
+
+		</tr>
+		{% for item in rejected_list %}
+			{% if item.resubmitted %}
+
+			{% else %}
+			<tr>
+				<td nowrap><a href="/workflow/job/{{item.item.job.id}}/">{{item.item.job.id}} {{item.item.job.name}} &nbsp;&nbsp;</a></td>
+				<td>{{item.item.size}}</td>
+				<td>
+				  {% ifequal category 'market'%}
+				  	  {{item.item|item_proof_link:""}}
+				  {% else %}
+				      {{item.item|item_preview_art_link:""}}
+				  {% endifequal %}
+				</td>
+				{% ifnotequal category 'market' %}
+					<td nowrap>{{item.item.printlocation.plant}}</td>
+					<td nowrap>{{item.item.printlocation.press}}{% if item.item.special_mfg %}-{{item.item.special_mfg}}{% endif %}</td>
+				{% endifnotequal %}
+
+				{% ifequal category 'demand' %}
+					<td>
+						{{item.item.job.salesperson}}
+					</td>
+				{% endifequal %}
+
+				{% ifequal category 'market' %}
+					<td>
+						{{item.entry_comments}}
+					</td>
+				{% endifequal %}
+
+				<td nowrap>
+					{{item.review_date|date:"n-j-Y"}} ({{item.reviewer}})
+				</td>
+
+			</tr>
+			<tr>
+				<td></td>
+				<td colspan="3"><strong>Remarks:</strong> {{item.comments}}</td>
+				<td>
+					{% if perms.accounts.clemson_employee %}
+						<form id="review_resub" onsubmit="process_review('{{item.id}}', '{{category}}', 'resub');return false;">
+							<input type="submit" value="Resubmit" onsubmit="process_review('{{item.id}}', '{{category}}', 'resub');return false;" />
+						</form>
+					{% endif %}
+				</td>
+			</tr>
+			{% endif %}
+		{% endfor %}
+	</table>
+
+	{% if expired_list %}
+    <hr />
+
+	<a name="items_expired"><h2>Reviews Expired in the Last 14 Days</h2></a>
+	<div class="ui-widget" id="submit_div">
+		<div class="ui-state-highlight ui-corner-all" style="margin-top: 10px; padding: 0 .7em;">
+		<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+		These reviews were not completed within the allotted 3 business day
+		window and have expired. If you have questions about any of these
+		reviews please contact the artist for that job.</p>
+		</div><br>
+	</div>
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Size</th>
+			<th>Expired</th>
+			<th>Art</th>
+			<th>Plant</th>
+			<th>Press</th>
+			<th>Platemaker (Type)</th>
+			<th>Annual Use</th>
+		</tr>
+		{% for item in expired_list %}
+		<tr>
+			<td><a href="/workflow/job/{{item.item.job.id}}/">{{item.item.job.id}} {{item.item.job.name}}</a></td>
+			<td>{{item.item.size}}</td>
+			<td>{{item.expires|date:"n-j-Y"}}</td>
+			<td>
+			  <a href="{% url "get_item_preview_art" item.item.job.id item.item.num_in_job %}">
+		    	<img src="{{MEDIA_URL}}img/icons/picture_save.png" style="vertical-align:text-bottom" />
+			  </a>
+			</td>
+			<td>{{item.item.printlocation.plant}}</td>
+			<td>{{item.item.printlocation.press}}{% if item.item.special_mfg %}-{{item.item.special_mfg}}{% endif %}</td>
+			<td>{{item.item.platepackage.platemaker}} ({{item.item.platepackage.platetype}})</td>
+			<td>{{item.item.annual_use}} ({{item.item.case_pack}}/cs)</td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% endif %}
+
+{% endblock body %}

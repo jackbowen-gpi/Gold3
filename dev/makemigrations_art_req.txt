@@ -1,0 +1,8 @@
+2025-09-01 18:49:48 DEBUG    2025-09-01 18:49:48 [DEBUG]          fsb_box.py:27
+                             gchub_db.apps.auto_corrugated.docume
+                             nts.fsb_box: Font file not found at:
+                             /mnt\Production\autocorr_elements\VA
+                             G Rounded BT.ttf
+Migrations for 'art_req':
+  gchub_db\apps\art_req\migrations\0034_alter_product_ship_to_state.py
+    ~ Alter field ship_to_state on product

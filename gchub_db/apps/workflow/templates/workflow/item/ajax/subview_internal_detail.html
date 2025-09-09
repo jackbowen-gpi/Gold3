@@ -1,0 +1,34 @@
+	<img src="{{MEDIA_URL}}img/icons/lightning_go.png">
+	{% include "workflow/item/toggle_detail_navbar.html" %}
+	<div class="outline_fancy">
+		<h3 class="inline">HUB-Only Information</h3>
+		<p>
+			<a href='{% url "error_tracking_add" item.id %}'>
+			  <img src="{{MEDIA_URL}}img/icons/error.png" style="vertical-align:text-bottom" alt="Report Error" />
+			    Report an Error
+			</a>
+		</p>
+		<form id="iteminternal" name="iteminternal" onsubmit="edit_iteminternal('{{item.id}}');return false;">
+			<table>
+				<tr>
+					<th>Item Status</th>
+				</tr>
+				<tr>
+					<td>{{form.item_situation}}</td>
+				</tr>
+				<tr>
+					<th>Proof Overdue</th>
+					<th>File Out Overdue</th>
+				</tr>
+				<tr>
+					<td>Exempt: {{form.overdue_exempt}}</td>
+					<td>Exempt: {{form.file_out_exempt}}</td>
+				</tr>
+				<tr>
+					<td>Reason: {{form.overdue_exempt_reason}}</td>
+					<td>Reason: {{form.file_out_exempt_reason}}</td>
+				</tr>
+			</table>
+			<input type="submit" value="Update Info" onclick="edit_iteminternal('{{item.id}}');return false;" />
+		</form>
+	</div>

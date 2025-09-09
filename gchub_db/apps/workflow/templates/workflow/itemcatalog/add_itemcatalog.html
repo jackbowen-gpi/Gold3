@@ -1,0 +1,25 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/item_catalog.js"></script>
+	{% include "workflow/itemcatalog/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+
+<h1 class="inline">Add Product to Item Catalog</h1><br /><br />
+{% include "workflow/itemcatalog/navbar_div.inc.html" %}
+	<form id="itemcatalog" name="itemcatalog" onsubmit="add_itemcatalog();return false;">
+		<dl>
+		{% for field in add_form %}
+		    <dt>{{ field.label_tag }}</dt>
+		    <dd>{{ field }}</dd>
+		    {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
+		    {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}
+		    <br />
+		{% endfor %}
+		</dl>
+		<input type="submit" value="Add Product" onclick="add_itemcatalog();return false;" />
+	</form>
+{% endblock %}

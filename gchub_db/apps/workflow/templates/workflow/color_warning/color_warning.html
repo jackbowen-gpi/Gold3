@@ -1,0 +1,84 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<style type="text/css">
+		.warninglink {
+			color:blue;
+		}
+		.warninglink:hover {
+			color:black;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+<div style="text-align: center;background-color:#666666">
+<table style="background-color:transparent;border: none;margin: 0px auto;">
+	<tr>
+	    <td style="background-color:inherit;border:inherit">
+			<h1 style="color:white">**Warning: Press change jobs will ignore color warnings**</h1>
+		</td>
+	</tr>
+	<tr>
+	    <td style="text-align:center;background-color:inherit;border:inherit">
+			<a style="color:white", href="/workflow/color_warning/add_warning/">
+			   <img src='{{MEDIA_URL}}img/icons/table_add.png'
+			        style="vertical-align:bottom" alt="Warnings"/> Add New Color Warning
+			</a>
+		</td>
+	</tr>
+</table>
+</div>
+<div style="text-align: center;background-color:#666666">
+<table style="background-color: black;margin: 0px auto;" border="1">
+	<tr>
+		<!-- Pantone color is being swapped for definition but not in the model, so we are changing in the templates -->
+		<td><h1>Pantone color</h1></td>
+		<td><h1>QPO#</h1></td>
+		<td><h1>Date Added</h1></td>
+		<td><h1>Status</h1></td>
+		<td></td>
+	</tr>
+	{% for warning in warnings %}
+		<tr>
+		<!-- Pantone color is being swapped for definition but not in the model, so we are changing in the templates -->
+		<td>{{ warning.definition }}</td>
+		<td>{{ warning.qpo_number}}</td>
+		<td>{{ warning.date_added|date:"m-d-Y"}}</td>
+		{% if warning.dismissed %}
+			<td>Dismissed</td>
+		{% elif warning.active%}
+			<td>Active</td>
+		{% else %}
+			<td>Inactive</td>
+		{% endif %}
+		<!-- Deactivated warnings are view only. -->
+		{% if warning.dismissed %}
+			<td style="border:inherit">
+				<a class="warninglink", href="/workflow/color_warning/view_warning/{{ warning.id }}">
+	 			<img src='{{MEDIA_URL}}img/icons/zoom.png' style="vertical-align:bottom" alt="Warning"/>
+				View
+				</a>
+			</td>
+		{% else %}
+			<td style="border:inherit">
+				<a class="warninglink", href="/workflow/color_warning/edit_warning/{{ warning.id }}">
+				   <img src='{{MEDIA_URL}}img/icons/table_edit.png'
+				        style="vertical-align:bottom" alt="Warning"/> Edit
+				</a>
+			</td>
+		{% endif %}
+	</tr>
+	{%endfor %}
+</table>
+</div>
+
+
+
+{% for error in errors %}
+<table style="margin: 0px auto;" border="1">
+	<tr><td>{{ error }}</td></tr>
+</table>
+{% endfor %}
+
+{% endblock %}

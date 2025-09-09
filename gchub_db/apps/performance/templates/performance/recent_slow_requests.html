@@ -1,0 +1,101 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<h1>Recent slow requests</h1>
+<p>Showing up to 200 recent slow requests logged by RequestProfilerMiddleware.</p>
+<style>
+  .perf-filter { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; align-items: end; margin-bottom: 1rem; }
+  .perf-filter label { display: flex; flex-direction: column; font-size: 0.95rem; }
+  .perf-filter input[type="text"], .perf-filter input[type="number"], .perf-filter select { width: 100%; box-sizing: border-box; padding: 0.35rem 0.45rem; border: 1px solid #ccc; border-radius: 3px; }
+  .perf-filter .actions { display:flex; gap:0.5rem; align-items:center; justify-self: end; }
+  @media (min-width: 900px) {
+    /* reserve columns and ensure actions sit in the last column */
+    .perf-filter { grid-template-columns: 1fr 120px 120px 100px 120px 120px; }
+    .perf-filter .actions { justify-content:flex-end; justify-self: end; grid-column: 6 / 7; }
+  }
+</style>
+
+<div style="clear:both;">
+  <form method="get" class="perf-filter">
+    <label>Path contains:
+      <input type="text" name="q" value="{{ query.q|default:'' }}" autocomplete="off">
+    </label>
+    <label>Min ms:
+      <input type="number" name="min_ms" value="{{ query.min_ms|default:'' }}">
+    </label>
+    <label>Max ms:
+      <input type="number" name="max_ms" value="{{ query.max_ms|default:'' }}">
+    </label>
+    <label>Limit:
+      <input type="number" name="limit" value="{{ query.limit|default:200 }}">
+    </label>
+    <label>Sort by:
+      <select name="sort_by">
+        <option value="timestamp" {% if query.sort_by == "timestamp" %}selected{% endif %}>Timestamp</option>
+        <option value="duration" {% if query.sort_by == "duration" %}selected{% endif %}>Duration</option>
+      </select>
+    </label>
+    <label>Dir:
+      <select name="sort_dir">
+        <option value="desc" {% if query.sort_dir == "desc" or not query.sort_dir %}selected{% endif %}>Desc</option>
+        <option value="asc" {% if query.sort_dir == "asc" %}selected{% endif %}>Asc</option>
+      </select>
+    </label>
+    <div class="actions">
+      <button type="submit">Filter</button>
+      <button type="submit" name="export_format" value="csv">Export CSV</button>
+    </div>
+  </form>
+</div>
+{% if not entries %}
+  <p>No entries found.</p>
+{% else %}
+  <table style="clear:both;width:100%;border-collapse:collapse;">
+    <tr><th>Path</th><th>Duration (ms)</th><th>DB queries</th><th>SQL snippets</th></tr>
+    {% for e in entries %}
+      <tr>
+        <td>{{ e.path }}</td>
+        <td>{{ e.duration_ms }}</td>
+        <td>{{ e.db_queries }}</td>
+        <td>
+          {% if e.sql %}
+            <ul>
+            {% for s in e.sql %}
+              <li>
+                <pre style="white-space:pre-wrap">{{ s|truncatechars:120 }}</pre>
+                <button type="button" class="show-sql" data-sql="{{ s|escapejs }}">Full SQL</button>
+              </li>
+            {% endfor %}
+            </ul>
+          {% else %}
+            -
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+
+<!-- Modal for full SQL display -->
+<div id="sql-modal" style="display:none;position:fixed;left:10%;top:10%;right:10%;bottom:10%;background:#fff;border:1px solid #666;padding:1em;overflow:auto;z-index:9999">
+  <button id="sql-modal-close" style="float:right">Close</button>
+  <h3>Full SQL</h3>
+  <pre id="sql-modal-content" style="white-space:pre-wrap"></pre>
+</div>
+
+<script>
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if (t.classList && t.classList.contains('show-sql')){
+      var sql = t.getAttribute('data-sql') || '';
+      var md = document.getElementById('sql-modal');
+      var content = document.getElementById('sql-modal-content');
+      content.textContent = sql;
+      md.style.display = 'block';
+    }
+    if (t.id === 'sql-modal-close'){
+      document.getElementById('sql-modal').style.display = 'none';
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,34 @@
+<div style='padding:5px;'>
+  <div style='float:left;padding:5px;'>
+  {% if perms.accounts.clemson_employee %}
+      <strong>Items with <a href="{% url "items_rejected" %}"> Rejections:</a></strong>
+      {{items_rejected}}
+  {% else %}
+	  <a href="{% url "get_report" "item_fileout" %}">
+	    <img src="{{MEDIA_URL}}img/icons/page_white_paste.png"
+	         style="vertical-align:text-bottom" />
+	    Items Recently Filed Out
+	  </a>
+	  {% if perms.accounts.beverage_access %}
+	  	<br />
+	    <a href="{% url "get_report" "item_proofed" %}">
+	      <img src="{{MEDIA_URL}}img/icons/page_white_paste.png"
+	           style="vertical-align:text-bottom" />
+	      Items Recently Posted
+	    </a>
+	  {% endif %}
+  {% endif %}
+  </div>
+  <div style='float:right;padding:5px;'>
+    {% now "l, n-j-Y" %}
+  </div>
+	{% if perms.accounts.clemson_employee %}
+	<div style='padding:5px;outline:1px dashed black;clear:both;text-align:center;background:white;'>
+		<br />
+	    <span style="font-size:24px;font-weight:bold;line-height:100%;color:{{last_error_color}};">
+	    	{{last_error}}
+	    </span>
+	    <br />
+	    <em>days since last error</em>
+	</div>
+	{% endif %}

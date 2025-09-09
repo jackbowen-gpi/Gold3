@@ -1,0 +1,431 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<style type="text/css">
+		.jobs_due_dates{
+		    float:left;
+		}
+		.jobs_due_totals{
+		    float:right;
+		    margin-right:5px;
+			border:1px solid gray;
+			padding: 2px;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+{% load manager_tools %}
+<div>
+	<h1 class="inline"><img src="{{MEDIA_URL}}img/icons/paste_plain.png" style="vertical-align:text-center" alt="ToDo" />
+		{{page_title}} for {{day0|date:"l, n-j-Y"}}
+		{% if manager_tools and perms.accounts.clemson_manager %}
+			 | Manager View
+		{% endif %}
+	</h1>
+	<br />
+	<br />
+	<div style="width:50%; float:left;">
+		<div class="outline_fancy">
+			<div class ='jobs_due_dates'><strong>{{day1|date:"l, n-j-Y"}}</strong></div>
+			{% if manager_tools and perms.accounts.clemson_manager %}
+				<div class ='jobs_due_totals'>
+					<span class="smtext">
+						{{jobs_due_1_total_hours|floatformat:2}} / {{jobs_due_1_avg_total_hours|floatformat:2}} total
+					</span>
+				</div>
+			{% endif %}
+			<br />
+			{% for job in jobs_due_1 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					{{job|show_manager_tools|safe}}
+				{% else %}
+					{{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			{% for job in revisions_due_1 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					Rev: {{job|show_manager_tools|safe}}
+				{% else %}
+					Rev: {{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			<br />
+		</div>
+
+		<div class="outline_fancy">
+			<div class ='jobs_due_dates'><strong>{{day2|date:"l, n-j-Y"}}</strong></div>
+			{% if manager_tools and perms.accounts.clemson_manager %}
+				<div class ='jobs_due_totals'>
+					<span class="smtext">
+						{{jobs_due_2_total_hours|floatformat:2}} / {{jobs_due_2_avg_total_hours|floatformat:2}} total
+					</span>
+				</div>
+			{% endif %}
+			<br />
+			{% for job in jobs_due_2 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					{{job|show_manager_tools|safe}}
+				{% else %}
+					{{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			{% for job in revisions_due_2 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					Rev: {{job|show_manager_tools|safe}}
+				{% else %}
+					Rev: {{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			<br />
+		</div>
+
+		<div class="outline_fancy">
+			<div class ='jobs_due_dates'><strong>{{day3|date:"l, n-j-Y"}}</strong></div>
+			{% if manager_tools and perms.accounts.clemson_manager %}
+				<div class ='jobs_due_totals'>
+					<span class="smtext">
+						{{jobs_due_3_total_hours|floatformat:2}} / {{jobs_due_3_avg_total_hours|floatformat:2}} total
+					</span>
+				</div>
+			{% endif %}
+			<br />
+			{% for job in jobs_due_3 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					{{job|show_manager_tools|safe}}
+				{% else %}
+					{{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			{% for job in revisions_due_3 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					Rev: {{job|show_manager_tools|safe}}
+				{% else %}
+					Rev: {{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			<br />
+		</div>
+
+		<div class="outline_fancy">
+			<div class ='jobs_due_dates'><strong>{{day4|date:"l, n-j-Y"}}</strong></div>
+			{% if manager_tools and perms.accounts.clemson_manager %}
+				<div class ='jobs_due_totals'>
+					<span class="smtext">
+						{{jobs_due_4_total_hours|floatformat:2}} / {{jobs_due_4_avg_total_hours|floatformat:2}} total
+					</span>
+				</div>
+			{% endif %}
+			<br />
+			{% for job in jobs_due_4 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					{{job|show_manager_tools|safe}}
+				{% else %}
+					{{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			{% for job in revisions_due_4 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					Rev: {{job|show_manager_tools|safe}}
+				{% else %}
+					Rev: {{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			<br />
+		</div>
+
+		<div class="outline_fancy">
+			<div class ='jobs_due_dates'><strong>{{day5|date:"l, n-j-Y"}}</strong></div>
+			{% if manager_tools and perms.accounts.clemson_manager %}
+				<div class ='jobs_due_totals'>
+					<span class="smtext">
+						{{jobs_due_5_total_hours|floatformat:2}} / {{jobs_due_5_avg_total_hours|floatformat:2}} total
+					</span>
+				</div>
+			{% endif %}
+			<br />
+			{% for job in jobs_due_5 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					{{job|show_manager_tools|safe}}
+				{% else %}
+					{{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			{% for job in revisions_due_5 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					Rev: {{job|show_manager_tools|safe}}
+				{% else %}
+					Rev: {{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			<br />
+		</div>
+
+		<div class="outline_fancy">
+			<div class ='jobs_due_dates'><strong>{{day6|date:"l, n-j-Y"}}</strong></div>
+			{% if manager_tools and perms.accounts.clemson_manager %}
+				<div class ='jobs_due_totals'>
+					<span class="smtext">
+						{{jobs_due_6_total_hours|floatformat:2}} / {{jobs_due_6_avg_total_hours|floatformat:2}} total
+					</span>
+				</div>
+			{% endif %}
+			<br />
+			{% for job in jobs_due_6 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					{{job|show_manager_tools|safe}}
+				{% else %}
+					{{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			{% for job in revisions_due_6 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					Rev: {{job|show_manager_tools|safe}}
+				{% else %}
+					Rev: {{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			<br />
+		</div>
+
+		<div class="outline_fancy">
+			<div class ='jobs_due_dates'><strong>{{day7|date:"l, n-j-Y"}}</strong></div>
+			{% if manager_tools and perms.accounts.clemson_manager %}
+				<div class ='jobs_due_totals'>
+					<span class="smtext">
+						{{jobs_due_7_total_hours|floatformat:2}} / {{jobs_due_7_avg_total_hours|floatformat:2}} total
+					</span>
+				</div>
+			{% endif %}
+			<br />
+			{% for job in jobs_due_7 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					{{job|show_manager_tools|safe}}
+				{% else %}
+					{{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			{% for job in revisions_due_7 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					Rev: {{job|show_manager_tools|safe}}
+				{% else %}
+					Rev: {{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			<br />
+		</div>
+
+		<div class="outline_fancy">
+			<div class ='jobs_due_dates'><strong>{{day8|date:"l, n-j-Y"}}</strong></div>
+			{% if manager_tools and perms.accounts.clemson_manager %}
+				<div class ='jobs_due_totals'>
+					<span class="smtext">
+						{{jobs_due_8_total_hours|floatformat:2}} / {{jobs_due_8_avg_total_hours|floatformat:2}} total
+					</span>
+				</div>
+			{% endif %}
+			<br />
+			{% for job in jobs_due_8 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					{{job|show_manager_tools|safe}}
+				{% else %}
+					{{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			{% for job in revisions_due_8 %}
+				{% if manager_tools and perms.accounts.clemson_manager %}
+					Rev: {{job|show_manager_tools|safe}}
+				{% else %}
+					Rev: {{job.todo_list_html|safe}}
+				{% endif %}
+			{% endfor %}
+			<br />
+		</div>
+	</div>
+
+	<div style="width:50%; float:left;">
+		<div class="outline_fancy">
+			{% if jobs_overdue %}
+				<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align:text-bottom" alt="Overdue" /> <strong>Overdue Jobs:</strong><br />
+				{% for job in jobs_overdue %}
+					{% if manager_tools and perms.accounts.clemson_manager %}
+						{{job|show_manager_tools|safe}}
+					{% else %}
+						{{job.todo_list_html|safe}}
+					{% endif %}
+				{% endfor %}
+				{% for job in overdue_revisions %}
+					{% if manager_tools and perms.accounts.clemson_manager %}
+						Rev: {{job|show_manager_tools|safe}}
+					{% else %}
+						Rev: {{job.todo_list_html|safe}}
+					{% endif %}
+				{% endfor %}
+				<br />
+			{% endif %}
+
+			{% if jobs_needing_file_out %}
+				<img src="{{MEDIA_URL}}img/icons/film_go.png" style="vertical-align:text-bottom" alt="File Out" /> <strong>Jobs Needing to File Out</strong> ({{jobs_needing_file_out.count}}):<br />
+				<!--{% for job in jobs_needing_file_out %}
+					{{job.todo_list_html|safe}}
+				{% endfor %}-->
+				<div style="padding:5px;outline:1px dashed black;clear:both;">
+					{% if jobs_needing_file_out_today %}
+						<div class ='jobs_due_dates'><strong>{{day1|date:"l, n-j-Y"}} (Today)</strong></div>
+						{% if manager_tools and perms.accounts.clemson_manager %}
+							<div class ='jobs_due_totals'>
+								<span class="smtext">
+									{{jobs_needing_file_out_today_total|floatformat:2}} total
+								</span>
+							</div>
+						{% endif %}
+						<br />
+						{% for job in jobs_needing_file_out_today %}
+							{% if manager_tools and perms.accounts.clemson_manager %}
+								{{job|show_manager_tools_fileout|safe}}
+							{% else %}
+								{{job.todo_list_html|safe}}
+							{% endif %}
+						{% endfor %}
+						<br />
+					{% endif %}
+
+					{% if jobs_needing_file_out_tomorrow %}
+						<div class ='jobs_due_dates'><strong>{{day2|date:"l, n-j-Y"}} (Tomorrow)</strong></div>
+						{% if manager_tools and perms.accounts.clemson_manager %}
+							<div class ='jobs_due_totals'>
+								<span class="smtext">
+									{{jobs_needing_file_out_tomorrow_total|floatformat:2}} total
+								</span>
+							</div>
+						{% endif %}
+						<br />
+						{% for job in jobs_needing_file_out_tomorrow %}
+							{% if manager_tools and perms.accounts.clemson_manager %}
+								{{job|show_manager_tools_fileout|safe}}
+							{% else %}
+								{{job.todo_list_html|safe}}
+							{% endif %}
+						{% endfor %}
+						<br />
+					{% endif %}
+
+					{% if jobs_needing_file_out_day3 %}
+						<div class ='jobs_due_dates'><strong>{{day3|date:"l, n-j-Y"}}</strong></div>
+						{% if manager_tools and perms.accounts.clemson_manager %}
+							<div class ='jobs_due_totals'>
+								<span class="smtext">
+									{{jobs_needing_file_out_day3_total|floatformat:2}} total
+								</span>
+							</div>
+						{% endif %}
+						<br />
+						{% for job in jobs_needing_file_out_day3 %}
+							{% if manager_tools and perms.accounts.clemson_manager %}
+								{{job|show_manager_tools_fileout|safe}}
+							{% else %}
+								{{job.todo_list_html|safe}}
+							{% endif %}
+						{% endfor %}
+						<br />
+					{% endif %}
+
+					{% if jobs_needing_file_out_day4 %}
+						<div class ='jobs_due_dates'><strong>{{day4|date:"l, n-j-Y"}}</strong></div>
+						{% if manager_tools and perms.accounts.clemson_manager %}
+							<div class ='jobs_due_totals'>
+								<span class="smtext">
+									{{jobs_needing_file_out_day4_total|floatformat:2}} total
+								</span>
+							</div>
+						{% endif %}
+						<br />
+						{% for job in jobs_needing_file_out_day4 %}
+							{% if manager_tools and perms.accounts.clemson_manager %}
+								{{job|show_manager_tools_fileout|safe}}
+							{% else %}
+								{{job.todo_list_html|safe}}
+							{% endif %}
+						{% endfor %}
+						<br />
+					{% endif %}
+
+					{% if jobs_needing_file_out_soon %}
+						<div class ='jobs_due_dates'><strong>Soon</strong></div>
+						{% if manager_tools and perms.accounts.clemson_manager %}
+							<div class ='jobs_due_totals'>
+								<span class="smtext">
+									{{jobs_needing_file_out_soon_total|floatformat:2}} total
+								</span>
+							</div>
+						{% endif %}
+						<br />
+						{% for job in jobs_needing_file_out_soon %}
+							{% if manager_tools and perms.accounts.clemson_manager %}
+								{{job|show_manager_tools_fileout|safe}}
+							{% else %}
+								{{job.todo_list_html|safe}}
+							{% endif %}
+						{% endfor %}
+						<br />
+					{% endif %}
+
+					{% if jobs_needing_file_out_overdue %}
+						<div class ='jobs_due_dates'><strong>Overdue</strong></div>
+						{% if manager_tools and perms.accounts.clemson_manager %}
+							<div class ='jobs_due_totals'>
+								<span class="smtext">
+									{{jobs_needing_file_out_overdue_total|floatformat:2}} total
+								</span>
+							</div>
+						{% endif %}
+						<br />
+						{% for job in jobs_needing_file_out_overdue %}
+							{% if manager_tools and perms.accounts.clemson_manager %}
+								{{job|show_manager_tools_fileout|safe}}
+							{% else %}
+								{{job.todo_list_html|safe}}
+							{% endif %}
+						{% endfor %}
+					{% endif %}
+				</div>
+				<br />
+			{% endif %}
+
+			{% if jobs_pending %}
+				<img src="{{MEDIA_URL}}img/icons/help.png" style="vertical-align:text-bottom" alt="Pending" /> <strong>Pending Jobs</strong> ({{jobs_pending.count}}):<br />
+				{% for job in jobs_pending %}
+					{{job.todo_list_html|safe}}
+				{% endfor %}
+				<br />
+			{% endif %}
+
+			{% if jobs_on_hold %}
+				<img src="{{MEDIA_URL}}img/icons/stop.png" style="vertical-align:text-bottom" alt="Hold" /> <strong>Jobs on Hold</strong> ({{jobs_on_hold.count}}):<br />
+				{% for job in jobs_on_hold %}
+					{{job.todo_list_html|safe}}
+				{% endfor %}
+				<br />
+			{% endif %}
+		</div>
+		<div class="outline_fancy">
+			<img src="{{MEDIA_URL}}img/icons/tag_green.png" style="vertical-align:text-bottom" alt="Overdue" /> <strong>Upcoming Shipments</strong><br />
+			{% for ship in shipto_list %}
+				<a href="/workflow/job/{{ship.job.id}}/">
+				{{ship.job.id}}</a> - {{ship.name}}, {{ship.city}}, {{ship.state}} <em>({{ship.job.real_due_date|date:"n/j"}})</em><br />
+			{% endfor %}
+			<br />
+			<strong>Possible Matches</strong><br />
+			{% for ship, dict in shipto_list_dupes_dict.items %}
+				{{dict.address.name}}, {{dict.address.city}}, {{dict.address.state}} - {% for job in dict.job_list %}
+				<a href="/workflow/job/{{job.id}}/">{{job.id}}</a>&nbsp;&nbsp;{% endfor %}<br />
+			{% empty %}
+				None
+			{% endfor %}
+		</div>
+	</div>
+	<div style="clear:both;">&nbsp;
+	</div>
+</div>
+
+{% endblock %}

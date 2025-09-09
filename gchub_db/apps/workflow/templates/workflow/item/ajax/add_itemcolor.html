@@ -1,0 +1,57 @@
+	{% if item.job.workflow.name == "Carton" %}
+		<img src="{{MEDIA_URL}}img/icons/color_swatch.png">
+		<span class="sub_heading">Add Color to Item #{{ item.num_in_job }} - {{ item.size }}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+		<form id="itemcolor" name="itemcolor" onsubmit="add_itemcolor('{{item.id}}', '{{item.job.id}}');return false;">
+			<br />
+			<input type="hidden" name="changePicker" id="changePicker" />
+			<input type="hidden" name="item" id="item" value="{{item.id}}">
+			<table border="0">
+				<tr>
+					<td><label for="id_sequence">Seq:</label> {{form.sequence}}</td>
+				</tr>
+				<tr>
+					<td><label for="id_definition">Color:</label> {{form.definition}}</td>
+				</tr>
+				<tr>
+					<td><label for="id_color">Color Map:</label> {{form.color}}</td>
+				</tr>
+				<tr>
+					<td><label>Color Picker:</label><div style='display:none' id='divPicker'><input id='changeColorPicker' type='hidden' class="basic"/></div></td>
+				</tr>
+			</table>
+			<br />
+			<input type="submit" value="Add Color" onclick="add_itemcolor('{{item.id}}', '{{item.job.id}}');return false;" />
+		</form>
+	{% else %}
+		<img src="{{MEDIA_URL}}img/icons/color_swatch.png">
+		<span class="sub_heading">Add Color to Item #{{ item.num_in_job }} - {{ item.size }}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+		<form id="itemcolor" name="itemcolor" onsubmit="add_itemcolor('{{item.id}}', '{{item.job.id}}');return false;">
+			<br />
+			Please note that this color will be added to the end of the list. <br />
+			If you'd like it to appear higher, you'll need to rearrange the colors by editing each one.<br />
+			<br />
+
+			<input type="hidden" name="item" id="item" value="{{item.id}}">
+			<table border="0">
+				<tr>
+					<td><label for="id_sequence">Seq:</label> {{form.sequence}}</td>
+				</tr>
+				<tr>
+					<td><label for="id_color">Color:</label> {{form.definition}}</td>
+				</tr>
+				<tr>
+					<td><label for="id_screened">Screened:</label> {{form.screened}}</td>
+				</tr>
+				<tr>
+					<td><label for="id_plate_code">Plate Code:</label> {{form.plate_code}}</td>
+				</tr>
+				<tr>
+					<td><label for="id_num_plates">Plate Qty:</label> {{form.num_plates}}</td>
+				</tr>
+			</table>
+			<br />
+			<input type="submit" value="Add Color" onclick="add_itemcolor('{{item.id}}', '{{item.job.id}}');return false;" />
+		</form>
+	{% endif %}

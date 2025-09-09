@@ -1,0 +1,56 @@
+<span class="sub_heading">
+<img src="{{MEDIA_URL}}img/icons/clock_add.png"
+style="vertical-align: text-bottom" alt="MiscInfo" />
+  Time and Materials Info
+</span>
+<br />
+<br />
+
+<!-- Timesheet entries -->
+<div style="positon:relative;float:left;width:60%;">
+	<table>
+		<tr>
+			<th>Date</th>
+			<th>Artist</th>
+			<th>Category</th>
+			<th>Hours</th>
+			<th>Comments</th>
+		</tr>
+	{% for sheet in timesheets %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+			<td>{{sheet.date}}</td>
+			<td>{{sheet.artist}}</td>
+			<td>{{sheet.category}}</td>
+			<td>{{sheet.hours}}</td>
+			<td>{{sheet.comments}}</td>
+		</tr>
+	{% endfor %}
+	</table>
+</div>
+
+<!--- Timesheet Totals -->
+<div class="outline_fancy" style="position:relative;width:380px;float:left;left:5px;">
+	<span class="sub_heading">
+	  Timesheet Totals
+	</span>
+	<br />
+	<br />
+	{% for category, total in totals.items %}
+		{{total|floatformat:2}} {{category}} <br />
+	{% endfor %}
+	<hr align="left" width="30%">
+	<strong>{{ hours_grand_total }} Total</strong>
+	<br />
+</div>
+<!--- Materials Totals -->
+<div class="outline_fancy" style="position:relative;width:380px;float:left;left:5px;">
+	<span class="sub_heading">
+	  Materials
+	</span>
+	<br />
+	<br />
+	{% for name, total in materials.items %}
+		{{total}} Total <br />
+	{% endfor %}
+	<br />
+</div>

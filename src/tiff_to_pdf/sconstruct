@@ -1,0 +1,77 @@
+"""
+SCons build script for tiff_to_pdf. This is currently Linux/Unix/Mac only.
+Not that we run this on Windows machines anyway.
+
+Quick start, type:
+	scons install
+"""
+import os, sys
+from subprocess import Popen, PIPE
+from . import bin_name
+
+# Magick++-config is a binary that retrieves ImageMagick details that assist
+# in compiling programs that link ImageMagick in. This cuts down on a
+# lot of hard-coding, even across different platforms.
+mconf = 'Magick++-config'
+# Compiler flags.
+cxx_flags = Popen([mconf, '--cxxflags'], stdout=PIPE).communicate()[0].strip().split()
+# ImageMagick -I include directives.
+cpp_flags = Popen([mconf, '--cppflags'], stdout=PIPE).communicate()[0].strip().split()
+# Add MacPorts include directory to paths.
+cpp_flags.append('-I/opt/local/include')
+# Build in all of the ImageMagick depend libs.
+libs = Popen([mconf, '--libs'], stdout=PIPE).communicate()[0]
+# ImageMagick -L library paths.
+ldflags = Popen([mconf, '--ldflags'], stdout=PIPE).communicate()[0]
+
+# A list of C/C++ libs to link.
+lib_list = ['tiff']
+# Equivalent to GNU Make's -L Library path arguments.
+lib_paths = []
+
+# Go through `Magick++-config --libs` output.
+for entry in libs.split():
+    if entry[1] == 'L':
+        # If this is a library path, add it to the lib_paths list.
+        lib_paths.append(entry[2:])
+    elif entry[1] == 'l':
+        # If this is a library, add it to the library list.
+        lib_list.append(entry[2:])
+
+# Go through `Magick++-config --libs` output.
+for entry in ldflags.split():
+    if entry[1] == 'L':
+        # We're only interested in library paths.
+        lib_paths.append(entry[2:])
+
+env = Environment()
+env.Append(CXXFLAGS=cxx_flags)
+env.Append(CPPFLAGS=cpp_flags)
+env.Append(LIBPATH = lib_paths)
+env.Append(LIBS = lib_list)
+
+# The directory that the tiff_to_pdf source is located in.
+tiff_to_pdf_src_dir = os.path.dirname(os.path.abspath(bin_name.__file__))
+# Source files to compile.
+sources = Split("""
+tiffToPDF.cpp
+colors.cpp
+tiffManager.cpp
+tiff.cpp
+""")
+object_list = env.Object(source = sources)
+
+# This brings everything together into a buildable target. Note that the
+# target is the file name of the compiled binary. This is determined
+# by the bin_name module in the source directory. The workflow app uses this
+# same module to determine which binary to call in production.
+default_target = env.Program(target=bin_name.tiff_to_pdf_bin(),
+                             source=object_list)
+# If no target is specified, use the default.
+Default(default_target)
+
+# Install bin in gchub_db/bin
+install_path = os.path.join(os.path.dirname(os.path.dirname(tiff_to_pdf_src_dir)), 'bin')
+
+# User can 'scons install' to install the binary to the bin dir.
+env.Alias('install', env.Install(install_path, default_target))

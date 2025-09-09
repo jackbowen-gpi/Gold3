@@ -1,0 +1,60 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+<style type="text/css">
+  #login_outline {width:500px;margin-left:auto;margin-right:auto;
+                  text-align:center;background-color:white;
+                  border:3px solid gray}
+  #login_form_container {width:300px;text-align:center;margin: 0 auto}
+  .login_info_box {width:375px;text-align:center;margin: 0 auto;padding:6px}
+  img {vertical-align:bottom}
+  #body_wrap {background-color: transparent;border:none}
+</style>
+
+<script type="text/javascript">
+    // This focuses on the password text element.
+    function focus_on_password() {
+        $('id_password').focus();
+    }
+    
+    Event.observe(window, 'load', function() {
+        // Focus on the password box from the beginning.
+        focus_on_password();
+        // Every time they select a user, focus again.
+	    Event.observe('id_username', 'change', focus_on_password);
+	});
+</script>
+{% endblock %}
+
+{% block body %}
+<div class="outline" id="login_outline">
+  <p><img src="{{MEDIA_URL}}img/gold2logo.png" alt="GOLD Logo" /></p>
+  <p>
+    This site is limited to parties that have been explicitly granted access.
+    <br />
+    You must log in with a valid username and password.
+    <br />
+  </p>
+  {% if errors %}
+    <p><span class="warning">{{errors}}</span></p>
+  {% endif %}
+  <div class="graycontainer" id="login_form_container">
+    	<form method="post" action="/accounts/login/">
+    	  {% csrf_token %}
+    	  <p>
+    	     <label>Username</label>
+    		 {{form.username}}<br />
+    	   <label>Password</label>
+    	    {{form.password}}
+    	   <br /><br />
+    	   <input class="button" type="submit" value="Login" />
+    	  </p>
+    	</form>
+  </div>
+  <div class="outline login_info_box">
+    <img src="{{MEDIA_URL}}img/icons/information.png" alt="Information" />
+    Email <a href="mailto:{{EMAIL_SUPPORT}}">{{EMAIL_SUPPORT}}</a> to request 
+    access.
+  </div><br />
+</div>
+{% endblock %} 

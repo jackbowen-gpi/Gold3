@@ -1,0 +1,26 @@
+{% extends "standard.html" %}
+
+{% block body %}
+
+<h1 class="inline"><img src="{{MEDIA_URL}}img/icons/database_edit.png" style="vertical-align:text-center" /> Beverage Brand Codes</h1>
+<br />
+<table>
+	<tr>
+		<th>Code</th>
+		<th>Brand</th>
+	</tr>
+	{% for code in codes %}
+	<tr>
+		<td><strong>{{code.code}}</strong></td>
+		<td>
+			{{code.name}}
+			{% if perms.accounts.beverage_access %}
+				<a href="/workflow/beverage/code_manager/edit/{{code.id}}/">
+	    			<small>(edit)</small>
+				</a>
+			{% endif %}
+		</td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock %}

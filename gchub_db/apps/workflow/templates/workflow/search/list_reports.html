@@ -1,0 +1,114 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<h1>Available Reports</h1>
+<div class="outline_fancy" style="width:375px">
+	<h2>Job Reports</h2>
+		<a href="{% url "get_report" "job_unassigned" %}">
+		  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+		  All Jobs Unassigned
+		</a>
+		<br />
+		<a href="{% url "get_report" "job_hold" %}">
+		  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+		  All Jobs on Hold
+		</a>
+		<br />
+		<a href="{% url "get_report" "job_active" %}">
+		  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+		  Assigned Jobs in Process
+		</a>
+		<br />
+	<br />
+</div>
+<br />
+<div class="outline_fancy" style="width:375px">
+	<h2>Item Reports</h2>
+	<a href="{% url "get_report" "item_revision" %}">
+	  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+	  Items Needing Revision
+	</a>
+	<br />
+	{% if perms.accounts.beverage_access %}
+    <a href="{% url "get_report" "item_proofed" %}">
+      <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+      Items Recently Posted
+    </a>
+    <br />
+	{% endif %}
+	{% if perms.accounts.foodservice_access %}
+	<a href="{% url "get_report" "item_ninedigit" %}">
+	  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+	  Recent Nine Digit Numbers Added
+	</a>
+	<br />
+	<a href="{% url "get_report" "item_approved-noninedigit" %}">
+	  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+	  Items Approved w/o Nine Digit Numbers
+	</a>
+	<br />
+	{% endif %}
+	<a href="{% url "get_report" "item_fileout" %}">
+	  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+	  Items Recently Filed Out
+	</a>
+	<br />
+	<a href="{% url "get_report" "item_proof-notapproved" %}">
+	  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+	  Items Proofed, Reminder Sent, Awaiting Approval
+	</a>
+	<br />
+    <a href="{% url "get_report" "item_new-nutrition" %}">
+      <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+      Items Using New Nutrition Labels
+    </a>
+    <br />
+    <a href="{% url "get_report" "item_bioengineered" %}">
+      <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+      Items Using Bioengineered Labels
+    </a>
+    <br />
+	<a href="{% url "get_report" "item_makeship" %}">
+	  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+	  Make and Ship Items
+	</a>
+	<br />
+	<br />
+</div>
+<br />
+<div class="outline_fancy" style="width:375px">
+	<h2>Misc. Reports</h2>
+	{% if perms.accounts.beverage_access %}
+	<a href="{% url "inkcov_report" "None" %}">
+	  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+	  Ink Coverage by Plants
+	</a>
+	<br />
+	{% endif %}
+
+	{% if perms.accounts.foodservice_access %}
+	<a href="{% url "fsb_inkcov_report" %}">
+	  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+	  Ink Coverage by FSB Plants
+	</a>
+	<br />
+	{% endif %}
+
+	{% ifequal user.username "Cindy_Mueller" %}
+	<a href="{% url "fedex_shipments" %}">
+	  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+	  Recent Fedex Shipments
+	</a>
+	<br />
+	{% endifequal %}
+	{% if perms.accounts.clemson_employee %}
+	<a href="{% url "fedex_shipments" %}">
+	  <img src="{{MEDIA_URL}}img/icons/bullet_black.png" style="vertical-align:text-bottom" />
+	  Recent Fedex Shipments
+	</a>
+	<br />
+	{% endif %}
+
+	<br />
+</div>
+{% endblock %}

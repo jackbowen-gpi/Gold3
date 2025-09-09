@@ -1,0 +1,30 @@
+
+<div class="outline_fancy">
+	<h3 class="inline">Item: #{{item.num_in_job}} {{item}} - Tiff RIP information</h3>
+	<br>
+	<table>
+	{% if ripTiffs %}
+		<tr>
+			<th>Tiff</th>
+			<th>RIP</th>
+			<th>DGC Strategy</th>
+			<th>DGC Curve</th>
+		<tr>
+		{% for filename, rip in ripTiffs.items %}
+			<tr>
+				<td>{{filename}}</td>
+				{% for value in rip %}
+					<td>{{value}}</td>
+				{% endfor %}
+			</tr>
+		{% endfor %}
+	{% else %}
+		<p>No Tiffs have been created for this item</p>
+	{% endif %}
+	</table>
+
+	 <a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "production_detail"))'>
+      Back
+    </a>
+    <br />
+</div>

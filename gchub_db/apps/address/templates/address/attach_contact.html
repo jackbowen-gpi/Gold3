@@ -1,0 +1,46 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/address/address.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/fedex/fedex.js"></script>
+    {% include "address/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+  <h1>Attach Address to Job</h1>
+  {% include "address/navbar_div.inc.html" %}
+
+  <div class="outline" style="width:420px; padding-left:8px;">
+	<strong>{{contact.first_name}} {{contact.last_name}}</strong>
+	{% if contact.job_title %}- <em>{{contact.job_title}}</em>{% endif %}
+	<br />
+	<div style="padding-left:8px;">
+		{{contact.company}}<br />
+		{{contact.address1}}<br />
+		{% if contact.address2 %}{{contact.address2}}<br />{% endif %}
+		{{contact.city}}, {{contact.state}} {{contact.zip_code}} {{contact.country}}<br /><br />
+		T: {{contact.phone}} {% if contact.ext %}Ext: {{contact.ext}}{% endif %}<br />
+		{% if contact.fax %}F: {{contact.fax}}<br />{% endif %}
+		{% if contact.email %}E: {{contact.email}}<br />{% endif %}
+		<br />
+	</div>
+	You have chosen to attach this address to a job. Enter the number below.<br /><br />
+	<form id="contactdata" name="contactdata" onsubmit="contact_to_jobaddress();return false;">
+	<!-- This input will move from the address app to the workflow app, and populate the JobAddress table -->
+		<input type="hidden" name="name" id="id_name" value="{{contact.first_name}} {{contact.last_name}}" />
+		<input type="hidden" name="company" id="id_company" value="{{contact.company}}" />
+		<input type="hidden" name="title" id="id_title" value="{{contact.job_title}}" />
+		<input type="hidden" name="address1" id="id_address1" value="{{contact.address1}}" />
+		<input type="hidden" name="address2" id="id_address2" value="{{contact.address2}}" />
+		<input type="hidden" name="city" id="id_city" value="{{contact.city}}" />
+		<input type="hidden" name="state" id="id_state" value="{{contact.state}}" />
+		<input type="hidden" name="zip" id="id_zip" value="{{contact.zip_code}}" />
+		<input type="hidden" name="country" id="id_country" value="{{contact.country}}" />
+		<input type="hidden" name="phone" id="id_phone" value="{{contact.phone}}" />
+		<input type="hidden" name="email" id="id_email" value="{{contact.email}}" />
+		Job: <input name="job" id="id_job" type="text"></input><br />
+		<input type="submit" value="Attach to Job" onclick="contact_to_jobaddress();return false;" />
+	</form>
+  </div>
+{% endblock %}

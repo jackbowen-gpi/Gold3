@@ -1,0 +1,196 @@
+<img src="{{MEDIA_URL}}img/icons/date_edit.png"> <span class="sub_heading">Edit {{event}} for Items in {{job}}</span><br />
+	<br />
+	<div class="outline_fancy" style="width: 450px">
+
+		{% ifequal event "Preflight" %}
+			<form id="updateselected" name="updateselected" onsubmit="edit_all_items_update_selected('{{job.id}}', '{{event}}', 'Update');return false;">
+	            <br />
+	            <label for="items_checked">Item : </label>
+	            <div style="height: auto; margin: 0 0 10px 98px;">
+				<input type="checkbox" id="toggle_all_update_all" checked="checked"/>
+			    Toggle All
+			    <br />
+			    <br />
+
+	            Items that are greyed out can not be Preflighted.
+	            <br />
+	            <br />
+	 			{% for item in items %}
+	 			  <div style="height:auto;">
+	 			  {% if item.can_preflight %}
+					  <input type="checkbox" name="items_checked" checked="checked" id="update_all_item_{{item.id}}" value="{{item.id}}" />#{{item.num_in_job}}
+		 			  {{item}}
+	 			  {% else %}
+	 			  	  <input type="checkbox" disabled="true" name="items_checked" id="update_all_item_{{item.id}}" value="{{item.id}}" /><span style="color:lightgrey">#{{item.num_in_job}}
+		 			  {{item}}</span>
+	 			  {% endif %}
+	 			  </div>
+	 			{% endfor %}
+				</div>
+
+				<input type="submit" value="{{event}} selected items" />
+			</form>
+		{% endifequal %}
+		{% ifequal event "Proof" %}
+			<form id="updateselected" name="updateselected" onsubmit="edit_all_items_update_selected('{{job.id}}', '{{event}}', 'Update');return false;">
+	            <br />
+	            <label for="items_checked">Item : </label>
+	            <div style="height: auto; margin: 0 0 10px 98px;">
+				<input type="checkbox" id="toggle_all_update_all" checked="checked"/>
+			    Toggle All
+			    <br />
+			    <br />
+
+	            Items that are greyed out can not be Proofed.
+	            <br />
+	            <br />
+	 			{% for item in items %}
+	 			  <div style="height:auto;">
+	 			  {% if item.can_proof %}
+					  <input type="checkbox" name="items_checked" checked="checked" id="update_all_item_{{item.id}}" value="{{item.id}}" />#{{item.num_in_job}}
+		 			  {{item}}
+	 			  {% else %}
+	 			  	  <input type="checkbox" disabled="true" name="items_checked" id="update_all_item_{{item.id}}" value="{{item.id}}" /><span style="color:lightgrey">#{{item.num_in_job}}
+		 			  {{item}}</span>
+	 			  {% endif %}
+	 			  </div>
+	 			{% endfor %}
+				</div>
+
+				<input type="submit" value="{{event}} selected items" />
+			</form>
+		{% endifequal %}
+		{% ifequal event "Approve" %}
+			<form id="updateselected" name="updateselected" onsubmit="edit_all_items_update_selected('{{job.id}}', '{{event}}', 'Update');return false;">
+	            <br />
+	            <label for="items_checked">Item : </label>
+	            <div style="height: auto; margin: 0 0 10px 98px;">
+				<input type="checkbox" id="toggle_all_update_all" checked="checked"/>
+			    Toggle All
+			    <br />
+			    <br />
+
+	            Items that are greyed out can not be Approved.
+	            <br />
+	            <br />
+	 			{% for item in items %}
+	 			  <div style="height:auto;">
+	 			  {% if item.can_approve %}
+					  <input type="checkbox" name="items_checked" checked="checked" id="update_all_item_{{item.id}}" value="{{item.id}}" />#{{item.num_in_job}}
+		 			  {{item}}
+	 			  {% else %}
+	 			  	  <input type="checkbox" disabled="true" name="items_checked" id="update_all_item_{{item.id}}" value="{{item.id}}" /><span style="color:lightgrey">#{{item.num_in_job}}
+		 			  {{item}}</span>
+	 			  {% endif %}
+	 			  </div>
+	 			{% endfor %}
+				</div>
+
+				<input type="submit" value="{{event}} selected items" />
+			</form>
+		{% endifequal %}
+		{% ifequal event "Forecast" %}
+			{% ifequal job.workflow.name "Foodservice" %}
+				<tr>
+					<td>
+						{% if perms.workflow.can_forecast_item %}
+						<form id="updateselected" name="updateselected"  onsubmit="edit_all_items_update_selected('{{job.id}}', '{{event}}', 'Update');return false;">
+							<br />
+				            <label for="items_checked">Item : </label>
+				            <div style="height: auto; margin: 0 0 10px 98px;">
+								<input type="checkbox" id="toggle_all_update_all" checked="checked"/>
+							    Toggle All
+							    <br />
+							    <br />
+
+					            Items that are greyed out can not be Forcasted.
+					            <br />
+					            <br />
+					 			{% for item in items %}
+					 			  <div style="height:auto;">
+					 			  {% if item.can_forecast %}
+									  <input type="checkbox" name="items_checked" checked="checked" id="update_all_item_{{item.id}}" value="{{item.id}}" />#{{item.num_in_job}}
+						 			  {{item}}
+					 			  {% else %}
+					 			  	  <input type="checkbox" disabled="true" name="items_checked" id="update_all_item_{{item.id}}" value="{{item.id}}" /><span style="color:lightgrey">#{{item.num_in_job}}
+						 			  {{item}}</span>
+					 			  {% endif %}
+					 			  </div>
+					 			{% endfor %}
+
+								<img src="{{MEDIA_URL}}img/icons/rainbow.png" style="vertical-align: text-bottom" />
+								Forecast
+								<input type="input" name="items_forecast" id="forecast_submit"/>
+								<br />
+								<input type="submit" name="forecast_submit" id="forecast_submit" value="Forecast All"/>
+							</div>
+						</form>
+						{% else %}
+						<img src="{{MEDIA_URL}}img/icons/rainbow.png" style="vertical-align: text-bottom" /> Forecast All
+						{% endif %}
+					</td>
+					<td>
+						<span class="warning">{% for item in items_no_forecast %}({{item.num_in_job}})-{{item.size}} &nbsp;{% endfor %}</span>
+					</td>
+				</tr>
+			{% endifequal %}
+		{% endifequal %}
+		{% ifequal event "Remake PDFs" %}
+			{% ifequal job.workflow.name "Beverage" %}
+				{% if perms.accounts.clemson_employee %}
+					<form id="updateselected" name="updateselected" onsubmit="edit_all_items_update_selected('{{job.id}}', '{{event}}', 'Update');return false;">
+			            <br />
+			            <label for="items_checked">Item : </label>
+			            <div style="height: auto; margin: 0 0 10px 98px;">
+						<input type="checkbox" id="toggle_all_update_all" checked="checked"/>
+					    Toggle All
+					    <br />
+					    <br />
+
+			            Items that are greyed out can not have PDFs Remade.
+			            <br />
+			            <br />
+			 			{% for item in items %}
+			 			  <div style="height:auto;">
+							  <input type="checkbox" name="items_checked" checked="checked" id="update_all_item_{{item.id}}" value="{{item.id}}" />#{{item.num_in_job}}
+				 			  {{item}}
+			 			  </div>
+			 			{% endfor %}
+						</div>
+
+						<input type="submit" value="Remake PDFs for selected items" />
+					</form>
+				{% endif %}
+			{% endifequal %}
+		{% endifequal %}
+		{% ifequal event "File Out" %}
+			<form id="updateselected" name="updateselected" onsubmit="edit_all_items_update_selected('{{job.id}}', '{{event}}', 'Update');return false;">
+	            <br />
+	            <label for="items_checked">Item : </label>
+	            <div style="height: auto; margin: 0 0 10px 98px;">
+				<input type="checkbox" id="toggle_all_update_all" checked="checked"/>
+			    Toggle All
+			    <br />
+			    <br />
+
+	            Items that are greyed out can not be Filed Out.
+	            <br />
+	            <br />
+	 			{% for item in items %}
+	 			  <div style="height:auto;">
+	 			  {% if item.can_file_out %}
+					  <input type="checkbox" name="items_checked" checked="checked" id="update_all_item_{{item.id}}" value="{{item.id}}" />#{{item.num_in_job}}
+		 			  {{item}}
+	 			  {% else %}
+	 			  	  <input type="checkbox" disabled="true" name="items_checked" id="update_all_item_{{item.id}}" value="{{item.id}}" /><span style="color:lightgrey">#{{item.num_in_job}}
+		 			  {{item}}</span>
+	 			  {% endif %}
+	 			  </div>
+	 			{% endfor %}
+				</div>
+
+				<input type="submit" value="{{event}} selected items" />
+			</form>
+		{% endifequal %}
+	</div>
+	<br />

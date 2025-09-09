@@ -1,0 +1,9 @@
+{% include "emails/email_header.txt" %}
+
+This is an automated email telling you that there was an error trying to process a ColorKey in the ColorKey Queue
+
+Item: {{entry.item}}
+Job: {{entry.item.job}}
+ColorKeyQueue ID: {{entry.id}}
+
+Attempts: {{entry.number_of_attempts}}

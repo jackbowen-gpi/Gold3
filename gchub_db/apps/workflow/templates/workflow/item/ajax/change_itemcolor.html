@@ -1,0 +1,65 @@
+	<img src="{{MEDIA_URL}}img/icons/color_wheel.png">
+	<span class="sub_heading">Change Plate Info on Item {{color.item.num_in_job}}, {{color.item}}, {{color.item.job.workflow.name}}</span><br />
+	<br />
+	{% ifequal color.item.job.workflow.name "Beverage" %}
+		<strong>Currently: Seq:</strong> {{color.sequence}}  <strong>Color:</strong> {{color.color}}  <strong>Code:</strong> {{color.plate_code}}
+		<br />
+		{% if perms.accounts.clemson_employee %}
+			<a href='javascript:delete_itemcolor("{{color.id}}", "{{color.item.job.id}}", "{{color.item.id}}")'><img src="{{MEDIA_URL}}img/icons/delete.png" style="vertical-align: text-bottom" /> Delete Color</a>
+		{% endif %}
+	{% endifequal %}
+	{% if color.item.job.workflow.name == "Carton" %}
+		<strong>Currently: Seq:</strong> {{color.sequence}}  <strong>Color:</strong> {{color.color}}
+		{% if perms.accounts.clemson_employee %}
+			<a href='javascript:delete_itemcolor("{{color.id}}", "{{color.item.job.id}}", "{{color.item.id}}")'><img src="{{MEDIA_URL}}img/icons/delete.png" style="vertical-align: text-bottom" /> Delete Color</a>
+		{% endif %}
+	{% endif %}
+	<br /><br />
+	<form id="itemcolor" name="itemcolor" onsubmit="change_itemcolor('{{color.id}}', '{{color.item.id}}');return false;">
+		<input type="hidden" name="item" id="id_item" value="{{color.item.id}}">
+		<table border="0">
+		{% ifequal color.item.job.workflow.name "Beverage" %}
+			<tr>
+				<td><label for="id_sequence">Seq:</label> {{form.sequence}}</td>
+			</tr>
+			<tr>
+				<td><label for="id_color">Color:</label> {{form.definition}}</td>
+			</tr>
+			<tr>
+				<td><label for="id_screened">Screened:</label> {{form.screened}}</td>
+			</tr>
+		{% endifequal %}
+		{% if color.item.job.workflow.name != "Carton" %}
+		<tr>
+			<td><label for="id_plate_code">Plate Code:</label> {{form.plate_code}}</td>
+		</tr>
+		{% endif %}
+		{% ifequal color.item.job.workflow.name "Beverage" %}
+			<tr>
+				<td><label for="id_num_plates">Plate Qty:</label> {{form.num_plates}}</td>
+			</tr>
+		{% endifequal %}
+		{% if color.item.job.workflow.name == "Carton" %}
+			<input type="hidden" name="changePicker" id="changePicker" value="{{color.hexvalue}}" />
+			<input id="hexvalue" type="hidden" value="{{color.hexvalue}}" />
+			<tr>
+				<td><label for="id_sequence">Seq:</label> {{form.sequence}}</td>
+			</tr>
+			<tr>
+				<td><label for="id_definition">PMS Color:</label> {{form.definition}}</td>
+			</tr>
+			<tr>
+				<td><label for="id_color">Color Map:</label> {{form.color}}</td>
+			</tr>
+			<tr>
+				<td><label>Color Picker:</label><div style='display:none' id='divPicker'><input id='changeColorPicker' type='hidden' class="basic"/></div></td>
+			</tr>
+		{% endif %}
+		</table>
+		<br />
+		{% if color.item.job.workflow.name == "Carton" %}
+			<input type="submit" value="Edit Color" onclick="change_itemcolor('{{color.id}}', '{{color.item.id}}', 'Carton');return false;" />
+		{% else %}
+			<input type="submit" value="Edit Color" onclick="change_itemcolor('{{color.id}}', '{{color.item.id}}', '{{color.item.job.workflow.name}}');return false;" />
+		{% endif %}
+	</form>

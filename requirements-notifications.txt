@@ -1,0 +1,14 @@
+# Windows Notification Dependencies
+# Choose ONE of these options:
+
+# Option 1: win10toast (Simplest, Windows 10/11 only)
+win10toast==0.9
+
+# Option 2: plyer (Cross-platform, more features)
+# plyer==2.1.0
+
+# Option 3: windows-toasts (Most modern, Windows 10/11, rich features)
+# windows-toasts==1.0.0
+
+# For development/testing on non-Windows systems
+# psutil==5.9.0  # For system info if needed

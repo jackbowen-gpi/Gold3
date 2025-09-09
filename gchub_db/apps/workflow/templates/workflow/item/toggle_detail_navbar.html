@@ -1,0 +1,60 @@
+<span class="sub_heading">Item #{{ item.num_in_job }} - {{item}}
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "timeline_detail"))'
+  {% ifequal view "timeline" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>TIMELINE</a>
+
+<a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "production_detail"))'
+  {% ifequal view "production" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>PRODUCTION</a>
+
+{% ifnotequal job.workflow.name "Container" %}
+<a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "billing_detail"))'
+  {% ifequal view "billing" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>BILLING</a>
+{% endifnotequal %}
+
+{% if perms.accounts.clemson_employee or perms.accounts.shelbyville_platemaking %}
+<a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "jdf_detail"))'
+  {% ifequal view "jdf" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>JDF</a>
+ {% endif %}
+
+{% if perms.accounts.clemson_employee %}
+<a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "internal_detail"))'
+  {% ifequal view "internal" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>INTERNAL</a>
+ {% endif %}
+
+<a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "ink_data"))'
+  {% ifequal view "ink_data" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>INK DATA</a>
+
+{% if job.workflow.name == "Carton" %}
+<a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "sap_detail"))'
+  {% ifequal view "sap" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endifequal %}>SAP</a>
+{% endif %}
+
+<br />

@@ -1,0 +1,81 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<h1>Spec Sheet View for: {{job}}</h1>
+<div style="padding:3px">Return to <a href="{{job.get_absolute_url}}">job detail page</a>.</div>
+
+<div class="grey_bordered">
+	{% for item in job.item_set.all %}
+	<table width="500px">
+		<tr>
+			<th colspan="4">{{item.num_in_job}} - {{item.size}}</th>
+		</tr>
+		<tr>
+			<th width="60px">Plant:</th>
+			<td width="130px">{{item.printlocation.plant}}</td>
+			<th width="60px">Press:</th>
+			<td>{{item.printlocation.press}}{% if item.special_mfg %} - {{item.special_mfg}}{% endif %}</td>
+		</tr>
+		<tr>
+			<th width="60px">Case Pk:</th>
+			<td width="130px">{{item.case_pack}}</td>
+			<th width="60px">Ann. Use:</th>
+			<td>{{item.annual_use}}</td>
+		</tr>
+		<tr>
+			<th width="60px">Approval:</th>
+			<td width="130px">{% if item.approval_date %}
+									<img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" />
+									{{ item.approval_date|date:"n-j-Y" }}
+								{% else %}
+									<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align:text-bottom" />
+								{% endif %}
+			</td>
+			<th width="60px">9 Digit#:</th>
+			<td>{{item.fsb_nine_digit}} ({{item.fsb_nine_digit_date|date:"n-j-Y"}})</td>
+		</tr>
+		<tr>
+			<th width="60px">SCC#:</th>
+			<td width="130px">{{item.bom_number}}</td>
+			<th width="60px">WRIN#:</th>
+			<td>{{item.wrin_number}}</td>
+		</tr>
+		<tr>
+			<th width="60px">UPC#:</th>
+			<td width="130px">{{item.upc_number}}</td>
+			<th width="60px">&nbsp;</th>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<th colspan="2">Description:</th>
+			<th colspan="2">
+				Ink Usage:<br />
+			</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				{% for line in item.get_specsheet_description%}
+					{{ line }}<br />
+				{% endfor %}
+			</td>
+			<td colspan="2">
+				<strong><em>{{item.get_inkbook_display}}</em></strong>
+				<table>
+					{% for itemcolor in item.itemcolor_set.all %}
+						<tr>
+							<td style="background-color:{{itemcolor.hexvalue}}">&nbsp;&nbsp;</td>
+							<td>{{ itemcolor.fsb_display_name }}</td>
+							<td>{{ itemcolor.coverage_sqin }}</td>
+							<td>{{ itemcolor.lpi|floatformat:0 }}</td>
+							<td>{{ itemcolor.angle|floatformat:0 }}&#186;</td>
+						</tr>
+					{% endfor %}
+				</table>
+			</td>
+		</tr>
+	</table>
+	{% endfor %}
+</div>
+
+<div style="padding:3px">Return to <a href="{{job.get_absolute_url}}">job detail page</a>.</div>
+{% endblock %}

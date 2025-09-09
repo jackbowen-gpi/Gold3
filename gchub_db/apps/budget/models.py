@@ -1,0 +1,54 @@
+from django.contrib.sites.models import Site
+from django.db import models
+
+
+class Budget(models.Model):
+    """Defines department budget number on a monthly basis, divided by workflow."""
+
+    year = models.IntegerField()
+    workflow = models.ForeignKey(Site, on_delete=models.CASCADE)
+    January = models.IntegerField()
+    February = models.IntegerField()
+    March = models.IntegerField()
+    April = models.IntegerField()
+    May = models.IntegerField()
+    June = models.IntegerField()
+    July = models.IntegerField()
+    August = models.IntegerField()
+    September = models.IntegerField()
+    October = models.IntegerField()
+    November = models.IntegerField()
+    December = models.IntegerField()
+
+    class Meta:
+        verbose_name_plural = "Budget"
+        unique_together = (
+            (
+                "year",
+                "workflow",
+            ),
+        )
+
+    def __str__(self):
+        return str(self.year) + " - " + str(self.workflow)
+
+
+class InvoiceAmt(models.Model):
+    """Store invoiced amounts for each month, FK'd to Budget."""
+
+    budget = models.OneToOneField(Budget, on_delete=models.CASCADE)
+    January = models.IntegerField(blank=True, null=True)
+    February = models.IntegerField(blank=True, null=True)
+    March = models.IntegerField(blank=True, null=True)
+    April = models.IntegerField(blank=True, null=True)
+    May = models.IntegerField(blank=True, null=True)
+    June = models.IntegerField(blank=True, null=True)
+    July = models.IntegerField(blank=True, null=True)
+    August = models.IntegerField(blank=True, null=True)
+    September = models.IntegerField(blank=True, null=True)
+    October = models.IntegerField(blank=True, null=True)
+    November = models.IntegerField(blank=True, null=True)
+    December = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Invoice Amounts"

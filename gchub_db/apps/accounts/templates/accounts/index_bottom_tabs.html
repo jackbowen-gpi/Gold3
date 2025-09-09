@@ -1,0 +1,99 @@
+{% if perms.accounts.clemson_employee %}
+<div id="bottom_tabview" class="yui-navset">
+    <ul class="yui-nav">
+        <li class="selected">
+          <a href="#tab1"><em>Upcoming Events</em></a>
+        </li>
+        <li>
+          <a href="#tab2">
+            <em>
+              GOLD Changes
+              {% if gold_changes_today != 0 %}
+              ({{gold_changes_today}} recent)
+              {% endif %}
+            </em>
+          </a>
+        </li>
+        <li>
+          <a href="#tab3">
+            <em>Wiki Search</em>
+          </a>
+        </li>
+    </ul>
+    <div class="yui-content" style="background: #FFFFFF;">
+      <div style="background: #FFFFFF url('/media/img/calendar_bg.jpg') no-repeat top right;">
+        {# BEGIN: EVENT TAB #}
+        {% for day in daily_events %}
+          <h3 class="home_event_day">{{day.0.event_date|date:"l, M j"}}:</h3>
+          <br />
+          {% for event in day %}
+            <div class="home_event_entry">
+              &#149; {{event.get_event_line_html|safe}}
+            </div>
+          {% endfor %}
+        {% endfor %}
+        <br />
+        <a href="/calendar/month/{% now "Y" %}/{% now "n" %}/">
+           <img src='{{MEDIA_URL}}img/icons/calendar.png'
+                style="vertical-align:bottom" alt="Calendar"/> Go to Calendar
+        </a>
+      </div>
+      <div style="background: #FFFFFF url('/media/img/thundercuddles_bg.jpg') no-repeat top right;">
+        {# BEGIN: CHANGES #}
+        {% for day in gold_changes %}
+          <h3 class="home_event_day">{{day.0.creation_date|date:"l, M j"}}:</h3>
+          <br />
+          {% for change in day %}
+            <div class="home_event_entry">
+              &#149; {{change.change|safe}}
+            </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+      <div>
+        {# BEGIN: WIKI SEARCH #}
+        <h3>Find it Quick</h3>
+        <p>
+          The <a href="http://wiki.na.graphicpkg.pri">Wiki</a> is an excellent source
+          for documentation on our workflow
+          and the systems used at Clemson. If you have a question about
+          something, enter a keyword below and search on it.
+        </p>
+        <p>
+          <form action="http://wiki.na.graphicpkg.pri/index.php" id="wiki_searchform">
+          <div>
+            <input type='hidden' name="title" value="Special:Search"/>
+            <input id="searchInput" name="search" type="text"
+                   title="Search GCHUB Wiki [f]" accesskey="f" value="" />
+            <input type='submit' name="fulltext" id="mw-searchButton"
+                   value="Search" title="Search the pages for this text" />
+          </div>
+          </form>
+          <br />
+          <br />
+
+	    <h3>Add a Quote to the Wiki</h3>
+	      	<form action="/accounts/wiki/">
+		      <div>
+		        <input type='hidden' name="title" value="Template:IntelligentQuotes"/>
+		        Quote:<input type='input' name="quote" value=""/>
+				By:<input type='input' name="person" value=""/>
+		        <input type='submit' name="" id="mw-addButton"
+		               value="Add" title="Add a quote to the wiki" />
+		      </div>
+		    </form>
+        </p>
+
+        <br />
+        <h3>Contribute Your Knowledge</h3>
+        <p>
+          If you have free time, it would be greatly appreciated if you'd
+          look at the <a href="http://wiki.na.graphicpkg.pri/index.php/Requests_for_Documentation">
+          Requests for Documentation</a> page and tackle any of the topics
+          there that you can. Browsing the Wiki and fixing or improving
+          things at random is also a great way to help.
+        </p>
+      </div>
+    </div>
+</div>
+{% endif %}

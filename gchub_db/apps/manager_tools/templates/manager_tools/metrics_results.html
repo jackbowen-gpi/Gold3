@@ -1,0 +1,161 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+    <!-- Google Charts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load("46", {packages:["corechart"]});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            // Load the data from the view.
+            var item_data = google.visualization.arrayToDataTable({{items_table_data|safe}});
+            var charges_data = google.visualization.arrayToDataTable({{charges_table_data|safe}});
+            var qc_reviews_data = google.visualization.arrayToDataTable({{qc_reviews_table_data|safe}});
+            var items_proofed_data = google.visualization.arrayToDataTable({{items_proofed_table_data|safe}});
+            var items_preflighted_data = google.visualization.arrayToDataTable({{items_preflighted_table_data|safe}});
+            var revisions_proofed_data = google.visualization.arrayToDataTable({{revisions_proofed_table_data|safe}});
+            var final_filed_data = google.visualization.arrayToDataTable({{final_filed_table_data|safe}});
+
+            // Set shared options for bar annotations.
+            var view_options = {
+            	calc: "stringify",
+            	sourceColumn: 1,
+            	type: "string",
+            	role: "annotation"
+            };
+
+            // Load data into views and set bar annotations.
+            var item_view = new google.visualization.DataView(item_data);
+            item_view.setColumns([0, 1, view_options]);
+            var charges_view = new google.visualization.DataView(charges_data);
+            charges_view.setColumns([0, 1, view_options]);
+            var qc_reviews_view = new google.visualization.DataView(qc_reviews_data);
+            qc_reviews_view.setColumns([0, 1, view_options]);
+            var items_proofed_view = new google.visualization.DataView(items_proofed_data);
+            items_proofed_view.setColumns([0, 1, view_options]);
+            var items_preflighted_view = new google.visualization.DataView(items_preflighted_data);
+            items_preflighted_view.setColumns([0, 1, view_options]);
+            var revisions_proofed_view = new google.visualization.DataView(revisions_proofed_data);
+            revisions_proofed_view.setColumns([0, 1, view_options]);
+            var final_filed_view = new google.visualization.DataView(final_filed_data);
+            final_filed_view.setColumns([0, 1, view_options]);
+
+            //Set shared options for charts.
+            var options = {
+                width: 600,
+                height: 500,
+                bar: {groupWidth: "95%"},
+                legend: { position: "none" }
+            };
+
+			// Create charts
+            var item_chart = new google.visualization.BarChart(document.getElementById("items_chart"));
+            var charges_chart = new google.visualization.BarChart(document.getElementById("charges_chart"));
+            var qc_reviews_chart = new google.visualization.BarChart(document.getElementById("qc_reviews_chart"));
+            var items_proofed_chart = new google.visualization.BarChart(document.getElementById("items_proofed_chart"));
+            var items_preflighted_chart = new google.visualization.BarChart(document.getElementById("items_preflighted_chart"));
+            var revisions_proofed_chart = new google.visualization.BarChart(document.getElementById("revisions_proofed_chart"));
+            var final_filed_chart = new google.visualization.BarChart(document.getElementById("final_filed_chart"));
+
+            // Set title and draw charts
+            options.title = "Items per Artist";
+            item_chart.draw(item_view, options);
+            options.title = "Amount Charged";
+            charges_chart.draw(charges_view, options);
+            options.title = "QC Reviews";
+            qc_reviews_chart.draw(qc_reviews_view, options);
+            options.title = "Items Proofed";
+            items_proofed_chart.draw(items_proofed_view, options);
+            options.title = "Items Preflighted";
+            items_preflighted_chart.draw(items_preflighted_view, options);
+            options.title = "Revisions Proofed";
+            revisions_proofed_chart.draw(revisions_proofed_view, options);
+            options.title = "Items Final Filed";
+            final_filed_chart.draw(final_filed_view, options);
+
+        } //end drawChart()
+      </script>
+{% endblock %}
+
+{% block body %}
+<h1>{{page_title}} from {{ date_from }} to {{ date_to }}</h1>
+<hr />
+<br />
+
+<!-- Back link -->
+<h3>
+	<a href="/manager_tools/metrics/" >
+		<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+		Back
+	</a>
+</h3>
+<br />
+
+<!-- User data table -->
+<h2>Data</h2>
+{% load humanize %}
+<table class="rowHover">
+	<tr>
+		<th>Name</th>
+		<th>Items</th>
+		<th>Amt. Charged</th>
+		<th>QC Reviews</th>
+		<th>Items Proofed</th>
+		<th>Items Preflighted</th>
+		<th>Revisions Proofed</th>
+		<th>Items Final Filed</th>
+	</tr>
+{% for data in user_data %}
+	<tr>
+		<td>{{data.name}}</td>
+		<td style="text-align:right;">{{data.num_items}}</td>
+		<td style="text-align:right;">${{data.amt_charged|floatformat:2|intcomma}}</td>
+		<td style="text-align:right;">{{data.total_num_qcs_reviews}}</td>
+		<td style="text-align:right;">{{data.num_proof_outs}}</td>
+		<td style="text-align:right;">{{data.num_preflights}}</td>
+		<td style="text-align:right;">{{data.num_revisions_proofed}}</td>
+		<td style="text-align:right;">{{data.num_final_file}}</td>
+	</tr>
+{% endfor %}
+</table>
+
+<!-- Download links-->
+<div>
+	<a href="excel/{{ date_from.year }}/{{ date_from.month }}/{{ date_from.day }}/to/{{ date_to.year }}/{{ date_to.month }}/{{ date_to.day }}/" >
+		<img src="{{MEDIA_URL}}img/icons/page_excel.png">
+		Download data as Excel.
+	</a>
+	<br />
+	<a href="pdf/{{ date_from.year }}/{{ date_from.month }}/{{ date_from.day }}/to/{{ date_to.year }}/{{ date_to.month }}/{{ date_to.day }}/" >
+		<img src="{{MEDIA_URL}}img/icons/page_white_acrobat.png">
+		Download data as a PDF report.
+	</a>
+</div>
+<br />
+
+<!-- Items per artist chart -->
+<div class="outline_fancy" style="width:600px" id="items_chart"></div>
+<!-- Amount charged chart -->
+<div class="outline_fancy" style="width:600px" id="charges_chart"></div>
+<!-- QCs Reviewed chart -->
+<div class="outline_fancy" style="width:600px" id="qc_reviews_chart"></div>
+<!-- Items proofed chart -->
+<div class="outline_fancy" style="width:600px" id="items_proofed_chart"></div>
+<!-- Items Preflighted chart -->
+<div class="outline_fancy" style="width:600px" id="items_preflighted_chart"></div>
+<!-- Revisions proofed chart -->
+<div class="outline_fancy" style="width:600px" id="revisions_proofed_chart"></div>
+<!-- Items final filed chart -->
+<div class="outline_fancy" style="width:600px" id="final_filed_chart"></div>
+
+<!-- Back link -->
+<h3>
+	<a href="/manager_tools/metrics/" >
+		<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+		Back
+	</a>
+</h3>
+<br />
+
+{% endblock %}

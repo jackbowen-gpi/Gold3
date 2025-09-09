@@ -1,0 +1,68 @@
+from django.urls import re_path as url
+
+from gchub_db.apps.auto_corrugated.views import *
+
+urlpatterns = [
+    url(
+        r"^pdf_generation_form/(?P<box_id>\d+)/",
+        pdf_generation_form,
+        name="auto_corrugated_pdf_generation_form_remake",
+    ),
+    url(
+        r"^pdf_generation_form/edit/(?P<box_id>\d+)/",
+        pdf_generation_form_edit,
+        name="auto_corrugated_pdf_generation_form_edit",
+    ),
+    url(
+        r"^pdf_generation_form/",
+        pdf_generation_form,
+        name="auto_corrugated_pdf_generation_form",
+    ),
+    url(
+        r"^pdf_label_generation_form/",
+        pdf_label_generation_form,
+        name="auto_corrugated_pdf_label_generation_form",
+    ),
+    url(
+        r"^json/get_boxitem_specs/",
+        json_get_boxitem_specs,
+        name="auto_corrugated_json_get_boxitem_specs",
+    ),
+    url(
+        r"^json/get_boxitem_dimensions/",
+        json_get_boxitem_dimensions,
+        name="auto_corrugated_json_get_boxitem_dimensions",
+    ),
+    url(r"^box_search_form/", box_search_form, name="auto_corrugated_box_search_form"),
+    url(
+        r"^label_search_form/",
+        label_search_form,
+        name="auto_corrugated_label_search_form",
+    ),
+    url(
+        r"^view_box_data/(?P<box_id>\d+)/",
+        view_box_data,
+        name="auto_corrugated_view_box_data",
+    ),
+    url(
+        r"^approve/(?P<box_id>\d+)/(?P<type>\D+)/",
+        approve_box,
+        name="auto_corrugated_approve_box",
+    ),
+    url(
+        r"^view_label_data/(?P<label_id>\d+)/",
+        view_label_data,
+        name="auto_corrugated_view_label_data",
+    ),
+    url(
+        r"^generate_box/(?P<box_id>\d+)/(?P<method>\D+)/",
+        generate_box,
+        name="auto_corrugated_generate_box",
+    ),
+    url(
+        r"^generate_label/(?P<label_id>\d+)/",
+        generate_label,
+        name="auto_corrugated_generate_label",
+    ),
+    url(r"^help/", help, name="auto_corrugated_help"),
+]

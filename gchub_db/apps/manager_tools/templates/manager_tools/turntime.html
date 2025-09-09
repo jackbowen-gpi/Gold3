@@ -1,0 +1,118 @@
+{% extends "standard.html" %}
+
+{% block extra_head %} 
+	<style type="text/css">
+		input {
+			border: none;
+			padding: 0;
+			margin: 0;
+			vertical-align: text-bottom;
+		}
+	</style>
+  
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript"> 
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using 
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+		
+		//jQuery stuff.
+		$j(document).ready(function(){
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+			// Show busy indicator
+			$j( "#submit, a" ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("This can take a moment...");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+			});
+		});//End jQuery stuff.
+	</script>
+{% endblock %}
+
+{% block body %}
+<h1>{{page_title}}</h1>
+<hr />
+
+<!---Busy dialog-->
+<div id="busy_dialog">
+  <center>
+	  <p><div id="busy_dialog_text"></div></p>
+	  <img src="{{MEDIA_URL}}img/spinner.gif" />
+  <center>
+</div>
+
+<div style="width:50%">
+	<p>
+	Year-to-date info about average turn times for items. Foodservice is
+    measured from print location assignment date to first proof date. Evergreen 
+    is measured from first preflight date to first proof date.
+    </p>
+
+	<p>
+    <strong>Note:</strong> This report only goes back to 2018 due to a bug in 
+    the data that didn't get fixed until mid-February 2018.
+    </p>
+</div>
+
+<h3>
+	<a href="/manager_tools/" >
+		<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+		Back
+	</a>
+</h3>
+<br />
+
+<!-- Data table -->
+<div class="grey_bordered">
+	<h2> 
+		<form method="post">
+			{% csrf_token %}
+			Average {{turnform.workflow}} turn times for {{turnform.year}}
+		<input type="image" src="{{MEDIA_URL}}img/icons/arrow_refresh.png" alt="Submit" id="submit" />
+		</form>
+	</h2>
+	
+	<!-- welcome message is only shown on the quick initial page load.-->
+	{% if welcome_message %}
+		<p>{{welcome_message}}</p>
+	{% else %}
+		<table class="rowHover">
+			<tr>
+				<th style="text-align:center;">Month</th>			
+				<th style="text-align:center;">Days</th>
+			</tr>
+		{% for month in turn_data %}
+			<tr class="{% cycle 'rowA' 'rowB' %}">
+				<td>
+					<!-- Make a link to the artist breakdowns -->
+					<a href="/manager_tools/turntime/artists/{{month.name}}/{{year}}/{{workflow}}/">
+						{{month.name}}
+						<!-- Display this extra text if it's the last month of the current year. -->
+						{% if year == current_year%}
+							{% if month == turn_data|last  %}
+								(month to date)
+							{% endif %}
+						{% endif %}
+					</a> <!-- Close the link to the artists breakdowns -->
+				</td>	
+				<td style="text-align:right;">{{month.days}}</td>
+			</tr>
+		{% endfor %}
+		</table>
+	{% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,372 @@
+{% extends "standard.html" %}
+
+{% block page_title %}e-Tools Request: {{job.id}} {{job.name}}{% endblock %}
+
+{% block extra_head %}
+<!-- Dependencies -->
+<!-- Sam Skin CSS for TabView -->
+<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/tabview/assets/skins/sam/tabview.css" />
+
+<!-- JavaScript Dependencies for Tabview: -->
+<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/element/element-min.js"></script>
+
+<!-- Source file for TabView -->
+<script type="text/javascript" src="{{YUI_URL}}build/tabview/tabview-min.js"></script>
+
+<script type="text/javascript">
+YAHOO.util.Event.onContentReady("etools_tabview", function () {
+	var myTabs = new YAHOO.widget.TabView("etools_tabview");
+
+});
+</script>
+<style type="text/css">
+  .label_td {
+    border:1px solid white;
+    border-right:1px solid gray;
+    background-color:transparent;
+    text-align:right;
+    font-weight:bold;
+    width:18%;
+  }
+  .data_td {
+    border:1px solid gray;
+    background-color:white;
+    padding:4px;
+    width:30%;
+  }
+  table { width:95%; }
+</style>
+{% endblock %}
+
+{% block body %}
+<h1>e-Tools Request: {{job.id}} {{job.name}}</h1>
+<p>&larr; <a href='{% url "job_detail" job.id %}'>Back to Job detail page</a></p>
+
+<div class="yui-skin-sam">
+<div id="etools_tabview" class="yui-navset">
+    <ul class="yui-nav">
+        <li class="selected"><a href="#tab1"><em>Job Info</em></a></li>
+        <li><a href="#tab2"><em>Raw Data</em></a></li>
+    </ul>
+    <div class="yui-content">
+      <div>
+        {# BEGIN: JOB INFO TAB #}
+        <table class='etools_table'>
+          <caption>General Info</caption>
+          <tr>
+            <td class='label_td'>GOLD Job</td>
+            <td class='data_td'>{{ejob.Job_ID}} {{ejob.job_name}}</td>
+
+            <td class='label_td'>ETools ID</td>
+            <td class='data_td'>{{ejob.Request_ID}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Contact</td>
+            <td class='data_td'>{{ejob.contact_name}}</td>
+
+            <td class='label_td'>Contact Email</td>
+            <td class='data_td'>{{ejob.contact_email}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Date Created</td>
+            <td class='data_td'>{{ejob.Date_Created|date:"m/d/y"}}</td>
+
+            <td class='label_td'>Date Needed By</td>
+            <td class='data_td'>{{ejob.dateneeded|date:"m/d/y"}}</td>
+          </tr>
+        </table>
+
+        <table class='etools_table'>
+          <caption>Details</caption>
+          <tr>
+            <td class='label_td'>Art Type</td>
+            <td class='data_td'>{{ejob.arttype}}</td>
+
+            <td class='label_td'>Print Group</td>
+            <td class='data_td'>{{ejob.printgroup}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Market Segment</td>
+            <td class='data_td'>{{ejob.marketsegment}}</td>
+
+            <td class='label_td'>Floor Stock</td>
+            <td class='data_td'>{{ejob.floorstock}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Replaces Design</td>
+            <td class='data_td'>{{ejob.replaces_previous_design|yesno:"Yes,No,Unknown"}}</td>
+
+            <td class='label_td'>Design Replaced</td>
+            <td class='data_td'>
+            {% if ejob.replaces_previous_design_name %}
+              {{ejob.replaces_previous_design_name}}
+            {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class='label_td'>Channel</td>
+            <td class='data_td'>{{ejob.channel}}</td>
+
+            <td class='label_td'>Keep UPC</td>
+            <td class='data_td'>{{ejob.keep_same_UPC}}</td>
+          </tr>
+        </table>
+
+        {% if ejob.itemtype1 %}
+        <table class='etools_table'>
+          <caption>Item 1</caption>
+          <tr>
+            <td class='label_td'>Item Type</td>
+            <td class='data_td'>{{ejob.itemtype1}}</td>
+
+            <td class='label_td'>Label Color</td>
+            <td class='data_td'>{{ejob.labelcolor1}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Item Colors</td>
+            <td class='data_td'>{{ejob.color_item1}}</td>
+
+            <td class='label_td'>Wrap Proof</td>
+            <td class='data_td'>
+              {% ifequal ejob.wrapproof1 "0" %}
+                No
+              {% else %}
+                Yes
+              {% endifequal %}
+            </td>
+          </tr>
+        </table>
+        {% else %}
+        <table class='etools_table'>
+          <caption>No Item Data</caption>
+        </table>
+        {% endif %}
+
+        {% if ejob.itemtype2 %}
+        <table class='etools_table'>
+          <caption>Item 2</caption>
+          <tr>
+            <td class='label_td'>Item Type</td>
+            <td class='data_td'>{{ejob.itemtype2}}</td>
+
+            <td class='label_td'>Label Color</td>
+            <td class='data_td'>{{ejob.labelcolor2}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Item Colors</td>
+            <td class='data_td'>{{ejob.color_item2}}</td>
+
+            <td class='label_td'>Wrap Proof</td>
+            <td class='data_td'>
+              {% ifequal ejob.wrapproof2 "0" %}
+                No
+              {% else %}
+                Yes
+              {% endifequal %}
+            </td>
+          </tr>
+        </table>
+        {% endif %}
+
+        {% if ejob.itemtype3 %}
+        <table class='etools_table'>
+          <caption>Item 3</caption>
+          <tr>
+            <td class='label_td'>Item Type</td>
+            <td class='data_td'>{{ejob.itemtype3}}</td>
+
+            <td class='label_td'>Label Color</td>
+            <td class='data_td'>{{ejob.labelcolor3}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Item Colors</td>
+            <td class='data_td'>{{ejob.color_item3}}</td>
+
+            <td class='label_td'>Wrap Proof</td>
+            <td class='data_td'>
+              {% ifequal ejob.wrapproof3 "0" %}
+                No
+              {% else %}
+                Yes
+              {% endifequal %}
+            </td>
+          </tr>
+        </table>
+        {% endif %}
+
+        {% if ejob.itemtype4 %}
+        <table class='etools_table'>
+          <caption>Item 4</caption>
+          <tr>
+            <td class='label_td'>Item Type</td>
+            <td class='data_td'>{{ejob.itemtype4}}</td>
+
+            <td class='label_td'>Label Color</td>
+            <td class='data_td'>{{ejob.labelcolor4}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Item Colors</td>
+            <td class='data_td'>{{ejob.color_item4}}</td>
+
+            <td class='label_td'>Wrap Proof</td>
+            <td class='data_td'>
+              {% ifequal ejob.wrapproof4 "0" %}
+                No
+              {% else %}
+                Yes
+              {% endifequal %}
+            </td>
+          </tr>
+        </table>
+        {% endif %}
+
+        {% if ejob.itemtype5 %}
+        <table class='etools_table'>
+          <caption>Item 5</caption>
+          <tr>
+            <td class='label_td'>Item Type</td>
+            <td class='data_td'>{{ejob.itemtype5}}</td>
+
+            <td class='label_td'>Label Color</td>
+            <td class='data_td'>{{ejob.labelcolor5}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Item Colors</td>
+            <td class='data_td'>{{ejob.color_item5}}</td>
+
+            <td class='label_td'>Wrap Proof</td>
+            <td class='data_td'>
+              {% ifequal ejob.wrapproof5 "0" %}
+                No
+              {% else %}
+                Yes
+              {% endifequal %}
+            </td>
+          </tr>
+        </table>
+        {% endif %}
+
+        {% if ejob.itemtype6 %}
+        <table class='etools_table'>
+          <caption>Item 6</caption>
+          <tr>
+            <td class='label_td'>Item Type</td>
+            <td class='data_td'>{{ejob.itemtype6}}</td>
+
+            <td class='label_td'>Label Color</td>
+            <td class='data_td'>{{ejob.labelcolor6}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Item Colors</td>
+            <td class='data_td'>{{ejob.color_item6}}</td>
+
+            <td class='label_td'>Wrap Proof</td>
+            <td class='data_td'>
+              {% ifequal ejob.wrapproof6 "0" %}
+                No
+              {% else %}
+                Yes
+              {% endifequal %}
+            </td>
+          </tr>
+        </table>
+        {% endif %}
+
+        {% if ejob.itemtype7 %}
+        <table class='etools_table'>
+          <caption>Item 7</caption>
+          <tr>
+            <td class='label_td'>Item Type</td>
+            <td class='data_td'>{{ejob.itemtype7}}</td>
+
+            <td class='label_td'>Label Color</td>
+            <td class='data_td'>{{ejob.labelcolor7}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Item Colors</td>
+            <td class='data_td'>{{ejob.color_item7}}</td>
+
+            <td class='label_td'>Wrap Proof</td>
+            <td class='data_td'>
+              {% ifequal ejob.wrapproof7 "0" %}
+                No
+              {% else %}
+                Yes
+              {% endifequal %}
+            </td>
+          </tr>
+        </table>
+        {% endif %}
+
+        {% if ejob.itemtype8 %}
+        <table class='etools_table'>
+          <caption>Item 8</caption>
+          <tr>
+            <td class='label_td'>Item Type</td>
+            <td class='data_td'>{{ejob.itemtype8}}</td>
+
+            <td class='label_td'>Label Color</td>
+            <td class='data_td'>{{ejob.labelcolor8}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Item Colors</td>
+            <td class='data_td'>{{ejob.color_item8}}</td>
+
+            <td class='label_td'>Wrap Proof</td>
+            <td class='data_td'>
+              {% ifequal ejob.wrapproof8 "0" %}
+                No
+              {% else %}
+                Yes
+              {% endifequal %}
+            </td>
+          </tr>
+        </table>
+        {% endif %}
+
+        {% if ejob.itemtype9 %}
+        <table class='etools_table'>
+          <caption>Item 9</caption>
+          <tr>
+            <td class='label_td'>Item Type</td>
+            <td class='data_td'>{{ejob.itemtype9}}</td>
+
+            <td class='label_td'>Label Color</td>
+            <td class='data_td'>{{ejob.labelcolor9}}</td>
+          </tr>
+          <tr>
+            <td class='label_td'>Item Colors</td>
+            <td class='data_td'>{{ejob.color_item9}}</td>
+
+            <td class='label_td'>Wrap Proof</td>
+            <td class='data_td'>
+              {% ifequal ejob.wrapproof9 "0" %}
+                No
+              {% else %}
+                Yes
+              {% endifequal %}
+            </td>
+          </tr>
+        </table>
+        {% endif %}
+
+      </div>
+      <div>
+        {# BEGIN: RAW DATA TAB #}
+  	    <table class='etools_table'>
+  	      <caption>Raw Data</caption>
+	  	  {% for key, value in ejob.items %}
+		  <tr>
+		    <td class='label_td'>{{key}}</td>
+		    <td class='data_td'>{{value}}</td>
+		  </tr>
+		  {% endfor %}
+        </table>
+      </div>
+    </div>
+</div>
+</div>
+
+<p>&larr; <a href='{% url "job_detail" job.id %}'>Back to Job detail page</a></p>
+{% endblock %}

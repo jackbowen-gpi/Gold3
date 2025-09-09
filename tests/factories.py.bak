@@ -1,0 +1,52 @@
+"""Test factories using factory_boy when available.
+
+This module exposes small helpers `create_site()` and `create_user()` that
+tests should import. When `factory_boy` is installed we use lightweight
+`DjangoModelFactory` factories. Otherwise we fall back to minimal helpers that
+call the Django ORM directly so tests remain runnable without extra deps.
+"""
+import uuid
+
+from django.contrib.sites.models import Site
+from django.contrib.auth.models import User
+
+
+# Prefer factory_boy when available, but fall back to minimal helpers so tests run
+try:
+    import factory
+    from factory.django import DjangoModelFactory
+
+
+    class SiteFactory(DjangoModelFactory):
+        class Meta:
+            model = Site
+
+        domain = factory.LazyAttribute(lambda o: f"site-{uuid.uuid4()}.local")
+        name = factory.LazyAttribute(lambda o: f"site-{str(uuid.uuid4())[:6]}")
+
+
+    class UserFactory(DjangoModelFactory):
+        class Meta:
+            model = User
+
+        username = factory.LazyAttribute(lambda o: f"user-{uuid.uuid4()}")
+        # use PostGenerationMethodCall to set a usable password
+        password = factory.PostGenerationMethodCall("set_password", "p")
+
+
+    def create_site(name_prefix="site"):
+        # backward-compatible convenience helper using factory_boy
+        return SiteFactory(domain=f"{name_prefix}-{uuid.uuid4()}.local", name=name_prefix)
+
+
+    def create_user(username_prefix="user"):
+        return UserFactory(username=f"{username_prefix}-{uuid.uuid4()}")
+
+except Exception:
+    # factory_boy isn't installed / import failed — provide tiny fallbacks so tests still run
+    def create_site(name_prefix="site"):
+        return Site.objects.create(domain=f"{name_prefix}-{uuid.uuid4()}.local", name=name_prefix)
+
+
+    def create_user(username_prefix="user"):
+        return User.objects.create_user(username=f"{username_prefix}-{uuid.uuid4()}", password="p")

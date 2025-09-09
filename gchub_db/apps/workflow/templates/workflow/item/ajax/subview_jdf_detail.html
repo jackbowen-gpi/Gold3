@@ -1,0 +1,115 @@
+	<img src="{{MEDIA_URL}}img/icons/lightning_go.png">
+	{% include "workflow/item/toggle_detail_navbar.html" %}
+	<div class="outline_fancy">
+		<form id="itemdata" name="itemdata" onsubmit="update_item('{{item.id}}', 'jdf', '{{item.job.id}}');return false;">
+		<table width="600px">
+			<!-- Shelbyville gets a different set of options. -->
+			{% if perms.accounts.shelbyville_platemaking and not perms.accounts.clemson_employee  %}
+				<tr>
+					<th>Actions:</th>
+					<td colspan="2">
+						{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+							{% ifequal item.platepackage.platemaker.name "Shelbyville" %}
+								<a href='javascript:do_colorkey_queue({{item.id}})'>
+								<img src="{{MEDIA_URL}}img/icons/color_swatch.png" style="vertical-align: text-bottom" /> Color Keys to Shelbyville
+								</a>
+							{% endifequal %}
+						{% endif %}
+					</td>
+				</tr>
+			<!-- Here's what everyone else shoud see. -->
+			{% else %}
+				{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<tr>
+					<th>Proof Ticket</th>
+					<td>{{item.jdf_fsb_flexproof}}</td>
+				</tr>
+				{% endif %}
+				<tr>
+					<th>S&R Ticket</th>
+					{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+						<td>{{item.jdf_fsb_sr}}</td>
+					{% endif %}
+					{% ifequal job.workflow.name "Beverage" %}
+						<td>{{ item.jdf_bev_sr }}</td>
+					{% endifequal %}
+				</tr>
+				<tr>
+					<th>S&R RIP Ticket</th>
+					{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+						<td>
+							{{item.jdf_fsb_rip}}
+						</td>
+					{% endif %}
+					{% ifequal job.workflow.name "Beverage" %}
+						<td>{{item.jdf_bev_srrip}}</td>
+					{% endifequal %}
+				</tr>
+				{% if item.path_to_file %}
+				<tr>
+					<th>Actions:</th>
+					<td colspan="2">
+						{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+							{% if item.steps_with %}
+								Item mixes with item #{{item.steps_with.num_in_job}} - {{item.steps_with}}, Step and RIP not available.
+							{% else %}
+								<a href='javascript:run_jdf_request({{item.job.id}}, {{item.num_in_job}}, "fsb_ffo")'>
+								<img src="{{MEDIA_URL}}img/icons/application_view_tile.png" style="vertical-align: text-bottom" /> Step and RIP
+								</a>
+							{% endif %}
+								<br /><br />
+							{% if job.workflow.name == "Carton" %}
+								<a href='javascript:run_jdf_request({{item.job.id}}, {{item.num_in_job}}, "carton_contract_proof")'>
+								<img src="{{MEDIA_URL}}img/icons/picture_add.png" style="vertical-align: text-bottom" /> Contract Proof
+								</a>
+							{% else %}
+								<a href='javascript:run_jdf_request({{item.job.id}}, {{item.num_in_job}}, "fsb_proof_flexproof_manual")'>
+								<img src="{{MEDIA_URL}}img/icons/picture_add.png" style="vertical-align: text-bottom" /> Extra Proof (no approval box)
+								</a>
+							{% endif %}
+							{% ifequal item.platepackage.platemaker.name "Shelbyville" %}
+								<br /><br />
+								<a href='javascript:do_colorkey_queue({{item.id}})'>
+								<img src="{{MEDIA_URL}}img/icons/color_swatch.png" style="vertical-align: text-bottom" /> Color Keys to Shelbyville
+								</a>
+							{% endifequal %}
+						{% endif %}
+					</td>
+				</tr>
+				{% endif %}
+				<tr>
+					<th>1-Up</th>
+					<td>{{item.path_to_file}}</td>
+				</tr>
+				{% ifequal job.workflow.name "Beverage" %}
+				<tr>
+					<th>Options</th>
+					<td>
+						<p><label for="id_jdf_no_dgc">No DGC:</label>{{form.jdf_no_dgc}}</p>
+						<p><label for="id_jdf_no_step">No Stepping:</label>{{form.jdf_no_step}}</p>
+						<p><label for="id_uses_pre_distortion">Pre-Distorted:</label>{{form.uses_pre_distortion}}</p>
+						<input type="submit" value="Update JDF Options" onclick="update_item('{{item.id}}', 'jdf', '{{item.job.id}}');return false;" />
+					</td>
+				</tr>
+				{% endifequal %}
+				<tr>
+					<th colspan="2">
+						Error Log
+					</th>
+				</tr>
+				<tr>
+					<td colspan="2">
+						{% for joblog in jdf_errors %}
+						    <p>
+								<strong>{{joblog.event_time|date:"n-j-Y g:i"}}: </strong>
+								{{joblog.log_text|safe|linebreaksbr|truncatewords:200}}
+						    </p>
+						{% empty %}
+							<p>Error-free is the way to be!</p>
+						{% endfor %}
+					</td>
+				</tr>
+			{% endif %}
+		</table>
+		</form>
+	</div>

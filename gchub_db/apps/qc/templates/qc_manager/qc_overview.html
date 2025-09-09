@@ -1,0 +1,68 @@
+<img src="{{MEDIA_URL}}img/icons/page_white_magnify.png" />
+<span class="sub_heading">Job QC Manager</span><br />
+
+  {% for qc in job.get_finalized_qcs %}
+  <div class="jobaddress_block">
+    <table class="jobaddres_table" style='width:100%;margin-bottom:0px'>
+      <tr>
+        <td style='width:40%'><strong>QC by {{qc.reviewer}}</strong></td>
+        <td style='width:30%'><strong>Items QC'd</strong></td>
+        <td><strong>Reviews</strong</td>
+      </tr>
+      <tr>
+        <td>Submitted on {{qc.review_date|date:"n-j-Y"}}
+        </td>
+        <td>
+        {% ifequal qc.items.count job.item_set.count %}
+          All {{job.item_set.count}} items
+        {% else %}
+          {% for item in qc.items.all %}
+            {{item.num_in_job}}{% if forloop.last %}{% else %},{% endif %}
+          {% endfor %}
+        {% endifequal %}
+        </td>
+        <td>
+          {% for review in qc.get_finalized_children %}
+            <div style='clear:both;margin-bottom:3px'>
+              <a href="{% url "qc_view_qc" review.id %}"
+                 onclick="window.open(this.href, 'popupwindow', 'width=680,height=650,scrollbars=1,location=0,toolbar=0,menubar=0,status=0');return false">
+                 {% if review.is_whoopsless %}
+                 <img src="{{MEDIA_URL}}img/icons/accept.png" style="vertical-align:text-bottom" />
+                 {% else %}
+                 <img src="{{MEDIA_URL}}img/icons/bell.png" style="vertical-align:text-bottom" />
+                 {% endif %}
+                {{review.reviewer}} @ {{review.review_date|date:"n-j-Y"}}
+              </a>
+            </div>
+          {% endfor %}
+        </td>
+      </tr>
+      {% ifequal request.user qc.reviewer %}
+      {% else %}
+        {% if qc.get_finalized_children %}
+        {% else %}
+        <tr>
+          <td colspan="3">
+            <div style="clear:both;margin-left:10px">
+
+            <a href="{% url "qc_create_review_and_redirect2" qc.id %}"
+               onclick="javascript:window.open(this.href, 'popupwindow', 'width=840,height=550,scrollbars=1,location=0,toolbar=0,menubar=0,status=0');return false">
+
+              <img src="{{MEDIA_URL}}img/icons/magnifier.png" style="vertical-align:text-bottom" />
+                Start a Review
+             </a>
+            </div>
+          </td>
+        </tr>
+        {% endif %}
+      {% endifequal %}
+    </table>
+  </div>
+  {% endfor %}
+
+  <div style='clear:both'>
+  <a href='javascript:load_div("bottom_view", "{% url "qc_select_and_create" job.id %}")'>
+    <img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align:text-bottom" />
+    Start a new QC
+  </a>
+  </div>

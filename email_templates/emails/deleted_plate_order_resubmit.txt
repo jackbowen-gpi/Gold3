@@ -1,0 +1,3 @@
+{% include "emails/email_header.txt" %}
+
+The plate order {{job_number}} for Item: {{plate_order_item}} has been canceled due to changes and a new plate order will be submitted.

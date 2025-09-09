@@ -1,0 +1,63 @@
+{% extends "standard.html" %}
+{% load item_links %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/platemaking.js"></script>
+	{% include "workflow/platemaking/navbar_header_plateorder.inc.html" %}
+
+{% endblock %}
+
+{% block body %}
+{% ifequal display "search" %}
+<h1>Plate Reorder Search Form</h1>
+{% include "workflow/platemaking/navbar_div_plateorder.inc.html" %}
+	<form method="get" action="" name="plate_reorder_search" enctype="multipart/form-data">
+	  <div class="outline" style="width:350px">
+	  	  <h2>Search Parameters</h2>
+		  <label for="id_id">Job #:</label>{{form.job}}<br />
+		  <label for="id_size">Item:</label>{{form.size}}<br />
+		  <label for="id_plant">Plant:</label>{{form.plant}}<br />
+		  <input style='margin-left:92px' type="submit" value="Search" />
+	  </div>
+	</form>
+
+{% else %}
+	<h1>Plate Orders Matching Criteria</h1>
+	{% include "pagination_bar.html" %}
+	<table width="100%">
+		{% for entry in object_list %}
+			<tr>
+				<td>
+					<strong><a href="{{entry.item.job.get_absolute_url}}">{{entry.item.job}}</a></strong> - {{entry.item.bev_nomenclature}}<br />
+					<strong>Description:</strong> {{entry.item.description}}<br />
+					<strong>Original Platemaker:</strong> {{entry.item.platepackage.platemaker}} ({{entry.item.platepackage.platetype}})<br />
+					<strong>Num Up:</strong> {{entry.item.num_up}}<br />
+					{{entry.item|item_proof_link:"View Artwork"}}<br /><br />
+					<strong>Date of Order:</strong> {{entry.date_entered|date:"n-j-Y"}} ({% if entry.new_order %}New{% else %}Reorder{% endif %})<br /><br />
+
+				</td>
+				<td>
+					<table>
+						<tr>
+							<th>Plates Available</th>
+						</tr>
+						{% for color in entry.item.itemcolor_set.all %}
+							<tr>
+								<td>{{color.sequence}}: {{color.item.bev_nomenclature}} {{color.plate_code}} - {{color.color}}</td>
+							</tr>
+						{% endfor %}
+						<tr>
+							<td>
+								<a href="{% url "plate_reorder_form" entry.id %}"><img src="{{MEDIA_URL}}img/icons/tag_blue.png" style="vertical-align: text-bottom" /> Reorder These Plates</a>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+	<br />
+	<a href="{% url "plate_reorder_search" %}">New Search</a>
+{% endifequal %}
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "standard.html" %} 
+
+{% block page_title %}Item Catalog{% endblock %}
+
+{% block extra_head %}
+  <style type="text/css">
+    .yui-skin-sam .yui-dt tbody td {
+      border-bottom: 1px solid #ddd;
+    }
+    .centered_cell {
+      text-align:center;
+    }
+  </style>
+  <script type="text/javascript" src="{{YUI_URL}}build/yuiloader/yuiloader-min.js"></script>
+  <script type="text/javascript">
+    var loader = new YAHOO.util.YUILoader({
+        base: "{{YUI_URL}}build/",
+        combine: false,
+        loadOptional: true,
+        require: ["container", "menu", "datatable", "datasource", "paginator",
+                  "json", "connection", "dragdrop", "button"],
+        onSuccess: function() {
+          setup_menu();
+          var CF;
+          setup_datatable("{% url "item_catalog_search" %}");
+          setup_search_dialog();
+          setup_toolbar();
+        }
+    });
+    loader.insert();
+  </script>
+  <script type="text/javascript" src="{{MEDIA_URL}}js/item_catalog/cat_browser.js"></script>
+  {% include "item_catalog/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+  <h1>Item Catalog</h1>
+  {% include "item_catalog/navbar_div.inc.html" %}
+  <div id="toolbar" class="yui-skin-sam"></div>
+  <div class="yui-skin-sam">
+    {# This is the YUI datatable div. #}
+    <div id="dtable" class="yui-skin-sam">
+    </div>
+  </div>
+ 
+<div class="yui-skin-sam" style='display:inline'>
+<div id="dialog1" class="yui-pe-content" style="visibility:hidden">
+<div class="hd">Search Item Catalog</div>
+
+<div class="bd">
+<form id="id_itemcat_search_form" name="itemcat_search_form" method="POST" action="assets/post.php">
+    <label for="id_size">Size Name:</label>
+    {{form.size}}<br />
+
+    <label for="id_mfg_name">MFG Name:</label>
+    {{form.mfg_name}}<br />
+    
+    <label for="id_category">Category:</label>
+    {{form.category}}<br />
+
+    <div class="clear"></div>
+
+    <label for="id_active">Active Only:</label>
+    {{form.active}}
+</form>
+</div>
+</div>
+</div>
+
+<div id="newdialogs" class="yui-skin-sam" style='display:inline'>
+  <div id="diag_marker"></div>
+</div>
+
+{% endblock %}

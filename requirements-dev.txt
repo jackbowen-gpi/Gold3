@@ -1,0 +1,6 @@
+pre-commit>=3.6,<4
+black>=24.1,<25
+ruff>=0.18,<1
+factory_boy>=3.2,<4
+pytest>=8.4,<9
+pytest-django>=4.11,<5

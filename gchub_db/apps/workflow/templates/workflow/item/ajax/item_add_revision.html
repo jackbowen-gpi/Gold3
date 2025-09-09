@@ -1,0 +1,49 @@
+	<img src="{{MEDIA_URL}}img/icons/note_edit.png">
+	{% if revision.id %}
+	<span class="sub_heading">Edit Revision for Item #{{ item.num_in_job }} - {{ item.size }}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	{% else %}
+	<span class="sub_heading">Enter Revision for Item #{{ item.num_in_job }} - {{ item.size }}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	{% endif %}
+	<form id="revision" name="revision" onsubmit="update_revision('{{item.id}}', '{{item.job.id}}');return false;">
+	<input type="hidden" name="item" id="item" value="{{item.id}}">
+		<label for="id_due_date">Due Date:</label>
+		{{ revisionform.due_date }} <span class="smtext"></span><br />
+
+		{% ifequal item.job.workflow.name "Beverage" %}
+			<label for="id_rev_charge_type">Rev. Charge:</label>
+			{{ revisionform.rev_charge_type }}<br />
+		{% endifequal %}
+
+		<label for="id_comments">Instructions:</label>
+		{{ revisionform.comments }}<br />
+
+		{% if revision.id %}
+			<br />
+			<input type="submit" value="Edit revision" onclick="edit_revision('{{item.id}}', '{{item.job.id}}', '{{revision.id}}');return false;" />
+		{% else %}
+			<label for="id_apple_to_group">Apply to multiple items in job?</label>
+			{{ revisionform.apply_to_all}}<br />
+			<br />
+			<br />
+			<br />
+
+			<div id="revision_holder" style="display:none;margin-left:90px">
+			<p>Items that are greyed out are not eligible for revision</p>
+			{% for each_item in all_items %}
+ 			  <div style="height:auto;">
+ 			  	  {% if each_item.can_enter_revision %}
+ 			  	  	<input type="checkbox" name="items_checked" id="revise_all_item_{{each_item.id}}" value="{{each_item.id}}" />#{{each_item.num_in_job}}
+	 			  	{{each_item}}
+ 			  	  {% else %}
+				  	<input type="checkbox" disabled name="items_checked" id="revise_all_item_{{each_item.id}}" value="{{each_item.id}}" />#{{each_item.num_in_job}}
+	 			  	{{each_item}}
+	 			  {% endif %}
+ 			  </div>
+ 			{% endfor %}
+ 			</div>
+
+			<br />
+			<input type="submit" value="Add revision" onclick="update_revision('{{item.id}}', '{{item.job.id}}');return false;" />
+		{% endif %}
+
+	</form>

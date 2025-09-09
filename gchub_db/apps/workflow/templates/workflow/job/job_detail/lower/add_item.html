@@ -1,0 +1,23 @@
+	<img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" />
+	<h2 class="inline">Add Item to Job: {{job.id}} {{job.name}}</h2>
+	<br /><br />
+	<form id="newitem" name="newitem" onsubmit="add_item('{{job.id}}');return false;">
+		<input type="hidden" name="job" id="id_job" value="{{job.id}}" />
+		<input type="hidden" name="item_status" id="id_item_status" value="Pending" />
+		<input type="hidden" name="workflow" id="id_workflow" value="{{job.workflow.id}}" />
+		<label for="id_size">Size:</label>
+		{{ itemform.size }}<br />
+
+		<label for="id_case_pack">Case Pack:</label>
+		{{ itemform.case_pack }}<br />
+
+		<label for="id_annual_use">Annual Use:</label>
+		{{ itemform.annual_use }}<br />
+
+		<br />
+		<input type="submit" value="Add Item" onclick="add_item('{{job.id}}');return false;" />
+		<br />
+		<div class="outline" style="width:350px">
+			<img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align: text-bottom" /> If the item you need is not in the Size pulldown menu, you may need to add it to the <a href="/workflow/itemcatalog/">Item Catalog.</a>
+		</div>
+	</form>

@@ -1,0 +1,6 @@
+A new “Promotional” job has been entered into GOLD: {{job.id}} – {{job.name}}
+<br/>
+If you have any questions, please contact {{salesperson}}
+<br/>
+<br/>
+=== DO NOT REPLY TO THIS EMAIL. THIS EMAIL WAS AUTOMATICALLY GENERATED. ===

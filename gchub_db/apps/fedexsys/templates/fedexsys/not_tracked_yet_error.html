@@ -1,0 +1,21 @@
+{% extends "standard.html" %}
+
+{% block page_title %}Shipment Details{%endblock %}
+
+{% block extra_head %}
+  {% include "address/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+<h1>Ship Details: {{tracking_num}}</h1>
+{% include "address/navbar_div.inc.html" %}
+<p>
+  Tracking information has not yet been received by FedEx for this
+  shipment. This should happen within the next 10-15 minutes. Try
+  refreshing the page shortly.
+</p>
+<p>
+  If you continue to see this page for more than half an hour, please
+  notify <a href="mailto:clemson.support@graphicpkg.com">GOLD Support</a>.
+</p>
+{% endblock %}

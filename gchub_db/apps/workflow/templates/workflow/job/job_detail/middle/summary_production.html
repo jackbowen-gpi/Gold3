@@ -1,0 +1,124 @@
+{% load item_links %}
+	<img src="{{MEDIA_URL}}img/icons/cog.png" style="vertical-align:text-bottom" />
+    {% include "workflow/job/job_detail/middle/toggle_navbar.html" %}
+
+	<div class="outline_fancy">
+	<table width="100%">
+		<tr>
+			<th width="10px">#</th>
+			<th>Size</th>
+			{% ifequal job.workflow.name "Beverage" %}
+				<th>Search Past</th>
+			{% endifequal %}
+			<th>Art In</th>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<th>V x H</th>
+			{% endif %}
+			<th>Plant-Press</th>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<th>Spec. Mfg.</th>
+			{% endif %}
+			<th>Plates</th>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<th>Quality</th>
+			{% endif %}
+			<th>Inks</th>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<th>Volume</th>
+			{% endif %}
+			{% ifequal job.workflow.name "Beverage" %}
+				<th>Prod. Art</th>
+				<th>Replaces</th>
+			{% endifequal %}
+			{% ifequal job.workflow.name "Container" %}
+				<th>Dimensions (LxWxH)</th>
+			{% endifequal %}
+		</tr>
+		{% for item in itemsinjob %}
+		{% if item.item_situation and perms.accounts.clemson_employee %}
+			{% ifequal item.item_situation 11 %}
+			<tr class="rowLightGreen">
+			{% else %}
+			<tr class="rowStopped">
+			{% endifequal %}
+		{% else %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+		{% endif %}
+			<td>{{ item.num_in_job }}</td>
+			<td class="fakelink"><!-- Link to preview artwork -->
+			  <span onMouseOver="this.style.cursor='pointer';" onclick='load_div("bottom_view", item_ajax_url("{{ item.id }}", "production_detail"))'>
+			  {{item}}
+			  </span>
+			</td>
+			{% ifequal job.workflow.name "Beverage" %}
+				<td>
+					<a href='{% url "item_find_same" item.id %}'>
+						<img src="{{MEDIA_URL}}img/icons/magnifier_zoom_in.png" style="vertical-align:text-bottom" alt="Find Same Items" /> Item
+					</a>
+				</td>
+			{% endifequal %}
+			<td>{{item|item_preview_art_link:""}}</td>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<td>{% if item.get_item_spec %}
+						{% if item.get_item_spec.active %}
+							{{ item.get_item_spec.vertical }} x {{ item.get_item_spec.horizontal }}
+							<a href="{% url "edit_itemspecs" item.get_item_spec.id %}">
+								<img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align:text-bottom" alt="More Information" />
+							</a>
+						{% else %}
+							<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align:text-bottom" alt="Spec is Inactive!" /> Inactive!
+						{% endif %}
+					{% else %}
+						{% if item.printlocation %}
+								<a href="{% url "new_itemspecs_full" item.size.id item.printlocation.id %}"><img src="{{MEDIA_URL}}img/icons/chart_line_add.png" style="vertical-align: text-bottom" /> Add Spec.</a>
+						{% endif %}
+					{% endif %}
+				</td>
+			{% endif %}
+			<td>{{ item.printlocation }}</td>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<td>{{ item.special_mfg }}</td>
+			{% endif %}
+			<td>{{ item.platepackage }}</td>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<td>{{ item.quality }}</td>
+			{% endif %}
+			<td>
+				{% for color in item.itemcolor_set.all %}
+					<span style="background-color:{{color.hexvalue}};">&nbsp;</span>
+				{% endfor %}
+				{{ item.itemcolor_set.count }}&nbsp;
+				{% if item.get_item_spec.num_colors_from_stepspec %}
+					{% ifequal item.get_item_spec.too_much_ink "Yes" %}
+						<img src="{{MEDIA_URL}}img/icons/exclamation.png" style="vertical-align: text-bottom" />
+					{% endifequal %}
+					({{item.get_item_spec.num_colors_from_stepspec}})
+				{% endif %}
+			</td>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<td>
+					{{ item.annual_use }} ({{ item.case_pack }}/cs)
+					{% if item.is_master_stepped_item %}
+						<img src="{{MEDIA_URL}}img/icons/application_cascade.png"
+							 style="vertical-align:text-bottom"
+						     alt="Master Step" />
+					{% endif %}
+					{% if item.steps_with %}
+						<img src="{{MEDIA_URL}}img/icons/application_link.png"
+							 style="vertical-align:text-bottom"
+						     alt="Steps With" /> {{item.steps_with.num_in_job}}
+					{% endif %}
+				</td>
+			{% endif %}
+			{% ifequal job.workflow.name "Beverage" %}
+				<td>{{item|item_finalfile_link:""}}</td>
+				<td>{{ item.replaces }}</td>
+			{% endifequal %}
+			{% ifequal job.workflow.name "Container" %}
+				<td>{{item.length}} x {{item.width}} x {{item.height}}</td>
+			{% endifequal %}
+		</tr>
+		{% endfor %}
+	</table>
+	</div>
+	{% include "workflow/job/job_detail/middle/item_summary_footer.html" %}

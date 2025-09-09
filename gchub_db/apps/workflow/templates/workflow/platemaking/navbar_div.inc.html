@@ -1,0 +1,22 @@
+<div class="yui-skin-sam">
+<div id="platemaking_nav" class="yuimenubar yuimenubarnav">
+    <div class="bd">
+        <ul class="first-of-type">
+        	{% if perms.accounts.clemson_employee %}
+            	<li class="yuimenubaritem first-of-type"><a class="yuimenubaritemlabel" href="{% url "platemaking" 'All' %}">Pending Orders</a></li>
+            	<li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="{% url "platemaking_completed" 'All' %}">Completed Orders</a></li>
+        	{% else %}
+	        	{% if perms.accounts.shelbyville_platemaking %}
+	            	<li class="yuimenubaritem first-of-type"><a class="yuimenubaritemlabel" href="{% url "platemaking" 'Shelbyville' %}">Pending Orders</a></li>
+	            	<li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="{% url "platemaking_completed" 'Shelbyville' %}">Completed Orders</a></li>
+	        	{% endif %}
+	        	{% if perms.accounts.kenton_platemaking %}
+	            	<li class="yuimenubaritem first-of-type"><a class="yuimenubaritemlabel" href="{% url "platemaking" 'Kenton' %}">Pending Orders</a></li>
+	            	<li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="{% url "platemaking_completed" 'Kenton' %}">Completed Orders</a></li>
+	        	{% endif %}
+	        {% endif %}
+        </ul>
+    </div>
+</div>
+</div>
+<br />

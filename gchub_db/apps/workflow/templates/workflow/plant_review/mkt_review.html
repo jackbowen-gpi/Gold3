@@ -1,0 +1,242 @@
+{% extends "standard.html" %}
+{% load item_links %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript">
+		function process_review(item_id, update_type) {
+	   /*
+	    * Fired when he user hits the Accept or Reject button. Calls the validator
+	    * and sends off an AJAX request if all is good.
+	    */
+	   if (update_type == "reject") {
+	   		var comment = window.prompt("Please enter explanation for rejection and/or instructions for correction.")
+	   } else if (update_type == "resub") {
+	   		var comment = window.prompt("Please enter explanation for resubmission.")
+	   } else {
+	   		var comment = ""
+	   }
+	   YAHOO.example.container.wait.show();
+	   //Uses process_review() which handles review actions for more than just marketing reviews.
+	   new Ajax.Request('/workflow/item/'+ item_id +'/review/market/' + update_type +'/?comment='+ encodeURIComponent(comment), {
+	       method: 'GET',
+	       onSuccess: function(http_req) {
+	           // Get a JSON object from the response string (from the server).
+	           jsobj = http_req.responseText.evalJSON();
+	           // See if there was a form processing error.
+	           if (jsobj["is_error"] == false) {
+				  window.location = "/workflow/mkt_review/"
+	           } else {
+	               // Form validation error happened.
+	               hide_modal_wait();
+	               alert(jsobj["message"]);
+	           }
+	       },
+	       onComplete: function() {
+	          hide_modal_wait();
+	   }});
+	} // end process_review()
+	</script>
+{% endblock %}
+
+{% block body %}
+	<h1><img src="{{MEDIA_URL}}img/icons/pictures.png"><span style="text-transform: capitalize">Market Review Summary</h1>
+	<br>
+	<div class="outline_fancy" style="width:480px">
+			<strong>Additional Reports:</strong><br>
+		  	<a href='/workflow/mkt_review/pending/0/'>
+		  		Pending Items
+	  		</a>|
+ 		  	<a href='/workflow/mkt_review/completed/0/'>
+		  		Completed Items
+	  		</a>
+	  		<p>
+	  		<strong>Tracked Item Reports:</strong><br>
+  			{% for type in tracker_types %}
+	  			<a href='/workflow/mkt_review/trackedart/{{type.id}}/'>
+			  		{{type}}
+	  			</a>
+	  			|
+  			{% endfor %}
+	</div>
+	<br>
+    <hr />
+
+	<h2>Items Needing Approval</h2>
+	<table style='width:100%; empty-cells : hide'>
+		<tr>
+			<th>Job</th>
+			<th>Print Group</th>
+			<th>Size</th>
+			<th>Art</th>
+			<th>Why?</th>
+			<th colspan="2">Actions</th>
+		</tr>
+		{% for item in approval_list %}
+		<tr>
+			<td><a href="/workflow/job/{{item.item.job.id}}/">{{item.item.job.id}} - {{item.item.num_in_job}} {{item.item.job.name}} &nbsp;&nbsp;</a></td>
+			{% if item.item.job.printgroup.description %}
+				<td>{{item.item.job.printgroup.description}}</td>
+			{% else %}
+				<td>&nbsp;</td>
+			{% endif %}
+			<td>{{item.item.size}}</td>
+			<td>
+			  {{item.item|item_proof_link:""}}
+			</td>
+			<td>
+				{{item.entry_comments}}
+			</td>
+			{% if perms.accounts.foodservice_marketing %}
+				<td>
+					<form id="review_accept" onsubmit="process_review('{{item.id}}', 'accept');return false;">
+						<input type="submit" value="Accept" onsubmit="process_review('{{item.id}}', 'accept');return false;" />
+					</form>
+				</td>
+				<td>
+					<form id="review_reject" onsubmit="process_review('{{item.id}}', 'reject');return false;">
+						<input type="submit" value="Reject" onsubmit="process_review('{{item.id}}', 'reject');return false;" />
+					</form>
+				</td>
+			{% endif %}
+		</tr>
+
+		{% if item.comments %}
+			<tr>
+				<td>
+				</td>
+				<td colspan="6">
+					<strong>^ Comments:</strong>
+					{{item.comments}}
+					<span class="smtext">
+						({{item.reviewer}}
+						{{item.review_initiated_date|date:"n-j-Y"}})
+					</span>
+				</td>
+			</tr>
+		{% endif %}
+		{% endfor %}
+		{% for item in resub_list %}
+		<tr>
+			<td><a href="/workflow/job/{{item.item.job.id}}/">{{item.item.job.id}} - {{item.item.num_in_job}} {{item.item.job.name}} &nbsp;&nbsp;</a></td>
+			{% if item.item.job.printgroup.description %}
+				<td>{{item.item.job.printgroup.description}}</td>
+			{% else %}
+				<td>&nbsp;</td>
+			{% endif %}
+			<td>{{item.item.size}}</td>
+			<td>
+			  {{item.item|item_proof_link:""}}
+			</td>
+			<td>
+				{{item.entry_comments}}
+			</td>
+			{% if perms.accounts.foodservice_marketing %}
+				<td>
+					<form id="review_accept" onsubmit="process_review('{{item.id}}', 'accept');return false;">
+						<input type="submit" value="Accept" onsubmit="process_review('{{item.id}}', 'accept');return false;" />
+					</form>
+				</td>
+				<td>
+					<form id="review_reject" onsubmit="process_review('{{item.id}}', 'reject');return false;">
+						<input type="submit" value="Reject" onsubmit="process_review('{{item.id}}', 'reject');return false;" />
+					</form>
+				</td>
+			{% endif %}
+		</tr>
+
+		{% if item.comments %}
+		<tr>
+			<td>
+			</td>
+			<td colspan="6">
+				<strong>^ Comments:</strong>
+				{% if item.resub_comments %}
+							{{item.resub_comments}} <span class="smtext">{{item.reviewer}} {{item.review_date}}</span>
+				{% endif %}
+			</td>
+		</tr>
+		{% endif %}
+		{% for refusal in rejected_list %}
+			{% ifequal refusal.item.job.id item.item.job.id %}
+			{% ifequal refusal.item.size item.item.size %}
+			{% if refusal.resubmitted %}
+				<tr>
+					<td>
+					</td>
+					<td colspan="6">
+						{{refusal.comments}} <span class="smtext">{{item.reviewer}} {{item.review_date}}</span>
+					</td>
+				</tr>
+				{% if refusal.resub_comments %}
+					<tr>
+						<td>
+						</td>
+						<td colspan="6">
+							{{refusal.resub_comments}} <span class="smtext">{{item.reviewer}} {{item.review_date}}</span>
+						</td>
+					</tr>
+				{% endif %}
+			{% endif %}
+			{% endifequal %}
+			{% endifequal %}
+		{% endfor %}
+		{% endfor %}
+	</table>
+
+    <hr />
+
+	<h2>Rejected Items</h2>
+	<table style='width:100%; empty-cells : hide'>
+		<tr>
+			<th>Job</th>
+			<th>Print Group</th>
+			<th>Size </th>
+			<th>Art</th>
+			<th>Why?</th>
+			<th colspan="2">Actions</th>
+		</tr>
+		{% for item in rejected_list %}
+			{% if item.resubmitted %}
+
+			{% else %}
+				<tr>
+					<td><a href="/workflow/job/{{item.item.job.id}}/">{{item.item.job.id}} - {{item.item.num_in_job}} {{item.item.job.name}} &nbsp;&nbsp;</a></td>
+					<td>{{item.item.job.printgroup.description}}</td>
+					<td>{{item.item.size}}</td>
+					<td>
+					  {{item.item|item_proof_link:""}}
+					</td>
+					<td>
+						{{item.entry_comments}}
+					</td>
+					<td>
+					{% if perms.accounts.clemson_employee %}
+						<form id="review_resub" onsubmit="process_review('{{item.id}}', 'resub');return false;">
+							<input type="submit" value="Resubmit" onsubmit="process_review('{{item.id}}', 'resub');return false;" />
+						</form>
+					{% endif %}
+					</td>
+				</tr>
+
+				{% if item.comments %}
+				<tr>
+					<td>
+					</td>
+					<td colspan="6">
+						<strong>^ Comments:</strong>
+						{{item.comments}}
+						<span class="smtext">
+							({{item.reviewer}}
+							{{item.review_date|date:"n-j-Y"}})
+						</span>
+					</td>
+				</tr>
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+	</table>
+
+    <hr />
+
+{% endblock body %}

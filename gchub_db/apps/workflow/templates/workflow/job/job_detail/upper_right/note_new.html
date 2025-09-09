@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="{{MEDIA_URL}}css/base.css" type="text/css" />
+  <script type="text/javascript" src="{{MEDIA_URL}}js/prototype.js"></script>
+  <script type="text/javascript" src="{{MEDIA_URL}}js/ckeditor/ckeditor.js"></script>
+  <title>Joblog Block</title>
+	<style type="text/css">
+		body { background:none; }
+	</style>
+</head>
+
+<body style="background-color:white;margin:3px">
+  <form method="post" action="" name="comment_form" id="id_comment_form">
+  {{form.log_text}}
+	<script>
+	    // Replace the <textarea id="id_log_text"> with a CKEditor
+	    // instance, using default configuration.
+		CKEDITOR.replace( 'id_log_text', {
+		    height: '100',
+		});
+	</script>
+	<br />
+    <a class="button" href="javascript:$('id_comment_form').submit()">
+      <span>Save Comment</span>
+    </a>
+  </form>
+</body>

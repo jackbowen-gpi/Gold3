@@ -1,0 +1,61 @@
+{% extends "standard.html" %}
+{% load item_links %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/platemaking.js"></script>
+{% endblock %}
+
+{% block body %}
+	<form id="order" name="order" onsubmit="submit_plate_reorder('{{order.item.id}}');return false;">
+	<input type="hidden" name="item" id="id_item" value="{{item.id}}" />
+	<table width="100%">
+			<tr>
+				<th colspan="2">Job</th>
+				<th>Item</th>
+				<th>Platemaker (Type)</th>
+			</tr>
+			<tr>
+				<td colspan="2"><strong><a href="{{order.get_absolute_url}}">{{order.item.job}}</a></strong></td>
+				<td><strong>{{order.item.bev_nomenclature}}</strong></td>
+				<td>{{order.item.platepackage.platemaker}} ({{order.item.platepackage.platetype}})</td>
+			</tr>
+			<tr>
+				<td colspan="2"><strong>Description: </strong>{{order.item.description}}</td>
+				<td colspan="2">
+					{{order.item|item_proof_link:"View Artwork"}}
+				</td>
+			</tr>
+			<tr>
+				<th>Plate</th>
+				<th>Sequence</th>
+				<th>Color</th>
+				<th>Order Qty.</th>
+			</tr>
+			{% for color in item_colors %}
+			<tr>
+				<td>{{color.item.bev_nomenclature}} {{color.plate_code}}</td>
+				<td>{{color.sequence}}</td>
+				<td>{{color.color}}</td>
+            	<td>
+            		<input type="text" name="quantity{{forloop.counter}}" id="id_quantity{{forloop.counter}}" value="0"></input>
+				</td>
+			</tr>
+			{% endfor %}
+			</tr>
+			<tr>
+				<td colspan="4">
+					<p>
+					<label for="id_instructions">Instructions:</label>{{form.instructions}}<br />
+					<label for="id_date_needed">Due Date:</label>{{form.date_needed}}<br />
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="4" style="background-color:#FFFF99">
+					<center><input type="submit" value="Place Order" onclick="submit_plate_reorder('{{order.item.id}}');return false;" /></center>
+				</td>
+			</tr>
+	</table>
+	</form>
+{% endblock %}

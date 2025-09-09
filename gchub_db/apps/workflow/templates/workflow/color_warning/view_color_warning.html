@@ -1,0 +1,40 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<h1>Color Warning Details</h1>
+<hr />
+<div >
+	<table>
+		<tr>
+			<th>Pantone Color</td>
+			<td>{{ warning.definition }}</td>
+		</tr>
+		<tr>
+			<th>QPO#</td>
+			<td>{{ warning.qpo_number }}</td>
+		</tr>
+		<tr>
+			<th>Notes</td>
+			<td>{{ warning.notes }}</td>
+		</tr>
+		<tr>
+			<th>Active</td>
+			<td>{{ warning.active }}</td>
+		</tr>
+		<tr>
+			<th>Dismissed</td>
+			<td>{{ warning.dismissed }}</td>
+		</tr>
+		<tr>
+			<th>Dismissal Notes</td>
+			<td>{{ warning.dismissal_notes }}</td>
+		</tr>
+	</table>
+</div>
+<div>
+<h3>
+	<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+	<a href="/workflow/color_warning/color_warning/" >Back</a>
+</h3>
+</div>
+{% endblock %}

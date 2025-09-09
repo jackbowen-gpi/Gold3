@@ -1,0 +1,8 @@
+2025-09-01 18:50:03 DEBUG    2025-09-01 18:50:03 [DEBUG]          fsb_box.py:27
+                             gchub_db.apps.auto_corrugated.docume
+                             nts.fsb_box: Font file not found at:
+                             /mnt\Production\autocorr_elements\VA
+                             G Rounded BT.ttf
+Created admin user: dev_admin
+Wrote admin session cookie to: C:\Dev\Gold\gchub_db\dev\admin_session_cookie.txt
+sessionid=2jccyskm6moq1geh0nqn143lphzftgst

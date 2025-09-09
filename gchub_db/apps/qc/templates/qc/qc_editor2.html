@@ -1,0 +1,232 @@
+{% extends "standard_popup.html" %}
+
+{% block page_title %}QC - {{qcdoc.job.id}} {{qcdoc.job.name}}{% endblock %}
+
+{% block extra_head %}
+
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/qc/qc_editor2.css" />
+
+<!-- Base Stuff -->
+<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/element/element-min.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/button/button-min.js"></script>
+
+<!-- For AJAX Requests -->
+<script type="text/javascript" src="{{YUI_URL}}build/connection/connection-min.js"></script>
+
+<!-- Source file for TabView -->
+<script type="text/javascript" src="{{YUI_URL}}build/tabview/tabview-min.js"></script>
+<script type="text/javascript" src="{{MEDIA_URL}}js/qc/qc_editor.js"></script>
+
+<script type="text/javascript">
+  // Store from the server.
+  var MEDIA_URL = '{{MEDIA_URL}}';
+  var FINISH_URL = '{% url "qc_finish_qc" qcdoc.id %}';
+  // Holds the TabView widget reference.
+  var qc_tabview = null;
+  // Holds info about each QCResponse object.
+  var qc_response_data = new Array();
+  // Button references for easy retrieval.
+  var approve_button = null;
+  var notapplicable_button = null;
+  // If this is true, this is the first (artist) QC and not a review.
+  var is_artist_qc = {% if qcdoc.parent %}false{% else %}true{% endif %};
+
+  /*
+   * Populate the qc_response_data array with info from the DB.
+   */
+  function populate_qc_response_data() {
+    {% for qcresponse in qcResponseList %}
+      qcr_array = new Object();
+      qcr_array['id'] = {{qcresponse.id}};
+      qcr_array['response'] = {{qcresponse.response}};
+      qcr_array['title'] = '{{qcresponse.category.title}}';
+      qcr_array['whoops_report_url'] = '{% url "qc_ajax_whoops_report" qcresponse.id %}';
+      qcr_array['whoops_div_url'] = '{% url "qc_ajax_whoops_get_div" qcresponse.id %}';
+      qcr_array['set_response_type_url'] = '{% url "qc_ajax_set_response_type" qcresponse.id %}';
+      qc_response_data[{{forloop.counter0}}] = qcr_array;
+    {% endfor %}
+  } // end populate_qc_response_data()
+
+  /*
+   * Once the page has loaded, perform setup work, register events, etc.
+   */
+  YAHOO.util.Event.onContentReady("qc_wrapper", function () {
+    // Store QC state data on our client's browser.
+    populate_qc_response_data();
+    // Instantiate the TabView control.
+    qc_tabview = new YAHOO.widget.TabView("qc_tabview");
+
+    // Register buttons and click events.
+    approve_button = new YAHOO.widget.Button("approve_button", {onclick: {fn: on_approve_button_clicked}});
+
+    {% if not qcdoc.parent %}
+    notapplicable_button = new YAHOO.widget.Button("notapplicable_button", {onclick: {fn: on_notapplicable_button_clicked}});
+    {% endif %}
+
+    {# Whoops are only used for review QCs. #}
+    {% if qcdoc.parent %}
+      new YAHOO.widget.Button("whoops_button", {onclick: {fn: on_whoops_button_clicked}});
+    {% endif %}
+
+    update_approve_button_state();
+
+    // Lower navigation buttons.
+    new YAHOO.widget.Button("previous_button", {onclick: {fn: on_previous_button_clicked}});
+    new YAHOO.widget.Button("next_button", {onclick: {fn: on_next_button_clicked}});
+    new YAHOO.widget.Button("finish_button", {onclick: {fn: on_finish_button_clicked}});
+
+    // Update the 'Approve' button based on state when the current tab changes.
+    qc_tabview.on("activeIndexChange", update_approve_button_state);
+    qc_tabview.on("activeIndexChange", update_button_locations);
+
+
+
+    // create an Element instance wrapping 'navID':
+    // get the Height of the nav list ie: Gut Check, UPC, Final File
+    var el = new YAHOO.util.Element('navID');
+    var heightNav = el.getStyle('height');
+
+    // get the Height of the content area
+    var yc = new YAHOO.util.Dom.getElementsByClassName('yui-content');
+    YAHOO.util.Dom.setStyle(yc, 'height', heightNav);
+
+    // get the height of the Bottom portion of the page ie. Text Area & buttons
+    var fb = new YAHOO.util.Dom.getElementsByClassName('forceBottom')[0];
+    var heightBot = fb.getStyle('height');
+
+    // get the element that holds the upper portion of content
+    // calculate the height to make the content scroll if it is
+    // too large for the given area.
+    var ft = new YAHOO.util.Dom.getElementsByClassName('forceTop');
+    calHeight1 = parseInt(heightNav, 10);
+    calHeight2 = parseInt(heightBot, 10);
+    calHeight3 = calHeight1 - calHeight2 - 15;
+    var heightPX = calHeight3.toString() + 'px';
+    YAHOO.util.Dom.setStyle(ft, 'height', heightPX);
+
+    //create an event listener:
+//    var handleClick = function(e) {
+//        alert(el.get('id') + ' clicked ' + heightPX);
+         //remove this listener, so that
+        //it only fires on the firs click:
+//        el.removeListener(handleClick);
+//    };
+
+    //assign an event listener using 'on';
+    //el.addListener and el.on are identical here:
+//    el.on('click', handleClick);
+  });
+</script>
+
+
+{% endblock %}
+
+{% block body_content %}
+<div id="qc_wrapper" class="yui-skin-sam">
+    <div id="header">
+        <h1>Quality Control - <span>{{qcdoc.job.id}} {{qcdoc.job.name}} [{{qc_type}}]</span></h1>
+    <!--    <h1><span>Control</span></h1>  -->
+    </div> <!-- End Header -->
+
+
+  <div id="qc_tabview" class="yui-navset">
+
+<!-- New Tabs -->
+   <div id="nav">
+    <ul class="yui-nav" id="navID">
+      {% for qcresponse in qcResponseList %}
+        <li {% ifequal forloop.counter0 0 %}class="selected tabs"{% else %}class="tabs"{% endifequal %}>
+          <a href="#tab{{forloop.counter}}">
+            <em>
+              <img id="tab_status_img_{{forloop.counter0}}"
+                   src="{{MEDIA_URL}}{{qcresponse.get_response_icon_filename}}"
+                   class="tab_status_img" alt="{{qcresponse.response}}"/>
+              {{qcresponse.category.title}}
+            </em>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+   </div>
+<!-- Ending New Tabs -->
+
+
+    <div class="yui-content">
+    {% for qcresponse in qcResponseList %}
+      <div>
+       <div class="forceTop">
+        {# Pops the first element off the stack #}
+        <p>{{qcr_descriptions.popleft|safe}}</p>
+        <ul>
+          {% for question in qcresponse.get_workflow_questions %}
+            <li>{{qcr_questions.popleft|safe}}</li>
+          {% endfor %}
+        </ul>
+        {% if qcresponse.get_parent_qcresponse_comments %}
+        <div class="qc_comment_div">
+          <strong>Comments from {{qcresponse.qcdoc.parent.reviewer}}</strong>
+          <br />
+          {{qcresponse.get_parent_qcresponse_comments}}
+        </div>
+        {% endif %}
+        <div id="qc_whoops_div_{{qcresponse.id}}">
+          {% include "qc/whoops_div.html" %}
+        </div>
+       </div> <!-- end forceTop -->
+
+       <div class="forceBottom">
+        <div class="qc_comment_div">
+          <strong>
+          {% if qcdoc.parent %}
+            If you find or suspect a problem, enter details below and hit the Whoops!&trade; button.
+          {% else %}
+            If you would like to leave notes for the artist reviewing your QC, enter them below and hit Approve.
+          {% endif %}
+          </strong>
+          <br />
+          <textarea id="id_qcresponse_comment_{{forloop.counter0}}"
+                    cols="120" rows="4"
+                    class="comment_box">{{qcresponse.comments|default:""}}</textarea>
+        </div>
+        <div id="qc_button_div_{{forloop.counter0}}" class="qc_button_div">
+        {% ifequal forloop.counter0 0 %}
+            <input type="button" id="approve_button" name="approve" value="Approve" />
+
+            {# N/A is only for artist QCs. #}
+            {% if not qcdoc.parent %}
+            <input type="button" id="notapplicable_button" name="test" value="N/A" />
+            {% endif %}
+
+            {# Whoops are only used for review QCs. #}
+            {% if qcdoc.parent %}
+              <input type="button" id="whoops_button" name="whoops" value="Whoops!&trade;" />
+            {% endif %}
+        {% endifequal %}
+        </div>
+       </div> <!-- End forceBottom -->
+      </div>
+    {% endfor %}
+    </div> <!-- End yui-content -->
+
+    <div class="clear"></div>
+  </div>
+
+
+  {# This is the bar on the bottom of the page, outside of the tabview. #}
+  <div id="button_bar">
+    {# Next/Previous buttons #}
+    <div id="arrow_button_div">
+      <input type="button" id="previous_button" name="previous" value="&larr; Prev" />
+      <input type="button" id="next_button" name="next" value="Next &rarr;" />
+    </div>
+
+    {# Finalize button is floated right #}
+    <div id="finalize_button_div">
+      <input type="button" id="finish_button" name="finalize" value="Finalize" />
+    </div>
+  </div>
+
+    <div class="clear"></div>
+</div>
+{% endblock %}

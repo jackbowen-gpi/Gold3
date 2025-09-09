@@ -1,0 +1,57 @@
+{% extends "standard.html" %}
+{% load item_links %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/platemaking.js"></script>
+	{% include "workflow/platemaking/navbar_header_plateorder.inc.html" %}
+{% endblock %}
+
+{% block body %}
+	<h1>Pending and Completed Plate Orders</h1>
+	{% include "workflow/platemaking/navbar_div_plateorder.inc.html" %}
+	{% include "pagination_bar.html" %}
+	<table width="100%">
+		<tr>
+			<th>Ordered</th>
+			<th>Completed</th>
+			<th>Invoiced</th>
+			<th>Information</th>
+			<th>Ordered By</th>
+			<th>Plate Info</th>
+		</tr>
+		{% for entry in object_list %}
+			<tr>
+				<td style="vertical-align:top;" nowrap>{{entry.date_entered|date:"n-j-Y"}}</td>
+				<td style="vertical-align:top;" nowrap>{{entry.stage2_complete_date|date:"n-j-Y"}}</td>
+				<td style="vertical-align:top;" nowrap>
+					{% if entry.invoice_date %}
+						{{entry.invoice_date|date:"n-j-Y"}}
+					{% else %}
+						{% if perms.accounts.accounting_access %}
+							<a href="javascript:mark_plateorder_invoiced('{{entry.id}}')">Invoice</a>
+						{% endif %}
+					{% endif %}
+				</td>
+				<td style="vertical-align:top;">
+					<strong>Job:</strong> <a href="{{entry.item.job.get_absolute_url}}">{{entry.item.job}}</a><br />
+					<strong>Item:</strong> {{entry.item.bev_nomenclature}}<br />
+					<strong>Instructions:</strong> {{entry.instructions}}<br />
+				</td>
+				<td style="vertical-align:top;">
+					<strong>{{entry.send_to_plant}}</strong><br />
+					({{entry.requested_by}})
+				</td>
+				<td style="vertical-align:top;" nowrap>
+					<strong>{{entry.item.size}}</strong><br />
+					{% for plate in entry.plateorderitem_set.all %}
+						{% ifnotequal plate.quantity_needed 0 %}
+							{{plate.quantity_needed}}x : {{plate.color.item.bev_nomenclature}} {{plate.color.plate_code}} - {{plate.color.color}} (#{{plate.color.sequence}})<br />
+						{% endifnotequal %}
+					{% endfor %}
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+
+{% endblock %}

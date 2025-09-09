@@ -1,0 +1,43 @@
+{% extends "standard_popup.html" %}
+
+{% block page_title %}Upload - {{job.id}} {{job.name}}{% endblock %}
+
+{% block body_content %}
+  {% comment %}
+    This div is initially shown, and contains the upload form. It is hidden
+    when the form is submitted.
+  {% endcomment %}
+  <div class="outline_fancy" style="background-color:#FFFFFF;padding:6px;" id="upload_form">
+    <h2>Upload DB doc to Job: {{job.id}} {{job.name}}</h2>
+    <p>
+      To upload a file to this job's database documents, click the
+      <em>Browse</em> button below and select the desired file. Once you
+      <em>Submit</em> the file, the upload will begin and you will be notified
+      of its completion.
+    <p>
+      <hr />
+      <form id="file" name="file" method="post" action="" 
+            onsubmit="$('upload_form').hide();$('upload_feedback').show()" 
+            enctype="multipart/form-data">
+        <input type="hidden" name="job" id="id_job" value="{{job.id}}" />
+        <strong>File:</strong> {{ fileform.file }}<br />
+        <hr />
+        <input type="submit" value="Upload File" />
+      </form>
+    </p>
+  </div>
+  
+  {% comment %}
+    This div is used to show the user that the upload is progressing. It starts
+    hidden, and is revealed when the user clicks the submit button above.
+  {% endcomment %}
+  <div class="outline_fancy" id="upload_feedback" style='display:none;background-color:#FFFFFF;padding:6px;'>
+    <h2 style='text-align:center'>Uploading File</h2>
+    <p style='text-align:center'>
+      You may change windows back to GOLD and continue working
+      while the file uploads.
+      <br /><br />
+      <img src="{{MEDIA_URL}}img/spinner.gif" alt="Uploading"/>
+    </p>
+  </div>
+{% endblock %}

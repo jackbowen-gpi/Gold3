@@ -1,0 +1,63 @@
+	<img src="{{MEDIA_URL}}img/icons/film_edit.png" style="vertical-align:text-bottom" />
+    {% include "workflow/job/job_detail/middle/toggle_navbar.html" %}
+
+	<div class="outline_fancy">
+	<table width="100%">
+		<tr>
+			<th width="10px">#</th>
+			<th>Size</th>
+			<th>Num Colors</th>
+			<th>Print Location</th>
+			<th>Plate Package</th>
+			<th>Pending Plate Orders</th>
+			<th>Completed Plate Orders</th>
+			<th>Plate Files</th>
+		</tr>
+		{% for item in itemsinjob %}
+		{% if item.item_situation and perms.accounts.clemson_employee %}
+			{% ifequal item.item_situation 11 %}
+			<tr class="rowLightGreen">
+			{% else %}
+			<tr class="rowStopped">
+			{% endifequal %}
+		{% else %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+		{% endif %}
+			<td>{{ item.num_in_job }}</td>
+			<td class="fakelink"><!-- Link to preview artwork -->
+			  <span onMouseOver="this.style.cursor='pointer';" onclick='load_div("bottom_view", item_ajax_url("{{ item.id }}", "production_detail"))'>
+			    {{item}}
+			  </span>
+			</td>
+			<td>
+				{{item.itemcolor_set.count}}
+			</td>
+			<td>
+				{{item.printlocation}}
+			</td>
+			<td>
+				{{item.platepackage}}
+			</td>
+			<td>
+				{% for order in item.get_active_plate_orders %}
+					<a href="">#{{order.id}}</a>&nbsp;&nbsp;
+				{% endfor %}
+			</td>
+			<td>
+				{% for order in item.get_completed_plate_orders %}
+					<a href="">#{{order.id}}</a>&nbsp;&nbsp;
+				{% endfor %}
+			</td>
+			<td>
+				{% if item.final_file_date %}
+					<a href="">
+					  <img src="{{MEDIA_URL}}img/icons/basket_put.png" style="vertical-align:text-bottom" />
+					  Download
+					</a>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	</div>
+	{% include "workflow/job/job_detail/middle/item_summary_footer.html" %}

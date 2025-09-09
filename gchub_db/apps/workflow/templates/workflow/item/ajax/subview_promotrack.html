@@ -1,0 +1,72 @@
+	<img src="{{MEDIA_URL}}img/icons/arrow_turn_right.png">
+	{% include "workflow/job/ajax/load_tracker_page.html" %}
+	<div class="outline_fancy">
+		<br/>
+		{% if promotracklist %}
+			<h3 class="inline">Promotional Trackers</h3>
+			<table>
+					<tr>
+						<th>Item</th>
+						<th>Type</th>
+						<th>Comments</th>
+						<th>Date</th>
+						<th>Added By</th>
+					</tr>
+					{% for art in promotracklist %}
+						<tr>
+							<td>{{ art.item.num_in_job }}</td>
+							<td>{{ art.type }}</td>
+							<td>{{ art.addition_comments }}</td>
+							<td>{{ art.addition_date|date:"n-j-Y" }}</td>
+							<td>{{ art.edited_by }}</td>
+							<td>
+								<form id="delete_tracked_promo_{{ art.item.num_in_job }}" onsubmit="delete_item_tracker('{{art.item.id}}', '{{art.id}}', 'promotional', {{job.id}});return false;">
+									<img src="/media/img/icons/delete.png" style="vertical-align:text-bottom" alt="Delete"/>
+									<input type="submit" value="Delete" onsubmit="delete_item_tracker('{{art.item.id}}', '{{art.id}}', 'promotional', {{job.id}});return false;"  />
+								</form>
+							</td>
+						</tr>
+					{% endfor %}
+			</table>
+		{% endif %}
+		<h3 class="inline">Add a Promotional Tracker</h3>
+		<form id="itemtrackerpromoform" name="itemtrackerpromoform" onsubmit="add_item_tracker('{{job.id}}', 'itemtrackerpromoform', 'item_tracker_promo');return false;">
+			<table>
+				<tr>
+					<th class="rightalign">
+		        		<label for="id_items">Items</label>
+		    		</th>
+
+		    		<td>
+		    			<input type="checkbox" id="toggle_all_promo" checked="checked"/>
+					    Toggle All
+					    <br />
+					    <br />
+						{% for item in job_items %}
+							<input type="checkbox" name="items_checked" id="promo_item_{{item.id}}" checked="checked" value="{{item.id}}" />#{{item.num_in_job}}
+							{{item}}<br />
+						{% endfor %}
+		    		</td>
+				<tr>
+				</tr>
+					<th class="rightalign">
+		        		<label for="id_tracker_catagory">Types:</label>
+	        		</th>
+	        		<td>
+		        		{{ form.catagory }}
+		        		<span class="smtext">Command+click to multi-select.</span>
+	        		</td>
+
+        		</tr>
+				<tr>
+					<th class="rightalign">
+		        		<label for="id_addition_comments">Comments:</label>
+	        		</th>
+	        		<td>
+		        		{{ form.addition_comments }}
+	        		</td>
+        		</tr>
+    		</table>
+    		<input type="submit" value="Add" onclick="add_item_tracker('{{job.id}}', 'itemtrackerpromoform', 'item_tracker_promo');return false;" />
+		</form>
+	</div>

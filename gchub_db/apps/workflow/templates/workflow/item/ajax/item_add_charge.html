@@ -1,0 +1,52 @@
+	<img src="{{MEDIA_URL}}img/icons/money_dollar.png">
+	<span class="sub_heading">Add Charge for Item #{{ item.num_in_job }} - {{ item.size }}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<br /><br />
+	<form id="charge" name="charge" onsubmit="add_charge('{{item.id}}', '{{item.job.id}}');return false;">
+	<input type="hidden" name="item" id="id_item" value="{{item.id}}">
+		<!--  <label for="id_charge_category">Category:</label>
+		<select name="charge_category">
+			<option value="base_packages">Base Packages</option>
+			<option value="proofing">Proofing</option>
+			<option value="revisions">Revisions</option>
+		</select>
+		<br /> -->
+
+		<label for="id_description">Charge Type:</label>
+			<select name="description" id="id_description" onchange="auto_fill_charge(this.form, '{{item.quality}}', '{{item.itemcolor_set.count}}', '{{item.id}}')">
+			<option value="" selected="selected">---------</option>
+			{% for type in charge_options %}
+				<option value="{{type.id}}">{{type.menu_name}}</option>
+			{% endfor %}
+
+			</select><br>
+
+		<label for="id_artist">Artist:</label>
+			<select name="artist" id="id_artist">
+			{% for artist in artists %}
+			   <option value="{{artist.id}}" {% ifequal artist current_artist %}selected="selected"{% endifequal %}>{{artist.first_name}} {{artist.last_name}}</option>
+			{% endfor %}
+			</select><br />
+
+		<label for="id_rush_days">Rush Days:</label>
+			<select name="rush_days" id="id_rush_days" onchange="auto_fill_charge(this.form, '{{item.quality}}', '{{item.itemcolor_set.count}}', '{{item.id}}')">
+			<option value="" selected="selected">--</option>
+			<option value="0">0</option>
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+			<option value="6">6</option>
+			<option value="7">7</option>
+			<option value="8">8</option>
+			</select><br>
+
+		<label for="id_amount">Amount:</label>
+		{{ chargeform.amount }}<br />
+
+		<label for="id_comments">Comments:</label>
+		{{ chargeform.comments }}<br />
+
+		<br />
+		<input type="submit" value="Add Charge" onclick="add_charge('{{item.id}}', '{{item.job.id}}');return false;" />
+	</form>

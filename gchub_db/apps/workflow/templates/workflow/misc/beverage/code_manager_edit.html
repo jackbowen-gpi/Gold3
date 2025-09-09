@@ -1,0 +1,45 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript">
+		function edit_code(code_id) {
+		   /*
+		    * Fired when he user hits the Edit Code. Calls the validator
+		    * and sends off an AJAX request if all is good.
+		    */
+		   YAHOO.example.container.wait.show();
+		   new Ajax.Request('/workflow/beverage/code_manager/edit/'+ code_id +'/', {
+		       method: 'POST',
+		       parameters: Form.serialize('code_edit'),
+		       onSuccess: function(http_req) {
+		           // Get a JSON object from the response string (from the server).
+		           jsobj = http_req.responseText.evalJSON();
+		           // See if there was a form processing error.
+		           if (jsobj["is_error"] == false) {
+		               window.location = "/workflow/beverage/code_manager/"
+		           } else {
+		               // Form validation error happened.
+		               hide_modal_wait();
+		               alert(jsobj["message"]);
+		           }
+		       },
+		       onComplete: function() {
+		          hide_modal_wait();
+		   }});
+		} // end edit_code()
+	</script>
+
+{% endblock %}
+
+{% block body %}
+<h1 class="inline"><img src="{{MEDIA_URL}}img/icons/database_edit.png" style="vertical-align:text-center" /> Edit Beverage Brand Code</h1>
+<p>
+Please enter new information for <b>{{code.name}}</b>.
+<form id="code_edit" name="code_edit" onsubmit="edit_code('{{code.id}}');return false;">
+	<div class="form_p">
+	  	{{add_form.as_p}}
+	</div>
+	<input type="submit" value="Edit Code" onclick="edit_code('{{code.id}}');return false;" />
+</form>
+{% endblock %}

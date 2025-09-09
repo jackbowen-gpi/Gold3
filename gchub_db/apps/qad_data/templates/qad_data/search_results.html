@@ -1,0 +1,21 @@
+{% extends "standard.html" %}
+
+{% block body %}
+  <h1>Print Group Search Results</h1>
+  <p>{% include "pagination_bar.html" %}</p>
+
+  <table style="width:450px;">
+    <tr>
+      <th>Print Group Name</th>
+      <th>Description</th>
+    </tr>
+    {% for result in object_list %}
+	<tr class="{% cycle 'rowA' 'rowB' %}">
+	  <td>{{result.name}}</td>
+	  <td>{{result.description}}</td>
+	</tr>
+	{% endfor %}
+  </table>
+  {% include "pagination_bar.html" %}
+  <p><a href="{% url "qad_data-search_printgroup" %}">New Search</a></p>
+{% endblock %}

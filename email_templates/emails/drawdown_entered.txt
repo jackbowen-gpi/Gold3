@@ -1,0 +1,23 @@
+A new ink drawdown request has been entered by User: {{user}} for Customer/Job: {{drawdownReq.customer_name}}.
+
+DRAWDOWN REQUEST:
+Job: {% if drawdownReq.job_number %}{{drawdownReq.job_number}}{% else %}{{drawdownReq.customer_name}}{% endif %}
+Date Entered: {{drawdownReq.creation_date|date:"n-j-Y"}}
+Date Needed: {{drawdownReq.date_needed|date:"n-j-Y"}}
+Send Prints to:
+{{drawdownReq.send_prints_to}}
+Comments:
+{{drawdownReq.comments}}
+
+REQUESTED ITEMS:
+{% for ddItem in drawdownItems %}
+Item {% if ddItem.item_number %}{{ddItem.item_number}}{% else %}N/A{% endif %} - {% if ddItem.artwork and ddItem.item_number and drawdownReq.job_number %}Artwork IS attached{% else %}Artwork IS NOT attached{% endif %}
+Num copies: {{ddItem.number_copies}}
+Print Location: {{ddItem.print_location}}
+Substrate: {{ddItem.substrate}}
+Colors Needed:
+{{ddItem.colors_needed}}
+---------------------------
+
+{% endfor %}
+{% include "emails/drawdown_email_footer.txt" %}

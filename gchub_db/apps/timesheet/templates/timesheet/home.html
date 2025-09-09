@@ -1,0 +1,178 @@
+{% extends "standard.html" %} 
+
+{% block extra_head %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript -->
+	<script type="text/javascript"> 	
+		//prototype is loaded in GOLD's base html and it uses $ just like jQuery
+		//does. So we'll change $ to $j for the jQuery on this page using 
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+		
+		//Accordian effect.
+		$j( function() {
+			$j( "#accordion" ).accordion({heightStyle: 'content'});
+		} );
+
+		//Date pickers
+		$j( function() {
+			var dateFormat = "mm/dd/yy",
+			
+			//From field
+           	from = $j( "#id_end_date" )
+           	.datepicker({
+				changeMonth: true,
+              	changeYear: true,
+              	numberOfMonths: 1,
+              	showButtonPanel: true,
+       		})
+           	.on( "change", function() {
+    	  		to.datepicker( "option", "minDate", getDate( this ) );
+       		}),
+			
+			//To field
+       		to = $j( "#id_start_date" ).datepicker({
+  				changeMonth: true,
+              	changeYear: true,
+              	numberOfMonths: 1,
+              	showButtonPanel: true,
+       		})
+           	.on( "change", function() {
+    	  		from.datepicker( "option", "maxDate", getDate( this ) );
+           	});
+
+       		function getDate( element ) {
+          		var date;
+          		try {
+             		date = $j.datepicker.parseDate( dateFormat, element.value );
+      			} catch( error ) {
+             		date = null;
+          		}
+				return date;
+       		} 
+		} );//End date pickers 	
+	</script> 
+
+	<!--CSS (this is just copied from base.html to sidestep a conflict)-->
+	<style type="text/css">
+		a img {
+			border: none
+		}
+		a { 
+			color: #883333; 
+			text-decoration: none
+		}
+		/* This specifically overwrites the jquery a-tag css so we get to control the link color */
+		.ui-widget-content a { 
+			color: #883333; 
+			text-decoration: none
+		}
+		a:visited { 
+			color: #883333
+		}
+		a:hover { 
+			color: #222222 
+		}
+		#refresh {
+			border: none;
+			padding: 0;
+			margin: 0;
+			vertical-align: text-bottom;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+<h1>
+	<!-- Managers can set a custom date range. -->
+	{% if is_manager %}
+		<form method="post">
+			{% csrf_token %}
+			{{page_title}} from {{reportform.end_date}} to {{reportform.start_date}}
+		<input type="image" src="{{MEDIA_URL}}img/icons/arrow_refresh.png" alt="Submit" id="refresh" />
+		{{ reportform.non_field_errors }}
+	    {{ reportform.end_date.errors }}
+	    {{ reportform.start_date.errors }}
+		</form>
+	{% else %}
+		{{page_title}}
+	{% endif %}
+</h1>
+<hr />
+
+<p>
+	{{message}}
+</p>
+
+<!-- Show a link to enter new timesheets if not in manager view. -->
+{% if is_manager is False %}
+	<div style="margin-left:20px">
+		<h2>
+			<a href="add/" >
+				<img src="{{MEDIA_URL}}img/icons/clock_add.png" />
+				New Timesheet Entry
+			</a>
+		</h2>
+	</div>
+	<br />
+{% else %}
+	<h3>
+		<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+		<a href="/manager_tools/timesheets/" >Back</a>
+	</h3>
+	<br />
+{% endif %}
+
+<div id="accordion">
+
+<!-- Iterate through each day in the master list and display the timesheet data -->
+<!-- 0 is the date, 1 is the timesheet queryset, 2 is the total hours -->
+{% for day_data in timesheets_by_date%}
+  <h3>
+  	<!-- The date -->
+  	{{ day_data.0|date:"D, n-j" }}
+  	<!-- Flag today and yesterday. -->
+	{% if day_data.0 == today_check %}
+	  (Today)
+	{% endif %}
+	{% if day_data.0 == yesterday_check %}
+	  (Yesterday)
+	{% endif %}
+  </h3>
+  <div>
+	<table>
+		<tr>
+			<th>Job</th>
+			<th>Category</th>
+			<th>Hours</th>
+			<th>Comments</th>
+		</tr>
+	<!-- Display each individual timesheet entry. -->
+	{% for sheet in day_data.1 %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+			{% if sheet.job %}
+				<td><a href="{{sheet.job.get_absolute_url}}" title="{{sheet.job}}" alt="{{sheet.job}}">{{sheet.job.id}} {{sheet.job.name|slice:":50"}} ({{sheet.job.items_in_job}})</a> </td>
+			{% else %}
+				<td>N/A</td>
+			{% endif %}
+			<td>{{sheet.category}}</td>
+			<td>{{sheet.hours}}</td>
+			<td>{{sheet.comments}}</td>	
+			<!-- Show the edit timesheet form if not in manager view. -->
+			{% if is_manager is False %}
+				<td><a href="edit/{{sheet.id}}/">Edit</a></td>
+			{% endif %}
+		</tr>
+	{% endfor %}
+	</table>
+	<!-- Total Hours -->
+	<strong>Total: {{ day_data.2|floatformat:2 }}</strong>
+  </div>
+{% endfor %}
+</div>
+
+{% endblock %}

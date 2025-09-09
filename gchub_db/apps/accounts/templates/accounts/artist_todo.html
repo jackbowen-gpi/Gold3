@@ -1,0 +1,135 @@
+{% if user_stickied_jobs %}
+<table width="99%" class="minimal_horizontal">
+  <caption>My Stickied Jobs</caption>
+  <thead>
+  <tr>
+    <th>Job</th>
+    <th>Due Date</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for job in user_stickied_jobs %}
+        <tr>
+          <td style="padding:2px">
+            <a href="/workflow/job/{{job.id}}/">{{job}}</a> ({{job.items_in_job}})
+          </td>
+          <td>
+          {% ifequal job.workflow_status "Final File" %}
+          	{{job.final_file_due_date|date:"n-j-Y"}}
+          {% else %}
+            {% ifequal job.workflow_status "Revisions" %}
+              {% if job.revision_earliest_due_date %}
+                {{job.revision_earliest_due_date|date:"n-j-Y"}}
+              {% endif %}
+            {% else %}
+              {{job.due_date|date:"n-j-Y"}}
+            {% endifequal %}
+          {% endifequal %}
+          </td>
+          <td>
+            {{job.workflow_status}}
+            <!-- TD, OD, PR, FF, RV -->
+          </td>
+        </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<br />
+{% endif %}
+
+<table width="99%" class="minimal_horizontal">
+  <caption>My Active Jobs</caption>
+  <thead>
+  <tr>
+	<th>Job</th>
+	<th>Due Date</th>
+	<th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for job in user_job_list %}
+	<!-- Corrugated jobs need to stay on the list until completed -->
+	{% if 'KD' in job.name %}
+		{% if job.workflow_status != "Complete" %}
+		<tr>
+		  <td style="padding:2px">
+		    <a href="/workflow/job/{{job.id}}/">{{job}}</a> ({{job.items_in_job}})
+		  </td>
+		  <td>
+		  {% ifequal job.workflow_status "Final File" %}
+		    {{job.final_file_due_date|date:"n-j-Y"}}
+		  {% else %}
+			{% ifequal job.workflow_status "Revisions" %}
+			  {% if job.revision_earliest_due_date %}
+			    {{job.revision_earliest_due_date|date:"n-j-Y"}}
+			  {% endif %}
+		    {% else %}
+			  {{job.due_date|date:"n-j-Y"}}
+			{% endifequal %}
+		  {% endifequal %}
+		  </td>
+		  <td>
+		    {{job.workflow_status}}
+            <!-- TD, OD, PR, FF, RV -->
+		  </td>
+		</tr>
+		{% endif %}
+	<!-- Non corrugated jobs need to stay on the list until proofed -->
+	{% else %}
+			{% if job.workflow_status != "Proofs Out" %}
+				{% if job.workflow_status != "Complete" %}
+			<tr>
+			  <td style="padding:2px">
+			    <a href="/workflow/job/{{job.id}}/">{{job}}</a> ({{job.items_in_job}})
+			  </td>
+			  <td>
+			  {% ifequal job.workflow_status "Final File" %}
+			    {{job.final_file_due_date|date:"n-j-Y"}}
+			  {% else %}
+				{% ifequal job.workflow_status "Revisions" %}
+				  {% if job.revision_earliest_due_date %}
+				    {{job.revision_earliest_due_date|date:"n-j-Y"}}
+				  {% endif %}
+			    {% else %}
+				  {{job.due_date|date:"n-j-Y"}}
+				{% endifequal %}
+			  {% endifequal %}
+			  </td>
+			  <td>
+			    {{job.workflow_status}}
+	            <!-- TD, OD, PR, FF, RV -->
+			  </td>
+			</tr>
+		{% endif %}
+		{% endif %}
+	{% endif %}
+  {% endfor %}
+  </tbody>
+</table>
+
+<br />
+<table width="99%" class="minimal_horizontal">
+  <caption>My Jobs on Hold</caption>
+  <thead>
+    <tr>
+	  <th>Job</th>
+	  <th>Due Date</th>
+    </tr>
+  </thead>
+  {% for job in user_hold_list %}
+  <tbody>
+  <tr>
+	<td style="padding:2px">
+	  <a href="/workflow/job/{{job.id}}/">{{job.id}} {{job.name}}</a> ({{job.items_in_job}})
+	</td>
+	<td>
+	  {{job.due_date|date:"n-j-Y"}}
+	</td>
+  </tr>
+  </tbody>
+  {% endfor %}
+</table>
+
+{% include "accounts/index_todo_bottom.html" %}
+</div>

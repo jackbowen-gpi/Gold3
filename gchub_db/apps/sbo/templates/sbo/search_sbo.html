@@ -1,0 +1,50 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+
+	<!--CSS-->
+	<style type="text/css">
+		.refreshButton {
+			background-color:lightgrey;
+			margin-left:10px;
+			border-radius:9px;
+			padding-left:5px;
+			padding-right:5px;
+		}
+
+		.refreshButton:hover {
+			background-color:darkgrey;
+		}
+	</style>
+
+{% endblock %}
+
+{% block body %}
+	<p><h1>SBO Search Page</h1></p>
+	<p></p>
+
+	<a href="/sbo/home/?page=1"><img src="{{MEDIA_URL}}img/icons/door_out.png" style="vertical-align:bottom"/> Search again</a>
+	<p></p>
+
+	<div class="outline_fancy" style="width:800px">
+	  	{% include "pagination_bar.html" %}
+		<table width="100%">
+		{% if object_list %}
+			<tr>
+		        <th>Date</th>
+		        <th>Type</th>
+		    </tr>
+			{% for entry in object_list %}
+			    <tr class="{% cycle 'rowA' 'rowB' %}">
+			        <td><a href="/sbo/sbo_detail/{{entry.id}}/">{{entry.date_observed|date:"n-j-Y"}}</a></td>
+			        <td>{{entry.get_behavior_type_display}}</td>
+			    </tr>
+			{% endfor %}
+		{% else %}
+			<td><h2>No search results found</h2></td>
+		{% endif %}
+		</table>
+		{% include "pagination_bar.html" %}
+	</div>
+
+{% endblock %}

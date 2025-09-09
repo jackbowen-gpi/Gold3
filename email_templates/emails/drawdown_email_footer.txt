@@ -1,0 +1,6 @@
+========================================================
+This email was automatically generated and sent by GOLD.
+Please direct any technical questions, comments, or suggestions to clemson.support@graphicpkg.com.
+Please direct any questions concerning the artwork or job to the artist.
+Email: {% if drawdownReq.job_number %}{{job.artist.email}}{% else %}{{user.email}}{% endif %}
+Phone: {{user.profile.phone_number}}

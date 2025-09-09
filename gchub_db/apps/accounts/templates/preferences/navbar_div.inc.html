@@ -1,0 +1,36 @@
+<div class="yui-skin-sam">
+<div id="preferences_nav" class="yuimenubar yuimenubarnav">
+    <div class="bd">
+        <ul class="first-of-type">
+            <li class="yuimenubaritem first-of-type">
+              <a class="yuimenubaritemlabel" href="{% url "preferences_contact_info" %}">
+                Contact Info
+              </a>
+            </li>
+            <li class="yuimenubaritem">
+              <a class="yuimenubaritemlabel" href="{% url "preferences_settings" %}">
+                Settings
+              </a>
+            </li>
+            <li class="yuimenubaritem">
+              <a class="yuimenubaritemlabel" href="{% url "preferences" %}">
+                Change Password
+              </a>
+            </li>
+            <li class="yuimenubaritem">
+              {# Try the standard Django name first; fall back to legacy name if not present. #}
+              {% url 'password_change' as pw_url %}
+              {% if pw_url %}
+                <a class="yuimenubaritemlabel" href="{{ pw_url }}">
+                  Admin - Change Password
+                </a>
+              {% else %}
+                <a class="yuimenubaritemlabel" href="{% url 'pass_change' %}">
+                  Admin - Change Password
+                </a>
+              {% endif %}
+            </li>
+        </ul>
+    </div>
+</div>
+</div>

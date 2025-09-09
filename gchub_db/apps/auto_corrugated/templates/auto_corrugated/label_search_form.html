@@ -1,0 +1,29 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/auto_corrugated/generation_styles.css" />
+	{% include "yui_container_includes.html" %}
+	{% include "auto_corrugated/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block page_title %}Search Labels{% endblock %}
+
+{% block body %}
+<h1>Search Previously Generated Labels</h1>
+{% include "auto_corrugated/navbar_div.inc.html" %}
+
+{% if form.errors %}
+<ul class="errorlist">
+  <li>Please correct the error{{ form.errors|pluralize }} with your submission!</li>
+</ul>
+{% endif %}
+
+<form action="" name="search" enctype="multipart/form-data" method="GET">
+  <div class="form_p">
+  	{{form.as_p}}
+  </div>
+<input type="submit" value="Search" />
+<div style="clear: both;"></div>
+</form>
+
+{% endblock %}

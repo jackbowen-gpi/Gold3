@@ -1,0 +1,35 @@
+</script>
+<img src="{{MEDIA_URL}}img/icons/page_white_magnify.png" />
+<span class="sub_heading">Start a new QC</span>
+<a href='javascript:load_div("bottom_view", "{% url "qc_select_and_create" job.id %}")'>
+    (Refresh)
+  </a>
+
+<p>Select the items to QC below.</p>
+<div style='margin-left:10px;margin-bottom:9px;'>
+  <form id="item_selection">
+
+  <input type="checkbox" id="toggle_all_qc" checked="checked"/>
+  Toggle All
+  <br />
+  <br />
+  {% for item in job.item_set.all %}
+  <input type="checkbox" name="item_{{item.id}}" id="item_{{item.id}}" value="{{item.id}}" checked="checked" />
+  {{item.num_in_job}} {{item.get_item_designation}}
+  <br />
+  {% endfor %}
+  </form>
+</div>
+{% comment %}
+<div style='margin:4px'>
+  <a class="button" href="javascript:ajax_send_creation_request({{job.id}})">
+    <span style="text-decoration: line-through;">Start QC</span>
+  </a>
+</div>
+{% endcomment %}
+
+<div style='margin:4px'>
+  <a class="button" href="javascript:ajax_send_creation_request2({{job.id}})">
+    <span>Start QC</span>
+  </a>
+</div>

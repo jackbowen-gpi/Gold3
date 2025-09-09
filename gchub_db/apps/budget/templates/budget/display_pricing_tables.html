@@ -1,0 +1,55 @@
+{% extends "standard.html" %}
+
+{% load humanize %}
+
+{% block body %}
+<div>
+	<h1 class="inline">{{page_title}} - {{workflow}}</h1><br /><br />
+	<div class="outline_fancy" style="width:600px">
+		{% for type in charge_data %}
+			<a href="#cat_{{type.id}}">{{type.category}} - {{type}}</a><br />
+		{% endfor %}
+	</div>
+	{% for type, charges in charge_data.items %}
+		<div class="outline_fancy" style="width:600px">
+			<a name="cat_{{type.id}}" />
+			<table width="600px">
+				<tr>
+					<td colspan="9"><h2 class="inline">{{type.category}} - {{type}}</h2></td>
+				</tr>
+				<tr>
+					<td></td>
+					<th colspan="8" style="text-align:center;">Inks</th>
+				</tr>
+				<tr>
+					<th style="text-align:right;width:75px;">Turnaround</th>
+					{% if type.adjust_for_colors %}
+						{% for rush, cost_table in charges.items %}
+							{% ifequal rush 0 %}
+								{% for ink in cost_table %}
+									<th width="50px" style="text-align:center;">{{ink}}</th>
+								{% endfor %}
+							{% endifequal %}
+						{% endfor %}
+					{% else %}
+						<th width="50px" style="text-align:center;">Any</th>
+						<th colspan="7" style="text-align:center;">&nbsp;</th>
+					{% endif %}
+				</tr>
+						{% for rush, cost_table in charges.items %}
+							<tr>
+								{% ifequal type.rush_type 'NONE' %}
+									<th style="text-align:right;">Any</th>
+								{% else %}
+									<th style="text-align:right;">{{rush}} day</th>
+								{% endifequal %}
+								{% for ink, cost in cost_table.items %}
+									<td style="text-align:right;">${{cost|floatformat:2}}</td>
+								{% endfor %}
+							</tr>
+						{% endfor %}
+			</table>
+		</div>
+	{% endfor %}
+</div>
+{% endblock %}

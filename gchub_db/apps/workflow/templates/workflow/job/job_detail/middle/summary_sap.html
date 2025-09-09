@@ -1,0 +1,46 @@
+{% load item_links %}
+{% load group_check %}
+	<img src="{{MEDIA_URL}}img/icons/date.png" style="vertical-align:text-bottom" alt="Timeline" />
+    {% include "workflow/job/job_detail/middle/toggle_navbar.html" %}
+
+	<div class="outline_fancy">
+	<table width="100%">
+		<tr>
+			<th width="10px">#</th>
+			<th>Size</th>
+			<th>GREQ</th>
+			<th>GDD</th>
+			<th>One Up Die</th>
+			<th>Step Die</th>
+			<th>Location</th>
+			<th>Coating Pattern</th>
+		</tr>
+
+		{% for item in itemsinjob %}
+		{% if item.item_situation and perms.accounts.clemson_employee %}
+			{% ifequal item.item_situation 11 %}
+			<tr class="rowLightGreen">
+			{% else %}
+			<tr class="rowStopped">
+			{% endifequal %}
+		{% else %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+		{% endif %}
+			<td>{{ item.num_in_job }}</td>
+			<td class="fakelink">
+			  <span onmouseover="this.style.cursor='pointer';"
+			        onclick='load_div("bottom_view", item_ajax_url("{{ item.id }}", "sap_detail"))'>
+				{{item}}
+			  </span>
+			</td>
+			<td>{{ item.graphic_req_number }}</td>
+			<td>{{ item.grn }}</td>
+			<td>{{ item.one_up_die }}</td>
+			<td>{{ item.step_die }}</td>
+			<td>{{ item.location }}</td>
+			<td>{{ item.coating_pattern }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+	</div>
+	{% include "workflow/job/job_detail/middle/item_summary_footer.html" %}

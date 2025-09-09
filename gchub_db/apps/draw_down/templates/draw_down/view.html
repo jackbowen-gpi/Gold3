@@ -1,0 +1,146 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+    {% include "yui_container_includes.html" %}
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/drawdown/drawdown.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/table-sorter/table-sorter.css" type="text/css" />
+    <script type="text/javascript" src="{{MEDIA_URL}}js/drawdown/drawdown.js"></script>
+    <script type="text/javascript">
+
+        function readable_substrate_list(){
+            var sub = $('drawdown-substrate-list')
+
+            var substrateValue = sub.innerHTML;
+            var splitSub = substrateValue.split(",");
+
+            if (splitSub[0][0] == "[")
+            {
+                var count = splitSub.length;
+                var index = 0;
+                for(index; index<count; index++){
+                    splitSub[index] = splitSub[index].substring(3, splitSub[index].length-1);
+                    splitSub[index] = splitSub[index].split("'").join("");
+                }
+
+                splitSub = splitSub.join(", ");
+                sub.update(splitSub);
+            }
+
+            else if  (splitSub[0][0] == "{")
+            {
+                var count = splitSub.length;
+                var index = 0;
+                for(index; index<count; index++){
+                    splitSub[index] = splitSub[index].substring(0, splitSub[index].length-1);
+                    splitSub[index] = splitSub[index].split('"').join("");
+                }
+
+                splitSub = splitSub.join(", ");
+                splitSub = splitSub.substring(1);
+                sub.update(splitSub);
+            }
+
+
+        }
+
+        /* Stuff to be done on page load. */
+        function on_load() {
+            readable_substrate_list();
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+
+<h1 class="title">{{page_title}}</h1>
+{% ifequal system "new" %}
+ <div class="drawdown-nav">
+    <a href="../..">Add New Request</a> | <a href="../../search/">Search for a Request</a> |
+    <a href="../../show/">View All</a> | <a href="../../edit/{{drawdownReq.id}}/">Edit Request</a>
+</div>
+ <br />
+
+<div class="drawdown-view">
+    <div class="drawdown-view-header">
+        <div class="dd-view-head-label"><p>Customer's Name:</div>
+        <div class="dd-view-head-content"><p>{{ drawdownReq.customer_name }}</div>
+    </div>
+    <table style="width:100%">
+	    <tr>
+	    	{% if drawdownReq.job_number %}
+	    	<td style="width:10%" class=oddselected>Job #</td><td style="width:10%" class=rowOdd><a href="/workflow/job/{{drawdownReq.job_number}}/">{{ drawdownReq.job_number }}</a></td>
+	    	{% else %}
+	    	<td style="width:10%" class=oddselected>Job #</td><td style="width:10%" class=rowOdd>{{ drawdownReq.job_number }}</td>
+	    	{% endif %}
+	    	<td style="width:15%" class=oddselected>Send Prints To</td><td style="width:65%" class=rowOdd>{% autoescape off %}{{ drawdownReq.send_prints_to}}{% endautoescape %}</td>
+	    </tr>
+	    <tr>
+	    	<td style="width:10%" class=evenselected>Date In</td><td style="width:10%" class=rowEven>{{ drawdownReq.creation_date|date:"n-j-Y" }}</td>
+	    	<td style="width:15%" class=evenselected>Comments/Notes</td><td style="width:65%" class=rowEven>{% autoescape off %}{{ drawdownReq.comments }}{% endautoescape %}</td>
+	    </tr>
+	    <tr>
+	    	<td style="width:10%" class=oddselected>Date Needed</div></td><td style="width:10%" class=rowOdd>{{ drawdownReq.date_needed|date:"n-j-Y" }}</td>
+	    	<td style="width:15%" class=oddselected>Requested By</div></td><td style="width:65%" class=rowOdd>{{ drawdownReq.requested_by }}</td>
+	    </tr>
+    </table>
+
+	{% for item in drawdownItem %}
+	<div class="drawdown-view-header">
+		<div><p class="drawdown-sub-header">Item {{ item.item_number }}</p></div>
+	</div>
+	<table style="width:100%">
+	    <tr>
+	    	<td style="width:10%" class=oddselected>Item Number</td><td style="width:20%" class=rowOdd>{{ item.item_number }}</a></td>
+	    	<td style="width:15%" class=oddselected>Colors Needed</td><td style="width:55%" class=rowOdd>{% autoescape off %}{{ item.colors_needed }}{% endautoescape %}</td>
+	    </tr>
+	    <tr>
+	    	<td style="width:10%" class=evenselected>Print Location</td><td style="width:20%" class=rowEven>{{ item.print_location }}</td>
+	    	<td style="width:15%" class=evenselected>Number of Copies</td><td style="width:55%" class=rowEven>{{ item.number_copies }}</td>
+	    </tr>
+	    <tr>
+	    	<td style="width:10%" class=oddselected>Substrate</div></td><td style="width:20%" class=rowOdd>{{ item.substrate }}</td>
+	    	<td style="width:15%" class=oddselected>Artwork Provided</div></td><td style="width:55%" class=rowOdd>{{ item.artwork }}</td>
+	    </tr>
+    </table>
+   	{% endfor %}
+    <div class="clearfix"></div>
+</div>
+{% else %}
+ <div class="drawdown-nav">
+    <a href="../..">Add New Request</a> | <a href="../../search/">Search for a Request</a> |
+    <a href="../../show/">View All</a>
+</div>
+ <br />
+<div class="drawdown-view">
+    <div class="drawdown-view-header">
+        <div class="dd-view-head-label"><p>Customer's Name:</div>
+        <div class="dd-view-head-content"><p>{{ contact.customer_name }}</div>
+        <div class="dd-view-head-label"><p>Requested By:</div>
+        <div class="dd-view-head-content"><p>{{ contact.requested_by}}</div>
+    </div>
+    <div class="grouped">
+    <div class="drawdown-view-bodyLeft">
+        <div class="dd-view-item oddselected"><p>Job #</div><div class="dd-view-content rowOdd"><p><a href="../../../workflow/job/{{contact.job_number}}/">{{ contact.job_number }}</a></div>
+        <div class="dd-view-item evenselected"><p>Substrate</div><div class="dd-view-content rowEven"><p id="drawdown-substrate-list">{{ contact.substrate }}</div>
+        <div class="dd-view-item oddselected"><p>Print Location</div><div class="dd-view-content rowOdd"><p>{{ contact.print_location }}</div>
+        <div class="dd-view-item evenselected"><p>Number of Copies</div><div class="dd-view-content rowEven"><p>{{ contact.number_copies }}</div>
+        <div class="dd-view-item oddselected"><p>Date In</div><div class="dd-view-content rowOdd"><p>{{ contact.creation_date|date:"n-j-Y" }}</div>
+        <div class="dd-view-item evenselected last"><p>Date Needed</div><div class="dd-view-content rowEven last"><p>{{ contact.date_needed|date:"n-j-Y" }}</div>
+    </div>
+    <div class="drawdown-view-bodyRight">
+        <div class="grouped">
+            <div class="dd-view-item oddselected"><p>Colors Needed</div><div class="dd-view-content rowOdd"><p>{% autoescape off %}{{ contact.colors_needed }}{% endautoescape %}</div>
+        </div>
+        <div class="grouped">
+            <div class="dd-view-item evenselected"><p>Send Prints To</div><div class="dd-view-content rowEven"><p>{% autoescape off %}{{ contact.send_prints_to}}{% endautoescape %}</div>
+        </div>
+        <div class="grouped last">
+            <div class="dd-view-item oddselected last"><p>Comments/Notes</div><div class="dd-view-content rowOdd last"><p>{% autoescape off %}{{ contact.comments }}{% endautoescape %}</div>
+        </div>
+    </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+{% endifequal %}
+
+{% endblock %}

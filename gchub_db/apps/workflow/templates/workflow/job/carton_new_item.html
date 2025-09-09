@@ -1,0 +1,434 @@
+{% extends "standard.html" %}
+{% load job_filters %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="{{YUI_URL}}build/animation/animation-min.js"></script>
+    <script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/job_item_entry.js"></script>
+	<script src='{{MEDIA_URL}}js/spectrum/spectrum.js'></script>
+	<link rel='stylesheet' href='{{MEDIA_URL}}css/spectrum/spectrum.css' />
+
+	<!-- Need to override some default css -->
+	<style>
+		#id_proof_type_notes {
+			width: 240px;
+		}
+	</style>
+
+		<!-- Javascript happens here. -->
+	<script type="text/javascript">
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+		//jQuery document ready stuff.
+		$j(document).ready(function(){
+			$j('select[id$="printlocation"]').on( "change", function() {
+				var printloc = $j('select[id$="printlocation"] option:selected').text().split(' - ');
+				if(printloc[0] == "Marion"){
+					if(printloc[1] == "7201" || printloc[1] == "7202" || printloc[1] == "7203" ||
+					printloc[1] == "7204" || printloc[1] == "7205" || printloc[1] == "7207" || printloc[1] == "7211"){
+						$j('select[id$="plate_thickness"]').val("0.067");
+					}else if(printloc[1] == "7206" || printloc[1] == "7212" || printloc[1] == "7213"){
+						$j('select[id$="plate_thickness"]').val("0.045");
+					}
+				}
+				else if(printloc[0] == "Stone Mtn"){
+					$j('select[id$="plate_thickness"]').val("0.067");
+				}
+			});
+
+			// Error dialog
+			$j( "#error_dialog" ).dialog({
+				modal: true,
+				autoOpen: false,
+				title: "Error",
+				buttons: {
+					Ok: function() {
+						$j( this ).dialog( "close" );
+					}
+				}
+			});
+
+			// Selecting ECG should disable GCR and vice-versa
+			$j('#id_ecg').on( "change", function() {
+				if ($j('#id_ecg').is(':checked')){ // Disable GCR when ECG is checked.
+					$j('#id_gcr').prop('checked', false);
+					$j('#id_gcr').prop("disabled",true);
+				} else{ // Enable GCR when ECG is unchecked.
+					$j('#id_gcr').prop("disabled",false);
+				}
+			})
+			$j('#id_gcr').on( "change", function() {
+				if ($j('#id_gcr').is(':checked')){ // Disable ECG when GCR is checked.
+					$j('#id_ecg').prop('checked', false);
+					$j('#id_ecg').prop("disabled",true);
+				} else{ // Enable ECG when GCR is unchecked.
+					$j('#id_ecg').prop("disabled",false);
+				}
+			})
+
+			// Shows proof type notes field on when needed.
+			$j('#id_proof_type').on( "change", function() {
+				var selected_proof = $j('select[id$="proof_type"]').val();
+				if (selected_proof.startsWith("EDITS_ORIGINAL")){
+					$j("#id_proof_type_notes").show();
+				}
+				else{
+					$j("#id_proof_type_notes").hide();
+				}
+			})
+
+			// Selects a color profile if all the required fields are filled in.
+			$j('select[id$="carton_workflow"],' +
+				'select[id$="line_screen"],' +
+				'select[id$="ink_set"],' +
+				'select[id$="substrate"],' +
+				'select[id$="printlocation"],' +
+				'select[id$="print_condition"]').on( "change", function() {
+				// See what's selected in each field
+				var carton_workflow = $j('select[id$="carton_workflow"]').val();
+				var line_screen = $j('select[id$="line_screen"]').val();
+				var ink_set = $j('select[id$="ink_set"]').val();
+				var substrate = $j('select[id$="substrate"]').val();
+				var printlocation = $j('select[id$="printlocation"]').val();
+				// Print condition is optional. Set to zero if blank.
+				var print_condition = $j('select[id$="print_condition"]').val();
+				if (!print_condition){
+					print_condition = 0;
+				}
+				// If we have all the info we need then try to look up a color profile. Print condition is optional.
+				if (carton_workflow && line_screen && ink_set && substrate && printlocation){
+					$j.get("/workflow/job/cartonprofile/"+carton_workflow+"/"+line_screen+"/"+ink_set+"/"+substrate+"/"+printlocation+"/"+print_condition+"/", function(carton_profile) {
+						// If we found one select it in the carton profile field and highlight it in green for a moment.
+						if (carton_profile){
+							if (carton_profile.length == 1){
+								$j('#id_carton_profile_display').effect("highlight", {color:"#12F333"}, 2000);
+								$j('#id_carton_profile_display').val(carton_profile[0][0]) // Display only field. It's a list of lists so [0][0] is the name.
+								$j('#id_carton_profile').val(carton_profile[0][1]) // Hidden real field. [0][1] is the profile id.
+							}
+							// Display an error if more than one profile found.
+							else{
+								// Don't throw an error if they haven't selected a print condition yet.
+								if (print_condition !=0){
+									// Put the profile IDs in the error message.
+									var profile_id_list = "Profiles found:";
+									profile_id_list += "<ul>";
+									carton_profile.forEach(listFunc);
+									profile_id_list += "</ul>";
+									document.getElementById("error_dialog_profiles").innerHTML = profile_id_list;
+									function listFunc(value) {
+									  profile_id_list += "<li>" + value[0] + " (ID#: " + value[1] + ")" + "</li>";
+									}
+									// Show the user an error.
+									$j( "#error_dialog" ).dialog( "open" );
+									$j('#id_carton_profile_display').val("Duplicate profiles found.") // Display only field.
+								}
+							}
+						}
+						// No profiles found. Blank the carton profile field out and highlight it in red for a moment.
+						else{
+							$j('#id_carton_profile_display').effect("highlight", {color:"red"}, 2000);
+							$j('#id_carton_profile_display').val("None found") // Display only field.
+							$j('#id_carton_profile').val("") // Hidden real field.
+						}
+					});
+				}
+			});
+
+			/*
+				This function will save the current item and either reload the page for another similar item,
+				 reload and blank it out or save and go to the job page
+			*/
+			function save(job_id, another_item){
+				YAHOO.example.container.wait.show();
+				var colorData = $j('#newitem').serialize();
+				$j.ajax({
+					type: "POST",
+					url: "/workflow/job/new/carton/"+job_id+"/item/"+another_item+"/",
+					data: colorData,
+					context: this,
+					success: function(data, status) {
+						jsobj = JSON.parse(data);
+						if (jsobj["is_error"] == false) {
+							if (another_item == 'Yes') {
+								alert("Item has been saved successfully");
+								window.location = "/workflow/job/new/carton/"+ job_id +"/item/new/";
+							} else if (another_item == 'No'){
+								window.location = "/workflow/job/"+ job_id +"/";
+							} else {
+								hide_modal_wait();
+								alert(jsobj["message"]);
+								$j("#id_grn").val("");
+								$j("#id_customer_code").val("");
+								$j("#id_description").val("");
+								$j("#id_upc").val("");
+							}
+						}else {
+						   hide_modal_wait();
+			               alert(jsobj["message"]);
+						}
+					}
+				});
+			}
+
+			$j("#saveAdd").on("click", function(){
+				save({{job.id}}, "Yes");
+			});
+			$j("#saveAddSim").on("click", function(){
+				save({{job.id}}, "Similar");
+			});
+			$j("#saveFinish").on("click", function(){
+				save({{job.id}}, "No");
+			});
+
+			/*
+				Here we are changing showing or hiding the color picker based on the value of the chosen color definition.
+				We only need to display the picker if match color is selected, otherwise we hide the div.
+			*/
+			var colorDefs = $j("[id^='id_colorDef']")
+			for(var x=0; x <  colorDefs.length; x++){
+				$j(colorDefs[x]).on( "change", function() {
+					var defName = $j("option:selected", this).text();
+					var counter = $j(this).attr('id').length - 1;
+					var colorObj = {
+						"Coating": "00000000",
+                        "Process Black": "90985234",
+                        "Low-Carbon Black": "91064286",
+                        "Process Cyan": "90985253",
+                        "Process Magenta": "90984629",
+                        "Process Yellow": "90985250",
+                        "ECG Orange": "90000001",
+                        "ECG Green": "90000003",
+                        "ECG Violet": "90000002",
+                        "ECG Blue": "91053240"
+					};
+					if(defName == "Match Color"){
+						$j("div[id ='divPicker_"+$j(this).attr('id').substr(counter)+"']").css('display', "block");
+						$j("#id_color"+$j(this).attr('id').substr(counter)).prop('readonly', false);
+						$j("#id_color"+$j(this).attr('id').substr(counter)).val("");
+					}else if(defName in colorObj){
+						$j("div[id ='divPicker_"+$j(this).attr('id').substr(counter)+"']").css('display', "none");
+						$j("#id_color"+$j(this).attr('id').substr(counter)).prop('readonly', true);
+						$j("#id_color"+$j(this).attr('id').substr(counter)).val(colorObj[defName]);
+						if($j("#id_sequence_"+$j(this).attr('id').substr(counter)).val() == ""){
+							$j("#id_sequence_"+$j(this).attr('id').substr(counter)).val($j(this).attr('id').substr(counter));
+						}
+					}else{
+						$j("div[id ='divPicker_"+$j(this).attr('id').substr(counter)+"']").css('display', "none");
+						$j("#id_color"+$j(this).attr('id').substr(counter)).prop('readonly', false);
+					}
+				})
+			}
+
+			/*
+				Here we are getting all of the inputs used by the color picker and then creating a callback on change
+				to incremenet the sequence box based on which color field changed.
+			*/
+			var colors = $j("input[id^='id_color']");
+			for(var x=0; x <  colors.length; x++){
+				$j(colors[x]).on( "change", function() {
+					var color = $j(this).val();
+					if(color == ""){
+						$j("[id ='id_sequence_"+$j(this).attr('id').substr($j(this).attr('id').length - 1)+"']").val("");
+					}else{
+						var counter = $j(this).attr('id').substr($j(this).attr('id').length - 1);
+						if($j("[id ='id_sequence_"+counter+"']").val() == ""){
+							$j("[id ='id_sequence_"+counter+"']").val(counter);
+						}
+					}
+				})
+			}
+
+			/*
+				Here we are initiating the color pickers and adding a callback on change to change the value of a div
+				that will be sent to the server in the form when saved. 10 are created for this function to iterate over
+				and change dynamically.
+			*/
+			var colorPickers = $j("input[id^='colorPicker']");
+			for(var x=0; x <  colorPickers.length; x++){
+				$j(colorPickers[x]).spectrum({
+			    	color: "#ffffff",
+					change: function(color) {
+				        $j("#picker"+$j(this).attr('id').substr($j(this).attr('id').length - 1)).val(color.toHexString());
+						console.log($j("#picker"+$j(this).attr('id').substr($j(this).attr('id').length - 1)).val());
+				    }
+				});
+			}
+		});
+	</script>
+{% endblock %}
+
+{% block body %}
+<!---Error dialog-->
+<div id="error_dialog">
+		<p>
+			Found more than one Carton Profile matching that criteria. That's
+			not supposed to happen.
+		</p>
+		<p id="error_dialog_profiles"></p>
+		<p>Please send this error to: <a href="mailto:{{EMAIL_SUPPORT}}">{{EMAIL_SUPPORT}}</a></p>
+</div>
+
+<div style="min-height:780px;">
+	<h1 class="inline"><img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-center" /> Add Item to Carton Job - <a href='{% url "job_detail" job.id %}'>{{job.id}} {{job.name}}</a></h1><br />
+
+			<form id="newitem" name="newitem">
+			<input type="hidden" name="item_status" id="id_item_status" value="Pending" />
+			<input type="hidden" name="job" id="id_job" value="{{job.id}}" />
+			<input type="hidden" name="workflow" id="id_workflow" value="{{workflow.id}}" />
+			<input type="hidden" name="carton_profile" id="id_carton_profile" />
+
+			<input type="hidden" name="picker1" id="picker1" value="#ffffff" />
+			<input type="hidden" name="picker2" id="picker2" value="#ffffff" />
+			<input type="hidden" name="picker3" id="picker3" value="#ffffff" />
+			<input type="hidden" name="picker4" id="picker4" value="#ffffff" />
+			<input type="hidden" name="picker5" id="picker5" value="#ffffff" />
+			<input type="hidden" name="picker6" id="picker6" value="#ffffff" />
+			<input type="hidden" name="picker7" id="picker7" value="#ffffff" />
+			<input type="hidden" name="picker8" id="picker8" value="#ffffff" />
+			<input type="hidden" name="picker9" id="picker9" value="#ffffff" />
+			<input type="hidden" name="picker10" id="picker10" value="#ffffff" />
+
+			<div class="outline" style="min-height:50px;background-color:#DDDDDD;float:left;min-width:401px;">
+				<h2 class="inline">Job Information</h2><br /><br />
+				<strong>Customer: </strong>{{job.customer_name}}<br />
+				<strong>Due Date: </strong>{{job.due_date|date:"n-j-Y"}}
+			</div>
+
+			<div class="outline" style="min-height:50px;background-color:#DDDDDD;float:left;min-width:350px;">
+				*Enter a 10 million number and its PMS equivalent. If there <br/>
+				is no comparable PMS color then pick <b>"Match Color"</b> as <br/>
+				the PMS and choose a color manually with the color picker.
+			</div>
+
+			<br/>
+
+			<div class="outline" style="min-height:450px;background-color:#DDDDDD;float:left;min-width:401px">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align: text-bottom" /> Item Information</h2><br />
+				<label style="width:9em" for="id_size">Size:</label>{{itemform.size}}<br />
+				<label style="width:9em" for="id_grn">GDD:</label>{{itemform.grn}}<br />
+				{% if job.carton_type == "Prepress" %}
+					<label style="width:9em" for="id_gdd_origin">GDD Origin:</label>{{itemform.gdd_origin}}<br />
+				{% endif %}
+				<label style="width:9em" for="id_graphic_req_number">Graphic Req #:</label>{{itemform.graphic_req_number}}<br />
+				{% if job.carton_type == "Imposition" %} <!-- These fields moves here for imposition carton types. -->
+					<label style="width:9em" for="id_customer_code">Cust. Code:</label>{{itemform.customer_code}}<br />
+					<label style="width:9em" for="id_upc">UPC:</label>{{itemform.upc}}<br />
+				{% endif %}
+				{% if job.carton_type == "Prepress" %}
+					<label style="width:9em" for="id_graphic_po">Graphic PO #:</label>{{itemform.graphic_po}}<br />
+				{% endif %}
+				<label style="width:9em" for="id_description">Description:</label>{{itemform.description}}<br />
+				<label style="width:9em" for="id_one_up_die">One Up Die:</label>{{itemform.one_up_die}}<br />
+				{% if job.carton_type == "Prepress" %} <!-- Theses fields moves here for prepress carton types. -->
+					<label style="width:9em" for="id_upc">UPC:</label>{{itemform.upc}}<br />
+					<label style="width:9em" for="id_customer_code">Cust. Code:</label>{{itemform.customer_code}}<br />
+				{% endif %}
+				{% if job.carton_type == "Imposition" %}
+					<label style="width:9em" for="id_step_die">Step Die:</label>{{itemform.step_die}}<br />
+				{% endif %}
+				{% if job.carton_type == "Imposition" %}
+					<label style="width:9em" for="id_coating_pattern">Coating Pattern:</label>{{itemform.coating_pattern}}<br />
+					<label style="width:9em" for="id_print_location">Print Location:</label>{{itemform.printlocation}}<br />
+				{% endif %}
+				<label style="width:9em" for="id_location">Location:</label>{{itemform.location}}<br />
+				{% if job.carton_type == "Prepress" %}
+					<label style="width:9em" for="id_proof_type">Proof Type:</label>{{itemform.proof_type}}<br />
+					<label style="width:9em" for="id_proof_type_notes"></label>{{itemform.proof_type_notes}}<br />
+				{% endif %}
+				{% if job.carton_type == "Imposition" %}
+					<label style="width:9em" for="id_plate_thickness">Plate Thickness:</label>{{itemform.plate_thickness}}<br />
+				{% endif %}
+				{% if job.carton_type == "Imposition" %}
+					<label style="width:9em" for="id_print_repeat">Print Repeat:</label>{{itemform.print_repeat}}<br />
+				{% endif %}
+				{% if job.carton_type == "Prepress" %}
+					<label style="width:9em" for="id_ecg">Apply ECG:</label>{{itemform.ecg}}<br />
+					<label style="width:9em" for="id_gcr">Apply GCR:</label>{{itemform.gcr}}<br />
+					<label style="width:9em" for="id_trap">Trap:</label>{{itemform.trap}}<br />
+					<label style="width:9em" for="id_product_group">Product Group:</label>{{itemform.product_group}}<br />
+				{% endif %}
+				{% if job.carton_type == "Imposition" %}
+					<label style="width:9em" for="id_platepackage">Plate Package:</label>{{itemform.platepackage}}<br />
+					<label style="width:9em" for="id_line_screen">Line Screen:</label>{{itemform.line_screen}}<br />
+				{% endif %}
+
+			</div>
+
+			<div class="outline" style="min-height:450px;background-color:#DDDDDD;float:left;min-width:350px">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/color_wheel.png" style="vertical-align: text-bottom" /> Color Information</h2><br />
+				<table width="150px">
+					<tr>
+						<th>Seq</th><th>PMS Equivalent</th><th>Color Map</th><th>Color Picker</th>
+					</tr>
+					<tr>
+						<td>{{itemform.sequence_1}}</td><td>{{itemform.colorDef1}}</td><td>{{itemform.color1}}</td><td><div style='display:none' id='divPicker_1'><input id='colorPicker1' type='hidden' class="basic"/></div></td>
+					</tr>
+					<tr>
+						<td>{{itemform.sequence_2}}</td><td>{{itemform.colorDef2}}</td><td>{{itemform.color2}}</td><td><div style='display:none' id='divPicker_2'><input id='colorPicker2' type='hidden' class="basic"/></div></td>
+					</tr>
+					<tr>
+						<td>{{itemform.sequence_3}}</td><td>{{itemform.colorDef3}}</td><td>{{itemform.color3}}</td><td><div style='display:none' id='divPicker_3'><input id='colorPicker3' type='hidden' class="basic"/></div></td>
+					</tr>
+					<tr>
+						<td>{{itemform.sequence_4}}</td><td>{{itemform.colorDef4}}</td><td>{{itemform.color4}}</td><td><div style='display:none' id='divPicker_4'><input id='colorPicker4' type='hidden' class="basic"/></div></td>
+					</tr>
+					<tr>
+						<td>{{itemform.sequence_5}}</td><td>{{itemform.colorDef5}}</td><td>{{itemform.color5}}</td><td><div style='display:none' id='divPicker_5'><input id='colorPicker5' type='hidden' class="basic"/></div></td>
+					</tr>
+					<tr>
+						<td>{{itemform.sequence_6}}</td><td>{{itemform.colorDef6}}</td><td>{{itemform.color6}}</td><td><div style='display:none' id='divPicker_6'><input id='colorPicker6' type='hidden' class="basic"/></div></td>
+					</tr>
+					<tr>
+						<td>{{itemform.sequence_7}}</td><td>{{itemform.colorDef7}}</td><td>{{itemform.color7}}</td><td><div style='display:none' id='divPicker_7'><input id='colorPicker7' type='hidden' class="basic"/></div></td>
+					</tr>
+					<tr>
+						<td>{{itemform.sequence_8}}</td><td>{{itemform.colorDef8}}</td><td>{{itemform.color8}}</td><td><div style='display:none' id='divPicker_8'><input id='colorPicker8' type='hidden' class="basic"/></div></td>
+					</tr>
+					<tr>
+						<td>{{itemform.sequence_9}}</td><td>{{itemform.colorDef9}}</td><td>{{itemform.color9}}</td><td><div style='display:none' id='divPicker_9'><input id='colorPicker9' type='hidden' class="basic"/></div></td>
+					</tr>
+					<tr>
+						<td>{{itemform.sequence_10}}</td><td>{{itemform.colorDef10}}</td><td>{{itemform.color10}}</td><td><div style='display:none' id='divPicker_10'><input id='colorPicker10' type='hidden' class="basic"/></div></td>
+					</tr>
+				</table>
+			</div>
+
+			<br/>
+
+			{% if job.carton_type == "Prepress" %}
+				<div class="outline" style="background-color:#DDDDDD;float:left;min-width:401px">
+					<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/page_white_visualstudio.png" style="vertical-align: text-bottom" /> Profile Information</h2><br />
+					<label style="width:9em" for="id_print_location">Print Location:</label>{{itemform.printlocation}}<br />
+					<label style="width:9em" for="id_carton_workflow">Carton Workflow:</label>{{itemform.carton_workflow}}<br />
+					<label style="width:9em" for="id_substrate">Substrate:</label>{{itemform.substrate}}<br />
+					<label style="width:9em" for="id_ink_set">Ink Set:</label>{{itemform.ink_set}}<br />
+					<label style="width:9em" for="id_line_screen">Line Screen:</label>{{itemform.line_screen}}<br />
+					<label style="width:9em" for="id_print_condition">Print Condition:</label>{{itemform.print_condition}}<br />
+					<label style="width:9em" for="id_carton_profile_display">Color Profile:</label>{{itemform.carton_profile_display}}<br />
+				</div>
+			{% endif %}
+
+			<div class="outline" style="background-color:#FFFF99;float:left;clear:both;width:99%">
+				<input type="button" id="saveAdd" value="Save &amp; Add Another" />
+				<input type="button" id="saveAddSim" value="Save &amp; Add Similar" />
+				<input type="button" id="saveFinish" value="Save &amp; Finish" />
+			</div>
+		</form>
+
+		<br />
+
+		<div style="float:left;clear:both;width:756px">
+		<p>
+			<img src="{{MEDIA_URL}}img/icons/bullet_go.png" style="vertical-align: text-bottom" /> Go to job: <a href='{% url "job_detail" job.id %}'>{{job.id}} {{job.name}}</a>
+		</p>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,168 @@
+<div class="outline">
+<a href='javascript:load_div("bottom_view", job_ajax_url("{{ job.id }}", "misc_info"))'>
+  <img src="{{MEDIA_URL}}img/icons/report.png" style="vertical-align: text-bottom" alt="MiscInfo" />
+  Misc Info.
+</a>
+{% if perms.accounts.job_entry %}
+	{% ifequal job.workflow.name "Beverage" %}
+		{% if job.bev_job_lock %}
+			<!-- Job is locked, cannot add new items. -->
+		{% else %}
+			<span style="display:inline-block">
+			<a href='{% url "new_beverage_item" job.id "new" %}'>
+			  <img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" alt="Add Item" />
+			  Add Item
+			</a>
+			</span>
+			{% if job.duplicated_from %}
+				<span style="display:inline-block">
+				<a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "item_duplicate_list"))'>
+				  <img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" alt="Dupe Item" />
+				  Duplicate Items
+				</a>
+				</span>
+			{% endif %}
+		{% endif %}
+	{% else %}
+		{% if job.workflow.name == "Container" %}
+			<span style="display:inline-block">
+			<a href='{% url "new_container_item" job.id %}'>
+			  <img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" alt="Add Item" />
+			  Add Item
+			</a>
+			</span>
+		{% elif job.workflow.name == "Carton" %}
+			<span style="display:inline-block">
+			<a href="/workflow/job/new/carton/{{job.id}}/item/new/">
+			  <img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" alt="Add Item" />
+			  Add Cart Item
+			</a>
+			</span>
+		{% else %}
+			<span style="display:inline-block">
+			<a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "add_item"))'>
+			  <img src="{{MEDIA_URL}}img/icons/add.png" style="vertical-align: text-bottom" alt="Add Item" />
+			  Add Item
+			</a>
+			</span>
+		{% endif %}
+	{% endifequal %}
+{% endif %}
+	{% ifnotequal job.workflow.name "Beverage" %}
+   <span style="display:inline-block">
+   <a href='javascript:load_div("bottom_view", job_ajax_url("{{ job.id }}", "shipping_manager"))'>
+     <img src="{{MEDIA_URL}}img/icons/book_edit.png" style="vertical-align: text-bottom" alt="Ship Mgr" />
+     Ship Mgr.[{{job.jobaddress_set.count}}]
+   </a>
+   </span>
+   {% endifnotequal %}
+   {% if perms.accounts.in_artist_pulldown %}
+    <span style="display:inline-block">
+   	<a href='javascript:load_div("bottom_view", "{% url "qc_manager" job.id %}")'>
+   	  <img src="{{MEDIA_URL}}img/icons/page_white_magnify.png" style="vertical-align: text-bottom" alt="QC Mgr" />
+   	  QC Mgr.
+   	</a>
+   	</span>
+   {% endif %}
+  	{% ifequal job.workflow.name "Beverage" %}
+  	  <span style="display:inline-block">
+   	  <a href='javascript:load_div("bottom_view", job_ajax_url("{{ job.id }}", "bev_item_nomenclature"))'>
+   	  <img src="{{MEDIA_URL}}img/icons/overlays.png" style="vertical-align: text-bottom" alt="Bev Nomenclature" />
+   	    Item Nomenclature
+   	  </a>
+   	  </span>
+   {% endifequal %}
+   {% if perms.accounts.in_artist_pulldown or perms.accounts.salesperson%}
+   		{% if perms.accounts.in_artist_pulldown or perms.accounts.beverage_access%}
+		    {% if job.bev_job_lock %}
+					<!-- Job is locked, cannot add new items. -->
+			{% else %}
+				<span style="display:inline-block">
+		  	 	<a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "edit_all_timeline"))'>
+		  	 	  <img src="{{MEDIA_URL}}img/icons/date_edit.png" style="vertical-align: text-bottom" alt="Update All" />
+			 	    Update All
+			 	</a>
+			 	</span>
+		 	{% endif %}
+		{% endif %}
+   {% endif %}
+   {% if perms.accounts.clemson_employee %}
+   	     {% if job.bev_job_lock %}
+
+		 {% else %}
+		 	 <span style="display:inline-block">
+		     <a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "edit_all_billing"))'>
+			      <img src="{{MEDIA_URL}}img/icons/money_dollar.png" style="vertical-align: text-bottom" alt="Bill All" />
+			      Bill All
+			 </a>
+			 </span>
+		 {% endif %}
+   {% endif %}
+   {% ifnotequal job.workflow.name "Foodservice" %}
+   		{% if job.e_tools_id %}
+   			<span style="display:inline-block">
+	        <a href='{% url "etools_show_request" job.id %}'>
+	          <img src="{{MEDIA_URL}}img/icons/connect.png" style="vertical-align: text-bottom" alt="Etools" />
+	          See ETools Data
+	        </a>
+	        </span>
+	    {% endif %}
+   {% endifnotequal %}
+   {% ifnotequal job.workflow.name "Beverage" %}
+	    <span style="display:inline-block">
+	    <a href='{% url "job_specsheet_data" job.id %}'>
+	        <img src="{{MEDIA_URL}}img/icons/page_gear.png" style="vertical-align: text-bottom" alt="Spec Sheets" />
+	        Spec Sheets
+	    </a>
+	    </span>
+   {% endifnotequal %}
+   {% ifnotequal job.workflow.name "Beverage" %}
+      {% if perms.accounts.clemson_manager or perms.accounts.clemson_supervisor %}
+		 <span style="display:inline-block">
+	     <a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "item_tracker_art"))'>
+		      <img src="{{MEDIA_URL}}img/icons/award_star_gold_2.png" style="vertical-align: text-bottom" alt="Artwork" />
+		      Trackers
+		 </a>
+		 </span>
+	  {% elif perms.accounts.clemson_employee %}
+		 <span style="display:inline-block">
+	     <a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "item_tracker_promo"))'>
+		      <img src="{{MEDIA_URL}}img/icons/award_star_gold_2.png" style="vertical-align: text-bottom" alt="Artwork" />
+		      Trackers
+		 </a>
+		 </span>
+   	  {% endif %}
+   {% endifnotequal %}
+   {% if perms.accounts.clemson_employee or perms.accounts.salesperson%}
+		{% if perms.accounts.clemson_employee or perms.accounts.beverage_access%}
+			{% if job.proof_status %}
+				{% ifnotequal job.workflow.name "Foodservice" %}
+					<span style="display:inline-block">
+					<a href="{% url "get_zipfile_proof" job.id %}">
+						<img src="{{MEDIA_URL}}img/icons/compress.png" style="vertical-align: text-bottom" alt="Download Proofs" />
+						Download All Proofs
+					</a>
+					</span>
+				{% endifnotequal %}
+			{% endif %}
+		{% endif %}
+	{% endif %}
+	{% ifequal job.workflow.name "Foodservice" %}
+		{% if perms.accounts.rename_item_folders %}
+			<span style="display:inline-block">
+			<a href='javascript:do_sync_item_folders("{{job.id}}")'>
+		      <img src="{{MEDIA_URL}}img/icons/folder.png" style='vertical-align:text-bottom'>
+		      Sync Folders
+		    </a>
+			</span>
+		{% endif %}
+	{% endifequal %}
+	{% if perms.accounts.clemson_manager %}
+		<span style="display:inline-block">
+		<a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "timesheets"))'>
+			<img src="{{MEDIA_URL}}img/icons/clock_add.png" style="vertical-align: text-bottom" alt="Time/Materials" />
+			Time/Mat.
+		</a>
+		</span>
+	{% endif %}
+ </div>

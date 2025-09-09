@@ -1,0 +1,8 @@
+import psycopg2, sys
+try:
+    conn = psycopg2.connect(host="127.0.0.1", port=5433, user="gchub", dbname="gchub_dev", password="pass123")
+    print("OK: connected")
+    conn.close()
+except Exception as e:
+    print("FAILED:", e)
+    sys.exit(1)

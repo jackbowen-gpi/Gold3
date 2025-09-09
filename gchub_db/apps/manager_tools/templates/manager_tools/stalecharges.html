@@ -1,0 +1,192 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<style type="text/css">
+		#submit {
+			border: none;
+			padding: 0;
+			margin: 0;
+			vertical-align: text-bottom;
+		}
+	</style>
+
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<!-- This is used to make fancy "busy" indicators while prepping the excel 
+	downloads. Needs a special cookie in the http header to work. See the readme
+	in the js directory. --->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery.fileDownload.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript"> 
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using 
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+
+		//Date pickers
+		$j( function() {
+		   var dateFormat = "mm/dd/yy",
+		   from = $j( "#id_date_from" )
+		   .datepicker({
+		      changeMonth: true,
+  		      changeYear: true,
+		      numberOfMonths: 1,
+		      showButtonPanel: true,
+		   })
+		   .on( "change", function() {
+		      to.datepicker( "option", "minDate", getDate( this ) );
+		   }),
+		   to = $j( "#id_date_to" ).datepicker({
+		      changeMonth: true,
+  		      changeYear: true,
+		      numberOfMonths: 1,
+		      showButtonPanel: true,
+		   })
+		   .on( "change", function() {
+		      from.datepicker( "option", "maxDate", getDate( this ) );
+		   });
+		
+		   function getDate( element ) {
+		      var date;
+		      try {
+		         date = $j.datepicker.parseDate( dateFormat, element.value );
+		      } catch( error ) {
+		         date = null;
+		      }
+		
+		      return date;
+		   }
+		} );//End date pickers
+		
+		$j(document).ready(function(){
+			// Used to cancel downloads.
+			var dlReq = null;
+
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+
+			// Show busy indicator for page loads.
+			$j( "#submit" ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("This can take a moment...");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+			});
+
+			// Show busy indicator while prepping excel download.
+			$j( "#excel" ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("This can take a moment...");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+				// Prep download using jquery.fileDownload.js and assign to dlReq
+				dlReq = $j.fileDownload('/manager_tools/stalecharges/excel/' + "{{date_from_url}}" + '/to/' + "{{date_to_url}}" + '/', {
+				    successCallback: function (url) {
+				    	// Hide busy indicator once download is ready.
+						$j( "#busy_dialog" ).dialog( "close" );
+				    },
+				});
+			});
+
+		});//End jQuery stuff.
+	</script>
+{% endblock %}
+
+{% load humanize %}
+
+{% block body %}
+<h1>{{page_title}}</h1>
+<hr />
+
+<!---Busy dialog-->
+<div id="busy_dialog">
+  <center>
+	  <p><div id="busy_dialog_text"></div></p>
+	  <img src="{{MEDIA_URL}}img/spinner.gif" />
+  <center>
+</div>
+
+<div style="width:50%">
+	<p>
+	Total un-invoiced charges for a given time span by sales person and pring group. 
+    </p>
+</div>
+
+<h3>
+	<a href="/manager_tools/" >
+		<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+		Back
+	</a>
+</h3>
+<br />
+
+<!-- Data table -->
+<div class="grey_bordered">
+	<h2> 
+		<form method="post">
+			{% csrf_token %}
+			Un-invoiced charges from {{staleform.date_from}} to {{staleform.date_to}}
+		<input type="image" src="{{MEDIA_URL}}img/icons/arrow_refresh.png" alt="Submit" id="submit" />
+		</form>
+	</h2>
+
+	<!-- welcome message is only shown on the quick initial page load.-->
+	{% if welcome_message %}
+		<p>{{welcome_message}}</p>
+	{% else %}
+		{% if data %}
+			<!-- Download links-->
+			<div>
+				<a id="excel" href='#'>
+					<img src="{{MEDIA_URL}}img/icons/page_excel.png">
+					Download data as Excel.
+				</a>
+			</div>
+			<br />
+			<!-- Iterate through each sales persons data -->
+			{% for sales_person_data in data %}
+				{% if sales_person_data.0%}
+						<h3>
+							{{sales_person_data.0.first_name}} {{sales_person_data.0.last_name}}
+						</h3>
+				{% else %}
+						<h3>
+							No sales person
+						</h3>
+				{% endif %}
+				<!--Make a table for this sales person's print group data-->
+				<table class="rowHover">
+					{% for print_group in sales_person_data.1 %}
+						{% if print_group == sales_person_data.1.0 %}
+						<!-- First row is the total -->
+							<tr>
+								<th>{{print_group.0}}</th> <!--Name-->
+								<th style="text-align:right;">${{print_group.1|floatformat:2|intcomma}}</th> <!--Total-->
+							</tr>
+						{% else %}
+							<tr class="{% cycle 'rowA' 'rowB' %}">
+								<td>{{print_group.0}}</td> <!--Name-->
+								<td style="text-align:right;">${{print_group.1|floatformat:2|intcomma}}</td> <!--Total-->					
+							</tr>
+						{% endif %}
+					{% endfor %}
+				</table>			
+			{% endfor %}
+		{% else %}
+			<p>
+			No data to display. Remember that data from the last 31 days will 
+			always be excluded to avoid jobs that are currently being worked on.
+			</p>
+		{% endif %}
+	{% endif %}
+</div>
+
+{% endblock %}

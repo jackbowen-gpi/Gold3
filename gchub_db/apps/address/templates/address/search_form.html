@@ -1,0 +1,45 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+  {% include "address/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+<h1>Address Search</h1>
+{% include "address/navbar_div.inc.html" %}
+	{% if form.errors %}
+	  <p><span class="error">Please correct the error{{ form.errors|pluralize }} with your submission!</span></p>
+	{% endif %}
+  <p>
+	<form method="get" action="" name="job_search" enctype="multipart/form-data">
+	  <div class="outline" style="width:450px">
+	  	  <span class="sub_heading">Search Parameters</span>
+	  	  <p><label for="id_first_name">First Name:</label>{{form.first_name}}</p>
+		  {% if form.first_name.errors %}<span class="field_error">{{ form.first_name.errors|join:", " }}</span>{% endif %}
+		  <p><label for="id_last_name">Last Name:</label>{{form.last_name}}</p>
+		  {% if form.last_name.errors %}<span class="field_error">{{ form.last_name.errors|join:", " }}</span>{% endif %}
+		  <p><label for="id_job_title">Job Title:</label>{{form.job_title}}</p>
+		  {% if form.job_title.errors %}<span class="field_error">{{ form.job_title.errors|join:", " }}</span>{% endif %}
+		  <p><label for="id_company">Company:</label>{{form.company}}</p>
+		  {% if form.company.errors %}<span class="field_error">{{ form.company.errors|join:", " }}</span>{% endif %}
+		  <p><label for="id_address1">Address 1:</label>{{form.address1}}</p>
+		  {% if form.address1.errors %}<span class="field_error">{{ form.address1.errors|join:", " }}</span>{% endif %}
+		  <p><label for="id_address2">Address 2:</label>{{form.address2}}</p>
+		  {% if form.address2.errors %}<span class="field_error">{{ form.address2.errors|join:", " }}</span>{% endif %}
+		  <p><label for="id_city">City:</label>{{form.city}}</p>
+		  {% if form.city.errors %}<span class="field_error">{{ form.city.errors|join:", " }}</span>{% endif %}
+		  <p><label for="id_state">State:</label>{{form.state}}</p>
+		  {% if form.state.errors %}<span class="field_error">{{ form.state.errors|join:", " }}</span>{% endif %}
+		  <p><label for="id_zip_code">Zip Code:</label>{{form.zip_code}}</p>
+		  {% if form.zip_code.errors %}<span class="field_error">{{ form.zip_code.errors|join:", " }}</span>{% endif %}
+		  <p><label for="id_country">Country:</label>{{form.country}}</p>
+		  {% if form.country.errors %}<span class="field_error">{{ form.country.errors|join:", " }}</span>{% endif %}
+		  <p><label for="id_phone">Phone:</label>{{form.phone}}</p>
+		  {% if form.phone.errors %}<span class="field_error">{{ form.phone.errors|join:", " }}</span>{% endif %}
+	  </div>
+
+	  <input type="submit" value="Search" />
+	</form>
+  </p>
+
+{% endblock %}

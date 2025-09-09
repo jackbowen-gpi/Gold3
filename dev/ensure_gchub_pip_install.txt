@@ -1,0 +1,1 @@
+Requirement already satisfied: psycopg2-binary in c:\dev\gold\gchub_db\.venv\lib\site-packages (2.9.10)

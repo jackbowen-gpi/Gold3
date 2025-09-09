@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" style="background-color:white">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <script type="text/javascript" src="{{MEDIA_URL}}js/prototype.js"></script>
+  <script type="text/javascript" src="{{MEDIA_URL}}js/general.js"></script>
+  {% include "yui_container_includes.html" %}
+  <link rel="stylesheet" href="{{MEDIA_URL}}css/base.css" type="text/css" />
+  <script type="text/javascript" src="{{MEDIA_URL}}js/workflow/job_detail.js"></script>
+  <title>Joblog Block</title>
+</head>
+
+<body style="margin:3px;background-color:#FFFFFF;">
+{% for joblog in joblog_recent %}
+  <div class="joblog_entry">
+    <!-- JobLog Type 7 == JOBLOG_TYPE_NOTE -->
+	{% if joblog.type == 7 %}
+      <div style="clear:both;margin-bottom:5px">
+        <img src="{{joblog.get_icon_url}}" alt="{{joblog.type}}" />
+        <span style="vertical-align:25%">Comment:
+          <span class="smtext">
+            {{joblog.event_time|date:"n-j-Y g:i"}}
+            ({{joblog.user.username}})
+            {% if joblog.user.username %}
+              {% if joblog.is_editable and joblog.can_edit_comment %}
+              	<!-- Beverage analysts can only edit comments when the job is pending.-->
+              	{% if perms.accounts.salesperson and perms.accounts.beverage_access and not perms.accounts.clemson_employee%}
+              		{% ifequal joblog.job.status "Pending" %}
+		              	- [<a href="{% url "joblog_edit_note" joblog.id %}">Edit Comment</a>]
+		                [<a href="#" onclick='joblog_delete_note("{{joblog.id}}", "{{joblog.job.id}}"); return false;'>Delete Comment</a>]
+              		{% endifequal %}
+              	{% else %}
+	              	- [<a href="{% url "joblog_edit_note" joblog.id %}">Edit Comment</a>]
+	                [<a href="#" onclick='joblog_delete_note("{{joblog.id}}", "{{joblog.job.id}}"); return false;'>Delete Comment</a>]
+                {% endif %}
+              {% endif %}
+            {% endif %}
+          </span>
+        </span>
+      </div>
+      <div style="margin-left:20px">
+        {{joblog.log_text|truncatewords_html:200|safe}}
+        {% if joblog.is_log_text_truncated %}
+          <p>
+          <strong><em>
+            This comment was truncated due to length. To see the rest, see the
+            complete Job Log.
+          </p></strong>
+        {% endif %}
+      </div>
+    {% else %}
+      <img src="{{joblog.get_icon_url}}" style="vertical-align: text-bottom" alt="Log Entry" / >
+      {{joblog.log_text|safe|linebreaksbr|truncatewords_html:200}}
+        {% if joblog.is_log_text_truncated %}
+          <p>
+          <em>
+            This entry was truncated due to length. To see the rest, see the
+            complete Job Log.
+          </em>
+          </p>
+        {% endif %}
+      <span class="smtext">
+        {{joblog.event_time|date:"n-j-Y g:i"}}
+        {% if joblog.user.username %}
+          ({{joblog.user.username}})
+        {% endif %}
+      </span>
+    {% endif %}
+  </div>
+{% endfor %}
+</body>
+</html>

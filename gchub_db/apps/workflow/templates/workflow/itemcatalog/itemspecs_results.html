@@ -1,0 +1,40 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+  {% include "workflow/itemcatalog/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+<img src="{{MEDIA_URL}}img/icons/report_user.png"><h2 class="inline">&nbsp;Item Specifications Search Results</h2><br /><br />
+{% include "workflow/itemcatalog/navbar_div.inc.html" %}
+<table>
+	<tr>
+		<th>Size</th>
+		<th>Plant</th>
+		<th>Press</th>
+		<th>Max Colors</th>
+		<th>Dimensions (hor. x vert.)</th>
+	</tr>
+	{% for item in items %}
+	<tr>
+		<td>
+			<a href="/workflow/itemcatalog/specs/edit/{{item.id}}/">{{item.size}}</a>
+		</td>
+		<td>
+			{{item.plant}}
+		</td>
+		<td>
+			{{item.press}}
+		</td>
+		<td>
+			{{item.num_colors}}
+		</td>
+		{% ifequal item.size.workflow.name "Foodservice" %}
+			<td>{{item.horizontal}}" x {{item.vertical}}"</td>
+		{% endifequal %}
+	</tr>
+	{% endfor %}
+</table>
+<br />
+<a href="/workflow/itemcatalog/"><img src="{{MEDIA_URL}}img/icons/house.png" style="vertical-align:text-bottom" /> Item Management Home</a>
+{% endblock %}

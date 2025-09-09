@@ -1,0 +1,125 @@
+{% extends "standard_popup.html" %}
+
+{% block page_title %}{{page_title}}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/button/assets/skins/sam/button.css" />
+<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/tabview/assets/skins/sam/tabview.css">
+
+<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/element/element-min.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/button/button-min.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/tabview/tabview-min.js"></script>
+
+<script type="text/javascript">
+  function submit_form() {
+	  {% ifequal mode "add" %}
+	  var request_url = '{% url "item_catalog_itemcat_popup_new_itemcatalog" %}';
+	  {% else %}
+	  var request_url = '{% url "item_catalog_itemcat_popup_edit_itemcatalog" object.id %}';
+	  {% endifequal %}
+
+	  new Ajax.Request(request_url, {
+		  method: 'get',
+		  parameters: $('id_item_mgr_form').serialize(),
+		  onSuccess: function(transport) {
+		      var jsobj = transport.responseText.evalJSON();
+		      if (jsobj["is_error"] == false) {
+                  //alert("SUCCESS");
+                  {% ifequal mode "add" %}
+                  {# Switch to the edit view for this ItemCatalog object. #}
+                  window.location = '/item_catalog/itemcat_popup/edit/'+ jsobj["contents"]["instance_id"] +'/';
+                  {% endifequal %}
+                  window.opener.location.href = window.opener.location.href;
+              } else {
+                  // Form validation error happened.
+                  alert(jsobj["message"]);
+              }
+		  }
+	  });
+  }
+
+  YAHOO.util.Event.onContentReady("item_mgr_div", function () {
+    // Register buttons and click events.
+    var myTabs = new YAHOO.widget.TabView("item_mgr_div");
+    new YAHOO.widget.Button({label:"Submit", id:"submit_btn",
+        container:"buttons",
+        onclick: {fn: submit_form}});
+  });
+</script>
+{% endblock %}
+
+{% block body_content %}
+<div class="yui-skin-sam">
+<div id="item_mgr_div" class="yui-navset">
+  <ul class="yui-nav">
+    <li class="selected"><a href="#tab1"><em>Item Details</em></a></li>
+    {% ifequal mode "edit" %}
+    <li><a href="#tab2"><em>Specifications</em></a></li>
+    {% endifequal %}
+  </ul>
+  <div class="yui-content">
+    {# Begin first tab #}
+    <div>
+	<form id="id_item_mgr_form" name="item_mgr_form">
+	  <table style='border:none;width:100%'>
+	    <tr>
+	      <td style='border:none;background-color:transparent'>
+	      {# Used to store the ID value, or None if this is a new item #}
+	      <input id="id_id" type="hidden" name="id" value="{{form.instance.id}}" />
+	      <dl>
+	        <dd>This is the common size designation for the item. IE: DMR-32 (required).</dd>
+	        <dt>{{ form.size.label_tag }}</dt>
+	        <dd>{{ form.size }}</dd>
+	        <br />
+	        <dd>
+	          The item's name as per QAD/MFG. This is usually similar to the size name.
+	          If you do not know what this should be, please ask someone. (required)
+	        </dd>
+	        <dt>{{ form.mfg_name.label_tag }}</dt>
+	        <dd>{{ form.mfg_name }}</dd>
+	        <br />
+	        <dd>
+	          If this item is exactly like another aside from one minor detail
+	          (handles, etc.), it is likely to go through the same workflow as
+	          the "parent" product.
+	        </dd>
+	        <dt>{{ form.acts_like.label_tag }}</dt>
+	        <dd>{{ form.acts_like }}</dd>
+	        <br />
+	        <dd>Select the workflow that this job is associated with. (required)</dd>
+	        <dt>{{ form.workflow.label_tag }}</dt>
+	        <dd>{{ form.workflow }}</dd>
+	        <br />
+	        <dd>
+	          The product substrate field will determine which substrate
+	          this item will be proofed on.</dd>
+	        <dt>{{ form.product_substrate.label_tag }}</dt>
+	        <dd>{{ form.product_substrate }}</dd>
+	        <br />
+	        <dd>
+	          Any item set as inactive will not show up in many of the item
+	          related drop-down menus in GOLD. Dis-continued items should be
+	          set as inactive.
+	        </dd>
+	        <dt>{{ form.active.label_tag }}</dt>
+	        <dd>{{ form.active }}</dd>
+	      </td>
+	      <td style='width:30%;border:none;background-color:transparent'>
+	        <strong>Product Category</strong>
+	        {{ form.productsubcategory }}
+	        {{ form.productsubcategory.help_text }}
+	        <div id="buttons"></div>
+	      </td>
+	    </tr>
+	  </table>
+	  </form>
+	</div>
+	{# Second tab #}
+	<div></div>
+	{# End second tab #}
+    </div>
+  </div>
+  </div>
+{% endblock %}

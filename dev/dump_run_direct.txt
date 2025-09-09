@@ -1,0 +1,6 @@
+2025-09-01 18:04:47 DEBUG    2025-09-01 18:04:47 [DEBUG]          fsb_box.py:27
+                             gchub_db.apps.auto_corrugated.docume
+                             nts.fsb_box: Font file not found at:
+                             /mnt\Production\autocorr_elements\VA
+                             G Rounded BT.ttf
+wrote dev/db_settings_active.json

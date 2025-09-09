@@ -1,0 +1,29 @@
+<span class="sub_heading">
+  <img src="{{MEDIA_URL}}img/icons/information.png"
+       style="vertical-align: text-bottom" alt="MiscInfo" />
+  Edit Misc. Job Information - {{job}}
+</span>
+<br />
+<form id="extjobinfo" name="extjobinfo"
+      onsubmit="edit_extended_job('{{job.id}}');return false"
+      style="width:420px">
+  <dl>
+{% for field in form %}
+  <dt>{{ field.label_tag }}</dt>
+  <dd>{{ field }}</dd>
+
+  {% if field.errors %}
+  <dd class="myerrors">{{ field.errors }}</dd>
+  {% endif %}
+{% endfor %}
+  </dl>
+  <div style='width:180px;margin:0 auto'>
+    <a class="button"
+       href="javascript:load_bottomblock('{{job.id}}', 'misc_info')">
+      <span>Cancel</span>
+    </a>
+    <a class="button" href='javascript:edit_extended_job("{{job.id}}")'>
+      <span>Save</span>
+    </a>
+  </div>
+</form>

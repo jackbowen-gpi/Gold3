@@ -1,0 +1,7 @@
+Connected to Postgres at 127.0.0.1:5432 as postgres
+Role 'gchub' already exists
+Updated password for role 'gchub'
+Database 'gchub_dev' already exists
+Granting privileges on database 'gchub_dev' to 'gchub'
+Privileges granted (best-effort)
+ensure_gchub completed successfully

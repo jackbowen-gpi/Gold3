@@ -1,0 +1,21 @@
+{% extends "standard.html" %}
+{% load item_links %}
+
+{% block body %}
+	<a name="previous_refusal_remarks"><h1>Previous Refusal Remarks for {{job_id}}</h1></a>
+	<table style='width:100%'>
+		<tr>
+			<th>Comments</th>
+			<th>Date</th>
+		</tr>
+		{% for item in refusal_list %}
+		<tr>
+			<td>{{item.comments}}</td>
+			<td>{{item.review_date}}</td>
+		</tr>
+		{% endfor %}
+		<tr>
+		    <a href="/workflow/review_mkt/">Back to index</a>
+		</tr>
+	</table>
+{% endblock body %}

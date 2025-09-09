@@ -1,0 +1,217 @@
+{% load item_links %}
+{% load group_check %}
+	<img src="{{MEDIA_URL}}img/icons/date.png" style="vertical-align:text-bottom" alt="Timeline" />
+    {% include "workflow/job/job_detail/middle/toggle_navbar.html" %}
+
+	<div class="outline_fancy">
+	<table width="100%">
+		<tr>
+			<th width="10px">#</th>
+			<th>Size</th>
+			<th>
+				{# Adjust name to accomodate slight differences between workflows #}
+				{% ifequal job.workflow.name "Foodservice" %}
+					Plant/Demand Review
+				{% else %}
+					Preflight
+				{% endifequal %}
+			</th>
+			{% ifequal job.workflow.name "Foodservice" %}
+			<th>Mkt. Review</th>
+			<th>Render?</th>
+			<th>Wrap?</th>
+			<th>Mock-Up?</th>
+			{% endifequal %}
+			<th>Last Proof</th>
+			{% ifequal job.workflow.name "Beverage" %}
+			<th>Stepped Proof</th>
+			{% endifequal %}
+			<th>Revision Status</th>
+			<th>Approval</th>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+			<th>Item No.</th>
+			{% endif %}
+			<th>Final File</th>
+		</tr>
+
+		{% for item in itemsinjob %}
+		{% if item.item_situation and perms.accounts.clemson_employee %}
+			{% ifequal item.item_situation 11 %}
+			<tr class="rowLightGreen">
+			{% else %}
+			<tr class="rowStopped">
+			{% endifequal %}
+		{% else %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+		{% endif %}
+			<td>{{ item.num_in_job }}</td>
+			<td class="fakelink">
+			  <span onmouseover="this.style.cursor='pointer';"
+			        onclick='load_div("bottom_view", item_ajax_url("{{ item.id }}", "timeline_detail"))'>
+				{{item}}
+			  </span>
+			</td>
+			<td>
+				{{item|item_preview_art_link:""}}
+				{% ifequal item.review_status.status "Rejected" %}
+				<a href="{% url "items_rejected" %}" title="Go to Rejected Items List">
+				{% endifequal %}
+				<img src="{{MEDIA_URL}}img/icons/{{item.review_status.icon}}.png"
+				     style="vertical-align:text-bottom"
+				     alt="{{item.review_status.status}}" />
+				   {{item.review_status.status}}
+				{% ifequal item.review_status.status "Rejected" %}
+				</a>
+				{% endifequal %}
+			</td>
+			{% ifequal job.workflow.name "Foodservice" %}
+			<td>
+				{% if item.mkt_review_check %}
+					{% ifequal item.review_status.status "Rejected" %}
+					<a href="{% url "items_rejected" %}" title="Go to Rejected Items List">
+					{% endifequal %}
+						<img src="{{MEDIA_URL}}img/icons/{{item.review_status_mkt.icon}}.png"
+						     style="vertical-align:text-bottom"
+						     alt="{{item.review_status_mkt.status}}" />
+						{{item.review_status_mkt.status}}
+					{% ifequal item.review_status.status "Rejected" %}
+					</a>
+					{% endifequal %}
+					{% else %}
+						N/A
+				{% endif %}
+			</td>
+			<td>
+				{% if item.render %}
+					Yes
+				{% else %}
+			    	---
+				{% endif %}
+			</td>
+			<td>
+				{% if item.wrappable_proof %}
+					Yes
+				{% else %}
+					{% if job.e_tools_id %}
+				        <a href='{% url "etools_show_request" job.id %}'>ETools</a>
+				    {% else %}
+				    	---
+				    {% endif %}
+				{% endif %}
+			</td>
+			<td>
+				{% if item.mock_up %}
+					Yes
+				{% else %}
+			    	---
+				{% endif %}
+			</td>
+			{% endifequal %}
+			<td>
+				{% if item.current_proof_date %}
+					{{item|item_proof_link:""}}
+					{{ item.current_proof_date|date:"n-j-Y" }}
+				{% else %}
+					<img src="{{MEDIA_URL}}img/icons/{{item.overdue_status.icon}}.png"
+					     style="vertical-align:text-bottom"
+					     alt="{{item.overdue_status.status}}" />
+					{{item.overdue_status.status}}
+				{% endif %}
+			</td>
+			{% ifequal job.workflow.name "Beverage" %}
+			<td>
+				{% if item.current_proof_date %}
+					{{item|item_stepped_proof_link:""}}
+					{{ item.current_proof_date|date:"n-j-Y" }}
+				{% else %}
+					<img src="{{MEDIA_URL}}img/icons/{{item.overdue_status.icon}}.png"
+					     style="vertical-align:text-bottom"
+					     alt="{{item.overdue_status.status}}" />
+					{{item.overdue_status.status}}
+				{% endif %}
+			</td>
+			{% endifequal %}
+			<td>{% if item.current_revision %}
+					<img src="{{MEDIA_URL}}img/icons/exclamation.png"
+					     style="vertical-align:text-bottom" alt="Revision" />
+					Due: {{item.current_revision.due_date|date:"n-j-Y"}}
+				{% else %}
+					<img src="{{MEDIA_URL}}img/icons/control_pause.png"
+					     style="vertical-align:text-bottom" alt="Waiting" />
+					None Pending
+				{% endif %}
+			</td>
+			<td>{% if item.approval_date %}
+					{% if item.current_revision %}
+						<img src="{{MEDIA_URL}}img/icons/exclamation.png"
+						     style="vertical-align:text-bottom"
+						     alt="Revision Warning" />
+					{% endif %}
+					{{item|item_approval_link:""}}
+					{{ item.approval_date|date:"n-j-Y" }}
+				{% else %}
+					<img src="{{MEDIA_URL}}img/icons/control_pause.png"
+					     alt="Waiting" />
+				{% endif %}
+			</td>
+			{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+			<td>{% if item.fsb_nine_digit %}
+					<img src="{{MEDIA_URL}}img/icons/accept.png"
+					     style="vertical-align:text-bottom"
+					     alt="Nine Digit Entered" />
+					{{ item.fsb_nine_digit }}&nbsp;
+					({{item.fsb_nine_digit_date|date:"n-j-Y"}})
+				{% else %}
+					<img src="{{MEDIA_URL}}img/icons/control_pause.png"
+					     alt="Waiting" />
+				{% endif %}
+			</td>
+			{% endif %}
+			<td>{% if item.final_file_date %}
+					{% if item.current_revision and perms.accounts.clemson_employee  %}
+						<img src="{{MEDIA_URL}}img/icons/exclamation.png"
+						     style="vertical-align:text-bottom"
+						     alt="Revision Warning" />
+					{% else %}
+						<!-- Don't show the download link to Evergreen analysts -->
+						{% if not request.user|has_group:"Evergreen Analyst" %}
+							<a href='javascript:load_div("bottom_view", item_ajax_url("{{ item.id }}", "tiff_download"))'>
+							  <img src="{{MEDIA_URL}}img/icons/basket_put.png"
+								   style="vertical-align:text-bottom"
+								   alt="Download Tiffs" />
+							</a>
+						{% else %}
+							  <img src="{{MEDIA_URL}}img/icons/basket_put_dimmed.png"
+								   style="vertical-align:text-bottom"
+								   alt="Download Tiffs" />
+						{% endif %}
+					{% endif %}
+					{{ item.final_file_date|date:"n-j-Y" }}
+				{% else %}
+					{% if item.item_situation and perms.accounts.clemson_employee %}
+							<img src="{{MEDIA_URL}}img/icons/stop.png"
+							 style="vertical-align:text-bottom"
+						     alt="Stopped" /> {{item.get_item_situation_display}}
+					{% else %}
+						<img src="{{MEDIA_URL}}img/icons/control_pause.png"
+							 style="vertical-align:text-bottom"
+						     alt="Waiting" />
+					{% endif %}
+				{% endif %}
+				{% if item.is_master_stepped_item %}
+					<img src="{{MEDIA_URL}}img/icons/application_cascade.png"
+						 style="vertical-align:text-bottom"
+					     alt="Master Step" />
+				{% endif %}
+				{% if item.steps_with %}
+					<img src="{{MEDIA_URL}}img/icons/application_link.png"
+						 style="vertical-align:text-bottom"
+					     alt="Steps With" /> {{item.steps_with.num_in_job}}
+				{% endif %}
+			</td>
+
+		</tr>
+		{% endfor %}
+	</table>
+	</div>
+	{% include "workflow/job/job_detail/middle/item_summary_footer.html" %}

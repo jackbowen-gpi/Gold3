@@ -1,0 +1,71 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	{% include "workflow/itemcatalog/navbar_header.inc.html" %}
+	<style type="text/css">
+	  label { width:120px; }
+	</style>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/item_catalog.js"></script>
+	<script type="text/javascript">
+
+		/*
+		 *Watches the Active check box to see if a spec is deactivated then
+		 *calls prompt_change() to ask the user why they did that.
+ 		 */
+		function on_load() {
+			var active_check = document.getElementById("id_active");
+			var active = active_check.value;
+			if (active) {
+				YAHOO.util.Event.addListener("id_active", "change",
+											prompt_change);
+			}
+		}
+			YAHOO.namespace("example.container");
+		    YAHOO.example.container.wait =
+		        new YAHOO.widget.Panel("wait", {
+		            width:"240px",
+	    	        fixedcenter:true,
+	        	    close:false,
+		            draggable:false,
+		            modal:true,
+		            visible:false,
+		            effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5}
+		        });
+		    YAHOO.example.container.wait.setHeader("Updating, please wait...");
+		    YAHOO.example.container.wait.setBody('<img src="{{MEDIA_URL}}img/rel_interstitial_loading.gif" />');
+		    YAHOO.example.container.wait.render(document.body);
+
+	   /*
+	    * Displays a pop-up window asking the user why they deactivated a spec.
+	    * Then, appends that reason to the comments.
+	    */
+		function prompt_change() {
+			var comment = window.prompt("Why was this spec deactivated?");
+			stepspec.id_comments.value = stepspec.id_comments.value + " Reason for deactivation: " + comment;
+		}
+
+	</script>
+
+{% endblock %}
+
+{% block body %}
+
+<h1 class="inline">{{page_title}} {{stepspec}}</h1><br /><br />
+{% include "workflow/itemcatalog/navbar_div.inc.html" %}
+	{% if duplicate %}
+		<form id="stepspec" name="stepspec" onsubmit="dupe_stepspecs('{{stepspec.id}}');return false;">
+	{% else %}
+		<form id="stepspec" name="stepspec" onsubmit="edit_stepspecs('{{stepspec.id}}');return false;">
+	{% endif %}
+		<div class="form_p">
+		  	{{add_form.as_p}}
+		</div>
+	{% if duplicate %}
+		<input type="submit" value="Duplicate Specification" onclick="dupe_stepspecs('{{stepspec.id}}');return false;" />
+	{% else %}
+		<input type="submit" value="Edit Specification" onclick="edit_stepspecs('{{stepspec.id}}');return false;" /><br /><br />
+		<a href="{% url "new_stepspecs_dupe" stepspec.id %}"><img src="{{MEDIA_URL}}img/icons/disk_multiple.png" style="vertical-align:text-bottom" /> Duplicate Spec</a>
+	{% endif %}
+	</form>
+{% endblock %}

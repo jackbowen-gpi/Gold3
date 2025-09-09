@@ -1,0 +1,116 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Load up YUI -->
+	<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="{{YUI_URL}}build/animation/animation-min.js"></script>
+	<script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
+	{% include "yui_container_includes.html" %}
+
+	<!--CSS-->
+	<style type="text/css">
+		.refreshButton {
+			background-color:lightgrey;
+			margin-left:10px;
+			border-radius:9px;
+			padding-left:5px;
+			padding-right:5px;
+		}
+
+		.refreshButton:hover {
+			background-color:darkgrey;
+		}
+	</style>
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript">
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+
+		//jQuery document ready stuff.
+		$j(document).ready(function(){
+
+		})
+	</script>
+{% endblock %}
+
+{% block body %}
+	<p><h1>SBO Detail Page</h1></p>
+	<p></p>
+
+	<a href="/sbo/home/?page=1"><img src="{{MEDIA_URL}}img/icons/door_out.png" style="vertical-align:bottom"/> Back to Search</a>
+	<p></p>
+
+	{% if sbo %}
+		<table>
+			<tr>
+				<th>Date Observed</th>
+				<td>{{sbo.date_observed|date:"n-j-Y"}}</td>
+			</tr>
+				{% if manager %}
+					<tr>
+						<th>Observer</th>
+						<td>{{observer}}</td>
+					</tr>
+				{% endif %}
+				{% if manager %}
+					<tr>
+						<th>Observed</th>
+						{% if observed %}
+						<td>{{observed}}</td>
+						{% else %}
+						<td>Potential Risk</td>
+						{% endif %}
+					</tr>
+				{% endif %}
+			<tr>
+				<th>Task</th>
+				<td>{{sbo.task}}</td>
+			</tr>
+			<tr>
+				<th>Behavior</th>
+				<td>{{sbo.behavior}}</td>
+			</tr>
+			<tr>
+				<th>Behavior Type</th>
+				{% ifequal sbo.behavior_type "at_risk" %}
+				<td>At Risk</td>
+				{% else %}
+				<td>Safe</td>
+				{% endifequal %}
+			</tr>
+			<tr>
+				<th>Reason</th>
+				<td>{{sbo.reason}}</td>
+			</tr>
+			<tr>
+				<th>Communicated?</th>
+				{% if sbo.communication %}
+				<td>Yes</td>
+				{% else %}
+				<td>No</td>
+				{% endif %}
+			</tr>
+			<tr id="how_row">
+				<th>Describe Communication</th>
+				<td>{{sbo.describe_communication}}</td>
+			</tr>
+			<tr>
+				<th>Additional Comments</th>
+				<td>{{sbo.additional_comments}}</td>
+			</tr>
+		</table>
+	{% else %}
+		No Safety Behavior Observation was found, please click back to continue.
+
+		<a style="color:black", class="refreshButton", href="/sbo/home/">Back to home</a>
+		<p></p>
+	{% endif %}
+{% endblock %}

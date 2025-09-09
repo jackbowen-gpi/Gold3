@@ -1,0 +1,19 @@
+<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/menu/assets/skins/sam/menu.css" />
+<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/container/container_core.js"></script>
+<script type="text/javascript" src="{{YUI_URL}}build/menu/menu.js"></script>
+<script type="text/javascript">
+
+ /*
+      Initialize and render the MenuBar when its elements are ready
+      to be scripted.
+ */
+ YAHOO.util.Event.onContentReady("preferences_nav", function () {
+     var oMenuBar = new YAHOO.widget.MenuBar("preferences_nav", {
+                                                 autosubmenudisplay: true,
+                                                 hidedelay: 750,
+                                                 lazyload: true });
+     oMenuBar.render();
+
+ });
+</script>

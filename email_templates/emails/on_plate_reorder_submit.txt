@@ -1,0 +1,4 @@
+{% include "emails/email_header.txt" %}
+
+Plates have been reordered for item {{item.bev_nomenclature}}.
+Instructions: {{new_order.instructions}}

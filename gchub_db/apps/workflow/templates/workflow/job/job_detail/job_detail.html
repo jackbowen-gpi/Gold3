@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/container/assets/container.css" />
+	<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/workflow/job_detail.css" />
+	<script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="{{YUI_URL}}build/animation/animation-min.js"></script>
+	<script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/workflow/job_detail.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/workflow/job_shipmanager.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/workflow/qc_manager.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/fedex/fedex.js"></script>
+	<script src='{{MEDIA_URL}}js/spectrum/spectrum.js'></script>
+	<link rel='stylesheet' href='{{MEDIA_URL}}css/spectrum/spectrum.css' />
+	<style type="text/css">
+		/* custom styles for this example */
+		.yui-skin-sam .yui-dt-col-address pre { font-family:arial;font-size:100%; }
+		/* Use PRE in first col to preserve linebreaks*/
+	</style>
+
+	<script type="text/javascript">
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+
+		//jQuery document ready stuff.
+		$j(document).ready(function(){
+			$j('#bottom_view').delegate('#toggle_all_qc', 'click', function() {
+				checkboxes = $j("[id^=item_]");
+			    for (var i = 0, n = checkboxes.length; i < n; i++) {
+			        checkboxes[i].checked = $j('#toggle_all_qc').attr("checked");
+			    }
+			});
+
+			$j('#bottom_view').delegate('#toggle_all_billing', 'click', function() {
+				checkboxes = $j("[id^=billing_item_]");
+			    for (var i = 0, n = checkboxes.length; i < n; i++) {
+			        checkboxes[i].checked = $j('#toggle_all_billing').attr("checked");
+			    }
+			});
+
+			$j('#bottom_view').delegate('#toggle_all_promo', 'click', function() {
+				checkboxes = $j("[id^=promo_item_]");
+			    for (var i = 0, n = checkboxes.length; i < n; i++) {
+			        checkboxes[i].checked = $j('#toggle_all_promo').attr("checked");
+			    }
+			});
+
+			$j('#bottom_view').delegate('#toggle_all_art', 'click', function() {
+				checkboxes = $j("[id^=art_item_]");
+			    for (var i = 0, n = checkboxes.length; i < n; i++) {
+			        checkboxes[i].checked = $j('#toggle_all_art').attr("checked");
+			    }
+			});
+
+			$j('#bottom_view').delegate('#toggle_all_mkt', 'click', function() {
+				checkboxes = $j("[id^=mkt_item_]");
+			    for (var i = 0, n = checkboxes.length; i < n; i++) {
+			        checkboxes[i].checked = $j('#toggle_all_mkt').attr("checked");
+			    }
+			});
+
+			// Carton invoice tab stuff
+			$j('#bottom_view').delegate('#toggle_all_invoice', 'click', function() {
+				checkboxes = $j("[id^=invoice_item_]");
+				for (var i = 0, n = checkboxes.length; i < n; i++) {
+					checkboxes[i].checked = $j('#toggle_all_invoice').attr("checked");
+				}
+				// Disable the download button if everything got de-selected.
+				downloadButt = $j("#invoice_download_btn");
+				downloadButt.attr("disabled", !checkboxes.is(":checked"));
+			});
+
+			// Disable the download button if nothing is selected.
+			$j('#bottom_view').delegate('[id^=invoice_item_]', 'click', function() {
+				checkboxes = $j("[id^=invoice_item_]");
+				downloadButt = $j("#invoice_download_btn");
+				downloadButt.attr("disabled", !checkboxes.is(":checked"));
+			});
+				// End carton invoice tab stuff
+
+			$j('#bottom_view').delegate('#toggle_all_update_all', 'click', function() {
+				checkboxes = $j("[id^=update_all_item_]");
+			    for (var i = 0, n = checkboxes.length; i < n; i++) {
+			    	if(!checkboxes[i].disabled){
+			        	checkboxes[i].checked = $j('#toggle_all_update_all').attr("checked");
+			        }
+			    }
+			});
+
+			$j('#bottom_view').delegate('#id_apply_to_all', 'click', function() {
+				checkboxes = $j("[id^=revise_all_item_]");
+			    for (var i = 0, n = checkboxes.length; i < n; i++) {
+			    	if(!checkboxes[i].disabled){
+			        	checkboxes[i].checked = $j('#id_apply_to_all').attr("checked");
+			        }
+			    }
+			    if($j('#id_apply_to_all').attr("checked") == "checked"){
+			    	$j('#revision_holder').css("display", "block")
+			    }else{
+			    	$j('#revision_holder').css("display", "none")
+			    }
+			});
+
+			/*
+				This waits for a specific item to be created (for pages like the #bottom-view that get created on
+				clicking links) and then calls the callback function which usually does something to that element
+			*/
+			function waitForElement(id, callback){
+				var interval = setInterval(function(){
+					if(document.getElementById(id)){
+						clearInterval(interval);
+						callback();
+					}
+				}, 1000);
+			}
+
+			/*
+			This puts a wait on the divPicker element when the button for clicking editCartonColor is clicked, then it
+			passes in a function that checks the colordef on the page and loads the color picker if it is match color and
+			hides it if it is not. This is for editing colors on the production tab of a carton item.
+			*/
+			colorObj = {
+				"Coating": "00000000",
+                "Process Black": "90985234",
+                "Low-Carbon Black": "91064286",
+                "Process Cyan": "90985253",
+                "Process Magenta": "90984629",
+                "Process Yellow": "90985250",
+                "ECG Orange": "90000001",
+                "ECG Green": "90000003",
+                "ECG Violet": "90000002",
+                "ECG Blue": "91053240"
+			};
+			$j('#bottom_view').on("click", "#editCartonColor", function() {
+				waitForElement("divPicker", function(){
+					var defName = $j("#id_definition option:selected").text();
+					var hexvalue = $j("#hexvalue").val();
+					if(defName == "Match Color"){
+						$j("#changeColorPicker.basic").spectrum({
+						    color: hexvalue,
+							change: function(color) {
+						        $j("#changePicker").val(color.toHexString());
+							}
+						})
+						$j("#divPicker").css('display', "block");
+					}
+				})
+				/*
+				This waits for bottomview to load an element called id_definition and then checks to see what was chosen.
+				If match color was chosen then it shows the color pickers, otherwise it hides it. This is for adding color
+				to a carton job on the production tab.
+				*/
+				$j('#bottom_view').on("change", "#id_definition", function() {
+					var defName = $j("option:selected", this).text();
+					if(defName == "Match Color"){
+						$j("#divPicker").css('display', "block");
+					}else if(defName in colorObj){
+						$j("#id_color").val(colorObj[defName]);
+						$j("#divPicker").css('display', "none");
+					}else{
+						$j("#divPicker").css('display', "none");
+					}
+
+					$j("#changeColorPicker.basic").spectrum({
+					    color: "#ffffff",
+						change: function(color) {
+					        $j("#changePicker").val(color.toHexString());
+						}
+					})
+				});
+			})
+
+			// Shows proof type notes field on produciton tab when needed.
+			$j('#bottom_view').on("change", "#id_proof_type", function() {
+				var selected_proof = $j('select[id$="proof_type"]').val();
+				if (selected_proof.startsWith("EDITS_ORIGINAL")){
+					$j("#id_proof_type_notes").show();
+				}
+				else{
+					$j("#id_proof_type_notes").hide();
+				}
+			})
+
+			// SAP tab carton profile error dialog
+			$j( "#error_dialog" ).dialog({
+				modal: true,
+				autoOpen: false,
+				title: "Error",
+				buttons: {
+					Ok: function() {
+						$j( this ).dialog( "close" );
+					}
+				}
+			});
+
+			/*
+			Watches the item SAP tab for certain changes. Selects a color
+			profile if all the required fields are filled in.
+			*/
+			$j('#bottom_view').on("change", "#id_carton_workflow, #id_line_screen, #id_ink_set, #id_substrate, #id_print_condition", function() {
+				// See what's selected in each field
+				var carton_workflow = $j('select[id$="carton_workflow"]').val();
+				var line_screen = $j('select[id$="line_screen"]').val();
+				var ink_set = $j('select[id$="ink_set"]').val();
+				var substrate = $j('select[id$="substrate"]').val();
+				var printlocation = $j('#id_hidden_printlocation').val();
+				// Print condition is optional. Set to zero if blank.
+				var print_condition = $j('select[id$="print_condition"]').val();
+				if (!print_condition){
+					print_condition = 0;
+				}
+				// If we have all the info we need then try to look up a color profile. Print condition is optional.
+				if (carton_workflow && line_screen && ink_set && substrate && printlocation){
+					$j.get("/workflow/job/cartonprofile/"+carton_workflow+"/"+line_screen+"/"+ink_set+"/"+substrate+"/"+printlocation+"/"+print_condition+"/", function(carton_profile) {
+						// If we found one select it in the carton profile field and highlight it in green for a moment.
+						if (carton_profile){
+							if (carton_profile.length == 1){
+								$j('#id_carton_profile_display').effect("highlight", {color:"#12F333"}, 2000);
+								$j('#id_carton_profile_display').val(carton_profile[0][0]) // Display only field. It's a list of lists so [0][0] is the name.
+								$j('#id_carton_profile').val(carton_profile[0][1]) // Hidden real field. [0][1] is the profile id.
+							}
+							// Display an error if more than one profile found.
+							else{
+								// Don't throw an error if they haven't selected a print condition yet.
+								if (print_condition !=0){
+									// Put the profile IDs in the error message.
+									var profile_id_list = "Profiles found:";
+									profile_id_list += "<ul>";
+									carton_profile.forEach(listFunc);
+									profile_id_list += "</ul>";
+									document.getElementById("error_dialog_profiles").innerHTML = profile_id_list;
+									function listFunc(value) {
+									  profile_id_list += "<li>" + value[0] + " (ID#: " + value[1] + ")" + "</li>";
+									}
+									// Show the user an error.
+									$j( "#error_dialog" ).dialog( "open" );
+									$j('#id_carton_profile_display').val("Duplicate profiles found.") // Display only field.
+								}
+							}
+						}
+						// No profiles found. Blank the carton profile field out and highlight it in red for a moment.
+						else{
+							$j('#id_carton_profile_display').effect("highlight", {color:"red"}, 2000);
+							$j('#id_carton_profile_display').val("None found") // Display only field.
+							$j('#id_carton_profile').val("") // Hidden real field.
+						}
+					});
+				}
+			});
+
+			/*
+			This puts a wait on the divPicker element when the button for clicking editCartonColor is clicked, then it
+			passes in a function that checks the colordef on the page and loads the color picker if it is match color and
+			hides it if it is not. This is for editing colors on the production tab of a carton item.
+			*/
+			$j('#bottom_view').on("click", "#addCartonColor", function() {
+				waitForElement("divPicker", function(){
+					/*
+					This waits for bottomview to load an element called id_definition and then checks to see what was chosen.
+					If match color was chosen then it shows the color pickers, otherwise it hides it. This is for adding color
+					to a carton job on the production tab.
+					*/
+					$j('#id_definition').on("change", function() {
+						var defName = $j("option:selected", this).text();
+						if(defName == "Match Color"){
+							$j("#divPicker").css('display', "block");
+						}else if(defName in colorObj){
+							$j("#id_color").val(colorObj[defName]);
+							$j("#divPicker").css('display', "none");
+						}else{
+							$j("#divPicker").css('display', "none");
+						}
+
+						$j("#changeColorPicker.basic").spectrum({
+						    color: "#ffffff",
+							change: function(color) {
+						        $j("#changePicker").val(color.toHexString());
+							}
+						})
+					});
+				})
+			})
+		})
+	</script>
+	<script type="text/javascript">
+	  /* Called when an item is selected from the Item dropdown.*/
+	  function update_form_from_size_selection() {
+		 var selected_value = $('#id_printlocation').val()
+		 new Ajax.Updater("id_printlocation", "{% url "item_json_get_item_specs" %}", {
+			 parameters: {'id_printlocation': selected_value},
+			 onComplete: function(request) {
+				 update_form_from_spec_selection();
+			 }
+		 });
+	  }
+
+	  // When the Item drop-down changes, update the list of available specs.
+	  YAHOO.util.Event.addListener("id_size", "change",
+	  		  update_form_from_size_selection);
+	</script>
+
+{% endblock %}
+
+{% block body_content %}
+<!---Error dialog-->
+<div id="error_dialog">
+		<p>
+			Found more than one Carton Profile matching that criteria. That's
+			not supposed to happen.
+		</p>
+		<p id="error_dialog_profiles"></p>
+		<p>Please send this error to: <a href="mailto:{{EMAIL_SUPPORT}}">{{EMAIL_SUPPORT}}</a></p>
+</div>
+
+<div id="job_wrap">
+	<div class="main_view" id="main_view">
+	   {% include "workflow/job/job_detail/upper_left/job_info_block.html" %}
+	</div>
+
+	<div class="joblog_view" id="joblog_view">
+	   {% include "workflow/job/job_detail/upper_right/joblog_main.html" %}
+	</div>
+
+	<div class="full_width_container" id="full_width_container">
+		<div class="sub_view" id="sub_view">
+		   {% include "workflow/job/job_detail/middle/summary_timeline.html" %}
+		</div>
+
+		<div class="bottom_view" id="bottom_view">
+		   {% include "workflow/job/job_detail/lower/job_misc_info.html" %}
+		</div>
+	</div>
+</div>
+{% endblock %}

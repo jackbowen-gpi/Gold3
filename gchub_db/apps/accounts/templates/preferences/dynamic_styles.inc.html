@@ -1,0 +1,70 @@
+{% load static %}
+{# Dynamic CSS Include for Preferences Pages #}
+{# Usage: {% include "preferences/dynamic_styles.inc.html" with theme_override="dark" %} #}
+
+<!-- Dynamic CSS Framework -->
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/preferences-dynamic.css' %}" />
+
+<!-- Theme variables override -->
+{% if theme_override %}
+<style>
+:root[data-theme="{{ theme_override }}"] {
+  {% if theme_override == "dark" %}
+    --primary-color: #2c5530;
+    --primary-dark: #1a3d1f;
+    --secondary-color: #4a7c59;
+    --accent-color: #5a9c66;
+    --background-color: #2d2d2d;
+    --card-background: #3d3d3d;
+    --text-light: #e0e0e0;
+    --text-medium: #b0b0b0;
+    --text-dark: #ffffff;
+  {% elif theme_override == "light" %}
+    --primary-color: #4a90e2;
+    --primary-dark: #2c5aa0;
+    --secondary-color: #6ba3f0;
+    --accent-color: #f0a500;
+    --background-color: #f8f9fa;
+    --card-background: #ffffff;
+    --text-light: #333333;
+    --text-medium: #666666;
+    --text-dark: #000000;
+  {% endif %}
+}
+</style>
+{% endif %}
+
+<!-- Page-specific customizations -->
+{% if custom_colors %}
+<style>
+:root {
+  {% for property, value in custom_colors.items %}
+    --{{ property }}: {{ value }};
+  {% endfor %}
+}
+</style>
+{% endif %}
+
+<!-- Animation controls -->
+{% if disable_animations %}
+<style>
+*, *::before, *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+</style>
+{% endif %}
+
+<!-- Load theme controller -->
+<script>
+// Theme configuration
+window.preferencesConfig = {
+  theme: '{{ theme_override|default:"default" }}',
+  animations: {% if disable_animations %}false{% else %}true{% endif %},
+  customColors: {{ custom_colors|default:"{}" }},
+  responsive: true,
+  accessibility: true
+};
+</script>
+<script src="{% static 'accounts/js/preferences-theme.js' %}"></script>

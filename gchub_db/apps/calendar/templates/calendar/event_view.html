@@ -1,0 +1,24 @@
+{% extends "standard.html" %}
+
+{% block body %}
+	<img src="{{MEDIA_URL}}img/icons/date.png" style="vertical-align:bottom" alt="Daily Calendar" /><h1 class="inline"> Calendar for {{event.event_date|date:"D, N j, Y"}}</h1><br />
+
+	<br />
+	{% for event in events %}
+	<div class="outline_fancy" style="width:200px">
+		<h2 class="inline"><img src='{{event.event_icon}}' style="vertical-align:bottom" /> {{event.get_type_display}}</h2>
+		<p>
+			<strong>Added by:</strong> {{event.employee}}<br />
+			<strong>Notes:</strong> {{event.description}}
+		</p>
+			{% ifequal user.username event.employee.username %}
+				{% if event.can_delete %}
+					<a href="{% url "event-delete" event.id %}"><img src="{{MEDIA_URL}}img/icons/date_delete.png" style="vertical-align:bottom" alt="Daily Calendar" /> Delete Event</a>
+				{% endif %}
+			{% endifequal %}
+	</div>
+	{% endfor %}
+
+	<br />
+	<img src="{{MEDIA_URL}}img/icons/calendar.png" style="vertical-align:text-bottom" /><a href="/calendar/month/{{event.event_date|date:"Y"}}/{{event.event_date|date:"n"}}/"> Return to Calendar</a>
+{% endblock %}

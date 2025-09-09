@@ -1,0 +1,1 @@
+C:\Dev\Gold\gchub_db\.venv\Scripts\python.exe: can't open file 'C:\\Dev\\Gold\\gchub_db\\dev\\ensure_gchub.py': [Errno 2] No such file or directory

@@ -1,0 +1,119 @@
+{% extends "standard.html" %} 
+
+{% block extra_head %}    
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript -->
+	<script type="text/javascript"> 	
+		//prototype is loaded in GOLD's base html and it uses $ just like jQuery
+		//does. So we'll change $ to $j for the jQuery on this page using 
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+		
+		//Date picker
+		$j( function() {
+			// Date picker
+			$j( "#id_date" ).datepicker();
+			
+			// Delete confirmation
+		    $j( "#dialog_confirm" ).dialog({
+		      autoOpen: false,
+		      resizable: false,
+		      modal: true,
+		      buttons: {
+		        "Delete": function() {
+		          window.location = '/timesheet/delete/' + "{{timesheet_id}}" + '/'
+		        },
+		        Cancel: function() {
+		          $j( this ).dialog( "close" );
+		        }
+		      }
+		    });
+
+			// Show delete confirmation when link is clicked.
+			$j( '#delete_entry' ).click(function() {
+				// Open confirmation dialog
+				$j( "#dialog_confirm" ).dialog( "open" );
+			});
+		
+		} );
+	</script> 
+{% endblock %}
+
+{% block body %}
+<div class="">
+	<h1>{{ page_title }}</h1>
+</div>
+<hr />
+
+<!-- Delete confirmation dialog -->
+<div id="dialog_confirm" title="Delete timesheet entry?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure you want to permanently deleted this timesheet entry?</p>
+</div>
+
+<form method="post" novalidate>
+{{ form.non_field_errors }}
+	<div class="fieldWrapper">
+		<p>
+	    {{ form.artist.errors }}
+	    {{ form.artist.label_tag }} {{ form.artist }}
+	    </p>
+	</div>
+	<div class="fieldWrapper">
+		<p>
+	    {{ form.date.errors }}
+	    {{ form.date.label_tag }} {{ form.date }}
+	    </p>
+	</div>
+	<div class="fieldWrapper">
+		<p>
+	    {{ form.jobnum.errors }}
+	    {{ form.jobnum.label_tag }} {{ form.jobnum }}
+	    </p>
+	</div>
+	<div class="fieldWrapper">
+		<p>
+	    {{ form.category.errors }}
+	    {{ form.category.label_tag }} {{ form.category }}
+	    </p>
+	</div>
+	<div class="fieldWrapper">
+		<p>
+	    {{ form.hour.errors }}
+	    {{ form.min.errors }}
+	    {{ form.hour.label_tag }} {{ form.hour }} : {{ form.min }}
+	    </p>
+	</div>
+	<div class="fieldWrapper">
+		<p>
+	    {{ form.comments.errors }}
+	    {{ form.comments.label_tag }} {{ form.comments }} {{ form.comments.help_text }}
+	    </p>
+	</div>
+    <input type="submit" value="Submit and Finish" name="Submit"/>
+    <input type="submit" value="Submit and Add Another" name="SubmitAdditional"/>
+</form>
+<br />
+
+{% if edit_flag %}
+	<h3>
+		<a id="delete_entry" href="#">
+			<img src="{{MEDIA_URL}}img/icons/cancel.png" />
+			Delete this entry
+		</a>
+	</h3>
+	<br />
+{% endif %}
+
+<h3>
+	<a href="/timesheet/" >
+		<img src="{{MEDIA_URL}}img/icons/arrow_left.png" />
+		Back
+	</a>
+</h3>
+<br />
+
+{% endblock %}

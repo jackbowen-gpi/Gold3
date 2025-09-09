@@ -1,0 +1,311 @@
+{% extends "standard.html" %}
+
+{% comment %}
+Legacy Search Form - Original GOLD style before Phase 3 enhancements
+{% endcomment %}
+
+{% block extra_extra_head %}
+<!-- jQuery and jQuery UI for date pickers -->
+<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+<script type="text/javascript">
+// Prototype.js is loaded in base.html and uses $ just like jQuery does.
+// Use jQuery.noConflict() to avoid conflicts
+var $j = jQuery.noConflict();
+</script>
+
+<script type="text/javascript">
+function on_load() {
+    // Initialize date pickers
+    initializeDatePickers();
+    
+    // Focus on first field
+    if (document.getElementById('id_search_all')) {
+        document.getElementById('id_search_all').focus();
+    } else if (document.getElementById('id_job_num')) {
+        document.getElementById('id_job_num').focus();
+    }
+}
+
+// Initialize date pickers for all date fields
+function initializeDatePickers() {
+    // Job search date fields
+    $j('#id_date_in_start, #id_date_in_end, #id_date_needed_start, #id_date_needed_end').datepicker({
+        dateFormat: 'mm/dd/yy',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: '-20:+5',
+        showButtonPanel: true
+    });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    on_load();
+});
+</script>
+
+<style>
+/* Remove all table borders in legacy search */
+.outline_fancy table,
+.outline_fancy table tr,
+.outline_fancy table td,
+.outline_fancy table th {
+    border: none !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    outline: none !important;
+}
+
+/* Make fields closer together with tighter spacing */
+.outline_fancy table td {
+    padding: 1px 0 !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+    vertical-align: middle !important;
+}
+
+/* Reduce spacing for form elements */
+.outline_fancy input,
+.outline_fancy select {
+    margin: 1px 0 !important;
+    padding: 2px !important;
+}
+
+/* Tighter spacing for the table rows */
+.outline_fancy table tr {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Standardize input field widths for better alignment */
+.outline_fancy input[type="text"],
+.outline_fancy input[type="date"],
+.outline_fancy select {
+    width: 150px !important;
+    box-sizing: border-box !important;
+}
+
+/* Special width for date range fields to fit side by side */
+.outline_fancy input[type="date"] {
+    width: 70px !important;
+}
+
+/* Make table cells consistent */
+.outline_fancy table td:first-child {
+    width: 120px !important;
+    white-space: nowrap !important;
+}
+
+.outline_fancy table td:last-child {
+    width: auto !important;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<img src="{{MEDIA_URL}}img/icons/zoom.png" style="vertical-align:text-bottom" alt="Search" /> <h1 class="inline">Search</h1>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<div style="margin-left: 15px; display: inline-block;">
+<a href='{% url "job_search" %}?legacy=1'
+{% if type == "job" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endif %}>JOBS</a>
+<a href='{% url "item_search" %}?legacy=1'
+{% if type == "item" %}
+    class="togglenavlink-highlighted"
+  {% else %}
+    class="togglenavlink"
+  {% endif %}>ITEMS</a>
+</div>
+
+{% if form.errors %}
+<span class="error">Please correct the error{{ form.errors|pluralize }} with your submission!</span>
+{% endif %}
+
+{% if type == "job" %}
+<form method="get" action="" name="job_search" enctype="multipart/form-data">
+    <input type="hidden" name="legacy" value="1">
+    
+    <div class="outline_fancy" style="width:600px">
+        <h2 class="inline">Search Parameters</h2><br />
+        <table cellpadding="0" cellspacing="0" width="100%" border="0" style="border:none;">
+            <tr><td align="right" style="padding-right:5px;">Job #:</td><td>{{form.job_num}}</td></tr>
+            {% if form.job_num.errors %}<tr><td colspan="2"><span class="field_error">{{ form.job_num.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Job Name:</td><td>{{form.name}}</td></tr>
+            {% if form.name.errors %}<tr><td colspan="2"><span class="field_error">{{ form.name.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Brand Name:</td><td>{{form.brand_name}}</td></tr>
+            {% if form.brand_name.errors %}<tr><td colspan="2"><span class="field_error">{{ form.brand_name.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">PO Number:</td><td>{{form.po_number}}</td></tr>
+            {% if form.po_number.errors %}<tr><td colspan="2"><span class="field_error">{{ form.po_number.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Customer:</td><td>{{form.customer}}</td></tr>
+            {% if form.customer.errors %}<tr><td colspan="2"><span class="field_error">{{ form.customer.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Customer ID #:</td><td>{{form.customer_id}}</td></tr>
+            {% if form.customer_id.errors %}<tr><td colspan="2"><span class="field_error">{{ form.customer_id.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Job Status:</td><td>{{form.status}}</td></tr>
+            {% if form.status.errors %}<tr><td colspan="2"><span class="field_error">{{ form.status.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">eTools ID #:</td><td>{{form.e_tools_id}}</td></tr>
+            {% if form.e_tools_id.errors %}<tr><td colspan="2"><span class="field_error">{{ form.e_tools_id.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Print Group:</td><td>{{form.printgroup}}</td></tr>
+            {% if form.printgroup.errors %}<tr><td colspan="2"><span class="field_error">{{ form.printgroup.errors|join:", " }}</span></td></tr>{% endif %}
+        </table>
+    </div>
+    
+    <div class="outline_fancy" style="width:600px;">
+        <h2 class="inline">Date Range Search</h2><br />
+        <table cellpadding="0" cellspacing="0" width="100%" border="0" style="border:none;">
+            <tr><td align="right" style="padding-right:5px;">Date In:</td><td>{{form.date_in_start}} thru {{form.date_in_end}}</td></tr>
+            {% if form.date_in_start.errors %}<tr><td colspan="2"><span class="field_error">{{ form.date_in_start.errors|join:", " }}</span></td></tr>{% endif %}
+            {% if form.date_in_end.errors %}<tr><td colspan="2"><span class="field_error">{{ form.date_in_end.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Date Needed:</td><td>{{form.date_needed_start}} thru {{form.date_needed_end}}</td></tr>
+            {% if form.date_needed_start.errors %}<tr><td colspan="2"><span class="field_error">{{ form.date_needed_start.errors|join:", " }}</span></td></tr>{% endif %}
+            {% if form.date_needed_end.errors %}<tr><td colspan="2"><span class="field_error">{{ form.date_needed_end.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Artist:</td><td>{{form.artist}}</td></tr>
+            {% if form.artist.errors %}<tr><td colspan="2"><span class="field_error">{{ form.artist.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Salesperson:</td><td>{{form.salesperson}}</td></tr>
+            {% if form.salesperson.errors %}<tr><td colspan="2"><span class="field_error">{{ form.salesperson.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">CSR:</td><td>{{form.csr}}</td></tr>
+            {% if form.csr.errors %}<tr><td colspan="2"><span class="field_error">{{ form.csr.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Prepress:</td><td>{{form.prepress_supplier}}</td></tr>
+            {% if form.prepress_supplier.errors %}<tr><td colspan="2"><span class="field_error">{{ form.prepress_supplier.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Keywords:</td><td>{{form.keywords}}</td></tr>
+            {% if form.keywords.errors %}<tr><td colspan="2"><span class="field_error">{{ form.keywords.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Carton Type:</td><td>{{form.carton_type}}</td></tr>
+            {% if form.carton_type.errors %}<tr><td colspan="2"><span class="field_error">{{ form.carton_type.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Workflow:</td><td>{{form.workflow}}</td></tr>
+            {% if form.workflow.errors %}<tr><td colspan="2"><span class="field_error">{{ form.workflow.errors|join:", " }}</span></td></tr>{% endif %}
+        </table>
+    </div>
+    
+    <div class="outline_fancy" style="width:600px; padding-bottom:15px;">
+        <h2 class="inline">Sorting Options</h2><br />
+        <table cellpadding="0" cellspacing="0" width="100%" border="0" style="border:none;">
+            <tr><td align="right" style="padding-right:5px;">Sort By:</td><td>{{form.sort_by}}</td></tr>
+            {% if form.sort_by.errors %}<tr><td colspan="2"><span class="field_error">{{ form.sort_by.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Sort Order:</td><td>{{form.sort_order}}</td></tr>
+            {% if form.sort_order.errors %}<tr><td colspan="2"><span class="field_error">{{ form.sort_order.errors|join:", " }}</span></td></tr>{% endif %}
+        </table>
+    </div>
+
+    <input type="submit" value="Search" />
+</form>
+{% endif %}
+
+{% if type == "item" %}
+<form method="get" action="" name="item_search" enctype="multipart/form-data">
+    <input type="hidden" name="legacy" value="1">
+    
+    <div class="outline_fancy" style="width:600px">
+        <h2 class="inline">Search Parameters</h2><br />
+        <table cellpadding="0" cellspacing="0" width="100%" border="0" style="border:none;">
+            <tr><td align="right" style="padding-right:5px;">Job #:</td><td>{{form.job_num}}</td></tr>
+            {% if form.job_num.errors %}<tr><td colspan="2"><span class="field_error">{{ form.job_num.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Size/Item:</td><td>{{form.name}}</td></tr>
+            {% if form.name.errors %}<tr><td colspan="2"><span class="field_error">{{ form.name.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Job Name:</td><td>{{form.name}}</td></tr>
+            {% if form.name.errors %}<tr><td colspan="2"><span class="field_error">{{ form.name.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Brand Name:</td><td>{{form.brand_name}}</td></tr>
+            {% if form.brand_name.errors %}<tr><td colspan="2"><span class="field_error">{{ form.brand_name.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Description:</td><td>{{form.description}}</td></tr>
+            {% if form.description.errors %}<tr><td colspan="2"><span class="field_error">{{ form.description.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Quality:</td><td>{{form.quality}}</td></tr>
+            {% if form.quality.errors %}<tr><td colspan="2"><span class="field_error">{{ form.quality.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">9 Digit #:</td><td>{{form.fsb_nine_digit}}</td></tr>
+            {% if form.fsb_nine_digit.errors %}<tr><td colspan="2"><span class="field_error">{{ form.fsb_nine_digit.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">WRIN #:</td><td>{{form.wrin_number}}</td></tr>
+            {% if form.wrin_number.errors %}<tr><td colspan="2"><span class="field_error">{{ form.wrin_number.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">SCC/BOM Number:</td><td>{{form.bom_number}}</td></tr>
+            {% if form.bom_number.errors %}<tr><td colspan="2"><span class="field_error">{{ form.bom_number.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">UPC Number:</td><td>{{form.upc_number}}</td></tr>
+            {% if form.upc_number.errors %}<tr><td colspan="2"><span class="field_error">{{ form.upc_number.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Case Pack:</td><td>{{form.case_pack}}</td></tr>
+            {% if form.case_pack.errors %}<tr><td colspan="2"><span class="field_error">{{ form.case_pack.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;"># of Colors:</td><td>{{form.color_num_low}} thru {{form.color_num_high}}</td></tr>
+            {% if form.color_num_low.errors %}<tr><td colspan="2"><span class="field_error">{{ form.color_num_low.errors|join:", " }}</span></td></tr>{% endif %}
+            {% if form.color_num_high.errors %}<tr><td colspan="2"><span class="field_error">{{ form.color_num_high.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Color:</td><td>{{form.itemcolor}}</td></tr>
+            {% if form.itemcolor.errors %}<tr><td colspan="2"><span class="field_error">{{ form.itemcolor.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Plant:</td><td>{{form.plant}}</td></tr>
+            {% if form.plant.errors %}<tr><td colspan="2"><span class="field_error">{{ form.plant.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Press:</td><td>{{form.press}}</td></tr>
+            {% if form.press.errors %}<tr><td colspan="2"><span class="field_error">{{ form.press.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Special MFG:</td><td>{{form.specialmfg}}</td></tr>
+            {% if form.specialmfg.errors %}<tr><td colspan="2"><span class="field_error">{{ form.specialmfg.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Platemaker:</td><td>{{form.platemaker}}</td></tr>
+            {% if form.platemaker.errors %}<tr><td colspan="2"><span class="field_error">{{ form.platemaker.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Platetype:</td><td>{{form.platetype}}</td></tr>
+            {% if form.platetype.errors %}<tr><td colspan="2"><span class="field_error">{{ form.platetype.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Prepress:</td><td>{{form.prepress_supplier}}</td></tr>
+            {% if form.prepress_supplier.errors %}<tr><td colspan="2"><span class="field_error">{{ form.prepress_supplier.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Date In:</td><td>{{form.date_in_start}} thru {{form.date_in_end}}</td></tr>
+            {% if form.date_in_start.errors %}<tr><td colspan="2"><span class="field_error">{{ form.date_in_start.errors|join:", " }}</span></td></tr>{% endif %}
+            {% if form.date_in_end.errors %}<tr><td colspan="2"><span class="field_error">{{ form.date_in_end.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Proof Out Date:</td><td>{{form.all_proof_date_start}} thru {{form.all_proof_date_end}}</td></tr>
+            {% if form.all_proof_date_start.errors %}<tr><td colspan="2"><span class="field_error">{{ form.all_proof_date_start.errors|join:", " }}</span></td></tr>{% endif %}
+            {% if form.all_proof_date_end.errors %}<tr><td colspan="2"><span class="field_error">{{ form.all_proof_date_end.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Approved:</td><td>{{form.approval_date_start}} thru {{form.approval_date_end}}</td></tr>
+            {% if form.approval_date_start.errors %}<tr><td colspan="2"><span class="field_error">{{ form.approval_date_start.errors|join:", " }}</span></td></tr>{% endif %}
+            {% if form.approval_date_end.errors %}<tr><td colspan="2"><span class="field_error">{{ form.approval_date_end.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">File Out Date:</td><td>{{form.final_file_date_start}} thru {{form.final_file_date_end}}</td></tr>
+            {% if form.final_file_date_start.errors %}<tr><td colspan="2"><span class="field_error">{{ form.final_file_date_start.errors|join:", " }}</span></td></tr>{% endif %}
+            {% if form.final_file_date_end.errors %}<tr><td colspan="2"><span class="field_error">{{ form.final_file_date_end.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Item Status:</td><td>{{form.item_situation}}</td></tr>
+            {% if form.item_situation.errors %}<tr><td colspan="2"><span class="field_error">{{ form.item_situation.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Artist:</td><td>{{form.artist}}</td></tr>
+            {% if form.artist.errors %}<tr><td colspan="2"><span class="field_error">{{ form.artist.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Salesperson:</td><td>{{form.salesperson}}</td></tr>
+            {% if form.salesperson.errors %}<tr><td colspan="2"><span class="field_error">{{ form.salesperson.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Marketing:</td><td>{{form.marketing}}</td></tr>
+            {% if form.marketing.errors %}<tr><td colspan="2"><span class="field_error">{{ form.marketing.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Nutrition:</td><td>{{form.nutrition}}</td></tr>
+            {% if form.nutrition.errors %}<tr><td colspan="2"><span class="field_error">{{ form.nutrition.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Workflow:</td><td>{{form.workflow}}</td></tr>
+            {% if form.workflow.errors %}<tr><td colspan="2"><span class="field_error">{{ form.workflow.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Promotional:</td><td>{{form.promo}}</td></tr>
+            {% if form.promo.errors %}<tr><td colspan="2"><span class="field_error">{{ form.promo.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">GDO:</td><td>{{form.graphic_req_number}}</td></tr>
+            {% if form.graphic_req_number.errors %}<tr><td colspan="2"><span class="field_error">{{ form.graphic_req_number.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">GREQ:</td><td>{{form.grn}}</td></tr>
+            {% if form.grn.errors %}<tr><td colspan="2"><span class="field_error">{{ form.grn.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">One Up Die:</td><td>{{form.one_up_die}}</td></tr>
+            {% if form.one_up_die.errors %}<tr><td colspan="2"><span class="field_error">{{ form.one_up_die.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Step Die:</td><td>{{form.step_die}}</td></tr>
+            {% if form.step_die.errors %}<tr><td colspan="2"><span class="field_error">{{ form.step_die.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Coating Pattern:</td><td>{{form.coating_pattern}}</td></tr>
+            {% if form.coating_pattern.errors %}<tr><td colspan="2"><span class="field_error">{{ form.coating_pattern.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Customer Code:</td><td>{{form.customer_code}}</td></tr>
+            {% if form.customer_code.errors %}<tr><td colspan="2"><span class="field_error">{{ form.customer_code.errors|join:", " }}</span></td></tr>{% endif %}
+        </table>
+    </div>
+    
+    <div class="outline_fancy" style="width:600px; padding-bottom:15px;">
+        <h2 class="inline">Sorting Options</h2><br />
+        <table cellpadding="0" cellspacing="0" width="100%" border="0" style="border:none;">
+            <tr><td align="right" style="padding-right:5px;">Sort By:</td><td>{{form.sort_by}}</td></tr>
+            {% if form.sort_by.errors %}<tr><td colspan="2"><span class="field_error">{{ form.sort_by.errors|join:", " }}</span></td></tr>{% endif %}
+            <tr><td align="right" style="padding-right:5px;">Sort Order:</td><td>{{form.sort_order}}</td></tr>
+            {% if form.sort_order.errors %}<tr><td colspan="2"><span class="field_error">{{ form.sort_order.errors|join:", " }}</span></td></tr>{% endif %}
+        </table>
+    </div>
+
+    <input type="submit" value="Search" />
+</form>
+{% endif %}
+
+<!-- Version Toggle -->
+<p style="margin-top: 20px; font-size: 11px; color: #666;">
+    {% if type == "job" %}
+        <a href="{% url 'job_search' %}?legacy=0">Switch to Enhanced Search Interface</a>
+    {% else %}
+        <a href="{% url 'item_search' %}?legacy=0">Switch to Enhanced Search Interface</a>
+    {% endif %}
+</p>
+
+{% endblock %}

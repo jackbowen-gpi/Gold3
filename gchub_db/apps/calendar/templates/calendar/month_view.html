@@ -1,0 +1,100 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<table style="margin:0 auto" border="1">
+	<tr>
+		<td style="text-align:center">
+			<a href="{% url "event-month_overview" last_year last_month %}">
+			  <img src="{{MEDIA_URL}}img/icons/date_previous.png" style="vertical-align:middle" alt="Previous Month" /> {{last_month_name}} {{last_year}}
+			</a>
+		</td>
+		<td colspan="5" style="text-align:center">
+			<h1 class="inline">{{month_name}} {{year}}</h1>
+		</td>
+		<td style="text-align:center">
+			<a href="{% url "event-month_overview" next_year next_month %}">
+			  {{next_month_name}} {{next_year}} <img src="{{MEDIA_URL}}img/icons/date_next.png" style="vertical-align:middle" alt="Next Month" />
+			</a>
+		</td>
+	</tr>
+	<tr>
+		<th style="text-align:center">Sunday</th>
+		<th style="text-align:center">Monday</th>
+		<th style="text-align:center">Tuesday</th>
+		<th style="text-align:center">Wednesday</th>
+		<th style="text-align:center">Thursday</th>
+		<th style="text-align:center">Friday</th>
+		<th style="text-align:center">Saturday</th>
+	</tr>
+	  {% for week in week_list %}
+	  <tr>
+	  {% for day in week %}
+	      {% ifequal day 0 %}
+	     	 <td style="background-color:white">
+	      {% else %}
+	      	 {% if isthismonth %}
+	      	 	{% ifequal day current_day %}
+	      			<td class="calendar_selected_day">
+	      		{% else %}
+	      			<td class="calendar_day">
+	      		{% endifequal %}
+	      	 {% else %}
+	     		 <td class="calendar_day">
+	     	 {% endif %}
+	     	 {% if perms.accounts.clemson_employee %}
+	         	<strong><a href="{% url "event-add" year month_num day %}">&nbsp;&nbsp;{{day}}&nbsp;</a></strong>
+	         {% else %}
+	        	<strong>&nbsp;&nbsp;{{day}}&nbsp;</strong>
+	         {% endif %}
+	         <br />
+	         {% for event in events_for_month %}
+				 {% ifequal day event.event_day %}
+				 <div class="calendar_event">
+					 <a href="{% url "event-view" event.id %}">
+					 	<img src='{{event.event_icon}}' style="vertical-align:middle" /> {{event.calendar_html|safe}}<br />
+					 </a>
+				 </div>
+				 {% endifequal %}
+			 {% endfor %}
+	      {% endifequal %}
+	    </td>
+	  {% endfor %}
+	  </tr>
+	  {% endfor %}
+</table>
+
+{% if perms.accounts.clemson_employee %}
+	<br />
+	{% if messages %}
+		<div class="outline_fancy" style="width:325px;margin:0 auto;">
+			{% for message in messages %}
+				<span class="warning"><img src="{{MEDIA_URL}}img/icons/tick.png" style="vertical-align:middle" alt="Event Message" /> {{ message }}</span>
+			{% endfor %}
+		</div>
+		<br />
+	{% endif %}
+	<div class="outline" style="width:325px;margin:0 auto;">
+		<img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align:middle" alt="Add Event Information" />
+		To add an event, click on the day the event occurs.<br />
+		<br />
+		<img src="{{MEDIA_URL}}img/icons/car.png" style="vertical-align:middle" /> Vacation<br />
+		<img src="{{MEDIA_URL}}img/icons/bug.png" style="vertical-align:middle" /> Sick Day<br />
+		<img src="{{MEDIA_URL}}img/icons/pill.png" style="vertical-align:middle" /> Doctor Appt.<br />
+		<img src="{{MEDIA_URL}}img/icons/cake.png" style="vertical-align:middle" /> Holiday<br />
+		<img src="{{MEDIA_URL}}img/icons/map.png" style="vertical-align:middle" /> Business Trip<br />
+		<img src="{{MEDIA_URL}}img/icons/group.png" style="vertical-align:middle" /> Office Meeting<br />
+		<img src="{{MEDIA_URL}}img/icons/user_suit.png" style="vertical-align:middle" /> Office Visit<br />
+		<img src="{{MEDIA_URL}}img/icons/status_away.png" style="vertical-align:middle" /> Leave of Absence<br />
+		<img src="{{MEDIA_URL}}img/icons/door_out.png" style="vertical-align:middle" /> Out of Office<br />
+	</div>
+	<br />
+	<div class="outline" style="width:325px;margin:0 auto;">
+		<img src="{{MEDIA_URL}}img/icons/car.png" style="vertical-align:middle" alt="Vacation Used" />
+		You have registered {{vacation_used}} out of {{vacation_total}} vacation day(s) for {{year}}.
+	</div>
+	<div class="outline" style="width:325px;margin:0 auto;">
+		<img src="{{MEDIA_URL}}img/icons/bug.png" style="vertical-align:middle" alt="Sick Used" />
+		You have registered {{sick_used}} out of {{sick_total}} sick day(s) for {{year}}.
+	</div>
+{% endif %}
+{% endblock %}

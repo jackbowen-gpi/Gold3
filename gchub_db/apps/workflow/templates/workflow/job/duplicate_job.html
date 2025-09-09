@@ -1,0 +1,79 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/job_item_entry.js"></script>
+{% endblock %}
+
+{% block body %}
+<div style="min-height:605px;">
+	<h1 class="inline"><img src="{{MEDIA_URL}}img/icons/disk_multiple.png" style="vertical-align: text-center" /> Duplicating Existing Job: {{job_original.id}} - {{job_original.name}}</h1><br />
+	<br />
+	<h2 class="inline">Type: {{dupe_type_name}}</h2><br />
+	<br />
+			<form id="dupejob" name="dupejob">
+
+		{% if job_original.workflow.name == "Foodservice" or job_original.workflow.name == "Carton" %}
+			<div class="outline" style="min-height:300px;background-color:#DDDDDD;float:left;width:350px">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/folder.png" style="vertical-align: text-bottom" /> Job Information</h2><br />
+				<label for="id_name">Name:</label>{{jobform.name}}<br />
+				<label for="id_due_date">Due Date:</label>{{jobform.due_date}}<br />
+				<label for="id_salesperson">Salesperson:</label>{{jobform.salesperson}}<br />
+			</div>
+			<div class="outline" style="min-height:300px;background-color:#DDDDDD;float:left;position:relative;width:400px">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/folder_image.png" style="vertical-align: text-bottom" /> Item Selection</h2><br />
+				<span class="smtext">(Select items you wish to include with the new job.)</span><br /><br />
+				{% for item in items_original %}
+					{{item.num_in_job}}. <input type="checkbox" name="item_{{item.id}}" id="id_item_{{item.id}}" /> {{item.size}}</input><br />
+				{% endfor %}
+			</div>
+			<div class="outline" style="min-height:206px;background-color:#DDDDDD;float:left;width:750px;clear:left;">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align: text-bottom" /> Instructions:</h2><br />{{jobform.instructions}}<br /><br />
+				<br />
+			</div>
+			<div class="outline" style="background-color:#FFFF99;float:left;clear:both;width:756px">
+				<input type="submit" value="Complete Duplication" onclick="dupe_existing_job({{job_original.id}}, '{{dupe_type}}');return false;" />
+				{% if dupe_type == "carton_imp" %}
+				(warning: slow)
+				{% endif %}
+			</div>
+		</form>
+		{% endif %}
+
+		{% ifequal job_original.workflow.name "Beverage" %}
+			<input type="hidden" name="status" id="id_status" value="Pending" />
+			<input type="hidden" name="workflow" id="id_workflow" value="{{job_original.workflow.id}}" />
+			<div class="outline" style="min-height:365px;background-color:#DDDDDD;float:left;width:400px">
+				<label for="id_brand_name">Brand Name:</label>{{jobform.brand_name}}<br />
+				<label for="id_customer_name">Customer:</label>{{jobform.customer_name}}<br />
+				<label for="id_customer_po_number">Customer PO:</label>{{jobform.customer_po_number}}<br />
+				<br />
+
+				<label for="id_due_date">Due Date:</label>{{jobform.due_date}}<br />
+				<label for="id_bill_to_type">Bill To:</label>{{jobform.bill_to_type}}<br />
+				<label for="id_business_type">Bus. Type:</label>{{jobform.business_type}}<br /><br />
+
+				<label for="id_salesperson">Analyst:</label>{{jobform.salesperson}}<br />
+				<label for="id_sales_service_rep">SSR:</label>{{jobform.sales_service_rep}}<br />
+				<label for="id_prepress_supplier">Prepress:</label>{{jobform.prepress_supplier}}<br />
+
+				<label for="id_temp_printlocation">Plant &amp; Press:</label>{{jobform.temp_printlocation}}<br />
+				<label for="id_temp_platepackage">Plates:</label>{{jobform.temp_platepackage}}<br />
+				<br />
+				<label for="id_use_new_bev_nomenclature">New Naming:</label>{{jobform.use_new_bev_nomenclature}} (Checked will use new nomenclature)<br />
+			</div>
+
+			<div class="outline" style="min-height:365px;background-color:#DDDDDD;float:left;width:350px;">
+				<h2 class="inline"><img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align: text-bottom" /> Instructions:</h2><br />{{jobform.instructions}}<br /><br />
+				<br />
+			</div>
+			<div class="outline" style="background-color:#FFFF99;float:left;clear:both;width:756px">
+				<input type="submit" value="Complete Duplication" onclick="dupe_existing_job({{job_original.id}}, '{{dupe_type}}');return false;" />
+				You can select the items to duplicate after this screen.
+			</div>
+		</form>
+		{% endifequal %}
+
+
+</div>
+{% endblock %}

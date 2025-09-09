@@ -1,0 +1,249 @@
+
+{% block extra_head %}
+    {% include "yui_container_includes.html" %}
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/drawdown/drawdown.css" type="text/css" media="all" />
+    <script type="text/javascript" src="{{MEDIA_URL}}js/drawdown/drawdown.js"></script>
+
+{% endblock %}
+
+{% load job_filters %}
+{% ifequal job.workflow.name "Beverage" %}
+<div class="headline_bev">
+{% endifequal %}
+{% ifequal job.workflow.name "Foodservice" %}
+<div class="headline_fsb">
+{% endifequal %}
+{% ifequal job.workflow.name "Carton" %}
+<div class="headline_car">
+{% endifequal %}
+{% ifequal job.workflow.name "Container" %}
+<div class="headline_con">
+{% endifequal %}
+
+<h1 style='padding:0px;margin:0px;margin-bottom:-7px'>
+  <a href='{% url "job_find_related" job.id %}'>{{ job.id }} {{ job.name|slice:":40" }}</a>
+  
+  {% comment %}
+  <a href='{% url "job_find_related" job.id %}' title='{{ job.name }}' alt='{{ job.name }}'>
+    {{ job.id }} 
+    {% if job.is_length_check %}
+        {{ job.name|slice:":40" }}... 
+    {% else %}
+        {{ job.name }} 
+    {% endif %}  
+  </a>
+  {% endcomment %}
+  {% ifequal job.workflow.name "Foodservice" %}
+	  <a href="{% url "drawdown_home" job.id %}" target="_blank">
+	  <img src="{{MEDIA_URL}}img/icons/brush.png" title="Ink Drawdown Request"
+	           style="vertical-align: text-top; float: right;" alt="Ink Drawdown" />
+	  </a>
+  {% endifequal %}
+</h1>
+<br />
+{% if job.po_number %}
+  <span style='padding:0px;margin:0px'><strong>PO Number:</strong> {{job.po_number}}</span>
+  <br />
+{% endif %}
+{% if job.e_tools_id %} 
+  <strong>eTools ID#:</strong> 
+  <a href='{% url "etools_show_request" job.id %}'>
+    {{job.e_tools_id}}
+  </a>
+  {% if job.printgroup %} 
+	  &nbsp;
+	  	<strong>Printgroup:</strong> 
+	  	<a href='{% url "job_find_printgroup" job.id %}'> {{job.printgroup}}</a>
+  {% endif %}
+  <br />
+{% endif %}
+{% if job.workflow.name == "Carton" %}
+  <strong>CustomerID:</strong> 
+  <a href='{% url "gps_connect_cust_info" job.id %}'>
+	{{job.customer_identifier}}
+  </a>
+{% endif %}
+{% if artreq %} 
+  <strong>Art Request:</strong> 
+  <a href='{% url "art_req_review" artreq.id %}'>
+	{{artreq.id}}
+  </a>
+  {% if job.printgroup %} 
+	  &nbsp;
+	  	<strong>Printgroup:</strong> 
+	  	<a href='{% url "job_find_printgroup" job.id %}'> {{job.printgroup}}</a>
+  {% endif %}
+  <br />
+{% endif %}
+{% if corr_artreq %} 
+  <strong>Art Request:</strong> 
+  <a href='{% url "art_req_review" corr_artreq.id %}'>
+	{{corr_artreq.id}}
+  </a>
+  {% if job.printgroup %} 
+	  &nbsp;
+	  	<strong>Printgroup:</strong> 
+	  	<a href='{% url "job_find_printgroup" job.id %}'> {{job.printgroup}}</a>
+  {% endif %}
+  <br />
+{% endif %}
+</div>
+
+<div style="float:left">
+<form action="/workflow/job/{{job.id}}/save/" id="jobdata" name="jobdata" 
+      onsubmit="update_job('{{job.id}};return false;')"
+      style='padding:0px;margin:0px'>
+      
+  
+
+  <label for="id_artist">Artist:</label> {{ jobform.artist }}<br />
+
+  {% if job.workflow.name == "Carton" %}
+  	<label for="id_customer_phone">PCSS:</label> 
+  	{{ jobform.pcss }}
+  	<br />
+  	<label for="id_graphic_specialist">Graphic SPC:</label> 
+  	{{ jobform.graphic_specialist }}
+  	<br />
+  {% endif %}
+
+  <label for="id_salesperson">
+    {# Changes label depending on workflow assignment #}
+    {% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}Salesperson:{% endif %}
+    {% ifequal job.workflow.name "Beverage" %}Analyst:{% endifequal %}
+    {% ifequal job.workflow.name "Container" %}CSR:{% endifequal %}
+  </label>
+  {{ jobform.salesperson }}
+  
+  {% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+    {% if job.salesperson %}
+    {# Show the lookup button for the GPI phone book. #}
+    <a href="https://graphicpkg.sharepoint.com/sites/search/Pages/peopleresults.aspx#k={{job.salesperson.last_name}}%20{{job.salesperson.first_name}}#l=1033" 
+      target="_blank">
+      <img src="{{MEDIA_URL}}img/icons/telephone.png" 
+           style="vertical-align: text-bottom" alt="Telephone Lookup" />
+    </a>
+    {% endif %}
+  {% endif %}
+  <br />
+  
+  {% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+  <label for="id_csr_no_edit">CSR:</label>
+  <input id="id_csr_no_edit" type="text" disabled="disabled" value="{{job.csr}}" />
+  <a href='javascript:load_div("main_view", "/workflow/job/{{job.id}}/change_csr/")'>
+  <img src="{{MEDIA_URL}}img/icons/pencil.png" style="vertical-align: text-bottom" />
+  </a>
+  <br />
+  {% endif %}
+  
+  <label for="id_customer_name">Customer:</label> 
+  {{ jobform.customer_name }}
+  <br />
+  
+  {% ifequal job.workflow.name "Beverage" %}
+  	<label for="id_brand_name">Brand:</label> 
+  	{{ jobform.brand_name }}
+  	<br />
+  {% endifequal %}
+  
+  {% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+  	<label for="id_customer_phone">Customer Ph:</label> 
+  	{{ jobform.customer_phone }}
+  	<br />
+  {% endif %}
+  
+  <label for="id_customer_email">Cust. Email:</label> 
+  {{ jobform.customer_email }}
+  <br />
+  
+  <label for="id_due_date_month" 
+    {% if overdue %}class="warning"{% endif %}>
+    Date Needed:</label> 
+  {{jobform.due_date}}
+  {% if overdue %}
+  <img src="{{MEDIA_URL}}img/icons/exclamation.png" 
+       style="vertical-align:text-bottom" alt="OverdueWarning" />
+  {% endif %}
+  <br />
+  
+  <label for="id_status">Status:</label>{{ jobform.status }}
+  {% ifequal request.user.id job.artist.id %}
+  <a href="{% url "job_cycle_job_todo_list_mode" job.id %}">
+    <img src="{{job.get_todo_list_mode_icon_url}}" 
+         alt="Todo status: {{job.get_todo_list_mode_display}}"
+         title="Todo status: {{job.get_todo_list_mode_display}}" /> 
+  </a>
+  {% endifequal %}
+  <br />
+
+	<!-- These fields should only be visible to managers. -->
+  {% if perms.accounts.clemson_manager or perms.accounts.clemson_supervisor%}
+    {% ifequal job.workflow.name "Foodservice" %}
+      <label for="id_type">Type:</label> {{ jobform.type }} <br />
+      <label for="id_category">Category:</label> {{ jobcomplexform.category }} <br />
+      <label for="id_complexity">Complexity:</label> {{ jobcomplexform.complexity }} <br />
+    {% endifequal %}
+  {% else %}
+    <!-- Hiding the fields in this way prevents any existing values from getting
+    erased when non-managers submit the form. -->
+    {% ifequal job.workflow.name "Foodservice" %}
+      {{ jobform.type.as_hidden }}
+      {{ jobcomplexform.category.as_hidden }}
+      {{ jobcomplexform.complexity.as_hidden }}
+    {% endifequal %}
+  {% endif %}
+  
+  {% ifequal job.workflow.name "Beverage" %}
+  	<label for="id_purchase_request_number">Purch. Req#:</label> 
+  	  {{ jobform.purchase_request_number }} 
+    <br />
+    <label for="id_olmsted_po_number">PO#:</label>
+      {{ jobform.olmsted_po_number }} 
+    <br />
+  {% endifequal %}
+  {% if job.workflow.name == "Carton" %}
+    <label for="id_carton_type">Carton Type:</label> {{ jobform.carton_type }} <br />
+  {% endif %}
+  <!-- TODO: Set edit based on login -->
+    
+  {% if perms.accounts.job_general_edit %}
+  
+    {% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+    {% else %}
+    <br /><br />
+    {% endif %}
+
+    <div style='width:245px;float:right'>
+      {% if perms.accounts.clemson_employee %}
+      <a class="button" 
+         href='javascript:load_div("main_view", "/workflow/job/{{job.id}}/change_name/")'>
+        <span>Rename Job</span>
+      </a>
+      {% endif %}
+      <a class="button" href="javascript:update_job('{{job.id}}')">
+        <span>Update Job Info</span>
+      </a>
+    </div>
+  {% endif %}
+</form>
+</div>
+
+<div style='float:left'>
+{{job|job_thumbnail}}
+</div>
+
+{% if job.has_promo_items %}
+<div style='text-align:-webkit-center;margin-left:12px;margin-top:15px;background-color:beige;max-width:125px;float:left'>
+	<img src="/media/img/icons/exclamation.png"><strong> Attention</strong><img src="/media/img/icons/exclamation.png">
+	<br/>
+	{{job.has_promo_items}}
+</div>
+{% endif %}
+
+{% if job.has_bottom_print %}
+<div style='text-align:center;margin-left:12px;margin-top:15px;background-color:LightCyan;max-width:125px;float:left'>
+	<img src="/media/img/icons/exclamation.png"><strong> Attention</strong><img src="/media/img/icons/exclamation.png">
+	<br/>
+	{{job.has_bottom_print}}
+</div>
+{% endif %}

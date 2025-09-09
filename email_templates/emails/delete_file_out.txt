@@ -1,0 +1,10 @@
+{% include "emails/email_header.txt" %}
+
+{{item}}, item {{itemnum}} of job {{job}}, is no longer approved and has been un-final filed. Please see below for required action.
+
+Demand Planning: Review and adjust forecasts.
+Plants: Review and adjust schedules as needed.
+Customer Service: Review and adjust any open orders.
+Clemson: Change forecast code to "O".
+
+http://gchub.graphicpkg.com/workflow/job/{{job.id}}/

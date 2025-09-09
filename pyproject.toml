@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gchub_db"
+version = "0.0.0"
+description = "Legacy gchub_db project shim for editable installs"
+authors = [ { name = "dev", email = "dev@example.com" } ]
+
+[tool.setuptools]
+packages = ["gchub_db"]
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.isort]
+profile = 'black'
+[tool.poetry]
+name = "gold"
+version = "0.1.0"
+description = "Gold (gchub_db) Django project dependency manifest for Poetry"
+authors = ["dev@example.local"]
+packages = [
+  { include = "gchub_db" }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.14"
+Django = "4.2.23"
+
+# Note: This pyproject is intentionally minimal. Use the instructions in
+# README_POETRY.md to migrate the current `requirements.txt` into Poetry's
+# dependency table and to install the environment locally.
+
+[tool.poetry.dev-dependencies]
+black = "^24.3"
+pytest = "^7.4"
+
+
+[tool.ruff]
+# Enable many fixes and be slightly more permissive for legacy code.
+line-length = 88
+select = ["E", "F", "W", "C", "N", "D"]
+extend-ignore = ["D212", "D404"]
+
+[tool.ruff.per-file-ignores]
+# Allow legacy scripts to skip docstring rules and some import placement checks
+"scripts/*" = ["D100", "D101", "D102", "D103", "D107", "E402"]
+"gchub_db/src/**" = ["D100", "D101", "D102", "D103"]
+
+# Broader legacy ignores to reduce noise from many historical modules.
+"gchub_db/**" = [
+  "D100", "D101", "D102", "D103", "D104", "D205", "D212", "D404",
+  "E402", "C901"
+]
+"gchub_db/includes/**" = ["D100", "D101", "D102", "D103", "E402"]
+"gchub_db/middleware/**" = ["D100", "D101", "D102", "D103", "D104", "C901", "E402"]
+"gchub_db/templatetags/**" = ["D100", "D101", "D102", "D103"]
+"gchub_db/settings*.py" = ["D100", "D101", "D102", "D103", "F403"]
+
+# Suppress wildcard-import/star-import warnings and other legacy-only complaints for historical modules
+"gchub_db/middleware/maintenance_mode/**" = ["D100", "D101", "D102", "D103", "F403", "F405", "F821"]
+"gchub_db/**/urls.py" = ["F403", "F405"]
+"gchub_db/**/tests/**" = ["D100", "D101", "D102", "D103"]
+
+# Additional targeted ignores for files still flagged after auto-fixes
+"gchub_db/includes/widgets.py" = ["D100", "D101", "D102", "D103", "D205", "N801"]
+"gchub_db/local_settings.py" = ["E501", "D100"]
+"gchub_db/manage.py" = ["D100"]
+"gchub_db/middleware/__init__.py" = ["D104"]
+"gchub_db/tmp_*.py" = ["D100", "E402"]
+"gchub_db/scripts/*" = ["D100", "D101", "D102", "D103", "E402"]
+
+# Root-level equivalents (repo layout uses root-level `includes/`, `middleware/`, etc.)
+"includes/**" = ["D100", "D101", "D102", "D103", "D205", "E402", "N801"]
+"local_settings.py" = ["E501", "D100"]
+"manage.py" = ["D100"]
+"middleware/**" = ["D100", "D101", "D102", "D103", "D104", "C901", "E402"]
+"templatetags/**" = ["D100", "D101", "D102", "D103"]
+"urls_dummy.py" = ["E501"]
+"tmp_*.py" = ["D100", "E402"]
+
+[tool.ruff.rules]
+# Increase complexity threshold to reduce C901 noise for legacy functions
+max-complexity = 20

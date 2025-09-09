@@ -1,0 +1,5 @@
+{% include "emails/email_header.txt" %}
+
+A {{item}}, item {{item.num_in_job}} of job {{item.job}}, has been filed out without a forecast.
+
+http://gchub.graphicpkg.com/workflow/job/{{item.job.id}}/

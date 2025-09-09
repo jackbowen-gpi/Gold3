@@ -1,0 +1,19 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	{% include "workflow/itemcatalog/navbar_header.inc.html" %}
+	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/item_catalog.js"></script>
+{% endblock %}
+
+{% block body %}
+
+<h1 class="inline">Add Specification for Step & Repeat</h1><br /><br />
+{% include "workflow/itemcatalog/navbar_div.inc.html" %}
+	<form id="stepspec" name="stepspec" onsubmit="add_stepspecs();return false;">
+		<div class="form_p">
+		  	{{add_form.as_p}}
+		</div>
+		<input type="submit" value="Add Specification" onclick="add_stepspecs();return false;" />
+	</form>
+{% endblock %}

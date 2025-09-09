@@ -1,0 +1,23 @@
+<table width="99%" class="minimal_horizontal">
+  <caption>My Active Jobs</caption>
+  <thead>
+  <tr>
+    <th>Job</th>
+    <th>Salesperson</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for job in user_job_list %}
+    <tr>
+	  <td style="padding:2px">
+        <a href="{{job.get_absolute_url}}">{{job.id}} {{job.name}}</a>
+        ({{job.items_in_job}})
+      </td>
+      <td>
+        {{job.salesperson.username}}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% include "accounts/index_todo_bottom.html" %}

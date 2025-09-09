@@ -1,0 +1,10 @@
+<img src="{{MEDIA_URL}}img/icons/script.png" style="vertical-align: text-bottom" alt="Job Log" />
+<span class="sub_heading">Job Log</span>
+<div style="clear: both; padding: 3px;margin:5px;">
+  <span class="smtext">filter:</span>
+  <a href='javascript:load_iframe("joblog_display", joblog_ajax_url("{{ job.id }}", "default"))' {% ifequal filter_type "default" %}class="togglenavlink-highlighted"{% else %}class="togglenavlink"{% endifequal %}>DEFAULT</a>
+  <a href='javascript:load_iframe("joblog_display", joblog_ajax_url("{{ job.id }}", "timeline"))' {% ifequal filter_type "timeline" %}class="togglenavlink-highlighted"{% else %}class="togglenavlink"{% endifequal %}>TIMELINE</a>
+  <a href='javascript:load_iframe("joblog_display", joblog_ajax_url("{{ job.id }}", "production"))' class="togglenavlink">PRODUCTION</a>
+  <a href='javascript:load_iframe("joblog_display", joblog_ajax_url("{{ job.id }}", "jdf"))' class="togglenavlink">JDF</a>
+  <a href='javascript:load_iframe("joblog_display", joblog_ajax_url("{{ job.id }}", "comments"))' class="togglenavlink">COMMENTS</a>
+</div>

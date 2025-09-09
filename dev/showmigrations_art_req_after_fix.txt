@@ -1,0 +1,39 @@
+2025-09-01 18:31:29 DEBUG    2025-09-01 18:31:29 [DEBUG]          fsb_box.py:27
+                             gchub_db.apps.auto_corrugated.docume
+                             nts.fsb_box: Font file not found at:
+                             /mnt\Production\autocorr_elements\VA
+                             G Rounded BT.ttf
+art_req
+ [X] 0001_initial
+ [X] 0002_product_case_pack
+ [X] 0003_auto_20180302_1702
+ [X] 0004_auto_20190522_1053
+ [X] 0005_partialartreq_is_completed
+ [X] 0005_auto_20190923_1111
+ [X] 0006_merge_20191002_1022
+ [X] 0007_product_render
+ [X] 0008_alter_additionalinfo_id_alter_artreq_id_and_more
+ [X] 0009_alter_product_ship_to_state
+ [X] 0010_alter_product_ship_to_state
+ [X] 0011_alter_product_ship_to_state
+ [X] 0012_alter_product_ship_to_state
+ [X] 0013_alter_product_ship_to_state
+ [X] 0014_alter_product_ship_to_state
+ [X] 0015_alter_product_ship_to_state
+ [X] 0016_alter_product_ship_to_state
+ [X] 0017_alter_product_ship_to_state
+ [X] 0018_alter_product_ship_to_state
+ [X] 0019_alter_product_ship_to_state
+ [X] 0020_alter_product_ship_to_state
+ [X] 0021_alter_product_ship_to_state
+ [X] 0022_alter_product_ship_to_state
+ [X] 0023_alter_product_ship_to_state
+ [X] 0024_alter_product_ship_to_state
+ [X] 0025_alter_product_ship_to_state
+ [X] 0026_alter_product_ship_to_state
+ [X] 0027_alter_product_ship_to_state
+ [X] 0028_alter_product_ship_to_state
+ [X] 0029_alter_product_ship_to_state
+ [X] 0030_alter_product_ship_to_state
+ [X] 0031_auto_fix_art_req
+ [X] 0032_alter_product_ship_to_state

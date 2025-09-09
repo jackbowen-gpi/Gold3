@@ -1,0 +1,38 @@
+<div class="yui-skin-sam">
+<div id="itemmgt_nav" class="yuimenubar yuimenubarnav">
+    <div class="bd">
+        <ul class="first-of-type">
+             <li class="yuimenubaritem first-of-type"><a class="yuimenubaritemlabel" href="{% url "itemcatalog_home" %}">Item Mgt. Home</a></li>
+             <li><a class="yuimenubaritemlabel" href="#catalog">Item Catalog</a>
+             <div id="catalog" class="yuimenu">
+                 <div class="bd">
+                 	<ul>
+	                    <li class="yuimenuitem"><a class="yuimenuitemlabel" href="{% url "catalog_search" %}">Search Catalog</a></li>
+	            		<li class="yuimenuitem"><a class="yuimenuitemlabel" href="{% url "new_itemcatalog" %}">Add to Catalog</a></li>
+	            	</ul>
+	             </div>
+	         </div>
+	         <li><a class="yuimenubaritemlabel" href="#specs">Item Specs</a>
+	         <div id="specs" class="yuimenu">
+                 <div class="bd">
+                 	<ul>
+	                    <li class="yuimenuitem"><a class="yuimenuitemlabel" href="{% url "spec_search" %}">Search Specs</a></li>
+	            		<li class="yuimenuitem"><a class="yuimenuitemlabel" href="{% url "new_itemspecs_basic" %}">Add to Specs</a></li>
+	            	</ul>
+	             </div>
+	         </div>
+	         <li><a class="yuimenubaritemlabel" href="#stepspecs">Step & Repeat Specs</a>
+ 	         <div id="stepspecs" class="yuimenu">
+                 <div class="bd">
+                 	<ul>
+	                    <li class="yuimenuitem"><a class="yuimenuitemlabel" href="{% url "step_search" %}">Search Specs</a></li>
+	            		<li class="yuimenuitem"><a class="yuimenuitemlabel" href="{% url "new_stepspecs_basic" %}">Add to Specs</a></li>
+	            	</ul>
+	             </div>
+	         </div>
+             <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="{% url "list_templates" %}">PDF Templates</a></li>
+        </ul>
+    </div>
+</div>
+</div>
+<br />

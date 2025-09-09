@@ -1,0 +1,6 @@
+Font file not found at: /mnt\Production\autocorr_elements\VAG Rounded BT.ttf
+92 objects imported automatically (use -v 2 for details).
+
+logged_in True
+status 200
+wrote tmp_search_results2.html

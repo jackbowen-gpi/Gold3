@@ -1,0 +1,3 @@
+{% include "emails/email_header.txt" %}
+
+Job {{job}} has been inactive for 45 days and will be invoiced.

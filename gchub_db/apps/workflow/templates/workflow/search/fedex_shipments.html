@@ -1,0 +1,149 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<!-- This is used to make fancy "busy" indicators while prepping big
+	downloads. Needs a special cookie in the http header to work. See the readme
+	in the js directory or look at inkcov_excel() in search_views. --->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery.fileDownload.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript">
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+
+		$j(function() {
+			// Used to cancel downloads.
+			var dlReq = null;
+
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+
+			// Show busy indicator while prepping excel download.
+			$j( "#excel_download" ).click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("Spreadsheets take a couple of minutes.");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+				// Prep download using jquery.fileDownload.js and assign to dlReq
+				dlReq = $j.fileDownload('/workflow/reports/fedex_shipments/download/' + "{{starting_date}}" + "/" + "{{ending_date}}" + '/', {
+					successCallback: function (url) {
+				    	// Hide busy indicator once download is ready.
+						$j( "#busy_dialog" ).dialog( "close" );
+				    },
+				});
+			});
+
+			//Date pickers
+			$j( "#id_start_date" ).datepicker({
+	            showOn: "button"
+			}).next().button({
+	            icons: {
+	                primary: "ui-icon-calendar",
+	                secondary: "ui-icon-triangle-1-s"
+	            },
+	            text: false
+	        });
+			$j( "#id_end_date" ).datepicker({
+	            showOn: "button",
+			}).next().button({
+	            icons: {
+	                primary: "ui-icon-calendar",
+	                secondary: "ui-icon-triangle-1-s"
+	            },
+	            text: false
+	        });//End date pickers.
+		});
+	</script>
+{% endblock %}
+
+{% block body %}
+	<h1>Enter a start date and end date for the fedex shipment time period.</h1>
+	<p>**The default search is one week</p>
+	<form method="get" action="" name="fedex_shipments" enctype="multipart/form-data">
+		<table>
+	        {% for field in dateform %}
+	            <tr>
+	                <th>{{ field.label_tag }}</th>
+	                <td>
+	                    {{ field }}
+	                </td>
+	            </tr>
+	        {% endfor %}
+	   </table>
+	   <input type="submit" value="Search">
+   </form>
+   <br />
+   <br />
+   <h3>The results below are shipments between {{starting_date}} and {{ending_date}} (Year-Month-Day) </h3>
+	{% if object_list.all %}
+	<!---Busy dialog-->
+	<div id="busy_dialog">
+	  <center>
+		  <p><div id="busy_dialog_text"></div></p>
+		  <img src="{{MEDIA_URL}}img/spinner.gif" />
+	  <center>
+	</div>
+
+	<a id="excel_download" href='#'">
+      <div class='ephasized_button'>
+        <img src="{{MEDIA_URL}}img/icons/page_excel.png" />
+        Download shipments in Excel format
+        </div>
+    </a>
+    {% endif %}
+	<br />
+   {% include "pagination_bar.html" %}
+   <table>
+   <tr>
+      <th>Created</th>
+      <th>Recipient</th>
+      <th>Job</th>
+      <th>Tracking #</th>
+   </tr>
+   {% if object_list.all %}
+	   {% for shipment in object_list %}
+	   <tr style="background-color:{%if shipment.date_shipped|date:"j"|divisibleby:2 %}#E6EEFF{% else %}#E6FFF8{% endif %}">
+	      <td>{{shipment.date_shipped|date:"g:i A, N j"}}</td>
+	      <td>
+	      	 {% if shipment.address %}
+		         {% if shipment.address.name %}
+		            {{shipment.address.name|default:"<em>Unknown</em>"}}
+		         {% else %}
+		            {{shipment.address.company|default:"<em>Unknown</em>"}}
+		         {% endif %}
+		     {% endif %}
+	      </td>
+	      <td class="centered">
+	         {% if shipment.job %}
+	            <a href="{{shipment.job.get_absolute_url}}">{{shipment.job}}</a>
+	         {% else %}
+	            N/A
+	         {% endif %}
+	      </td>
+	      <td>
+	         {% if shipment.tracking_num %}
+	            <a href="{% url "shipment_track" shipment.tracking_num %}">{{shipment.tracking_num}}</a>
+	         {% else %}
+	            N/A
+	         {% endif %}
+	      </td>
+	   </tr>
+	   {% endfor %}
+	{% else %}
+		<td>No Results Found</td>
+	{% endif %}
+   </table>
+	{% include "pagination_bar.html" %}
+
+{% endblock %}

@@ -1,0 +1,49 @@
+	<img src="{{MEDIA_URL}}img/icons/money_dollar.png">
+	<span class="sub_heading">Edit Charge - {{charge.item.job.id}} {{charge.item.job.name}} - Item #{{charge.item.num_in_job}} ({{charge.item.size}})</span>
+
+	<form id="charge" name="charge" onsubmit="update_charge('{{charge.id}}', '{{charge.item.job.id}}', '{{charge.item.id}}');return false;">
+		<input type="hidden" name="item" id="id_item" value="{{charge.item.id}}" />
+		<label for="id_description">Charge Type:</label>
+		{{ chargeform.description }}<br />
+
+		<label for="id_artist">Artist:</label>
+			<select name="artist" id="id_artist">
+			{% for artist in artists %}
+			   <option value="{{artist.id}}" {% ifequal artist current_artist %}selected="selected"{% endifequal %}>{{artist.first_name}} {{artist.last_name}}</option>
+			{% endfor %}
+			</select><br />
+
+		<label for="id_amount">Amount:</label>
+		{{ chargeform.amount }}<br />
+
+		<label for="id_rush_days">Rush Days:</label>
+		<select name="rush_days" id="id_rush_days" onchange="auto_fill_charge(this.form, '{{charge.item.quality}}', '{{charge.item.itemcolor_set.count}}', '{{charge.item.id}}')">
+		{% if not charge.rush_days %}
+			<option value="" selected="selected">--</option>
+		{% else %}
+			<option value="">--</option>
+		{% endif %}
+		{% for i in "012345678" %}
+			{% ifequal charge.rush_days forloop.counter0 %}
+				<option value="{{i}}" selected="selected">{{i}}</option>
+			{% else %}
+				<option value="{{i}}">{{i}}</option>
+			{% endifequal %}
+		{% endfor %}
+		</select><br>
+
+		<label for="id_comments">Comments:</label>
+		{{ chargeform.comments }}<br />
+
+		{% if charge.invoice_date %}
+			<br /><strong>This charge has already been invoiced.</strong><br />
+			<strong>Date:</strong> {{charge.invoice_date|date:"n-j-Y"}}<br />
+			<strong>Number:</strong> {{charge.invoice_number}}<br />
+		{% endif %}
+		<br />
+		{% if charge.invoice_date %}
+			<em>No edits may be made to this charge.</em>
+		{% else %}
+			<input type="submit" value="Edit Charge" onclick="update_charge('{{charge.id}}', '{{charge.item.job.id}}', '{{charge.item.id}}');return false;" />
+		{% endif %}
+	</form>

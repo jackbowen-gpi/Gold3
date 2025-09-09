@@ -1,0 +1,113 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	<!-- Load up jQuery -->
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
+	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
+
+	<!-- Javascript happens here. -->
+	<script type="text/javascript">
+		//prototype is loaded in GOLD's base html and it uses $ just like jquery
+		//does. So we'll change $ to $j for the jQuery on this page using
+		//jQuery.noConflict()
+		var $j = jQuery.noConflict();
+
+		//jQuery stuff.
+		$j(document).ready(function(){
+			// Busy inidcator
+			$j( "#busy_dialog" ).dialog({
+				autoOpen: false,
+				modal: true,
+				resizable: false,
+				title: "Working",
+			});
+			// Show busy indicator.
+			$j("a").click(function() {
+				// Set busy indicator text
+				$j("#busy_dialog_text").text("This can take a moment...");
+				// Open busy indicator
+				$j( "#busy_dialog" ).dialog( "open" );
+			});
+		});//End jQuery stuff.
+	</script>
+{% endblock %}
+
+{% block body %}
+<h1>{{page_title}}</h1>
+<hr />
+
+<!---Busy dialog-->
+<div id="busy_dialog">
+  <center>
+	  <p><div id="busy_dialog_text"></div></p>
+	  <img src="{{MEDIA_URL}}img/spinner.gif" />
+  <center>
+</div>
+
+<div style="width:50%">
+	<p>
+	Info about average turn times for jobs. Data is calculated from time sheet
+	entries by artists based on item types, categories, and complexities. Missing
+	data means there aren't any jobs that match that type/category/complexity
+	combo or the average hours were zero.
+	<br />
+	<br />
+	Click on a group of averages to see them broken down by artist.
+    </p>
+</div>
+
+<h3>
+	<a href="/manager_tools/" >
+		<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+		Back
+	</a>
+</h3>
+<br />
+
+<!-- Data table -->
+<div class="grey_bordered">
+	<table class="rowHover" style="empty-cells: hide">
+		<!-- First row. Lists the types. -->
+		<tr>
+			{% for column in first_row %}
+				{% if column == "BLANK" %}
+					<td></td>
+				{% else %}
+					<th>{{column}}</th>
+				{% endif %}
+			{% endfor %}
+		</tr>
+		<!-- The rest of the rows. Forgive me, this started simple.-->
+		{% for row in data_rows %}
+			<tr class="{% cycle 'rowA' 'rowB' %}">
+				{% for column in row %}
+					<!-- The first column is the category -->
+					{% if column == row.0 %}
+						<th>{{column}}</th>
+					{% else %}
+						<td>
+							{% for complexity in column %}
+								<!-- First item is the partial URL -->
+								{% if complexity == column.0 %}
+									<!-- Make a link to the artist breakdowns -->
+									<a href="/manager_tools/jobcategory_artists/{{complexity.1}}/">
+								{% else %}
+									<!-- Only display the data if the hour average isn't zero. -->
+									{% if complexity.1 > 0 %}
+										{{ complexity.0 }} = {{ complexity.1}} hours<br>
+									{% else %}
+										<br>
+									{% endif %}
+								{% endif %}
+							{% endfor %}
+							</a> <!-- Close the link to the artists breakdowns -->
+						</td>
+					{% endif %}
+				{% endfor %}
+			<tr>
+		{% endfor %}
+	</table>
+</div>
+
+{% endblock %}

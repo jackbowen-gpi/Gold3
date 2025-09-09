@@ -1,0 +1,13 @@
+{% extends "standard.html" %}
+
+{% block page_title %}Cancel Shipment{%endblock %}
+
+{% block extra_head %}
+  {% include "address/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+  <h1>Shipment Cancelled</h1>
+  {% include "address/navbar_div.inc.html" %}
+  <p>Shipment <strong>{{Reference}}</strong> (Fedex tracking #{{TrackingNumber}}) has been cancelled.</p>
+{% endblock %}

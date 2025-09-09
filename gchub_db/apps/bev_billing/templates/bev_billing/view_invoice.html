@@ -1,0 +1,123 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+    {% include "bev_billing/navbar_header.inc.html" %}
+
+	<script type="text/javascript" src="{{MEDIA_URL}}js/bev_billing/bev_billing.js"></script>
+	<style type="text/css">
+	  label { width:90px;}
+	  dl { margin-left:10px;
+	       margin-top:5px}
+	  dt { margin-top:6px;margin-bottom:2px}
+	  .invoice_button {
+	    display:block;
+	    clear:both;
+	    border:1px solid grey;
+	    padding:5px;
+	    margin:5px;
+	    background-color:#DBFFDE;
+	  }
+	  .invoice_button:hover {
+	    border:1px solid #696969;
+	  }
+	  .invoice_button img {
+	    vertical-align:text-bottom;
+	    margin-right:3px;
+	  }
+	  .ephasized_button {
+	    background-color:#FFFFE3;
+	  }
+	</style>
+{% endblock %}
+
+{% block body %}
+		<h1>{{invoice}}</h1>
+		{% include "bev_billing/navbar_div.inc.html" %}
+		<div class="outline_fancy" style="float:left;width:250px;margin-left:10px">
+		<form id="invoicedata" name="invoicedata" onsubmit="invoice_save('{{invoice.id}}');return false;">
+		<dl>
+			<dt>Job:</dt>
+			<dd><a href="{{invoice.job.get_absolute_url}}">{{invoice.job}}</a></dd>
+			<dt>Plant:</dt>
+			<dd>{{invoice.job.temp_printlocation.plant}}</dd>
+			<dt>Platemaker:</dt>
+			<dd>{{invoice.job.temp_platepackage.platemaker}}</dd>
+			<dt>Invoice Email List:</dt>
+			<dd>{% for user in invoice.job.temp_printlocation.plant.bev_controller.all %}
+					{{user.email}}
+				{% endfor %}
+			</dd>
+			<dt>QAD Entry:</dt>
+			{% if invoice.qad_entry_date %}
+			<dd>
+			  {{invoice.qad_entry_user}}
+			  ({{invoice.qad_entry_date|date:"M d, Y"}})
+			</dd>
+			{% else %}
+			<dd>{{form.qad_entered}} Job has been entered into QAD</dd>
+			{% endif %}
+			<dt>Invoice number:</dt>
+			{% if invoice.invoice_number %}
+			<dd>{{invoice.invoice_number}}</dd>
+			{% else %}
+			<dd>{{form.invoice_number}}</dd>
+			{% endif %}
+		</dl>
+		{% if perms.accounts.accounting_access and perms.accounts.beverage_access %}
+        <a href="javascript:invoice_save('{{invoice.id}}')">
+          <div class='invoice_button'>
+            <img src="{{MEDIA_URL}}img/icons/disk.png" />
+            Save Invoice Info
+          </div>
+        </a>
+        {% endif %}
+
+		{% if invoice.invoice_entry_date %}
+	    <a href="{% url "bev_billing-get_bev_invoice_pdf" invoice.id %}">
+	      <div class='invoice_button ephasized_button'>
+	        <img src="{{MEDIA_URL}}img/icons/book.png" />
+	        Download the invoice in PDF format
+	        </div>
+	    </a>
+	    {% endif %}
+		</div>
+
+	<div style="float:left;margin-left:10px">
+		<table width="500px">
+			<tr>
+				<th colspan="3">Itemized Charges</th>
+			</tr>
+			{% for charge in invoice.charge_set.all %}
+			<tr>
+				<td>{{charge.item}}</td>
+				<td>{{charge.description}}</td>
+				<td style="text-align:right;">
+				  ${{charge.amount|floatformat:2}}
+				</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<td colspan="2"><strong>Plates Subtotal</strong></td>
+				<td style="text-align:right;">
+				  <strong>${{invoice.total_plates|floatformat:2}}</strong>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><strong>Graphics Subtotal</strong></td>
+				<td style="text-align:right;">
+				  <strong>${{invoice.total_graphics|floatformat:2}}</strong>
+				</td>
+			</tr>
+			<tr>
+				<th colspan="2">Total:</th>
+				<td style="text-align:right;">
+				  <strong>${{invoice.total_amount|floatformat:2}}</strong>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<div style="clear:both">&nbsp;</div>
+
+{% endblock %}

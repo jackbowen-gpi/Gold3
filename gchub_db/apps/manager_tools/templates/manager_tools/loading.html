@@ -1,0 +1,82 @@
+{% extends "standard.html" %}
+
+{% block body %}
+<h1>{{page_title}}</h1>
+<hr />
+<div style="width:80%">
+	<p>This page is an overview of artist loading by hours for the next week.
+	Uses the same math to calculate hours as the To-Do List Manager View. These
+	hours represent jobs, revisions, and file-outs that have not yet been
+	completed.</p>
+
+	<p>Overdue items will be counted in today's totals.</p>
+
+	<p>Hours will disappear from this report as the artists complete
+	jobs just like the To-Do list.</p>
+</div>
+
+<h3>
+	<img src="{{MEDIA_URL}}img/icons/arrow_turn_left.png">
+	<a href="/manager_tools/" >Back</a>
+</h3>
+<br />
+{% load humanize %}
+
+<div class="grey_bordered">
+<h2>Daily Loading</h2>
+<div style="width:80%">
+	<p>Shows how many hours of work an artist has due each day. Assumes
+	{{hours_per_day}} hours of production time available per day.</p>
+</div>
+	<table class="rowHover">
+		<tr>
+			<th>Employee</th>
+			<th style="width:64px">{{day1|date:"D, n-j"}} (Today)</th>
+			<th style="width:64px">{{day2|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day3|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day4|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day5|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day6|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day7|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day8|date:"D, n-j"}}</th>
+		</tr>
+
+	{% for employee_data in daily_data %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+			{% for entry in employee_data %}
+				<td>{{ entry }}</td>
+			{% endfor %}
+		</tr>
+	{% endfor %}
+	</table>
+</div>
+
+<div class="grey_bordered">
+<h2>Timespan Loading</h2>
+<div style="width:80%">
+	<p>Shows how many hours of work an artist has due between now and a given
+	day. Assumes {{hours_per_day}} hours of production time available per day.</p>
+</div>
+	<table class="rowHover">
+		<tr>
+			<th>Employee</th>
+			<th style="width:64px">{{day1|date:"D, n-j"}} (Today)</th>
+			<th style="width:64px">{{day2|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day3|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day4|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day5|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day6|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day7|date:"D, n-j"}}</th>
+			<th style="width:64px">{{day8|date:"D, n-j"}}</th>
+		</tr>
+
+	{% for employee_data in timespan_data %}
+		<tr class="{% cycle 'rowA' 'rowB' %}">
+			{% for entry in employee_data %}
+				<td>{{ entry }}</td>
+			{% endfor %}
+		</tr>
+	{% endfor %}
+	</table>
+</div>
+{% endblock %}

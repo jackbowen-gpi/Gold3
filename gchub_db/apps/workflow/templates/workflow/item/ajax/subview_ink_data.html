@@ -1,0 +1,80 @@
+	<img src="{{MEDIA_URL}}img/icons/color_wheel.png" />
+	{% include "workflow/item/toggle_detail_navbar.html" %}
+	<div class="outline_fancy">
+		<h3 class="inline">Ink Data/Color Accuracy</h3>
+		<table>
+			<tr>
+				<th colspan="2" width="80px">Color</th>
+				{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+				<th>Color Map</th>
+				{% endif %}
+				<th>Inch² Cov.*</th>
+				{% if not item.hide_ink_coverage %}
+					<th>%Cov.*</th>
+				{% endif %}
+				<th>LPI</th>
+				<th>Ang.</th>
+				<th>DeltaE(2000)</th>
+				<th>L</th>
+				<th>a</th>
+				<th>b</th>
+				<th>C</th>
+				<th>H</th>
+				<th>Plate Code</th>
+			</tr>
+			{% for itemcolor in inks_used %}
+				<tr>
+					<td style="background-color:{{itemcolor.hexvalue}}">&nbsp;&nbsp;</td>
+					{% if itemcolor.item.job.workflow.name == "Carton" %}
+						<td>{{ itemcolor.definition.name }}</td>
+						<td>{{ itemcolor.color }}</td>
+					{% else %}
+						<td>{{ itemcolor.fsb_display_name }}</td>
+						{% if job.workflow.name == "Foodservice" or job.workflow.name == "Carton" %}
+						<td>########</td>
+						{% endif %}
+					{% endif %}
+					<td>{{itemcolor.coverage_sqin}}</td>
+					{% if not item.hide_ink_coverage %}
+						{% if itemcolor.percentage %}
+							<td>{{itemcolor.percentage}}%</td>
+						{% else %}
+							<td></td>
+						{% endif %}
+					{% endif %}
+					<td>{{itemcolor.lpi|floatformat:0}}</td>
+					<td>{{itemcolor.angle|floatformat:0}}&#186;</td>
+					<td>
+						{% ifequal itemcolor.delta_e_passes True %}
+						 <img src="{{MEDIA_URL}}img/icons/tick.png" style="vertical-align: text-bottom" />
+						{% endifequal %}
+						{{itemcolor.delta_e}}
+					</td>
+					<td>{{itemcolor.measured_lab_l}}</td>
+					<td>{{itemcolor.measured_lab_a}}</td>
+					<td>{{itemcolor.measured_lab_b}}</td>
+					<td>{{itemcolor.calculated_lch.lch_c|floatformat:"3"}}</td>
+					<td>{{itemcolor.calculated_lch.lch_h|floatformat:"3"}}</td>
+					<td>{{itemcolor.plate_code}} {{itemcolor.color}}
+						<a href='javascript:load_div("bottom_view", "/workflow/item/change_itemcolor/{{itemcolor.id}}/")'>
+							<img src="{{MEDIA_URL}}img/icons/page_white_edit.png" style="vertical-align: text-bottom" />
+						</a>
+					</td>
+				</tr>
+			{% empty %}
+				<tr>
+					<td colspan="11"><em>No inks yet!</em></td>
+				</tr>
+			{% endfor %}
+		</table>
+		{% if not item.hide_ink_coverage %}
+			<table>
+				<tr>
+					<th>Total Ink Coverage (Inch²)</th>
+				</tr>
+				<tr>
+					<td>{{total_ink_coverage_percent}}%</td>
+				</tr>
+			</table>
+		{% endif %}
+	</div>

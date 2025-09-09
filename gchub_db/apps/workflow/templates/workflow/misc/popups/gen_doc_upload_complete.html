@@ -1,0 +1,18 @@
+{% extends "standard_popup.html" %}
+
+{% block page_title %}File Uploaded{% endblock %}
+
+{% block body_content %}
+	<div class="outline_fancy" style="background-color:#FFFFFF;padding:6px;">
+		  <h2 style='text-align:center'>Upload Complete</h2>
+		  <p style='text-align:center'>
+		    <img src='{{MEDIA_URL}}img/check_mark.gif' />
+		  </p>
+		  <p>
+		    Your file has finished uploading.
+		  </p>
+		  <p style='text-align:center'>
+		    <input type='button' value="Close Window" onclick='window.close();'/>
+		  </p>
+ 	 </div>
+{% endblock %}

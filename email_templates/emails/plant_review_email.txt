@@ -1,0 +1,4 @@
+A new Plant Review as been entered for Job: {{job.id}}-{{item}}:
+
+Please click the following link to view the Plant Review in GOLD
+https://gchub.graphicpkg.com/workflow/review/plant/

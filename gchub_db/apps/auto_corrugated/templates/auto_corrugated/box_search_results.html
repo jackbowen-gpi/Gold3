@@ -1,0 +1,47 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/auto_corrugated/generation_styles.css" />
+	{% include "yui_container_includes.html" %}
+	{% include "auto_corrugated/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block page_title %}Search Results - Previously Generated Boxes{% endblock %}
+
+{% block body %}
+<h1>Search Results - Previously Generated Boxes</h1>
+{% include "auto_corrugated/navbar_div.inc.html" %}
+{% include "pagination_bar.html" %}
+<table>
+	<tr>
+		<th>Six Digit</th>
+		<th>Nine Digit</th>
+		<th>SCC Number</th>
+		<th>Plant</th>
+		<th>Item</th>
+		<th>Case Ct.</th>
+		<th>Format</th>
+		<th>First Created</th>
+		<th>Created By</th>
+		<th>Actions</th>
+	</tr>
+{% for entry in object_list %}
+	<tr>
+		<td>{{entry.six_digit_num}}</td>
+		<td>{{entry.nine_digit_num}}</td>
+		<td>{{entry.fourteen_digit_num}}</td>
+		<td>{{entry.plant}}</td>
+		<td>{{entry.item}}</td>
+		<td>{{entry.spec.case_count}}</td>
+		<td>{{entry.get_box_format_display}}</td>
+		<td>{{entry.creation_date|date:"n-j-Y g:i"}}</td>
+		<td>{{entry.entered_by}}</td>
+		<td><a href='{% url "auto_corrugated_view_box_data" entry.id %}'>View Box Data</a></td>
+	</tr>
+{% endfor %}
+
+</table>
+
+{% include "pagination_bar.html" %}
+
+{% endblock %}

@@ -1,0 +1,234 @@
+{% extends "standard.html" %}
+{% load item_links %}
+
+{% block extra_head %}
+	{% include "yui_container_includes.html" %}
+	<script type="text/javascript">
+		function process_demand_review(item_id, update_type) {
+	   /*
+	    * Fired when he user hits the Accept or Reject button. Calls the validator
+	    * and sends off an AJAX request if all is good.
+	    */
+	   if (update_type == "reject") {
+	   		var comment = window.prompt("Please enter explanation for rejection and/or instructions for correction.")
+	   } else {
+	   		var comment = ""
+	   }
+	   YAHOO.example.container.wait.show();
+	   new Ajax.Request('/workflow/item/'+ item_id +'/demand_review/'+ update_type +'/?comment='+ encodeURIComponent(comment), {
+	       method: 'GET',
+	       onSuccess: function(http_req) {
+	           // Get a JSON object from the response string (from the server).
+	           jsobj = http_req.responseText.evalJSON();
+	           // See if there was a form processing error.
+	           if (jsobj["is_error"] == false) {
+				  window.location = "/workflow/rejected_items/"
+	           } else {
+	               // Form validation error happened.
+	               hide_modal_wait();
+	               alert(jsobj["message"]);
+	           }
+	       },
+	       onComplete: function() {
+	          hide_modal_wait();
+	   }});
+	} // end process_demand_review()
+
+	function process_plant_review(item_id, update_type) {
+	   /*
+	    * Fired when he user hits the Accept or Reject button. Calls the validator
+	    * and sends off an AJAX request if all is good.
+	    */
+	   if (update_type == "reject") {
+	   		var comment = window.prompt("Please enter explanation for rejection and/or instructions for correction.")
+	   } else {
+	   		var comment = ""
+	   }
+	   YAHOO.example.container.wait.show();
+	   new Ajax.Request('/workflow/item/'+ item_id +'/plant_review/'+ update_type +'/?comment='+ comment, {
+	       method: 'GET',
+	       onSuccess: function(http_req) {
+	           // Get a JSON object from the response string (from the server).
+	           jsobj = http_req.responseText.evalJSON();
+	           // See if there was a form processing error.
+	           if (jsobj["is_error"] == false) {
+				  window.location = "/workflow/rejected_items/"
+	           } else {
+	               // Form validation error happened.
+	               hide_modal_wait();
+	               alert(jsobj["message"]);
+	           }
+	       },
+	       onComplete: function() {
+	          hide_modal_wait();
+	   }});
+	} // end process_plant_review()
+
+	function process_mkt_review(item_id, update_type) {
+		   /*
+		    * Fired when he user hits the Accept or Reject button. Calls the validator
+		    * and sends off an AJAX request if all is good.
+		    */
+		   if (update_type == "reject") {
+		   		var comment = window.prompt("Please enter explanation for rejection and/or instructions for correction.")
+		   } else {
+		   		var comment = ""
+		   }
+		   YAHOO.example.container.wait.show();
+		   new Ajax.Request('/workflow/item/'+ item_id +'/mkt_review/'+ update_type +'/?comment='+ comment, {
+		       method: 'GET',
+		       onSuccess: function(http_req) {
+		           // Get a JSON object from the response string (from the server).
+		           jsobj = http_req.responseText.evalJSON();
+		           // See if there was a form processing error.
+		           if (jsobj["is_error"] == false) {
+		        	   window.location = "/workflow/rejected_items/"
+		           } else {
+		               // Form validation error happened.
+		               hide_modal_wait();
+		               alert(jsobj["message"]);
+		           }
+		       },
+		       onComplete: function() {
+		          hide_modal_wait();
+		   }});
+		} // end process_mkt_review()
+	</script>
+{% endblock %}
+
+{% block body %}
+	<h1>{{page_title}}</h1>
+
+	<h2>Items with Demand Planning Refusals</h2>
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Size</th>
+			<th>Art</th>
+			<th>Qual.</th>
+			<th>Plant</th>
+			<th>Press</th>
+			<th>Refusal Date</th>
+		</tr>
+		{% for item in dp_rejected_list %}
+		<tr>
+			<td><a href="/workflow/job/{{item.job.id}}/">{{item.job.id}} {{item.job.name}} &nbsp;&nbsp;</a></td>
+			<td>{{item.size}}</td>
+			<td>
+			  <a href="{% url "get_item_preview_art" item.job.id item.num_in_job %}">
+			    <img src="{{MEDIA_URL}}img/icons/picture_save.png" style="vertical-align:text-bottom" />
+			  </a>
+			</td>
+			<td>{{item.quality}}</td>
+			<td>{{item.printlocation.plant}}</td>
+			<td>{{item.printlocation.press}}{% if item.special_mfg %}-{{item.special_mfg}}{% endif %}</td>
+			<td>
+				{{item.demand_plan_date|date:"n-j-Y"}}
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan="5">
+				<strong>Demand Planning Remarks:</strong> {{item.demand_plan_comments}}
+			</td>
+			<td>
+				{% if perms.accounts.clemson_employee %}
+					<form id="plant_review_reject" onsubmit="process_demand_review('{{item.id}}', 'resub');return false;">
+						<input type="submit" value="Resubmit" onsubmit="process_demand_review('{{item.id}}', 'resub');return false;" />
+					</form>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<hr />
+
+	<h2>Items with Plant Refusals</h2>
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Size</th>
+			<th>Art</th>
+			<th>Qual.</th>
+			<th>Plant</th>
+			<th>Press</th>
+			<th>Refusal Date</th>
+		</tr>
+		{% for item in pr_rejected_list %}
+		<tr>
+			<td><a href="/workflow/job/{{item.job.id}}/">{{item.job.id}} {{item.job.name}} &nbsp;&nbsp;</a></td>
+			<td>{{item.size}}</td>
+			<td>
+			  <a href="{% url "get_item_preview_art" item.job.id item.num_in_job %}">
+			    <img src="{{MEDIA_URL}}img/icons/picture_save.png" style="vertical-align:text-bottom" />
+			  </a>
+			</td>
+			<td>{{item.quality}}</td>
+			<td>{{item.printlocation.plant}}</td>
+			<td>{{item.printlocation.press}}{% if item.special_mfg %}-{{item.special_mfg}}{% endif %}</td>
+			<td>
+				{{item.preflight_date|date:"n-j-Y"}}
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan="5">
+				<strong>Plant Remarks:</strong> {{item.plant_comments}}<br />
+			</td>
+			<td>
+				{% if perms.accounts.clemson_employee %}
+					<form id="plant_review_reject" onsubmit="process_plant_review('{{item.id}}', 'resub');return false;">
+						<input type="submit" value="Resubmit" onsubmit="process_plant_review('{{item.id}}', 'resub');return false;" />
+					</form>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<hr />
+
+	<h2>Items with Marketing Refusals</h2>
+	<table style='width:100%'>
+		<tr>
+			<th>Job</th>
+			<th>Size</th>
+			<th>Art</th>
+			<th>Qual.</th>
+			<th>Plant</th>
+			<th>Press</th>
+			<th>Refusal Date</th>
+		</tr>
+		{% for item in mkt_rejected_list %}
+		<tr>
+			<td><a href="/workflow/job/{{item.job.id}}/">{{item.job}}</a></td>
+			<td>{{item.size}}</td>
+			<td>
+			  <a href="{% url "get_item_preview_art" item.job.id item.num_in_job %}">
+			    <img src="{{MEDIA_URL}}img/icons/picture_save.png" style="vertical-align:text-bottom" />
+			  </a>
+			</td>
+			<td>{{item.quality}}</td>
+			<td>{{item.printlocation.plant}}</td>
+			<td>{{item.printlocation.press}}{% if item.special_mfg %}-{{item.special_mfg}}{% endif %}</td>
+			<td>
+				{{item.mkt_review_date|date:"n-j-Y"}}
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan="5">
+				<strong>Marketing Remarks:</strong> {{item.mkt_review_comments}}<br />
+			</td>
+			<td>
+				{% if perms.accounts.clemson_employee %}
+					<form id="mkt_review_reject" onsubmit="process_mkt_review('{{item.id}}', 'resub');return false;">
+						<input type="submit" value="Resubmit" onsubmit="process_mkt_review('{{item.id}}', 'resub');return false;" />
+					</form>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+{% endblock body %}

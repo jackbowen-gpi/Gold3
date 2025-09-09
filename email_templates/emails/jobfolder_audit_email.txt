@@ -1,0 +1,10 @@
+<p>The following job folders were found to be either missing or empty. Please confirm and restore any missing job folders from backup ASAP.</p>
+
+<p>Missing job folders:</p>
+{{missing_folders}}
+
+<p>Empty job folders:</p>
+{{empty_folders}}
+
+<p>Error reading:</p>
+{{errors}}

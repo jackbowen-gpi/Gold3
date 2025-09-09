@@ -1,0 +1,35 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/auto_corrugated/generation_styles.css" />
+	{% include "yui_container_includes.html" %}
+	{% include "auto_corrugated/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block page_title %}Search Results - Previously Generated Labels{% endblock %}
+
+{% block body %}
+<h1>Search Results - Previously Generated Labels</h1>
+{% include "auto_corrugated/navbar_div.inc.html" %}
+{% include "pagination_bar.html" %}
+<table>
+	<tr>
+		<th>Nine Digit</th>
+		<th>SCC Number</th>
+		<th>First Created</th>
+		<th>Actions</th>
+	</tr>
+{% for entry in object_list %}
+	<tr>
+		<td>{{entry.nine_digit_num}}</td>
+		<td>{{entry.fourteen_digit_num}}</td>
+		<td>{{entry.creation_date|date:"n-j-Y g:i"}}</td>
+		<td><a href='{% url "auto_corrugated_view_label_data" entry.id %}'>View Label Data</a></td>
+	</tr>
+{% endfor %}
+
+</table>
+
+{% include "pagination_bar.html" %}
+
+{% endblock %}

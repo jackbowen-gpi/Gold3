@@ -1,0 +1,49 @@
+from django.db import models
+from django.db.models import Avg
+
+from gchub_db.apps.workflow import app_defs
+
+
+class ColorDefinition(models.Model):
+    """Represents an individual color."""
+
+    name = models.CharField(max_length=75)
+    lab_l = models.FloatField(blank=True, null=True)
+    lab_a = models.FloatField(blank=True, null=True)
+    lab_b = models.FloatField(blank=True, null=True)
+    lch_c = models.FloatField(blank=True, null=True)
+    lch_h = models.FloatField(blank=True, null=True)
+    coating = models.CharField(choices=app_defs.COATING_TYPES, max_length=1)
+    hexvalue = models.CharField(max_length=12, blank=True)
+    do_compare = models.BooleanField(default=True)
+    pantone_plus = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "%s - %s" % (str(self.name), str(self.coating))
+
+    class Meta:
+        ordering = ["name"]
+        unique_together = ("name", "coating")
+
+    def fsb_usage_count(self):
+        """From the given color def, return usage count."""
+        return self.itemcolor_set.filter(
+            item__job__workflow__name="Foodservice", delta_e__isnull=False
+        ).count()
+
+    def avg_delta(self):
+        """From the given color def, return the average delta-e."""
+        x = self.itemcolor_set.filter(
+            item__job__workflow__name="Foodservice", delta_e__isnull=False
+        ).aggregate(Avg("delta_e"))
+
+        return x["delta_e__avg"]
+
+    def avg_delta_warning(self):
+        """From the given color def check if the avg. detla-e is greater than two and
+        return true or false.
+        """
+        if self.avg_delta() >= 2:
+            return True
+        else:
+            return False

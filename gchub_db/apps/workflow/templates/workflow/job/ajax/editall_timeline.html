@@ -1,0 +1,75 @@
+{% block extra_head %}   
+	<!--CSS-->
+	<style type="text/css">
+		#forecast_submit{
+			color: #883333; 
+			text-decoration: none;
+			background:none;
+		    border:none; 
+		    padding:0;
+		    font: inherit;
+		    /*border is optional
+		    border-bottom:1px solid #444; */
+		    cursor: pointer;
+		}
+	</style>
+{% endblock %}
+
+<img src="{{MEDIA_URL}}img/icons/date_edit.png"> <span class="sub_heading">Edit Timeline Events for Items in {{job}}</span><br />
+<table width="500px">
+	<tr>
+		<th width="100px">Action</th>
+		<th>Items Not Qualified</th>
+	</tr>
+	{% comment %}
+	{% ifequal job.workflow.name "Beverage"%}
+	{% endcomment %}
+	{% if perms.accounts.in_artist_pulldown %}
+	<tr>
+		<td><a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "edit_all_timeline_pageload/Preflight/View"))'><img src="{{MEDIA_URL}}img/icons/picture_save.png" style="vertical-align: text-bottom" /> Preflight All</a></td>
+		<td><span class="warning">{% for item in items_no_preflight %}({{item.num_in_job}})-{{item.size}} &nbsp;{% endfor %}</span></td>
+	</tr>
+	{% comment %}
+	{% endifequal %}
+	{% endcomment %}
+	<tr>
+		<td><a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "edit_all_timeline_pageload/Proof/View"))'><img src="{{MEDIA_URL}}img/icons/package_go.png" style="vertical-align: text-bottom" /> Proof All</a></td>
+		<td><span class="warning">{% for item in items_no_proof %}({{item.num_in_job}})-{{item.size}} &nbsp;{% endfor %}</span></td>
+	</tr>
+	{% endif %}
+	<tr>
+		<td><a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "edit_all_timeline_pageload/Approve/View"))'><img src="{{MEDIA_URL}}img/icons/picture_go.png" style="vertical-align: text-bottom" /> Approve All</a></td>
+		<td><span class="warning">{% for item in items_no_approve %}({{item.num_in_job}})-{{item.size}} &nbsp;{% endfor %}</span></td>
+	</tr>
+	{% ifequal job.workflow.name "Foodservice" %}
+		<tr>
+			 <td>
+				{% if perms.workflow.can_forecast_item %}
+					<a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "edit_all_timeline_pageload/Forecast/View"))'>
+						<img src="{{MEDIA_URL}}img/icons/rainbow.png" style="vertical-align: text-bottom" /> Forecast All
+					</a>
+				{% else %}
+					<img src="{{MEDIA_URL}}img/icons/rainbow.png" style="vertical-align: text-bottom" /> Forecast All
+				{% endif %}
+		    </td>
+			<td>
+				<span class="warning">{% for item in items_no_forecast %}({{item.num_in_job}})-{{item.size}} &nbsp;{% endfor %}</span>
+			</td>
+		</tr>
+	{% endifequal %}
+	{% ifequal job.workflow.name "Beverage" %}
+		{% if perms.accounts.clemson_employee %}
+			<tr>
+				<td><a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "edit_all_timeline_pageload/Remake PDFs/View"))'><img src="{{MEDIA_URL}}img/icons/page_add.png" style="vertical-align: text-bottom" /> Remake PDFs</a></td>
+				<td></td>
+			</tr>
+		{% endif %}
+	{% endifequal %}
+	<tr>
+		<td><a href='javascript:load_div("bottom_view", job_ajax_url("{{job.id}}", "edit_all_timeline_pageload/File Out/View"))'><img src="{{MEDIA_URL}}img/icons/film_go.png" style="vertical-align: text-bottom" /> File Out All</a></td>
+		<td><span class="warning">{% for item in items_no_file_out %}({{item.num_in_job}})-{{item.size}} &nbsp;{% endfor %}</span></td>
+	</tr>
+</table>
+<div class="outline" style="width:450px"><img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align: text-bottom" /> Each link will update all qualified items. 
+For instance, if an item is already filed out, it will not be updated again if File Out All is selected. If an item has not been proofed
+yet or has a pending revision, it will not be updated if Approve All is selected.</div>

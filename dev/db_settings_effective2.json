@@ -1,0 +1,6 @@
+2025-09-01 17:19:42 DEBUG    2025-09-01 17:19:42 [DEBUG]          fsb_box.py:27
+                             gchub_db.apps.auto_corrugated.docume
+                             nts.fsb_box: Font file not found at:
+                             /mnt\Production\autocorr_elements\VA
+                             G Rounded BT.ttf
+{"default": {"ENGINE": "django.db.backends.postgresql", "NAME": "gchub_dev", "USER": "gchub", "PASSWORD": "gchub", "HOST": "127.0.0.1", "PORT": "5432", "ATOMIC_REQUESTS": false, "AUTOCOMMIT": true, "CONN_MAX_AGE": 0, "CONN_HEALTH_CHECKS": false, "OPTIONS": {}, "TIME_ZONE": null, "TEST": {"CHARSET": null, "COLLATION": null, "MIGRATE": true, "MIRROR": null, "NAME": null}}}

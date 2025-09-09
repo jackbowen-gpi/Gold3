@@ -1,0 +1,40 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+  {% include "workflow/itemcatalog/navbar_header.inc.html" %}
+{% endblock %}
+
+{% block body %}
+
+<img src="{{MEDIA_URL}}img/icons/chart_line_edit.png" alt="Item Mgt" /><h1 class="inline">&nbsp;Item Management Home</h1><br /><br />
+{% include "workflow/itemcatalog/navbar_div.inc.html" %}
+<div class="outline" style="width:50%;padding:10px;">
+	<img src="{{MEDIA_URL}}img/icons/briefcase.png" alt="Item Mgt" /> <h2 class="inline">Item Catalog</h2><br /><br />
+	The <strong>Item Catalog</strong> tracks specific sizes/products. This will
+	be general information about that size (ie. what type of item it is).
+	Item Catalog entries marked as active are what populates the pulldown menu
+	of available items in the job.
+	<br /><br />
+	<img src="{{MEDIA_URL}}img/icons/cog.png" alt="Item Mgt" /> <h2 class="inline">Item Specifications</h2><br /><br />
+	<strong>Item Specs</strong> track the varied manufacturing specifications for
+	each item in the Item Catalog (ie. which plants print this size and on which
+	presses).
+	<br /><br />
+	<strong>Example:</strong> Item Catalog stores that an SMR-16 is a Foodservice item
+	that is a Hot Cup. Item Specs stores that we print that cup on the Kenton Webtron
+	and it can print with 6 colors.
+	<br /><br />
+	<img src="{{MEDIA_URL}}img/icons/arrow_undo.png" alt="Item Mgt" /> <h2 class="inline">Step & Repeat Specifications</h2><br /><br />
+	<strong>Step & Repeat Specs</strong> track the special manufacturing processes
+	used to convert the cups  (ie. roll fed, blank fed, big cylinder, small cylinder,
+	etc).
+	<br /><br />
+	<strong>Example:</strong> Item Catalog stores that an SMR-16 is a Foodservice
+	item that is a Hot Cup. Item Specs stores that we print that cup on the Kenton
+	Webtron. Step and Repeat Spec stores that it is a roll fed configuration and
+	it can print with 6 colors. Step and Repeat spec also tells you the rectangle
+	dimension for the straight art and the number around, number across and total
+	number of blanks.
+
+</div>
+{% endblock %}

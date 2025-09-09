@@ -1,0 +1,58 @@
+{% extends "standard.html" %}
+
+{% block extra_head %}
+    {% include "yui_container_includes.html" %}
+    <link rel="stylesheet" href="{{MEDIA_URL}}css/drawdown/drawdown.css" type="text/css" media="all" />
+    <script type="text/javascript" src="{{MEDIA_URL}}js/drawdown/drawdown.js"></script>
+{% endblock %}
+
+
+{% block body %}
+<h1 style="text-align: center">{{page_title}}</h1>
+
+<form method="get" name="drawdown_search" id="drawdowndata" enctype="multipart/form-data">
+	<table style="margin: 0 auto">
+		<tr>
+		    <td><label>Job #:</label></td>
+		    <td>{{ form.job_number }}</td>
+	    </tr>
+	    <tr>
+		    <td><label>Customer Name:</label></td>
+		    <td>{{ form.customer_name }}</td>
+	    </tr>
+	    <tr>
+		    <td><label>Requested By:</label></td>
+		    <td>{{ form.requested_by }}</td>
+	    </tr>
+	    <tr>
+		    <td><label>Print Location:</label></td>
+		    <td>{{ form.print_location }}</td>
+	    </tr>
+	    <tr>
+		    <td><label>Date In Start:</label></td>
+		    <td>{{ form.date_in_start}}</td>
+	    </tr>
+	    <tr>
+		    <td><label>Date In End:</label></td>
+		    <td>{{ form.date_in_end }}</td>
+	    </tr>
+	    <tr>
+		    <td><label>Date Needed Start:</label></td>
+		    <td>{{ form.date_needed_start}}</td>
+	    </tr>
+	    <tr>
+		    <td><label>Date Needed End:</label></td>
+		    <td>{{ form.date_needed_end }}</td>
+	    </tr>
+    </table>
+
+	<div class="centered-submit" style="width: 43%">
+	    <div class="submit"><input type="submit" value="Search" /></div>
+	    <div class="reset"><input type="reset" value="Reset" /></div>
+	    <div class="search"><input value="Add Request" onclick="drawdown_home();return false;" /></div>
+	    <div class="search"><input value="Show Request" onclick="drawdown_show();return false;" /></div>
+    </div>
+</form>
+<div class="clearfix"></div>
+
+{% endblock %}

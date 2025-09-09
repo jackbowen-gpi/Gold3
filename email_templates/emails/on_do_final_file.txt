@@ -1,0 +1,18 @@
+{% include "emails/email_header.txt" %}
+
+{% if item.job.workflow.name == "Foodservice" %}
+Nine Digit Number: {{item.fsb_nine_digit}}
+Item {{item}} of job {{item.job}} has been filed out.
+Print Location: {{item.printlocation}}
+Plate Package: {{item.platepackage}}
+SCC Number: {{item.bom_number}}
+UPC Number: {{item.upc_number}}
+{% elif item.job.workflow.name == "Carton" %}
+Item {{item.grn}} of job {{item.job}} has been filed out.
+Print Location: {{item.printlocation}}
+Plate Package: {{item.platepackage}}
+{% else %}
+Item {{item}} of job {{item.job}} has been filed out.
+Print Location: {{item.printlocation}}
+Plate Package: {{item.platepackage}}
+{% endif %}
