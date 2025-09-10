@@ -12,7 +12,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 from gchub_db.apps.auto_corrugated.elements.fsb_elements import (
     Code128Barcode_Kenton,
     CollidableSVGGraphicElement,
-    CollidableTextElement,
     CompanyLogoElement,
     CountLabelElement,
     FlapTextElement,
@@ -22,6 +21,7 @@ from gchub_db.apps.auto_corrugated.elements.fsb_elements import (
     SpecialtyLogoElement,
     StamperBoxElement,
 )
+from includes.reportlib.elements.collidables import CollidableTextElement
 from gchub_db.includes import general_funcs
 from gchub_db.includes.reportlib.util import check_text_width
 
