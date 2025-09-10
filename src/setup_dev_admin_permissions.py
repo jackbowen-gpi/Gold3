@@ -7,13 +7,12 @@ This should fix any permission-related errors when testing with production data.
 import os
 import sys
 import django
+from django.contrib.auth.models import User, Permission, Group
 
 # Setup Django environment
 sys.path.insert(0, "/workspace")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
 django.setup()
-
-from django.contrib.auth.models import User, Permission, Group
 
 
 def main():

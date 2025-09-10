@@ -10,7 +10,7 @@ if (-not (Test-Path -Path .venv)) {
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 .\.venv\Scripts\Activate.ps1
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r config/requirements.txt
 
 Write-Output "Running migrations..."
 .\.venv\Scripts\python.exe manage.py migrate

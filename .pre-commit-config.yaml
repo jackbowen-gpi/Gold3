@@ -20,5 +20,5 @@ repos:
     rev: v1.13.0
     hooks:
       - id: mypy
-        args: [--explicit-package-bases, --namespace-packages, --no-error-summary]
+        args: [--config-file=config/mypy.ini, --explicit-package-bases, --namespace-packages, --no-error-summary]
         exclude: ^(.*__init__.py|settings_common.py|scripts/|includes/|upgrade_example.py|urls.py|\.scripts/)

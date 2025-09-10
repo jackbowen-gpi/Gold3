@@ -6,13 +6,12 @@ Test script to verify the new notification preferences work correctly.
 import os
 import sys
 import django
+from django.contrib.auth.models import User
 
 # Setup Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 django.setup()
-
-from django.contrib.auth.models import User
 
 
 def test_notification_preferences():

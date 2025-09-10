@@ -2,6 +2,11 @@
 # This package contains the application subpackages under gchub_db/apps
 
 # Import Celery app for Flower compatibility
-from celery_app import app as celery
+import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.celery_app import app as celery
 
 __all__ = ["celery"]

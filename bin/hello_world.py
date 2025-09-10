@@ -1,5 +1,10 @@
 # bin/hello_world.py
-from celery_app import app  # project Celery app module used in this repo
+import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.celery_app import app  # project Celery app module used in this repo
 
 
 @app.task

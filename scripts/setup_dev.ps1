@@ -68,8 +68,8 @@ if (-not (Test-Path $pythonBin)) {
 }
 Write-Host "Upgrading pip and installing requirements..."
 & $pythonBin -m pip install --upgrade pip
-if (Test-Path "$repoRoot\requirements.txt") {
-    & $pythonBin -m pip install -r "$repoRoot\requirements.txt"
+if (Test-Path "$repoRoot\config\requirements.txt") {
+    & $pythonBin -m pip install -r "$repoRoot\config\requirements.txt"
 } else {
     Write-Warning "No requirements.txt found; install needed packages manually."
 }

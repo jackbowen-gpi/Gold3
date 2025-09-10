@@ -26,7 +26,7 @@ python -m venv .venv
 
 # 2. Install dependencies
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r config/requirements.txt
 
 # 3. Configure environment
 $env:DJANGO_SETTINGS_MODULE = 'gchub_db.settings'
@@ -179,10 +179,10 @@ where python
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 
 # Install requirements
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r config/requirements.txt
 
 # Install development dependencies (optional)
-.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m pip install -r config/requirements-dev.txt
 ```
 
 ---
@@ -568,10 +568,17 @@ gchub_db/
 │   └── start-with-venv.ps1      # Development helpers
 ├── dev/                         # Development configuration
 │   └── docker-compose.yml       # Database containers
+├── config/                      # Configuration files
+│   ├── requirements.txt         # Python dependencies
+│   ├── requirements-dev.txt     # Development dependencies
+│   ├── docker-compose.yml       # Docker services
+│   ├── pyproject.toml           # Poetry configuration
+│   └── mypy.ini                 # Type checker config
+├── scripts/                     # Utility scripts
+├── data/                        # Data files and fixtures
+├── docs/                        # Documentation
 ├── tests/                       # Test suite
 ├── fixtures/                    # Sample data
-├── requirements.txt             # Python dependencies
-├── requirements-dev.txt         # Development dependencies
 └── manage.py                    # Django management script
 ```
 
