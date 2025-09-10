@@ -8,9 +8,9 @@ print("sys.path[0:6]=", sys.path[0:6])
 for name in ("gchub_db", "gchub_db.gchub_db"):
     try:
         spec = importlib.util.find_spec(name)
+        print("\nfind_spec", name, "->", spec)
     except Exception as e:
-        spec = f"ERROR: {e}"
-    print("\nfind_spec", name, "->", spec)
+        print("\nfind_spec", name, "-> ERROR:", e)
 
 p = os.path.abspath(os.path.join(os.getcwd(), "gchub_db", "gchub_db", "__init__.py"))
 print("\ninner __init__ path exists:", os.path.exists(p), p)

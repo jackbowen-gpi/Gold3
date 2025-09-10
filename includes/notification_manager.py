@@ -4,18 +4,15 @@ Django integration for Windows notifications to replace Growl.
 Drop-in replacement for the existing growl_at() method.
 """
 
-from django.conf import settings
 import logging
 from typing import Optional
+import os
+import requests
 
-# Import our Windows notification manager
-try:
-    from gchub_db.includes.windows_notifications import windows_notifier
 
-    WINDOWS_NOTIFICATIONS_AVAILABLE = True
-except ImportError:
-    WINDOWS_NOTIFICATIONS_AVAILABLE = False
-    logging.warning("Windows notifications not available")
+NOTIFICATION_DAEMON_URL = os.environ.get(
+    "NOTIFICATION_DAEMON_URL", "http://127.0.0.1:5341/notify"
+)
 
 
 def send_user_notification(
@@ -55,34 +52,23 @@ def send_user_notification(
         if growl_pref == GROWL_STATUS_STICKY:
             sticky = True
 
-    # For debugging/development - log to console if Windows notifications not available
-    if not WINDOWS_NOTIFICATIONS_AVAILABLE:
-        print(f"NOTIFICATION for {user_profile.user.username}: {title} - {description}")
-        return False
-
+    # Send notification to the notification daemon via HTTP POST
+    payload = {
+        "title": title,
+        "message": description,
+        "duration": 60 if sticky else 10,
+    }
     try:
-        # Get icon path from Django settings or use default
-        icon_path = getattr(settings, "NOTIFICATION_ICON_PATH", None)
-
-        if sticky:
-            success = windows_notifier.send_sticky_notification(
-                title=title, message=description, icon_path=icon_path
-            )
+        resp = requests.post(NOTIFICATION_DAEMON_URL, json=payload, timeout=1.0)
+        if resp.status_code == 200:
+            return True
         else:
-            success = windows_notifier.send_notification(
-                title=title,
-                message=description,
-                duration=10,  # 10 seconds for normal notifications
-                icon_path=icon_path,
+            logging.warning(
+                f"Notification daemon returned status {resp.status_code}: {resp.text}"
             )
-
-        return success
-
+            return False
     except Exception as e:
-        logging.error(
-            f"Windows notification error for user {user_profile.user.username}: {e}"
-        )
-        # Fallback to console output
+        logging.warning(f"Could not send notification to daemon: {e}")
         print(f"NOTIFICATION for {user_profile.user.username}: {title} - {description}")
         return False
 

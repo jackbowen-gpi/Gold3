@@ -4,6 +4,17 @@ A modernized Django web application for job workflow management, item cataloging
 
 ---
 
+## Examples & demo scripts
+
+The repository includes small demo scripts that show how Celery, django-celery-beat, and repo-level tasks are wired up.
+
+- Create a PeriodicTask (and trigger one run): `scripts/create_periodic_task.py`
+- Repo-level demo Celery task: `bin/tasks.py` (task name: `bin.tasks.bin_test`)
+- App-level demo Celery task: `gchub_db/apps/accounts/tasks.py` (task name: `gchub_db.apps.accounts.tasks.hello_world`)
+
+See `docs/README.md` for detailed developer documentation and deployment notes.
+
+
 ## 🚀 Quick Start
 
 ```powershell
@@ -31,6 +42,25 @@ docker compose -f .\dev\docker-compose.yml up -d postgres
 
 ---
 
+
+## 🐳 Docker Support
+
+This project supports running in Docker containers for easy setup and deployment. Docker allows you to run the app and its dependencies in isolated, reproducible environments.
+
+- **What is Docker?** Docker is a platform for packaging applications and their dependencies into containers, ensuring consistency across different systems.
+- **Why use Docker?** It simplifies setup, eliminates "works on my machine" issues, and makes onboarding and deployment easier.
+
+**See the full Docker guide:** [docker/README-docker.md](docker/README-docker.md)
+
+**Quick start:**
+```sh
+docker-compose up --build
+# Then visit http://localhost:8000
+```
+
+For advanced usage, troubleshooting, and more details, see the Docker guide linked above.
+
+---
 ## 📋 Table of Contents
 
 - [Overview](#overview)

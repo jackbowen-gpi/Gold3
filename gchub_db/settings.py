@@ -67,6 +67,7 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "formtools",
     "django_extensions",
+    "django_celery_beat",
     "gchub_db.apps.accounts",
     "gchub_db.apps.legacy_support",
     "gchub_db.apps.admin_log",

@@ -1,0 +1,87 @@
+version: '3.9'
+services:
+  web:
+    build: .
+    command: /app/scripts/docker-entrypoint.sh
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DEV_DB_HOST=db
+      - DEV_DB_PORT=5432
+      - NOTIFICATION_DAEMON_URL=http://notification-daemon:5341/notify
+    depends_on:
+      - db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: gchub_dev
+      POSTGRES_USER: gchub
+      POSTGRES_PASSWORD: gchub
+    ports:
+      - "5438:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+  celery:
+    build: .
+    command: /app/scripts/celery-worker-entrypoint.sh
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      DJANGO_SETTINGS_MODULE: "gchub_db.settings"
+      DEV_DB_HOST: "db"
+      DEV_DB_PORT: "5432"
+    depends_on:
+      - web
+      - redis
+  celery-beat:
+    build: .
+    command: /app/scripts/celery-beat-entrypoint.sh
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      DJANGO_SETTINGS_MODULE: "gchub_db.settings"
+      DEV_DB_HOST: "db"
+      DEV_DB_PORT: "5432"
+    depends_on:
+      - web
+      - redis
+  notification-daemon:
+    build: .
+    command: >
+      sh -c "python tools/notification_daemon.py --host 0.0.0.0 --port 5341"
+    volumes:
+      - .:/app
+    ports:
+      - "5341:5341"
+    depends_on:
+      - db
+  flower:
+    build: .
+    command: celery -A gchub_db flower
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery
+    environment:
+      DEV_DB_HOST: "db"
+      DEV_DB_PORT: "5432"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      DJANGO_SETTINGS_MODULE: "gchub_db.settings"
+volumes:
+  pgdata:

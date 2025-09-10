@@ -1,35 +1,37 @@
 #!/usr/bin/env python
-"""Notification daemon for Windows.
+"""Notification daemon for desktop notifications (cross-platform).
 
 Run this alongside the Django devserver. The daemon exposes a small HTTP
 endpoint (/notify) that accepts POST JSON payloads {title,message,duration,icon}
 and enqueues them. The daemon's main thread consumes the queue and calls
-win10toast.show_toast synchronously, which avoids win10toast main-thread
-restrictions when called from Django worker threads.
+plyer.notification.notify for cross-platform desktop notifications.
 
 Usage:
-  python tools/notification_daemon.py --host 127.0.0.1 --port 5341
+    python tools/notification_daemon.py --host 127.0.0.1 --port 5341
 """
 
 import argparse
 import json
 import logging
 import queue
+from typing import Dict, Any
 import threading
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
-try:
-    from win10toast import ToastNotifier
 
-    WIN10TOAST_AVAILABLE = True
+# Try plyer for cross-platform notifications
+try:
+    from plyer import notification as plyer_notification  # type: ignore[import-not-found]
+
+    PLYER_AVAILABLE = True
 except Exception:
-    WIN10TOAST_AVAILABLE = False
+    PLYER_AVAILABLE = False
     logging.warning(
-        "win10toast not available in daemon; notifications will print to console"
+        "plyer not available in daemon; notifications will print to console"
     )
 
 
-NOTIFY_QUEUE = queue.Queue()
+NOTIFY_QUEUE: "queue.Queue[Dict[str, Any]]" = queue.Queue()
 
 
 class NotifyHandler(BaseHTTPRequestHandler):
@@ -93,25 +95,24 @@ def main():
 
     try:
         # Main thread consumes the queue and performs show_toast calls.
-        notifier = ToastNotifier() if WIN10TOAST_AVAILABLE else None
         logging.info(
-            "Notification consumer started (main thread). WIN10TOAST_AVAILABLE=%s",
-            WIN10TOAST_AVAILABLE,
+            "Notification consumer started (main thread). PLYER_AVAILABLE=%s",
+            PLYER_AVAILABLE,
         )
         while True:
-            item = NOTIFY_QUEUE.get()
+            item: Dict[str, Any] = NOTIFY_QUEUE.get()
             try:
                 title = item.get("title") or "Notification"
                 message = item.get("message") or ""
                 duration = int(item.get("duration", 10))
                 icon = item.get("icon")
-                if WIN10TOAST_AVAILABLE and notifier:
-                    notifier.show_toast(
-                        title,
-                        message,
-                        duration=min(duration, 60),
-                        icon_path=icon,
-                        threaded=False,
+                if PLYER_AVAILABLE:
+                    plyer_notification.notify(
+                        title=title,
+                        message=message,
+                        timeout=min(duration, 60),
+                        app_icon=icon,
+                        app_name="Gold3 Notification Daemon",
                     )
                 else:
                     logging.info(

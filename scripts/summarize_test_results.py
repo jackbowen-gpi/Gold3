@@ -15,7 +15,8 @@ for f in files:
         status = "FAIL"
     if "NO TESTS RAN" in txt or "Found 0 test(s)." in txt:
         status = "NO TESTS"
-    fallback = ".fallback" in name or ".fallback.txt" in f
+    # Keep fallback as a string to avoid mixed-type assignment warnings from mypy
+    fallback = "yes" if (".fallback" in name or ".fallback.txt" in f) else "no"
     summary.append((name, status, fallback))
 with open(
     os.path.join(out_dir, "test_results_summary.txt"), "w", encoding="utf-8"

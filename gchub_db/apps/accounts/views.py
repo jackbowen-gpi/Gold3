@@ -23,7 +23,7 @@ from django.views.decorators.http import require_POST
 from mwclient import Site
 
 from gchub_db.includes.notification_manager import send_user_notification
-from gchub_db.includes.windows_notifications import WindowsNotificationManager
+# windows_notifications import removed; use plyer or notification_daemon instead
 
 import gchub_db.apps.workflow.app_defs as workflow_defs
 from gchub_db.apps.calendar.models import Event
@@ -620,16 +620,14 @@ def test_notification(request):
 
         if notification_type == "direct":
             # Test direct Windows notification manager
-            mgr = WindowsNotificationManager()
-            result = mgr.send_notification(
-                title="Direct Notification Test",
-                message="This is a direct test of the Windows notification manager.",
-                duration=5,
+            # WindowsNotificationManager removed; use plyer or notification_daemon instead
+            print(
+                "NOTIFICATION: Direct Notification Test - This is a direct test of the Windows notification manager."
             )
             return JsonResponse(
                 {
                     "success": True,
-                    "message": f"Direct notification sent successfully: {result}",
+                    "message": "Direct notification sent (console stub)",
                     "type": "direct",
                 }
             )
@@ -722,16 +720,12 @@ def test_notification(request):
 
         else:
             # Basic test
-            mgr = WindowsNotificationManager()
-            result = mgr.send_notification(
-                title="Basic Test",
-                message="This is a basic notification test.",
-                duration=3,
-            )
+            # WindowsNotificationManager removed; use plyer or notification_daemon instead
+            print("NOTIFICATION: Basic Test - This is a basic notification test.")
             return JsonResponse(
                 {
                     "success": True,
-                    "message": f"Basic notification sent: {result}",
+                    "message": "Basic notification sent (console stub)",
                     "type": "basic",
                 }
             )

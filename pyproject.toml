@@ -84,3 +84,4 @@ extend-ignore = ["D212", "D404"]
 [tool.ruff.rules]
 # Increase complexity threshold to reduce C901 noise for legacy functions
 max-complexity = 20
+# mypy config moved to mypy.ini (root). See mypy.ini for type-checker configuration

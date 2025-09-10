@@ -9,9 +9,9 @@ print("DJANGO_SETTINGS_MODULE=", os.environ.get("DJANGO_SETTINGS_MODULE"))
 for name in ("gchub_db", "gchub_db.conftest"):
     try:
         spec = importlib.util.find_spec(name)
+        print("\nfind_spec", name, "->", spec)
     except Exception as e:
-        spec = f"ERROR: {e}"
-    print("\nfind_spec", name, "->", spec)
+        print("\nfind_spec", name, "-> ERROR:", e)
 
 print('\nsys.modules keys containing "conftest":')
 for k in sorted(sys.modules.keys()):

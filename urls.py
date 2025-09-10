@@ -5,7 +5,7 @@ Compatibility wrapper to support Django <2.0 and >=2.0 URL imports.
 
 try:
     # Django < 2.0
-    from django.conf.urls import url, include
+    from django.conf.urls import url, include  # type: ignore[attr-defined]
 except Exception:
     # Django 2.0+ moved url to django.urls as re_path
     from django.urls import re_path as url, include
@@ -143,25 +143,18 @@ if settings.DJANGO_SERVE_MEDIA:
 # available when DEBUG=True so the package-level defensive insertion is not
 # required for local development.
 if getattr(settings, "DEBUG", False):
+    # Import dev_views defensively; attributes may or may not exist depending on layout
     try:
-        # Try importing the package-level dev_views first (newer layout)
-        from gchub_db.gchub_db.dev_views import (
-            set_dev_session,
-            set_dev_csrf,
-            dev_whoami,
-        )
+        import importlib
+
+        _dev_views = importlib.import_module("gchub_db.dev_views")
+        set_dev_session = getattr(_dev_views, "set_dev_session", None)
+        set_dev_csrf = getattr(_dev_views, "set_dev_csrf", None)
+        dev_whoami = getattr(_dev_views, "dev_whoami", None)
     except Exception:
-        try:
-            # Fall back to older module location if present
-            from gchub_db.dev_views import (
-                set_dev_session,
-                set_dev_csrf,
-                dev_whoami,
-            )
-        except Exception:
-            set_dev_session = None
-            set_dev_csrf = None
-            dev_whoami = None
+        set_dev_session = None
+        set_dev_csrf = None
+        dev_whoami = None
 
     try:
         if set_dev_session:

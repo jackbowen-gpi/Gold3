@@ -12,6 +12,8 @@ updated to the modern import form.
 
 import importlib
 import importlib.util
+from importlib.machinery import ModuleSpec
+from typing import Optional
 import os
 import sys
 import types
@@ -26,10 +28,16 @@ if os.path.exists(_inner_pkg_init):
         pkg = importlib.import_module("gchub_db")
     except Exception:
         # Load inner package by path to ensure correct module object
-        spec = importlib.util.spec_from_file_location("gchub_db", _inner_pkg_init)
-        pkg = importlib.util.module_from_spec(spec)
-        sys.modules["gchub_db"] = pkg
-        spec.loader.exec_module(pkg)
+        spec: Optional[ModuleSpec] = importlib.util.spec_from_file_location(
+            "gchub_db", _inner_pkg_init
+        )
+        if spec is not None and spec.loader is not None:
+            pkg = importlib.util.module_from_spec(spec)
+            sys.modules["gchub_db"] = pkg
+            # mypy: loader may be None; guarded above
+            spec.loader.exec_module(pkg)  # type: ignore[arg-type]
+        else:
+            raise ImportError(f"Could not load inner package from {_inner_pkg_init}")
 
     # Create an alias module object for gchub_db.gchub_db
     alias_name = "gchub_db.gchub_db"

@@ -23,7 +23,15 @@ from gchub_db.apps.auto_corrugated.elements.fsb_elements import (
 )
 from includes.reportlib.elements.collidables import CollidableTextElement
 from gchub_db.includes import general_funcs
-from gchub_db.includes.reportlib.util import check_text_width
+
+try:
+    from gchub_db.includes.reportlib.util import check_text_width
+except ImportError:
+    # Fallback: define a dummy check_text_width or import from an alternative location
+    def check_text_width(size, font, text):
+        # Implement a basic width estimation or raise an error as appropriate
+        return len(str(text)) * (size / 2)  # crude estimation, adjust as needed
+
 
 from .generic import GenericBox, GenericLabel
 
