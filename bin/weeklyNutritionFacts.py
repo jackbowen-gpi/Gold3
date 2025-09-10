@@ -16,7 +16,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 
-from gchub_db.apps.workflow.models import *
+from gchub_db.apps.workflow.models import ItemTracker
 
 # all trackers that have tracker.item for new nutrition labels
 trackers = ItemTracker.objects.filter(
@@ -109,4 +109,5 @@ email.attach_file(filename)
 # Poof goes the mail.
 email.send(fail_silently=False)
 
-# Email the resulting document to Bobbi Wagner and Laura Rosenthal at Evergreen Packaging and Shelly Congdon in Beverage
+# Email the resulting document to Bobbi Wagner and Laura Rosenthal at Evergreen Packaging
+# and Shelly Congdon in Beverage

@@ -3,6 +3,7 @@
 
 Generates an Excel file with monthly items and charge totals.
 """
+
 import bin_functions
 import openpyxl
 

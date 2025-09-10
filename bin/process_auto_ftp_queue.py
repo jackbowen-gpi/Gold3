@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Process the Auto FTP upload queue and upload ready tiffs to the Fusion Flexo FTP site."""
+"""Process Auto FTP upload queue, upload tiffs to FTP site."""
 
 import sys
 
@@ -16,6 +16,7 @@ from django.conf import settings
 
 try:
     import pysftp
+
     PYSFTP_AVAILABLE = True
 except ImportError:
     PYSFTP_AVAILABLE = False
@@ -40,8 +41,10 @@ def joblog_error(job_or_item, message, kill_script=False):
 
 def perform_mock_upload(item, upload):
     """Mock upload function for development - just logs that upload would have happened."""
-    print(f"MOCK: Would upload item {item.num_in_job} ({item.bev_nomenclature()}) to FTP")
-    
+    print(
+        f"MOCK: Would upload item {item.num_in_job} ({item.bev_nomenclature()}) to FTP"
+    )
+
     # Create the joblog entry to simulate successful upload
     item.do_create_joblog_entry(
         joblog_defs.JOBLOG_TYPE_FTP,
@@ -98,16 +101,16 @@ Begin main application logic
 --------------------------------------------------------------------------"""
 
 # Check if Auto FTP is enabled and pysftp is available
-auto_ftp_enabled = getattr(settings, 'AUTO_FTP_ENABLED', True)
+auto_ftp_enabled = getattr(settings, "AUTO_FTP_ENABLED", True)
 
 if not auto_ftp_enabled or not PYSFTP_AVAILABLE:
     if not auto_ftp_enabled:
         print("Auto FTP is disabled in settings. Processing queue in mock mode...")
     if not PYSFTP_AVAILABLE:
         print("pysftp library not available. Processing queue in mock mode...")
-    
+
     uploads = AutoFTPTiff.objects.filter(date_processed__isnull=True)
-    
+
     for upload in uploads:
         # Take this thing off the queue to prevent double processing.
         upload.mark_as_processed()
@@ -128,7 +131,7 @@ if not auto_ftp_enabled or not PYSFTP_AVAILABLE:
             print("* %s (%s)" % (sent_item, sent_item.bev_nomenclature()))
             # Handle the mock upload
             perform_mock_upload(sent_item, upload)
-    
+
     print("Mock Auto FTP processing complete.")
     sys.exit(0)
 

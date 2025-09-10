@@ -1,7 +1,5 @@
 """Links to item tasks with sanity checks included."""
 
-"""Links to item tasks with sanity checks included."""
-
 from django import template
 from django.conf import settings
 from django.urls import reverse
@@ -171,11 +169,11 @@ def item_preview_art_link(item, link_text="Preview Art"):
         )
     except fs_api.NoResultsFound:
         # Check if this is development mode with file system access disabled
-        if not getattr(settings, 'FS_ACCESS_ENABLED', True):
+        if not getattr(settings, "FS_ACCESS_ENABLED", True):
             alert_message = "Preview art is not available in development mode."
         else:
             alert_message = "No preview artwork available for this item."
-        
+
         return _safe_link(
             """
           <a onclick=\"alert('%s')\">
@@ -214,11 +212,13 @@ def item_print_seps_link(item, link_text="Printable Separations"):
         )
     except fs_api.NoResultsFound:
         # Check if this is development mode with file system access disabled
-        if not getattr(settings, 'FS_ACCESS_ENABLED', True):
-            alert_message = "Printable separations are not available in development mode."
+        if not getattr(settings, "FS_ACCESS_ENABLED", True):
+            alert_message = (
+                "Printable separations are not available in development mode."
+            )
         else:
             alert_message = "No printable separations are available for this item."
-        
+
         return _safe_link(
             """
           <a onclick=\"alert('%s')\">

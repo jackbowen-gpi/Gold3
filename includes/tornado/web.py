@@ -185,7 +185,7 @@ class RequestHandler(object):
         if isinstance(value, datetime.datetime):
             t = calendar.timegm(value.utctimetuple())
             value = email.utils.formatdate(t, localtime=False, usegmt=True)
-        elif isinstance(value, int) or isinstance(value, int):
+        elif isinstance(value, int):
             value = str(value)
         else:
             value = _utf8(value)

@@ -59,7 +59,7 @@ if TEST_PG_NAME:
             # 'test_' unless TEST.NAME is explicitly provided); we set TEST
             # name only when the caller explicitly requests the same DB name
             # for tests.
-            "TEST": {"NAME": TEST_PG_NAME},
+            "TEST": {"NAME": TEST_PG_NAME},  # type: ignore[dict-item]
         }
     }
 else:

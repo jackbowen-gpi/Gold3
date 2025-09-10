@@ -11,9 +11,9 @@ if parent not in sys.path:
     sys.path.insert(1, parent)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
-import django
+import django  # noqa: E402
 
 django.setup()
-from django.conf import settings
+from django.conf import settings  # noqa: E402
 
 print(json.dumps(settings.DATABASES))

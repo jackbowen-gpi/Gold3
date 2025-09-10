@@ -8,11 +8,13 @@ sys.path.insert(
     0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
 os.environ["DJANGO_SETTINGS_MODULE"] = "gchub_db.settings"
+
 # Back to the ordinary imports
+from . import fs_api
+
 """
 Test stuff for fs_api. We'll eventually move this to a better location.
 """
-from . import fs_api
 
 # fs_api.delete_job_folder(61234)
 # fs_api.create_job_folder(61234)

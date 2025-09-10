@@ -4,7 +4,7 @@ from reportlab.graphics.shapes import Drawing, Group, String
 from reportlab.lib.units import inch
 from svglib import svglib
 
-from gchub_db.includes.reportlib.util import check_text_width, convert_svg_to_color
+from includes.reportlib.util import check_text_width, convert_svg_to_color
 
 
 class InvalidPath(Exception):
@@ -26,6 +26,7 @@ class MultiLineTextElement(object):
     def __init__(self, lines, font="Helvetica", size=18):
         """Return a drawing obj. and x/y coordinates for given text lines"""
         self.drawing = Drawing()
+        self.text_align = "left"  # Default text alignment
         # Used to determine how wide the entire block of text is. This represents
         # the width of the widest line.
         max_width = 0
@@ -105,6 +106,8 @@ class SVGGraphicElement(object):
         available_area_Y: (int) Vert. area available for graphic placement.
         """
         self.drawing = Drawing()
+        self.bottom_left_x = bottom_left_x
+        self.alignment = "left"  # Default alignment
         # Import SVG graphic file.
         print(file_name)
         vector_graphic = svglib.svg2rlg(file_name)

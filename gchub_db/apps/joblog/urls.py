@@ -1,6 +1,14 @@
 from django.urls import re_path as url
 
-from gchub_db.apps.joblog.views import *
+from gchub_db.apps.joblog.views import (
+    joblog_add_note,
+    joblog_delete_log,
+    joblog_delete_note,
+    joblog_edit_note,
+    joblog_filtered,
+    joblog_fullview,
+    joblog_standard,
+)
 
 urlpatterns = [
     url(r"^(?P<job_id>\d+)/standard/$", joblog_standard, name="joblog_standard"),

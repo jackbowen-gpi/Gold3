@@ -1,23 +1,23 @@
-{% extends "standard.html" %} 
+{% extends "standard.html" %}
 
-{% block extra_head %}    
+{% block extra_head %}
 	<!-- Load up jQuery -->
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
 	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
 
 	<!-- Javascript -->
-	<script type="text/javascript"> 	
+	<script type="text/javascript">
 		//prototype is loaded in GOLD's base html and it uses $ just like jQuery
-		//does. So we'll change $ to $j for the jQuery on this page using 
+		//does. So we'll change $ to $j for the jQuery on this page using
 		//jQuery.noConflict()
 		var $j = jQuery.noConflict();
-		
+
 		//Date picker
 		$j( function() {
 			// Date picker
 			$j( "#id_date" ).datepicker();
-			
+
 			// Delete confirmation
 		    $j( "#dialog_confirm" ).dialog({
 		      autoOpen: false,
@@ -38,9 +38,9 @@
 				// Open confirmation dialog
 				$j( "#dialog_confirm" ).dialog( "open" );
 			});
-		
+
 		} );
-	</script> 
+	</script>
 {% endblock %}
 
 {% block body %}

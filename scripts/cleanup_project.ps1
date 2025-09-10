@@ -74,11 +74,11 @@ Remove-Item -Path ".\alloriginalerrors.md" -Force -ErrorAction SilentlyContinue
 
 # Clean up __pycache__ directories
 Write-Host "Cleaning Python cache..." -ForegroundColor Yellow
-Get-ChildItem -Path . -Recurse -Name "__pycache__" -Directory | 
+Get-ChildItem -Path . -Recurse -Name "__pycache__" -Directory |
     ForEach-Object { Remove-Item -Path $_ -Recurse -Force -ErrorAction SilentlyContinue }
 
 # Clean up .pyc files
-Get-ChildItem -Path . -Recurse -Name "*.pyc" | 
+Get-ChildItem -Path . -Recurse -Name "*.pyc" |
     ForEach-Object { Remove-Item -Path $_ -Force -ErrorAction SilentlyContinue }
 
 Write-Host "✅ Project cleanup completed!" -ForegroundColor Green

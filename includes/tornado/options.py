@@ -172,8 +172,8 @@ class _Options(dict):
     @classmethod
     def instance(cls):
         if not hasattr(cls, "_instance"):
-            cls._instance = cls()
-        return cls._instance
+            cls._instance = cls()  # type: ignore
+        return cls._instance  # type: ignore
 
     def __getattr__(self, name):
         if isinstance(self.get(name), _Option):

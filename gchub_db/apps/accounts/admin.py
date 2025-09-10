@@ -1,8 +1,6 @@
 from django.contrib import admin
-from django.urls import path, include
 
 from gchub_db.apps.accounts.models import UserProfile
-from .admin_views import send_alert_view
 
 
 class UserProfileAdmin(admin.ModelAdmin):
@@ -13,6 +11,6 @@ class UserProfileAdmin(admin.ModelAdmin):
 admin.site.register(UserProfile, UserProfileAdmin)
 
 # Customize admin site
-admin.site.site_header = "GHub Database Administration" 
+admin.site.site_header = "GHub Database Administration"
 admin.site.site_title = "GHub Admin"
 admin.site.index_title = "Welcome to GHub Administration"

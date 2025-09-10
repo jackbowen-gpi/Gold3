@@ -2,7 +2,7 @@
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import resolve, reverse
+from django.urls import resolve, reverse, NoReverseMatch
 from maintenance_mode import core, settings
 
 

@@ -15,13 +15,12 @@ from django.shortcuts import render
 from django.template import loader
 
 from gchub_db.apps.draw_down.models import Drawdown, DrawDownItem, DrawDownRequest
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import JOBLOG_TYPE_NOTE
 from gchub_db.apps.joblog.models import JobLog
 from gchub_db.apps.workflow.models import Job, PrintLocation
 from gchub_db.includes import fs_api
 from gchub_db.includes.gold_json import JSMessage
 from gchub_db.includes.widgets import GCH_SelectDateWidget
-from gchub_db.middleware import threadlocals
 
 # These are cached once when the server is started to avoid future queries.
 ARTIST_PERMISSION = Permission.objects.get(codename="in_artist_pulldown")
@@ -204,7 +203,6 @@ def home(request, job_id=None):
                 try:
                     # this checks for bad forms, if it is not valid but has the number_copies field then it
                     # just needs some data entered
-                    num_copies = ddiform.cleaned_data["number_copies"]
                     flag = False
                 except Exception:
                     # If the whole number_copies field is missing, this is a blank form
@@ -213,7 +211,6 @@ def home(request, job_id=None):
             drawdown = ddform.save()
             for ddiform in ddiformSet:
                 try:
-                    num_copies = ddiform.cleaned_data["number_copies"]
                     drawdownitem = ddiform.save()
                     drawdownitem.draw_down_request = drawdown
                     drawdownitem.save()
@@ -263,7 +260,6 @@ def home(request, job_id=None):
                 jobfolder = fs_api.get_job_folder(jobnum)
                 folder = os.path.join(jobfolder, fs_api.JOBDIR["3_preview_art"])
 
-                fileArray = []
                 for drawdownItem in drawdownItems:
                     if drawdownItem.artwork and drawdownItem.item_number:
                         try:
@@ -393,7 +389,6 @@ def show_legacy(request):
 def edit_drawdown(request, contact_id):
     """Saves edited Drawdown Request data."""
     current_data = DrawDownRequest.objects.get(id=contact_id)
-    current_items = DrawDownItem.objects.filter(draw_down_request=current_data.id)
 
     if request.method == "POST":  # save form
         ddform = DrawDownRequestForm(request.POST, instance=current_data)

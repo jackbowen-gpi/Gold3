@@ -1,5 +1,6 @@
 #!/usr/bin/python
 """Import item reviews into GOLD from external sources and produce reports."""
+
 import bin_functions
 
 bin_functions.setup_paths()

@@ -9,9 +9,7 @@ class BeverageViewTests(TestCase):
         create_site(name="Beverage", defaults={"domain": "localhost"})
         self.client = Client()
         # create and login a test user
-        from django.contrib.auth import get_user_model
 
-        User = get_user_model()
         u, _ = create_user(username="testuser")
         u.set_password("password")
         u.save()

@@ -62,9 +62,7 @@ def main():
                 try:
                     obj.save(update_fields=[field_name])
                 except Exception as e:
-                    print(
-                        f"Failed to save {app_label}.{model_name} id={getattr(obj,'id',None)}: {e}"
-                    )
+                    print(f"Failed to save {app_label}.{model_name} id={obj.pk}: {e}")
                     continue
                 updated += 1
         total += updated

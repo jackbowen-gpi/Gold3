@@ -1,5 +1,5 @@
 """
-Example of how to update your UserProfile.growl_at() method to use Windows notifications.
+Example: update your UserProfile.growl_at() method to use Windows notifications.
 You can either replace the existing method or add this as a new method.
 """
 
@@ -51,12 +51,12 @@ def notify_windows(self, title, description, sticky=False, pref_field=None):
 
 # For the bulk notification scripts like growl_code_changes.py and growl_intercom.py,
 # you can update them to use:
-from includes.notification_manager import bulk_notify_users
+# from includes.notification_manager import bulk_notify_users
 
 # Replace the loop that calls user.profile.growl_at() with:
-bulk_notify_users(
-    users_queryset=users,
-    title="GOLD Change Announcement",
-    message=change.change,
-    pref_field="growl_hear_gold_changes",
-)
+# bulk_notify_users(
+#     users_queryset=users,
+#     title="GOLD Change Announcement",
+#     message=change.change,
+#     pref_field="growl_hear_gold_changes",
+# )

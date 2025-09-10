@@ -73,7 +73,7 @@ def view_invoice(request, invoice_id):
                 send_invoice_email(invoice.id)
             return HttpResponse(JSMessage("Saved."))
         else:
-            return jobform.serialize_errors()
+            return form.serialize_errors()
     else:
         form = BevInvoiceForm(instance=invoice)
 

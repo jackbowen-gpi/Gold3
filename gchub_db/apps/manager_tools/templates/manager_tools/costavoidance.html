@@ -1,6 +1,6 @@
 {% extends "standard.html" %}
 
-{% block extra_head %} 
+{% block extra_head %}
 	<style type="text/css">
 		input {
 			border: none;
@@ -9,19 +9,19 @@
 			vertical-align: text-bottom;
 		}
 	</style>
-  
+
 	<!-- Load up jQuery -->
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
 	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
 
 	<!-- Javascript happens here. -->
-	<script type="text/javascript"> 
+	<script type="text/javascript">
 		//prototype is loaded in GOLD's base html and it uses $ just like jquery
-		//does. So we'll change $ to $j for the jQuery on this page using 
+		//does. So we'll change $ to $j for the jQuery on this page using
 		//jQuery.noConflict()
 		var $j = jQuery.noConflict();
-		
+
 		//jQuery stuff.
 		$j(document).ready(function(){
 			// Busy inidcator
@@ -62,8 +62,8 @@
     </p>
 
 	<p>
-    <strong>Note:</strong> This report keys off a charge's invoice date and that 
-	doesn't get filled in until we run month end billing. So, if the current 
+    <strong>Note:</strong> This report keys off a charge's invoice date and that
+	doesn't get filled in until we run month end billing. So, if the current
 	month is zero then billing probably hasn't been run yet.
     </p>
 </div>
@@ -78,23 +78,23 @@
 
 <!-- Data table -->
 <div class="grey_bordered">
-	<h2> 
+	<h2>
 		<form method="post">
 			{% csrf_token %}
 			Total cost avoidance charges for {{costform.year}}
 		<input type="image" src="{{MEDIA_URL}}img/icons/arrow_refresh.png" alt="Submit" id="submit" />
 		</form>
 	</h2>
-	
+
 
 	<table class="rowHover">
 		<tr>
-			<th style="text-align:center;">Month</th>			
+			<th style="text-align:center;">Month</th>
 			<th style="text-align:center;">Total</th>
 		</tr>
 	{% for month in costdata %}
 		<tr class="{% cycle 'rowA' 'rowB' %}">
-			<td>{{month.name}}</td>	
+			<td>{{month.name}}</td>
 			<td style="text-align:right;">${{month.total|floatformat:2|intcomma}}</td>
 		</tr>
 	{% endfor %}

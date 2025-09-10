@@ -1,6 +1,6 @@
 from django.urls import re_path as url
 
-from gchub_db.apps.django_su.views import *
+from gchub_db.apps.django_su.views import su_exit, su_login, login_as_user
 
 urlpatterns = [
     url(r"^$", su_exit, name="su_exit"),

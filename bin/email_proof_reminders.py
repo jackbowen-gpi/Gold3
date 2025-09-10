@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Send email reminders to salespeople for proofs that have been sitting for 15 days or more."""
+"""Send email reminders for proofs sitting for 15+ days."""
 
 import datetime
 from datetime import timedelta
@@ -15,7 +15,12 @@ django.setup()
 # Back to the ordinary imports
 from django.template import loader
 
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import (
+    JOBLOG_TYPE_ITEM_APPROVED,
+    JOBLOG_TYPE_ITEM_FILED_OUT,
+    JOBLOG_TYPE_ITEM_PROOFED_OUT,
+    JOBLOG_TYPE_JOBLOG_DELETED,
+)
 from gchub_db.apps.joblog.models import JobLog
 from gchub_db.apps.workflow.models import Revision
 from gchub_db.includes.general_funcs import send_info_mail

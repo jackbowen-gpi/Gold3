@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Retrieve and store Foodservice Corrugated specifications from the corporate MSSQL server via ODBC."""
+"""Retrieve Foodservice Corrugated specs from MSSQL via ODBC."""
 
 # Setup the Django environment
 import bin_functions

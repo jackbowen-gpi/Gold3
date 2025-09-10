@@ -9,7 +9,6 @@ handling).
 
 import os
 import importlib.util
-import types
 
 _real_mod = None
 

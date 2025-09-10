@@ -6,6 +6,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
 import django
 
 django.setup()
-from django.conf import settings
+from django.conf import settings  # noqa: E402
 
 print(json.dumps(settings.DATABASES))

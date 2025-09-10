@@ -6,7 +6,8 @@ print("CWD:", os.getcwd())
 print("sys.path[0:6]=", sys.path[0:6])
 print("env PYTHONPATH=", os.environ.get("PYTHONPATH"))
 
-# Ensure Django settings module matches how pytest will run it (legacy project uses repo-root shim `settings`)
+# Ensure Django settings module matches how
+# pytest will run it (legacy project uses repo-root shim `settings`)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 print("DJANGO_SETTINGS_MODULE=", os.environ.get("DJANGO_SETTINGS_MODULE"))
 

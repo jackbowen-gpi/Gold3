@@ -84,9 +84,9 @@ class NewArtReqForm(ModelForm):
         super(NewArtReqForm, self).__init__(*args, **kwargs)
         self.fields["design_name"].label = "*Design Name"
         self.fields["design_name"].widget.attrs["size"] = 70
-        self.fields["design_name"].widget.attrs[
-            "title"
-        ] = "This will be the name of the job in GOLD."
+        self.fields["design_name"].widget.attrs["title"] = (
+            "This will be the name of the job in GOLD."
+        )
         self.fields["contact_name"].label = "*Contact Name"
         self.fields["contact_email"].label = "*Contact Email"
         self.fields["contact_email"].widget.attrs["size"] = 70
@@ -95,9 +95,9 @@ class NewArtReqForm(ModelForm):
         self.fields["channel"].label = "*Channel"
         self.fields["print_type"].label = "*Print Type"
         self.fields["contact_name"].widget.attrs["size"] = 70
-        self.fields["contact_name"].widget.attrs[
-            "title"
-        ] = "This will be the primary contact for the job."
+        self.fields["contact_name"].widget.attrs["title"] = (
+            "This will be the primary contact for the job."
+        )
         self.fields["ship_to_name"].label = "*Customer Name"
         self.fields["ship_to_name"].widget.attrs["size"] = 70
         self.fields["ship_to_company"].label = "Company"
@@ -116,9 +116,9 @@ class NewArtReqForm(ModelForm):
         self.fields["ship_to_phone"].label = "*Phone"
         self.fields["mkt_segment"].label = "*Market Segment"
         self.fields["design_name"].widget.attrs["size"] = 70
-        self.fields["design_name"].widget.attrs[
-            "title"
-        ] = "This will be the name of the job in GOLD."
+        self.fields["design_name"].widget.attrs["title"] = (
+            "This will be the name of the job in GOLD."
+        )
         self.fields["csr"].queryset = User.objects.filter(
             is_active=True, groups__in=CSR_PERMISSION.group_set.all()
         ).order_by("last_name")
@@ -161,12 +161,12 @@ class ProductForm(ModelForm):
         self.fields["corr_type"].choices = CORRUGATED_TYPE_CHOICES[1:]
         self.fields["corr_only"].label = ""
         self.fields["corr_only"].help_text = "Corrugated Only"
-        self.fields["corr_only"].widget.attrs[
-            "title"
-        ] = "Check this if you just want a corrugated (KD) job created in GOLD. No cup job will be created."
-        self.fields["customer_number"].widget.attrs[
-            "title"
-        ] = "Customer specific numbers like WRIN#, GIN#, SKU#, etc."
+        self.fields["corr_only"].widget.attrs["title"] = (
+            "Check this if you just want a corrugated (KD) job created in GOLD. No cup job will be created."
+        )
+        self.fields["customer_number"].widget.attrs["title"] = (
+            "Customer specific numbers like WRIN#, GIN#, SKU#, etc."
+        )
         self.fields["plant1"].label = "Plant/Press"
         self.fields["plant1"].widget.attrs["title"] = "Plant 1"
         self.fields["plant2"].label = ""
@@ -198,9 +198,9 @@ class AdditionalInfoForm(ModelForm):
         super(AdditionalInfoForm, self).__init__(*args, **kwargs)
         self.fields["keep_same_upc"].help_text = "Keep same UPC"
         self.fields["keep_same_upc"].label = ""
-        self.fields["replaces_prev_design"].help_text = (
-            "Replaces previous design (Requires previous 9-Digit #)"
-        )
+        self.fields[
+            "replaces_prev_design"
+        ].help_text = "Replaces previous design (Requires previous 9-Digit #)"
         self.fields["replaces_prev_design"].label = ""
         self.fields["prev_9_digit"].widget = forms.Textarea(
             attrs={"cols": 15, "rows": 3}
@@ -336,9 +336,9 @@ def art_req_add(request, artreq_id=None, new_artreq_id=None):
 
     if products:
         # No blank form needed if editing existing product.
-        blank_prodcuts_forms = 0
+        pass
     else:
-        blank_prodcuts_forms = 1
+        pass
     # Build our formsets.
     ExtraProofFormSet = modelformset_factory(
         ExtraProof, form=ExtraProofForm, exclude=("artreq",), extra=blank_proofs_forms

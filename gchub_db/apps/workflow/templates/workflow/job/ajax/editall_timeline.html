@@ -1,11 +1,11 @@
-{% block extra_head %}   
+{% block extra_head %}
 	<!--CSS-->
 	<style type="text/css">
 		#forecast_submit{
-			color: #883333; 
+			color: #883333;
 			text-decoration: none;
 			background:none;
-		    border:none; 
+		    border:none;
 		    padding:0;
 		    font: inherit;
 		    /*border is optional
@@ -70,6 +70,6 @@
 		<td><span class="warning">{% for item in items_no_file_out %}({{item.num_in_job}})-{{item.size}} &nbsp;{% endfor %}</span></td>
 	</tr>
 </table>
-<div class="outline" style="width:450px"><img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align: text-bottom" /> Each link will update all qualified items. 
+<div class="outline" style="width:450px"><img src="{{MEDIA_URL}}img/icons/information.png" style="vertical-align: text-bottom" /> Each link will update all qualified items.
 For instance, if an item is already filed out, it will not be updated again if File Out All is selected. If an item has not been proofed
 yet or has a pending revision, it will not be updated if Approve All is selected.</div>

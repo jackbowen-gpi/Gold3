@@ -502,7 +502,7 @@
 		<img src="{{MEDIA_URL}}img/icons/add.png" alt="New Job" />
 		{% if duplicate %}Duplicate{% else %}New{% endif %} Carton Job
 	</h1>
-	
+
 	{% if duplicate %}
 		<form id="dupejob" name="dupejob">
 	{% else %}
@@ -551,7 +551,7 @@
 					</div>
 					<div class="form-row">
 						<label for="id_due_date">Due Date:</label>
-						<input type="date" id="id_due_date" name="due_date" 
+						<input type="date" id="id_due_date" name="due_date"
 							   value="{% if jobform.due_date.value %}{{ jobform.due_date.value|date:'Y-m-d' }}{% endif %}"
 							   class="date-picker">
 					</div>

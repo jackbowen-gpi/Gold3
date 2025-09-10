@@ -11,7 +11,7 @@
 	function hide_modal_wait() {
 	    setTimeout("YAHOO.example.container.wait.hide()",1250);
 	} // end hide_modal_wait()
-	
+
 	  function update_form_from_simple_box() {
 //	     $('id_simple_box:checked' function(){
 //	       alert("The checkbox has been clicked!");
@@ -20,7 +20,7 @@
          var chk = $('id_blank_label').checked
          var list = [];
 //         list = ['id_nine_digit_num', 'id_fourteen_digit_num', 'id_text_line_1', 'id_text_line_2'];
-         
+
          if (chk){
             $('id_nine_digit_num').value = 999999999;
             $('id_fourteen_digit_num').value = 99999999999999;
@@ -29,19 +29,19 @@
          //   list.each(Element.hide);
             $('id_nine_digit_num').setStyle({
                color: '#C88',
-               fontStyle: 'italic' 
+               fontStyle: 'italic'
             });
             $('id_fourteen_digit_num').setStyle({
                color: '#C88',
-               fontStyle: 'italic' 
+               fontStyle: 'italic'
             });
             $('id_text_line_1').setStyle({
                color: '#C88',
-               fontStyle: 'italic' 
+               fontStyle: 'italic'
             });
             $('id_text_line_2').setStyle({
                color: '#C88',
-               fontStyle: 'italic' 
+               fontStyle: 'italic'
             });
          } else{
             $('id_nine_digit_num').clear();
@@ -51,7 +51,7 @@
          //   $(list).each(Element.show);
          }
 	  }
-	  
+
 	  /* Called when an item is selected from the Item dropdown. Update
 	   * the Length/Width/Height and case count values from the defaults. */
 	  function update_form_from_size_selection() {
@@ -63,7 +63,7 @@
 			 }
 		 });
 	  }
-	  
+
 	  /* Called when a spec is selected. Populates the dimension fields. */
 	  function update_form_from_spec_selection() {
 		  var selected_value = $('id_spec').getValue();
@@ -107,31 +107,31 @@
 			      hide_modal_wait();
 			}});
 		} // end generate_box()
-		  
+
 	  /* Stuff to be done on page load. */
-	  function on_load() { 
+	  function on_load() {
           update_form_from_size_selection();
 	  }
 	  // When the Item drop-down changes, update the list of available specs.
-	  YAHOO.util.Event.addListener("id_item", "change", 
+	  YAHOO.util.Event.addListener("id_item", "change",
 	  		  update_form_from_size_selection);
 	  // When the Spec drop-down changes, update the dimensions.
-	  YAHOO.util.Event.addListener("id_spec", "change", 
+	  YAHOO.util.Event.addListener("id_spec", "change",
               update_form_from_spec_selection);
       // When the Spec drop-down changes, update the dimensions.
-      YAHOO.util.Event.addListener("id_blank_label", "change", 
+      YAHOO.util.Event.addListener("id_blank_label", "change",
               update_form_from_simple_box);
 	    // Initialize the temporary Panel to display while waiting for external content to load
 	    YAHOO.namespace("example.container");
-	    YAHOO.example.container.wait = 
-	        new YAHOO.widget.Panel("wait", {  
-	            width:"240px", 
-	            fixedcenter:true, 
-	            close:false, 
-	            draggable:false, 
+	    YAHOO.example.container.wait =
+	        new YAHOO.widget.Panel("wait", {
+	            width:"240px",
+	            fixedcenter:true,
+	            close:false,
+	            draggable:false,
 	            modal:true,
 	            visible:false,
-	            effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5} 
+	            effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5}
 	        });
 	    YAHOO.example.container.wait.setHeader("Updating, please wait...");
 	    YAHOO.example.container.wait.setBody('<img src="{{MEDIA_URL}}img/rel_interstitial_loading.gif" />');
@@ -167,7 +167,7 @@
 	    </a>
 	{% endifequal %}
     <p>&nbsp;</p>
-	</form>   
+	</form>
 </div>
 
 {% endblock %}

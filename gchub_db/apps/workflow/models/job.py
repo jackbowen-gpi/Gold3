@@ -1,9 +1,10 @@
 import datetime as _dt
 import os
 from datetime import date, timedelta
+from typing import TYPE_CHECKING
 
 from django.conf import settings
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import Group, Permission, User
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q, signals
@@ -14,24 +15,51 @@ from localflavor.us.models import USStateField
 from gchub_db.apps.accounts.models import UserProfile
 from gchub_db.apps.auto_ftp.models import AutoFTPTiff
 from gchub_db.apps.carton_billing.models import CartonSapEntry
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import JOBLOG_TYPE_JOB_CREATED, JOBLOG_TYPE_NOTE
 from gchub_db.apps.joblog.models import JobLog
 from gchub_db.apps.manager_tools.manager_tool_funcs import get_item_average_hours
 
 # Normally this would be a bad idea, but these variables are uniquely named.
 from gchub_db.apps.qad_data.models import QAD_PrintGroups
 from gchub_db.apps.workflow import gps_connect
-from gchub_db.apps.workflow.app_defs import *
+from gchub_db.apps.workflow.app_defs import (
+    ART_REC_TYPES,
+    BILL_TO_TYPES,
+    BUSINESS_TYPES,
+    CARTON_JOB_TYPES,
+    JOB_STATUSES,
+    JOB_TYPES,
+    PREPRESS_SUPPLIERS,
+    TODO_LIST_MODE_DEFAULT,
+    TODO_LIST_MODE_ICONS,
+    TODO_LIST_MODE_TYPES,
+)
 from gchub_db.apps.workflow.managers import JobManager
-from gchub_db.apps.workflow.models import *
+from gchub_db.apps.workflow.models.general import (
+    Charge,
+    ItemTracker,
+    JobAddress,
+    JobComplexity,
+    PlatePackage,
+    PrintLocation,
+    Revision,
+    SalesServiceRep,
+)
 from gchub_db.includes import fs_api, general_funcs
 from gchub_db.middleware import threadlocals
+
+if TYPE_CHECKING:
+    from .item import Item
 
 
 class Job(models.Model):
     """The main unit of workflow, represents an individual job with associated
     items.
     """
+
+    # Type annotations for Django reverse relationships
+    if TYPE_CHECKING:
+        item_set: models.Manager[Item]
 
     name = models.CharField(max_length=255)
     workflow = models.ForeignKey(Site, on_delete=models.CASCADE)
@@ -171,7 +199,7 @@ class Job(models.Model):
         else:
             return str(self.id) + " " + self.name
 
-    def delete(self):
+    def delete(self, using=None, keep_parents=False):
         """Deleting Job objects causes a chain of deletions for all objects
         with Foreignkey fields pointing to Job. This results in a lot of data
         loss. Set an is_deleted flag on the Job instead and filter out all
@@ -954,7 +982,6 @@ class Job(models.Model):
                         if self.real_due_date < today:
                             # Return immediately. Highest priority.
                             return "Overdue"
-                            check_due = 1
                         else:
                             status = "To-Do"
                             check_due = 1
@@ -1255,8 +1282,6 @@ class Job(models.Model):
             # If we find one that isn't proofed return False and then stop.
             if not item.current_proof_date():
                 return False
-                # Stops the function.
-                sys.exit(0)
         # If we made it this far then all the items had proofs. Return true.
         return True
 

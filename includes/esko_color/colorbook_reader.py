@@ -86,7 +86,6 @@ class EskoColorBook(object):
         color_name: (str) Raw color name as it appears in the Kalleidescope
                           color listing/colorbook.
         """
-        parsed_name = color_name.replace(" ", "_")
         # color_filename = 'cdb_%s_ras_spec.res' % parsed_name
         # color_spec_res_path = os.path.join(self.cdb_path, color_filename)
         return EskoColor(color_name, self.spec_file_path)

@@ -8,8 +8,8 @@
     <script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/auto_corrugated/generation_styles.css" />
-    
-    <script type="text/javascript">    
+
+    <script type="text/javascript">
     var digit9;
     var digit14;
     var text1;
@@ -18,22 +18,22 @@
     function hide_modal_wait() {
         setTimeout("YAHOO.example.container.wait.hide()",1250);
     } // end hide_modal_wait()
-    
+
       function update_form_from_simple_box() {
          var chk = $('id_pdf_type').value;
          digit9 = $('id_nine_digit_num').value;
          digit14 = $('id_fourteen_digit_num').value;
          text1 = $('id_text_line_1').value;
          text2 = $('id_text_line_2').value;
-		
+
          //Clear the values when changing to a blank label choice
          if ((chk == 1) || (chk == 3)){
             $('id_nine_digit_num').clear();
             $('id_fourteen_digit_num').clear();
             $('id_text_line_1').clear();
             $('id_text_line_2').clear();
-       
-            
+
+
             $('id_nine_digit_num').disabled = true;
             YAHOO.util.Dom.addClass('id_nine_digit_num','disableClass');
             $('id_fourteen_digit_num').disabled = true;
@@ -51,10 +51,10 @@
             YAHOO.util.Dom.removeClass('id_text_line_1','disableClass');
             $('id_text_line_2').disabled = false;
             YAHOO.util.Dom.removeClass('id_text_line_2','disableClass');
-            
+
          }
       }
-      
+
       function update_form_from_plant_selection() {
         var selected_plant = $('id_plant').getValue();
         var selected_value = $('id_item').getValue();
@@ -75,7 +75,7 @@
             $('id_plate_number').value = "";
         }
       }
-      
+
       /* Called when an item is selected from the Item dropdown. Update
        * the Length/Width/Height and case count values from the defaults. */
       function update_form_from_size_selection() {
@@ -88,7 +88,7 @@
              }
          });
       }
-      
+
       /* Called when a spec is selected. Populates the dimension fields. */
       function update_form_from_spec_selection() {
           var selected_value = $('id_spec').getValue();
@@ -142,7 +142,7 @@
             * Fired when he user hits the Generate Box button. Calls the validator
             * and sends off an AJAX request if all is good.
             */
-	            
+
            YAHOO.example.container.wait.show();
            new Ajax.Request('/acs/pdf_generation_form/', {
                method: 'POST',
@@ -162,13 +162,13 @@
                   hide_modal_wait();
             }});
         } // end generate_box()
-        
+
         function edit_box(box_id) {
            /*
             * Fired when he user hits the Generate Box button. Calls the validator
             * and sends off an AJAX request if all is good.
         	*/
-            
+
            YAHOO.example.container.wait.show();
            new Ajax.Request('/acs/pdf_generation_form/edit/'+ box_id +'/', {
                method: 'POST',
@@ -188,38 +188,38 @@
                   hide_modal_wait();
             }});
         } // end edit_box()
-      
+
       {% ifnotequal type "Label"  %}
       /* Stuff to be done on page load. */
-      function on_load() { 
+      function on_load() {
           update_form_from_plant_selection();
           update_form_from_size_selection();
           update_form_from_simple_box();
       }
       {% endifnotequal %}
       // When the Plant drop-down changes, update the list of available specs.
-      YAHOO.util.Event.addListener("id_plant", "change", 
+      YAHOO.util.Event.addListener("id_plant", "change",
               update_form_from_plant_selection);
       // When the Item drop-down changes, update the list of available specs.
-      YAHOO.util.Event.addListener("id_item", "change", 
+      YAHOO.util.Event.addListener("id_item", "change",
               update_form_from_size_selection);
       // When the Spec drop-down changes, update the dimensions.
-      YAHOO.util.Event.addListener("id_spec", "change", 
+      YAHOO.util.Event.addListener("id_spec", "change",
               update_form_from_spec_selection);
       // When the Spec drop-down changes, update the dimensions.
-      YAHOO.util.Event.addListener("id_pdf_type", "change", 
+      YAHOO.util.Event.addListener("id_pdf_type", "change",
               update_form_from_simple_box);
         // Initialize the temporary Panel to display while waiting for external content to load
         YAHOO.namespace("example.container");
-        YAHOO.example.container.wait = 
-            new YAHOO.widget.Panel("wait", {  
-                width:"240px", 
-                fixedcenter:true, 
-                close:false, 
-                draggable:false, 
+        YAHOO.example.container.wait =
+            new YAHOO.widget.Panel("wait", {
+                width:"240px",
+                fixedcenter:true,
+                close:false,
+                draggable:false,
                 modal:true,
                 visible:false,
-                effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5} 
+                effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5}
             });
         YAHOO.example.container.wait.setHeader("Updating, please wait...");
         YAHOO.example.container.wait.setBody('<img src="{{MEDIA_URL}}img/rel_interstitial_loading.gif" />');
@@ -244,7 +244,7 @@
 		  <li>Please correct the error{{ form.errors|pluralize }} with your submission!</li>
 		</ul>
 	{% endif %}
-	   
+
 	<form id="pdf_form" name="pdf_form" class="ul_form" method="POST">
 
 {% ifequal type "Label"  %}
@@ -257,13 +257,13 @@
                <dd>{{form.text_line_1}}</dd>
            <dt><label>Text Line 2:</label></dt>
                <dd>{{form.text_line_2}}</dd>
-           
+
            <!-- Hide this from view -->
            <div id="pdfType" style="display: none;">
                <dt><label>PDF_type:</label></dt>
                    <dd>{{form.pdf_type}}</dd>
            </div>
-           
+
        </dl>
        <!--  <input id="id_submit" class="submit" type="submit" value="Generate {{type}}" />  -->
        <a class="button2" style="float: left;" href="javascript:generate_label()">Generate Label</a>
@@ -318,14 +318,14 @@
              <a class="button2" style="float: right; margin: 5px" href="javascript:generate_box()">Generate Box</a>
            {% endif %}
         <dl>
-        
+
     </div>
-      
+
 {% endifequal %}
 
 	<div style="clear: both;"></div>
 
-	</form>   
+	</form>
 </div>
 
 {% endblock %}

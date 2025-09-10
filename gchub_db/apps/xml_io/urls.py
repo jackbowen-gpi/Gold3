@@ -6,7 +6,7 @@ of the file for matching.
 
 from django.urls import re_path as url
 
-from gchub_db.apps.xml_io.views import *
+from gchub_db.apps.xml_io.views import echo_input, run_jdf_jobitem, generate_jdf_jobitem
 
 jmf_views = [
     url(r"^echo$", echo_input),

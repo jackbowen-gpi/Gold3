@@ -3,6 +3,7 @@
 
 Exports an XLS with average lead times per salesperson.
 """
+
 import bin_functions
 import openpyxl
 

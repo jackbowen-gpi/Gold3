@@ -10,7 +10,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic.list import ListView
 
-from gchub_db.apps.sbo.models import *
+from gchub_db.apps.sbo.models import SBO
 from gchub_db.includes import general_funcs
 from gchub_db.includes.widgets import GCH_SelectDateWidget
 from gchub_db.middleware import threadlocals
@@ -46,29 +46,29 @@ class ModelSBOForm(ModelForm):
             is_active=True, groups__in=permission.group_set.all()
         ).order_by("username")
 
-        self.fields["task"].widget.attrs[
-            "placeholder"
-        ] = "What was the task being performed?"
+        self.fields["task"].widget.attrs["placeholder"] = (
+            "What was the task being performed?"
+        )
         self.fields["task"].label = "Task Performed"
         self.fields["task"].widget.attrs["height"] = 50
         self.fields["task"].widget.attrs["width"] = 200
         self.fields["behavior_type"].label = "Behavior Type"
-        self.fields["behavior"].widget.attrs[
-            "placeholder"
-        ] = "How was the task being performed?"
+        self.fields["behavior"].widget.attrs["placeholder"] = (
+            "How was the task being performed?"
+        )
         self.fields["behavior"].label = "Behavior Observed"
-        self.fields["reason"].widget.attrs[
-            "placeholder"
-        ] = "Why was the task performed safe or at risk?"
+        self.fields["reason"].widget.attrs["placeholder"] = (
+            "Why was the task performed safe or at risk?"
+        )
         self.fields["reason"].label = "Reason"
         self.fields["communication"].label = "Communication"
-        self.fields["describe_communication"].widget.attrs[
-            "placeholder"
-        ] = "How did you communicate with the person involved in performing the task"
+        self.fields["describe_communication"].widget.attrs["placeholder"] = (
+            "How did you communicate with the person involved in performing the task"
+        )
         self.fields["describe_communication"].label = "Describe Communication"
-        self.fields["additional_comments"].widget.attrs[
-            "placeholder"
-        ] = "Any additional comments for this safety behavior observation"
+        self.fields["additional_comments"].widget.attrs["placeholder"] = (
+            "Any additional comments for this safety behavior observation"
+        )
         self.fields["additional_comments"].label = "Additional Comments"
         self.fields["additional_comments"].required = False
         self.fields["date_observed"].label = "Date Observed"
@@ -336,7 +336,6 @@ def get_sbo_annual_data(year):
     return_object.append({"Nov": {}})
     return_object.append({"Dec": {}})
 
-    all_words = []
     for month_counter in range(len(return_object)):
         sbo_annual = {}
 

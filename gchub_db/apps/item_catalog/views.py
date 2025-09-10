@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from gchub_db.apps.item_catalog.models import *
+from gchub_db.apps.item_catalog.models import ProductSubCategory
 from gchub_db.apps.workflow.models import ItemCatalog
 from gchub_db.includes import fs_api
 from gchub_db.includes.form_utils import JSONErrorForm
@@ -199,7 +199,6 @@ def list_templates(request):
     """
     # all_pdfs = fs_api.get_pdf_templates()
 
-    active_pdf_list = []
     prod_categories = []
     prod_main_categories = []
     items_without_category = ItemCatalog.objects.filter(

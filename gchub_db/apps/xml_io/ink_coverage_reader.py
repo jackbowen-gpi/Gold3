@@ -19,9 +19,6 @@ class InkCoverageException(Exception):
     def __str__(self):
         return self.message
 
-    def __str__(self):
-        return self.__unicode__()
-
 
 class InkNode(object):
     """Abstraction for INK nodes in the XML document."""
@@ -440,7 +437,6 @@ class InkCoverageDocument(object):
                 % (ink_node_count, itemcolor_count)
             )
 
-        is_first_node = True
         # Go through each of the inks listed in the ink coverage document and
         # import an ItemColor object associated to the job/item for each.
         total_error_message = ""

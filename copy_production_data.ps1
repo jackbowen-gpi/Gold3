@@ -7,7 +7,7 @@ Write-Host "Starting production data copy process..." -ForegroundColor Green
 $tablesToCopy = @(
     # Reference tables first (no foreign key dependencies)
     "workflow_customer",
-    "workflow_plant", 
+    "workflow_plant",
     "workflow_inkset",
     "workflow_substrate",
     "workflow_printcondition",
@@ -20,21 +20,21 @@ $tablesToCopy = @(
     "workflow_chargetype",
     "workflow_jobcomplexity",
     "workflow_salesservicerep",
-    
+
     # Product/catalog tables
     "workflow_itemcatalog",
     "workflow_itemcatalogphoto",
     "item_catalog_productsubcategory",
-    
+
     # Item tables
     "workflow_item",
-    "workflow_itemspec", 
+    "workflow_itemspec",
     "workflow_itemcolor",
     "workflow_itemreview",
     "workflow_itemtracker",
     "workflow_itemtrackercategory",
     "workflow_itemtrackertype",
-    
+
     # Job related tables
     "workflow_job",
     "workflow_jobaddress",
@@ -42,7 +42,7 @@ $tablesToCopy = @(
     "workflow_stepspec",
     "workflow_prooftracker",
     "workflow_trackedart",
-    
+
     # Archives and other data
     "archives_kentonarchive",
     "archives_renmarkarchive",
@@ -53,16 +53,16 @@ $tablesToCopy = @(
 # Function to copy a table
 function Copy-Table {
     param($tableName)
-    
+
     Write-Host "Copying table: $tableName" -ForegroundColor Yellow
-    
+
     # First, clear the table in dev
     $clearCmd = "docker exec gchub_db-postgres-dev-1 psql -U gchub -d gchub_dev -c `"TRUNCATE TABLE $tableName CASCADE;`""
     Invoke-Expression $clearCmd
-    
+
     # Export from backup container
     $exportCmd = "docker exec postgres-backup-temp pg_dump -U postgres -d gchub_backup -t $tableName --data-only --no-owner | docker exec -i gchub_db-postgres-dev-1 psql -U gchub -d gchub_dev"
-    
+
     try {
         Invoke-Expression $exportCmd
         Write-Host "✓ Successfully copied $tableName" -ForegroundColor Green

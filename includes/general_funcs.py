@@ -26,9 +26,9 @@ def paginate_get_request(request):
     # ampersands and then prefix it with an ampersand to pad between existing
     # arguments.
     if len(extra_link) > 0:
-        extra_link = "&".join(extra_link)
-        extra_link = "&" + extra_link
-        return extra_link
+        extra_link_str = "&".join(extra_link)
+        extra_link_str = "&" + extra_link_str
+        return extra_link_str
     else:
         return ""
 

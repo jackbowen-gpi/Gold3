@@ -9,10 +9,9 @@ class TraceFinder(importlib.abc.MetaPathFinder):
     def find_spec(self, fullname, path, target=None):
         print("FIND_SPEC ->", fullname)
         try:
-            spec = importlib.util.find_spec(fullname)
+            importlib.util.find_spec(fullname)
         except Exception as e:
             print("  find_spec EXCEPTION for", fullname, e)
-            spec = None
         # Don't interfere: return None to let normal import machinery handle it
         return None
 

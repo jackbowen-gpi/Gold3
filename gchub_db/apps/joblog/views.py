@@ -1,7 +1,6 @@
 """JobLog Views"""
 
 from django import forms
-from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.db.models import Q
 from django.forms import ModelForm
@@ -11,7 +10,24 @@ from django.template import loader
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import (
+    JOBLOG_TYPE_CRITICAL,
+    JOBLOG_TYPE_ERROR,
+    JOBLOG_TYPE_ITEM_APPROVED,
+    JOBLOG_TYPE_ITEM_FILED_OUT,
+    JOBLOG_TYPE_ITEM_FORECAST,
+    JOBLOG_TYPE_ITEM_PREFLIGHT,
+    JOBLOG_TYPE_ITEM_PROOFED_OUT,
+    JOBLOG_TYPE_ITEM_REJECTED,
+    JOBLOG_TYPE_ITEM_REVISION,
+    JOBLOG_TYPE_ITEM_SAVED,
+    JOBLOG_TYPE_JDF,
+    JOBLOG_TYPE_JDF_ERROR,
+    JOBLOG_TYPE_JOBLOG_DELETED,
+    JOBLOG_TYPE_NOTE,
+    JOBLOG_TYPE_PRODUCTION_EDITED,
+    JOBLOG_TYPE_WARNING,
+)
 from gchub_db.apps.joblog.models import JobLog
 from gchub_db.apps.workflow.models import Job, PlateOrder, PlateOrderItem
 from gchub_db.includes import general_funcs
@@ -273,7 +289,6 @@ def joblog_delete_log(request, log_id):
             mail_body = loader.get_template("emails/delete_file_out.txt")
             # find the right email group and send notification mail to them
             mail_subject = "Action Required: Item Approval/Final File Canceled"
-            mail_from = "Gold - Clemson Support <%s>" % settings.EMAIL_SUPPORT
             econtext = {
                 "item": log.item,
                 "itemnum": log.item.num_in_job,

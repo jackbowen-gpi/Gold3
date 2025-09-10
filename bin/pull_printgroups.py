@@ -1,5 +1,6 @@
 #!/usr/bin/python
 """Import printgroups from etools for any job that does not already have the printgroup assigned in GOLD."""
+
 import bin_functions
 
 bin_functions.setup_paths()

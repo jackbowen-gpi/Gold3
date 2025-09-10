@@ -1,6 +1,6 @@
 {% extends "standard.html" %}
 
-{% block extra_head %} 
+{% block extra_head %}
 	<style type="text/css">
 		input {
 			border: none;
@@ -9,19 +9,19 @@
 			vertical-align: text-bottom;
 		}
 	</style>
-  
+
 	<!-- Load up jQuery -->
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
 	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
 
 	<!-- Javascript happens here. -->
-	<script type="text/javascript"> 
+	<script type="text/javascript">
 		//prototype is loaded in GOLD's base html and it uses $ just like jquery
-		//does. So we'll change $ to $j for the jQuery on this page using 
+		//does. So we'll change $ to $j for the jQuery on this page using
 		//jQuery.noConflict()
 		var $j = jQuery.noConflict();
-		
+
 		//jQuery stuff.
 		$j(document).ready(function(){
 			// Busy inidcator
@@ -57,12 +57,12 @@
 <div style="width:50%">
 	<p>
 	Year-to-date info about average turn times for items. Foodservice is
-    measured from print location assignment date to first proof date. Evergreen 
+    measured from print location assignment date to first proof date. Evergreen
     is measured from first preflight date to first proof date.
     </p>
 
 	<p>
-    <strong>Note:</strong> This report only goes back to 2018 due to a bug in 
+    <strong>Note:</strong> This report only goes back to 2018 due to a bug in
     the data that didn't get fixed until mid-February 2018.
     </p>
 </div>
@@ -77,21 +77,21 @@
 
 <!-- Data table -->
 <div class="grey_bordered">
-	<h2> 
+	<h2>
 		<form method="post">
 			{% csrf_token %}
 			Average {{turnform.workflow}} turn times for {{turnform.year}}
 		<input type="image" src="{{MEDIA_URL}}img/icons/arrow_refresh.png" alt="Submit" id="submit" />
 		</form>
 	</h2>
-	
+
 	<!-- welcome message is only shown on the quick initial page load.-->
 	{% if welcome_message %}
 		<p>{{welcome_message}}</p>
 	{% else %}
 		<table class="rowHover">
 			<tr>
-				<th style="text-align:center;">Month</th>			
+				<th style="text-align:center;">Month</th>
 				<th style="text-align:center;">Days</th>
 			</tr>
 		{% for month in turn_data %}
@@ -107,7 +107,7 @@
 							{% endif %}
 						{% endif %}
 					</a> <!-- Close the link to the artists breakdowns -->
-				</td>	
+				</td>
 				<td style="text-align:right;">{{month.days}}</td>
 			</tr>
 		{% endfor %}

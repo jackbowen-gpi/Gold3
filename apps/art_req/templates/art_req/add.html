@@ -1,6 +1,6 @@
 {% extends "standard.html" %}
 
-{% block extra_head %}    
+{% block extra_head %}
 
 	<!-- Load up jQuery -->
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
@@ -12,7 +12,7 @@
 	<script type="text/javascript" src="{{YUI_URL}}build/animation/animation-min.js"></script>
 	<script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
 	{% include "yui_container_includes.html" %}
-	
+
 	<!--CSS-->
 	<style type="text/css">
 		label { width:150px; }
@@ -21,7 +21,7 @@
 		#corr_help{ line-height:normal; }
 		#print_type_dialog{ line-height:normal; }
 	    alnright{ text-align: right; }
-		tr.corrigated th{ background-color: #A0A0A0; }		
+		tr.corrigated th{ background-color: #A0A0A0; }
 		tr.corrigated_all th{ background-color: #A0A0A0; }
 		tr.corrigated_preprint_field th{ background-color: #A0A0A0; }
 		tr.selector_corrigated th{ background-color: #A0A0A0; }
@@ -38,22 +38,22 @@
 	</style>
 
 	<!-- Javascript happens here. -->
-	<script type="text/javascript"> 	
+	<script type="text/javascript">
 		//prototype is loaded in GOLD's base html and it uses $ just like jquery
-		//does. So we'll change $ to $j for the jQuery on this page using 
+		//does. So we'll change $ to $j for the jQuery on this page using
 		//jQuery.noConflict()
 		var $j = jQuery.noConflict();
-		
+
 		//jQuery document ready stuff.
 		$j(document).ready(function(){
 			$j("body").fadeIn();
-			
+
 			//Tabs across the top of the page.
 	        var $jtabs = $j( "#tabs" ).tabs();
-	        
+
 	        //Move the New Print Group option to the top of the printgroup field.
 	        $j("#id_printgroup option[value=4363]").insertAfter("#id_printgroup option:first");
-	        
+
 	        //Auto generate Next/Previous Tab buttons at the bottom of the tabs.
 			$j(".ui-tabs-panel").each(function(i){
 				var totalSize = $j(".ui-tabs-panel").size() - 1;
@@ -65,31 +65,31 @@
 				//Puts a next button everywhere but the last tab.
 				if (i != totalSize) {
 					next = i + 2;
-					$j(this).append("<button id='next_tab' onclick=href='#' class='next-tab mover' rel='" + next + "'>Next</button>");  
+					$j(this).append("<button id='next_tab' onclick=href='#' class='next-tab mover' rel='" + next + "'>Next</button>");
 				}
-				
+
 				$j(this).append("<button type='button' name='form_save' class='save' >Save</button>");
-				
+
 				//Puts the submit button on the last tab.
 				if (i == totalSize) {
 					$j(this).append("<button type='submit' name='form_submit' id='form_submit'>Review Request</button>");
 					$j("#form_submit").append('<input type="hidden" name=partial value="{{currentArt.id}}"/>');
 				}
-						   		
+
 			});
-	        
-			$j('.next-tab, .prev-tab').click(function() { 
+
+			$j('.next-tab, .prev-tab').click(function() {
 		           $jtabs.tabs('select', $j(this).attr("rel"));
 		          return false;
 			});//End tabs.
-			
-			$j('.save').click(function() { 
+
+			$j('.save').click(function() {
 				var artData = $j('#form1').serialize();
-				
+
 				artData += "&form_save=''&partial={{ currentArt.id }}";
-				$j.ajax({ 
-				  type: "POST", 
-				  url: "/art_req/add/", 
+				$j.ajax({
+				  type: "POST",
+				  url: "/art_req/add/",
 				  data: artData,
 				  context: this,
 				  success: function(data, status) {
@@ -103,7 +103,7 @@
 				  }
 				});
 			});
-			
+
 			// Enables tooltips which display a field's title.
 			$j( "#tabs-1,#tabs-2,#tabs-3" ).tooltip({
 				show: {
@@ -111,7 +111,7 @@
 				delay: 250
 				}
 			});
-		
+
 			//Date pickers
 			$j( "#id_arrival_date" ).datepicker({
 	            showOn: "button"
@@ -132,7 +132,7 @@
 	            },
 	            text: false
 	        });//End date pickers.
-			
+
 			//Show/hide the market segment dialog box.
 				//Dialog box options.
 	        $j( "#mkt_seg_dialog" ).dialog({
@@ -141,7 +141,7 @@
 	            hide: "fade",
 	            modal: true
 	        });
-	        
+
 	        	//Opens dialog when icon is clicked.
 	        $j( "#mkt_seg_opener" ).click(function() {
 	        	//Grabs mkt seg's primary key so we can look it up in the db
@@ -157,7 +157,7 @@
 	            $j( "#mkt_seg_dialog" ).dialog( "open" );
 	            return false;
 	        });//End market segment dialog.
-		    
+
 		    //Corrugated help dialog.
 			$j( "#corr_help" ).dialog({
 	            autoOpen: false,
@@ -166,7 +166,7 @@
 	            hide: "fade",
 				modal: true,
 		    });
-		    
+
 		    //Opens corrugated help when help button is clicked.
 		    $j( "#corr_help_opener" ).click(function() {
 		   		$j( "#corr_help" ).dialog( "open" );
@@ -181,13 +181,13 @@
 	            hide: "fade",
 				modal: true,
 		    });
-		    
+
 		    //Opens print type info when help button is clicked.
 		    $j( "#print_type_opener" ).click(function() {
 		   		$j( "#print_type_dialog" ).dialog( "open" );
 		   		return false;
 		    });
-		    
+
 			//Busy indicator.
 			$j( "#form_submit" ).click(function() {
 				YAHOO.example.container.wait.show();
@@ -241,7 +241,7 @@
 	    	//The submit button
 	        $j( "button.save" ).button({
 	            icons: {
-	                
+
 	            }
 		    });//End button stuff.
 		    	//The submit button
@@ -249,11 +249,11 @@
 	            icons: {
 	                secondary: "ui-icon-check"
 	            }
-		    });//End button stuff.	
-		    
+		    });//End button stuff.
+
 		    //Show and hide extra corrigated fields
 				//Watches the corrigated type fields and shows/hides fields based on
-				//what's selected.			
+				//what's selected.
 			$j('select[id$="corr_type"]').change(function() {
 				//Grab the index number so we know which table this is.
 				var index = $j(this).attr('id').split('-')[1];
@@ -280,14 +280,14 @@
 				    corrigated.hide();
 				    corrigated_preprint_field.hide();
 				    corrigated_all.hide();
-				}				
+				}
 			});//End change watcher
-			
+
 			//This will trigger the above function and check what fields to show
 			//every time the page loads.
 			$j('select[id$="corr_type"]').trigger('change');
 			//End Show and hide corrigated stuff.
-			
+
 			//Casepack choice field limiter
 			//Clone the casepack input becuase we need it due to the stupid way
 			//we handle limiting the casepack field when a size is selected.
@@ -312,18 +312,18 @@
 				$j.get("/art_req/add/casepack/"+size+"/", function(casepacks) {
 					if(casepacks.length > 0){
 						//Loop through the array and build a string that will select
-						//multiple casepacks when dropped into another selector below.	
+						//multiple casepacks when dropped into another selector below.
 						var casepack_string = "[value='" + blank_option.val() + "'],";
 						for (var i = 0; i < casepacks.length; i++) {
 						    casepack_string = casepack_string.concat("[value='" + casepacks[i]+ "'],");
 						}
 						//Chop the last comma off.
 						var casepack_string = casepack_string.slice(0,-1);
-						//Reset the available casepack selections by cloning the 
-						//master casepack. Yes, this is a dumb way to do this. 
+						//Reset the available casepack selections by cloning the
+						//master casepack. Yes, this is a dumb way to do this.
 						//Thanks IE.
 						var newcasepack = mastercasepack.clone(true);
-						newcasepack.attr({'name': name, 'id': id});			
+						newcasepack.attr({'name': name, 'id': id});
 						casepack_selector.replaceWith(newcasepack);
 						//Remove all casepack options except the ones in the array.
 						$j("#" + id + " > option:not("+ casepack_string +")").remove();
@@ -335,15 +335,15 @@
 					}
 				});
 			});
-			
+
 			//This will empty out the casepack list if the size is empty on load.
 			var size = $j('select[id$="size"]');
 			if (size.val()  == ""){
 				size.trigger('change');
 			}
 			//End Casepack choice field limiter
-			
-			//Corrigated only enabler. 
+
+			//Corrigated only enabler.
 			//Enables the corrugated only checkbox when preprint is selected.
 			$j('select[id$="corr_type"]').change(function() {
 				//Grab whats currently selected in the corrugated type field.
@@ -355,33 +355,33 @@
 					$j('input[id$="corr_only"]').prop('disabled', true);
 				}
 			});
-			
-			//This will trigger the above function and check what casepacks to 
+
+			//This will trigger the above function and check what casepacks to
 			//show every time the page loads.
 			$j('select[id$="corr_type"]').trigger('change');
-			//End Corrigated only enabler. 
+			//End Corrigated only enabler.
 
 			//Enable autocomplete on all name fields.
 			$j("input[id$=ship_to_name]").each(function() {
 				autoComplete($j(this));
 			});
 
-			
+
 		});//End jQuery document ready stuff.
-		
+
 		//Makes javascript stuff print to the console. Example: log('Hello World');
 		function log(msg) {
 		    setTimeout(function() {
 		        throw new Error(msg);
 		    }, 0);
 		}
-		
+
 		//Adds an extra form to a formset dynamically.
 		function cloneMore(selector, type) {
 		    //Find out how many forms we're starting with.
             var total = parseInt($j('#id_' + type + '-TOTAL_FORMS').val());
             var total = parseInt(total)
-			//Create a clone of the selected form. Using clone(true) breaks 
+			//Create a clone of the selected form. Using clone(true) breaks
 			//auto completion for proof forms and has no other benefit.
 		    if (type=="Proof"){
 		   		var newElement = $j(selector).clone();
@@ -394,7 +394,7 @@
 		    // File fields are handled slightly differently
 		    if (type=="ArtReqFiles"){
 		    	log ('Cloning file field.');
-		        newElement.find('input').each(function() {       
+		        newElement.find('input').each(function() {
 	   				if($j(this).attr('for')){
 	   					var new_for = $j(this).attr('for').replace((total-1), total);
 	   					$j(this).attr({'for': new_for});
@@ -412,7 +412,7 @@
 		    // Whole forms have to have each header and cell incremented through.
 		    else{
 		    	log ('Cloning formset');
-		        newElement.find('td, th').find('*').each(function() {       
+		        newElement.find('td, th').find('*').each(function() {
 	   				if($j(this).attr('for')){
 	   					var new_for = $j(this).attr('for').replace((total-1), total);
 	   					$j(this).attr({'for': new_for});
@@ -427,7 +427,7 @@
 	   				}
 	            });
 	        }
-            //Increate the formset's total form count by 1.     
+            //Increate the formset's total form count by 1.
             total++;
             $j('#id_' + type + '-TOTAL_FORMS').val(total);
 	        //Put the newly cloned form after the original.
@@ -444,16 +444,16 @@
 		    if (type=="Proof"){
 				autoComplete(selector + ' input[id$=ship_to_name]');
 			}
-		}//End formset cloning                
-	
-		//Remove the last form from a formset dynamically.	
+		}//End formset cloning
+
+		//Remove the last form from a formset dynamically.
 		function removeForm(selector, type) {
 			//Check which form this is by it's index number.
 			var index = $j(selector + ' input').attr('id').split('-')[1];
 			//Make sure we don't remove the very last form from the formset.
 			if (index > 0){
 				$j(selector).remove();
-	            //Decreate the formset's total form count by 1.     
+	            //Decreate the formset's total form count by 1.
 	            var total = $j('#id_' + type + '-TOTAL_FORMS').val();
 	            total--;
 	            $j('#id_' + type + '-TOTAL_FORMS').val(total);
@@ -472,8 +472,8 @@
 				select: function( event, ui ) {
 					$j(this).val( ui.item.name );
 					//Select this table. (The parent table.)
-					var table = $j(this).closest('table')	
-					//Select and fill in the rest of the fields in this table.				
+					var table = $j(this).closest('table')
+					//Select and fill in the rest of the fields in this table.
 					$(table).find('[id$="company"]').val(ui.item.company)
 					$(table).find('[id$="addy_1"]').val(ui.item.addy_1)
 					$(table).find('[id$="addy_2"]').val(ui.item.addy_2)
@@ -496,65 +496,65 @@
 		}
 		//end addressbook auto-complete
 
-	</script> 
+	</script>
 {% endblock %}
 
 {% block body %}
 	<p>
 		<h1 class="inline">
-			<img src="{{MEDIA_URL}}img/icons/add.png" 
-			style="vertical-align:text-center" alt="New Job" /> 
+			<img src="{{MEDIA_URL}}img/icons/add.png"
+			style="vertical-align:text-center" alt="New Job" />
 			New Art Request
 		</h1>
 	</p>
-	
+
 	<a href="/art_req/home/">Return to Art Request Home Page</a>
-	
+
 	<p>(Fields marked with * are required.)</p>
 
 	<!-- Info about corrugated. Shown in a dialog when help button is clicked. -->
 	<div id="corr_help" title="Corrugated Info">
-		<p>Corrugated Type specifies what kind of corrugated box you want this 
-		product packed in. Depending on what type of corrugated you select you 
-		will be given different fields to fill out. Below are the different 
-		corrugated types, what they mean, and what type of info each field 
+		<p>Corrugated Type specifies what kind of corrugated box you want this
+		product packed in. Depending on what type of corrugated you select you
+		will be given different fields to fill out. Below are the different
+		corrugated types, what they mean, and what type of info each field
 		requires.</p>
 		<h3>Corrugated Types</h3>
 		<ul>
 			<li><strong>GPI:</strong> Standard Foodservice corrugated box.</li>
-			<li><strong>Custom:</strong> A customer specific pre-made corrugated 
-			box that that has generic graphics and no identification numbers. 
+			<li><strong>Custom:</strong> A customer specific pre-made corrugated
+			box that that has generic graphics and no identification numbers.
 			Only used for promotions.</li>
-			<li><strong>Preprint:</strong> A customer specific pre-made 
-			corrugated box that has specific graphics and identification 
+			<li><strong>Preprint:</strong> A customer specific pre-made
+			corrugated box that has specific graphics and identification
 			numbers.</li>
 		</ul>
 		<h3>GPI/Custom Fields</h3>
 		<ul>
-			<li><strong>Label Color:</strong> Literally what color you want the label to be. 
+			<li><strong>Label Color:</strong> Literally what color you want the label to be.
 			White is our most common color.</li>
-			<li><strong>Label Copy 1-3:</strong> These three lines will be the 
-			description that goes on the box and spec sheet. Label Copy 1 
-			usually starts with the size and job name. Limited to 22 characters 
+			<li><strong>Label Copy 1-3:</strong> These three lines will be the
+			description that goes on the box and spec sheet. Label Copy 1
+			usually starts with the size and job name. Limited to 22 characters
 			per line.</li>
 		</ul>
 		<h3>Preprint Fields</h3>
 		<ul>
 			<li><strong>Sleeve Count:</strong> Also known as the inner-pack.</li>
 			<li><strong>Print Color:</strong> The color of the text and graphics on the box.</li>
-			<li><strong>Case Color:</strong> The color of the corrugated used to make the box. 
+			<li><strong>Case Color:</strong> The color of the corrugated used to make the box.
 			Usually white or kraft.</li>
-			<li><strong>Corrugated Plants:</strong> If you think you know which 
+			<li><strong>Corrugated Plants:</strong> If you think you know which
 			plant the corrugated will print at please specify it here.</li>
-			<li><strong>Label Copy 1-3:</strong> These three lines will be the 
-			description that goes on the box and spec sheet. Label Copy 1 
-			usually starts with the size and job name. Limited to 22 characters 
+			<li><strong>Label Copy 1-3:</strong> These three lines will be the
+			description that goes on the box and spec sheet. Label Copy 1
+			usually starts with the size and job name. Limited to 22 characters
 			per line.</li>
-			<li><strong>Corrugated Only:</strong> This check box will become 
-			available when preprint corrugated is selected. By default a product 
-			with preprint corrugated will generate two jobs in GOLD: one for 
-			the product and another for the corrugated. In some cases you may 
-			want just the corrugated job to be generated and not the product 
+			<li><strong>Corrugated Only:</strong> This check box will become
+			available when preprint corrugated is selected. By default a product
+			with preprint corrugated will generate two jobs in GOLD: one for
+			the product and another for the corrugated. In some cases you may
+			want just the corrugated job to be generated and not the product
 			job. Checking the Corrugated Only check box makes that happen.</li>
 		</ul>
 	</div>
@@ -562,23 +562,23 @@
 	<!-- Info about print types. Shown in a dialog when help button is clicked. -->
 	<div id="print_type_dialog" title="Print Types">
 		<ul>
-			<li><strong>Stock:</strong> Applies to all of our active stock 
-			prints. (Champagne, Ecotainer, etc.) These tend to be stock prints 
-			that we floor stock. Pricing group will administer setup and 
+			<li><strong>Stock:</strong> Applies to all of our active stock
+			prints. (Champagne, Ecotainer, etc.) These tend to be stock prints
+			that we floor stock. Pricing group will administer setup and
 			coordinate with Clemson.</li>
-			<li><strong>Local:</strong> Custom print for make & ship customers. 
-			These tend to be distributor related customer leads and are 
+			<li><strong>Local:</strong> Custom print for make & ship customers.
+			These tend to be distributor related customer leads and are
 			included in rebate and broker commissions.</li>
-			<li><strong>National:</strong> Custom print for floor stock 
-			customers. (Big chains such as McDonald's, Wendy's, etc.) These 
-			tend to be excluded from distributor rebate & broker commissions. 
+			<li><strong>National:</strong> Custom print for floor stock
+			customers. (Big chains such as McDonald's, Wendy's, etc.) These
+			tend to be excluded from distributor rebate & broker commissions.
 			These programs will be administered by the pricing group.</li>
-			<li><strong>Trade:</strong> This will be limited to only the Coke 
-			and Pepsi stock. Pricing group will administer and coordinate with 
+			<li><strong>Trade:</strong> This will be limited to only the Coke
+			and Pepsi stock. Pricing group will administer and coordinate with
 			Clemson.</li>
-			<li><strong>Branded:</strong> Proprietary stock print for 
-			distributors. These will have similar characteristics to the way we 
-			handle our GPI stock designs around rebates, commissions and POD 
+			<li><strong>Branded:</strong> Proprietary stock print for
+			distributors. These will have similar characteristics to the way we
+			handle our GPI stock designs around rebates, commissions and POD
 			rebates.</li>
 		</ul>
 	</div>
@@ -589,7 +589,7 @@
 				<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
 				<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
 				<strong>Success! </strong>Your art request has been submitted.
-				Below are some links to the newly created jobs in GOLD. Or, if 
+				Below are some links to the newly created jobs in GOLD. Or, if
 				you have another art request to enter you can go ahead and do
 				that too.</p>
 				<ul>
@@ -605,9 +605,9 @@
 				<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
 				<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
 				<strong>Welcome! </strong>If this is your first time using the
-				new art request system we strongly encourage you to take a few 
-				moments and watch <u><a href='{% url "video_player_home" %}'>this 
-				instructional video</a></u>. If you have any question please 
+				new art request system we strongly encourage you to take a few
+				moments and watch <u><a href='{% url "video_player_home" %}'>this
+				instructional video</a></u>. If you have any question please
 				email <u><a href='mailto:{{EMAIL_SUPPORT}} ?Subject=Art%20Request%20Question'>
 				{{EMAIL_SUPPORT}}</a></u>.
 				</span></p>
@@ -620,7 +620,7 @@
 	<div class="ui-widget">
 		<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;">
 			<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
-			<strong>Error:</strong> Something was entered incorrectly. Errors 
+			<strong>Error:</strong> Something was entered incorrectly. Errors
 			are highlighted in red. Be sure to check all tabs.</p>
 		</div>
 	</div>
@@ -634,16 +634,16 @@
 	        <li><a href="#tabs-3"><h3>Products</h3></a></li>
 	        <li><a href="#tabs-4"><h3>Additional Info</h3></a></li>
 	    </ul>
-	    
+
 	    <!-- Main Contact Tab-->
 	    <div id="tabs-1">
 			<table>
 			<h3>Job Info</h3>
 			{% for field in artreqform %}
 			    <tr>
-			        <th>{{ field.label_tag }}</th> 
+			        <th>{{ field.label_tag }}</th>
 			        <td>
-			        	{{ field.errors }} 
+			        	{{ field.errors }}
 			        	{{ field }}
 			        	{{ field.help_text }}
 			        	{% ifequal field.name "mkt_segment" %}
@@ -651,11 +651,11 @@
 							    <p>Please select a market segment to learn more
 							    about it.</p>
 							</div>
-							<button id="mkt_seg_opener">Click to learn more 
+							<button id="mkt_seg_opener">Click to learn more
 							about this market segment.</button>
 		        		{% endifequal %}
 			        	{% ifequal field.name "print_type" %}
-							<button id="print_type_opener">Click to learn more 
+							<button id="print_type_opener">Click to learn more
 							about print types.</button>
 		        		{% endifequal %}
 			        	{% ifequal field.name "printgroup" %}
@@ -667,7 +667,7 @@
 			        		{% if perms.accounts.salesperson or perms.accounts.clemson_employee%}
 			        		<a href='{% url "address_home" %}'
 			        		target="_blank">
-								<img src="{{MEDIA_URL}}img/icons/book_addresses.png" 
+								<img src="{{MEDIA_URL}}img/icons/book_addresses.png"
 								style="vertical-align:bottom" alt="Address Book"
 								title = "Click to open address book." />
 							</a>
@@ -678,15 +678,15 @@
 			{% endfor %}
 			</div>
 			</table>
-			
+
 	    </div><!-- End of Main Contact Tab-->
-	    
+
 	    <!-- Extra Proofs Tab-->
 	    <div id="tabs-2">
 			<div class="ui-widget">
 				<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
 				<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
-				If you need additional proofs to go to someone besides the 
+				If you need additional proofs to go to someone besides the
 				customer please enter their info here.</p>
 				</div>
 			</div>
@@ -701,16 +701,16 @@
 				{% for field in form %}
 					{% ifnotequal field.name "id" %}
 					    <tr>
-					        <th>{{ field.label_tag }}</th> 
+					        <th>{{ field.label_tag }}</th>
 					        <td>
-					        	{{ field.errors }} 
+					        	{{ field.errors }}
 					        	{{ field }}
 					        	{{ field.help_text }}
 				        	{% ifequal field.name "save_address" %}
 				        		{% if perms.accounts.salesperson or perms.accounts.clemson_employee%}
 				        		<a href='{% url "address_home" %}'
 				        		target="_blank">
-									<img src="{{MEDIA_URL}}img/icons/book_addresses.png" 
+									<img src="{{MEDIA_URL}}img/icons/book_addresses.png"
 									style="vertical-align:bottom" alt="Address Book"
 									title = "Click to open address book." />
 								</a>
@@ -725,7 +725,7 @@
 		    {% endfor %}
 		    <!--This script will give cloneMore all the info it needs to make
 		    an additional copy of the above form when the add button is clicked.
-		    cloneMore("Table to copy.", "Formset prefix that was defined in the 
+		    cloneMore("Table to copy.", "Formset prefix that was defined in the
 		    view.")-->
 			<p><button type="button" id="add_more_proof" >Add More</button>
 			<button type="button" id="remove_proof">Remove Last</button></p>
@@ -738,7 +738,7 @@
 			    });
 			</script>
 	    </div><!-- End of Extra Proofs Tab-->
-	    
+
 		<!-- Product Selection Tab -->
 	    <div id="tabs-3">
 		    {{ productformset.management_form }}
@@ -750,7 +750,7 @@
 				    	<tr>
 				    	<th>{{ form.size.label_tag }}</th>
 				    	<td>
-				        	{{ form.size.errors }} 
+				        	{{ form.size.errors }}
 				        	{{ form.size }}
 				        	{{ form.size.help_text }}
 				    	</td>
@@ -758,7 +758,7 @@
 				    	<tr>
 				    	<th>{{ form.case_pack.label_tag }}</th>
 				    	<td>
-				        	{{ form.case_pack.errors }} 
+				        	{{ form.case_pack.errors }}
 				        	{{ form.case_pack }}
 				        	{{ form.case_pack.help_text }}
 				    	</td>
@@ -766,7 +766,7 @@
 				    	<tr>
 				    	<th>{{ form.annual_usage.label_tag }}</th>
 				    	<td>
-				        	{{ form.annual_usage.errors }} 
+				        	{{ form.annual_usage.errors }}
 				        	{{ form.annual_usage }}
 				        	{{ form.annual_usage.help_text }}
 				    	</td>
@@ -774,7 +774,7 @@
 				    	<tr>
 				    	<th>{{ form.order_quantity.label_tag }}</th>
 				    	<td>
-				        	{{ form.order_quantity.errors }} 
+				        	{{ form.order_quantity.errors }}
 				        	{{ form.order_quantity }}
 				        	{{ form.order_quantity.help_text }}
 				    	</td>
@@ -782,7 +782,7 @@
 				    	<tr>
 				    	<th>{{ form.customer_number.label_tag }}</th>
 				    	<td>
-				        	{{ form.customer_number.errors }} 
+				        	{{ form.customer_number.errors }}
 				        	{{ form.customer_number }}
 				        	{{ form.customer_number.help_text }}
 				    	</td>
@@ -790,7 +790,7 @@
 						<tr>
 							<th>{{ form.render.label_tag }}</th>
 							<td>
-								{{ form.render.errors }} 
+								{{ form.render.errors }}
 								{{ form.render }}
 								{{ form.render.help_text }}
 							</td>
@@ -798,7 +798,7 @@
 				    	<tr>
 				    	<th>{{ form.wrap_proof.label_tag }}</th>
 				    	<td>
-				        	{{ form.wrap_proof.errors }} 
+				        	{{ form.wrap_proof.errors }}
 				        	{{ form.wrap_proof }}
 				        	{{ form.wrap_proof.help_text }}
 				    	</td>
@@ -806,7 +806,7 @@
 				    	<tr>
 				    	<th>{{ form.mock_up.label_tag }}</th>
 				    	<td>
-				        	{{ form.mock_up.errors }} 
+				        	{{ form.mock_up.errors }}
 				        	{{ form.mock_up }}
 				        	{{ form.mock_up.help_text }}
 				    	</td>
@@ -815,7 +815,7 @@
 				    	<tr>
 				    	<th>{{ form.ink_jet_promo.label_tag }}</th>
 				    	<td>
-				        	{{ form.ink_jet_promo.errors }} 
+				        	{{ form.ink_jet_promo.errors }}
 				        	{{ form.ink_jet_promo }}
 				        	{{ form.ink_jet_promo.help_text }}
 				    	</td>
@@ -823,18 +823,18 @@
 				    	<tr>
 				    	<th>{{ form.label_promo.label_tag }}</th>
 				    	<td>
-				        	{{ form.label_promo.errors }} 
+				        	{{ form.label_promo.errors }}
 				        	{{ form.label_promo }}
 				        	{{ form.label_promo.help_text }}
 				    	</td>
 				    	</tr>
 				    	<th>{{ form.plant1.label_tag }}</th>
 				    	<td>
-				        	{{ form.plant1.errors }} 
+				        	{{ form.plant1.errors }}
 				        	{{ form.plant1 }}
 				        	{{ form.plant1.help_text }}
 							/
-				        	{{ form.press1.errors }} 
+				        	{{ form.press1.errors }}
 				        	{{ form.press1 }}
 				        	{{ form.press1.help_text }}
 				    	</td>
@@ -842,11 +842,11 @@
 				    	<tr>
 				    	<td></td>
 				    	<td>
-				        	{{ form.plant2.errors }} 
+				        	{{ form.plant2.errors }}
 				        	{{ form.plant2 }}
 				        	{{ form.plant2.help_text }}
 							/
-				        	{{ form.press2.errors }} 
+				        	{{ form.press2.errors }}
 				        	{{ form.press2 }}
 				        	{{ form.press2.help_text }}
 				    	</td>
@@ -854,11 +854,11 @@
 				    	<tr>
 				    	<td></td>
 				    	<td>
-				        	{{ form.plant3.errors }} 
+				        	{{ form.plant3.errors }}
 				        	{{ form.plant3 }}
 				        	{{ form.plant3.help_text }}
 							/
-				        	{{ form.press3.errors }} 
+				        	{{ form.press3.errors }}
 				        	{{ form.press3 }}
 				        	{{ form.press3.help_text }}
 				    	</td>
@@ -866,24 +866,24 @@
 				    	<tr>
 				    	<th>{{ form.ship_to_state.label_tag }}</th>
 				    	<td>
-				        	{{ form.ship_to_state.errors }} 
+				        	{{ form.ship_to_state.errors }}
 				        	{{ form.ship_to_state }}
 				        	{{ form.ship_to_state.help_text }}
 				    	</td>
-				    	</tr>			    	
+				    	</tr>
 				    	<tr class="selector_corrigated">
 				    	<th>{{ form.corr_type.label_tag }}</th>
 				    	<td>
-				        	{{ form.corr_type.errors }} 
+				        	{{ form.corr_type.errors }}
 				        	{{ form.corr_type }}
 				        	{{ form.corr_type.help_text }}
 						    {{ form.corr_only }}
 						    {{ form.corr_only.help_text }}
-							<button id="corr_help_opener">Click to learn more 
+							<button id="corr_help_opener">Click to learn more
 							about corrugated options.</button>
 				    	</td>
 				    	</tr>
-				    	<!-- Elements below here may be hidden or shown. 
+				    	<!-- Elements below here may be hidden or shown.
 		    			corrigated are gpi and custom corrigated fields
 		    			corrigated_preprint_field are preprint corrugated fields
 		    			corrigated_all are fields common to all types
@@ -891,7 +891,7 @@
 				    	<tr class="corrigated_preprint_field">
 				    	<th>{{ form.sleeve_count.label_tag }}</th>
 				    	<td>
-				        	{{ form.sleeve_count.errors }} 
+				        	{{ form.sleeve_count.errors }}
 				        	{{ form.sleeve_count }}
 				        	{{ form.sleeve_count.help_text }}
 				    	</td>
@@ -899,7 +899,7 @@
 				    	<tr class="corrigated_preprint_field">
 				    	<th>{{ form.print_color.label_tag }}</th>
 				    	<td>
-				        	{{ form.print_color.errors }} 
+				        	{{ form.print_color.errors }}
 				        	{{ form.print_color }}
 				        	{{ form.print_color.help_text }}
 				    	</td>
@@ -907,15 +907,15 @@
 				    	<tr class="corrigated_preprint_field">
 				    	<th>{{ form.case_color.label_tag }}</th>
 				    	<td>
-				        	{{ form.case_color.errors }} 
+				        	{{ form.case_color.errors }}
 				        	{{ form.case_color }}
 				        	{{ form.case_color.help_text }}
 				    	</td>
-				    	</tr>	
+				    	</tr>
 				    	<tr class="corrigated_preprint_field">
 				    	<th>{{ form.corr_plant1.label_tag }}</th>
 				    	<td>
-				        	{{ form.corr_plant1.errors }} 
+				        	{{ form.corr_plant1.errors }}
 				        	{{ form.corr_plant1 }}
 				        	{{ form.corr_plant1.help_text }}
 				    	</td>
@@ -923,23 +923,23 @@
 				    	<tr class="corrigated_preprint_field">
 				    	<td></td>
 				    	<td>
-				        	{{ form.corr_plant2.errors }} 
+				        	{{ form.corr_plant2.errors }}
 				        	{{ form.corr_plant2 }}
 				        	{{ form.corr_plant2.help_text }}
 				    	</td>
-				    	</tr>				    	
+				    	</tr>
 				    	<tr class="corrigated_preprint_field">
 				    	<td></td>
 				    	<td>
-				        	{{ form.corr_plant3.errors }} 
+				        	{{ form.corr_plant3.errors }}
 				        	{{ form.corr_plant3 }}
 				        	{{ form.corr_plant3.help_text }}
 				    	</td>
-				    	</tr>	
+				    	</tr>
 				    	<tr class="corrigated">
 				    	<th>{{ form.label_color.label_tag }}</th>
 				    	<td>
-				        	{{ form.label_color.errors }} 
+				        	{{ form.label_color.errors }}
 				        	{{ form.label_color }}
 				        	{{ form.label_color.help_text }}
 				    	</td>
@@ -947,7 +947,7 @@
 				    	<tr class="corrigated_all">
 				    	<th>{{ form.label_copy_1.label_tag }}</th>
 				    	<td>
-				        	{{ form.label_copy_1.errors }} 
+				        	{{ form.label_copy_1.errors }}
 				        	{{ form.label_copy_1 }}
 				        	{{ form.label_copy_1.help_text }}
 				    	</td>
@@ -955,7 +955,7 @@
 				    	<tr class="corrigated_all">
 				    	<th>{{ form.label_copy_2.label_tag }}</th>
 				    	<td>
-				        	{{ form.label_copy_2.errors }} 
+				        	{{ form.label_copy_2.errors }}
 				        	{{ form.label_copy_2 }}
 				        	{{ form.label_copy_2.help_text }}
 				    	</td>
@@ -963,7 +963,7 @@
 				    	<tr class="corrigated_all">
 				    	<th>{{ form.label_copy_3.label_tag }}</th>
 				    	<td>
-				        	{{ form.label_copy_3.errors }} 
+				        	{{ form.label_copy_3.errors }}
 				        	{{ form.label_copy_3 }}
 				        	{{ form.label_copy_3.help_text }}
 				    	</td>
@@ -973,8 +973,8 @@
 		    {% endfor %}
 		    <!--This script will give cloneMore all the info it needs to make
 		    an additional copy of the above form when the add button is clicked.
-		    cloneMore("Table to copy.", "Formset prefix that was defined in the 
-		    view.")-->	
+		    cloneMore("Table to copy.", "Formset prefix that was defined in the
+		    view.")-->
 		    <p><button type="button" id="add_more_product" >Add More</button>
 			<button type="button" id="remove_product">Remove Last</button></p>
 			<script>
@@ -984,7 +984,7 @@
 			    $j('#remove_product').click(function() {
 			    	removeForm('div.producttable:last', 'Product');
 			    });
-			</script> 
+			</script>
 	    </div><!-- End of Product Selection Tab-->
 
         <!-- Additional Info Tab-->
@@ -992,7 +992,7 @@
             <table>
                 {% for field in infoform %}
 	                <tr>
-	                    <th>{{ field.label_tag }}</th> 
+	                    <th>{{ field.label_tag }}</th>
 	                    <td>
 	                        {{ field.errors }}
 	                        {{ field }}
@@ -1001,19 +1001,19 @@
 	                </tr>
                 {% endfor %}
                 <tr>
-                	<th><label>File Upload</label></th> 
+                	<th><label>File Upload</label></th>
 					<td>
 				        {{ fileformset.management_form }}
 				        {% for form in fileformset.forms %}
 				            {{ form.id }}
 				            {% for field in form %}
 				                <div class="art_upload">
-				                    {{ field.errors }} 
+				                    {{ field.errors }}
 				                    {{ field }}
 				                </div>
 				            {% endfor %}
 				        {% endfor %}
-				        <p><button type="button" id="add_more_file">Add More</button></p>	
+				        <p><button type="button" id="add_more_file">Add More</button></p>
                         <script>
                             $j('#add_more_file').click(function() {
                                 cloneMore('div.art_upload:last', 'ArtReqFiles');
@@ -1030,7 +1030,7 @@
             	</tr>
             </table>
         </div><!-- End of Additional Info Tab-->
-	    
+
 	</div><!-- End of Tabs -->
 	</form>
 {% endblock %}

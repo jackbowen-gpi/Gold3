@@ -4,6 +4,7 @@
 Connects to Postgres using a superuser account, creates a role and database if
 missing, and grants privileges. Intended for local dev and CI helper usage.
 """
+
 from __future__ import annotations
 
 import os

@@ -220,10 +220,10 @@ const templateMessages = {{ template_messages|safe }};
 function updateMessageFromTemplate(templateKey) {
     const messageField = document.getElementById('id_message');
     const titleField = document.getElementById('id_title');
-    
+
     if (templateKey && templateMessages[templateKey]) {
         messageField.value = templateMessages[templateKey];
-        
+
         // Auto-generate title based on template
         const titles = {
             'server_maintenance': 'Server Maintenance Alert',
@@ -237,11 +237,11 @@ function updateMessageFromTemplate(templateKey) {
             'backup_reminder': 'Backup Reminder',
             'security_alert': 'Security Alert'
         };
-        
+
         if (titles[templateKey] && !titleField.value) {
             titleField.value = titles[templateKey];
         }
-        
+
         updatePreview();
     }
 }
@@ -249,7 +249,7 @@ function updateMessageFromTemplate(templateKey) {
 function updatePreview() {
     const title = document.getElementById('id_title').value || 'Alert Title';
     const message = document.getElementById('id_message').value || 'Alert message will appear here...';
-    
+
     document.getElementById('preview-title').textContent = '[ADMIN ALERT] ' + title;
     document.getElementById('preview-message').textContent = message;
 }
@@ -257,7 +257,7 @@ function updatePreview() {
 function toggleTargetSelection() {
     const allUsersCheckbox = document.getElementById('id_target_all_users');
     const groupCheckboxes = document.querySelectorAll('input[name="target_groups"]');
-    
+
     if (allUsersCheckbox.checked) {
         groupCheckboxes.forEach(cb => {
             cb.disabled = true;
@@ -271,7 +271,7 @@ function toggleTargetSelection() {
 function updateTestModeWarning() {
     const testMode = document.getElementById('id_test_mode').checked;
     const warning = document.getElementById('test-mode-warning');
-    
+
     if (testMode) {
         warning.style.display = 'block';
     } else {
@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('id_message').addEventListener('input', updatePreview);
     document.getElementById('id_target_all_users').addEventListener('change', toggleTargetSelection);
     document.getElementById('id_test_mode').addEventListener('change', updateTestModeWarning);
-    
+
     // Initial setup
     updatePreview();
     toggleTargetSelection();
@@ -299,10 +299,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="alert-form-container">
     <h1>📢 Send Alert Notification</h1>
     <p>Send important notifications to users via Windows notifications. Users will see these as desktop notifications.</p>
-    
+
     <form method="post">
         {% csrf_token %}
-        
+
         <!-- Template Selection -->
         <div class="template-section">
             <div class="form-group">
@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="help-text">{{ form.template.help_text }}</div>
             </div>
         </div>
-        
+
         <!-- Title and Message -->
         <div class="form-group">
             <label for="{{ form.title.id_for_label }}">Alert Title</label>
@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="error">{{ form.title.errors }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label for="{{ form.message.id_for_label }}">Alert Message</label>
             {{ form.message }}
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="error">{{ form.message.errors }}</div>
             {% endif %}
         </div>
-        
+
         <!-- Preview -->
         <div class="form-group">
             <label>Notification Preview</label>
@@ -339,11 +339,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p id="preview-message">Alert message will appear here...</p>
             </div>
         </div>
-        
+
         <!-- Target Selection -->
         <div class="group-selection">
             <h3>📋 Target Recipients</h3>
-            
+
             <div class="form-group">
                 <div class="checkbox-item">
                     {{ form.target_all_users }}
@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="help-text">{{ form.target_all_users.help_text }}</div>
             </div>
-            
+
             <div class="form-group">
                 <label>Or Select Specific Groups:</label>
                 <div class="checkbox-group">
@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 {% endif %}
             </div>
         </div>
-        
+
         <!-- Settings -->
         <div class="form-group">
             <label for="{{ form.duration.id_for_label }}">Display Duration (seconds)</label>
@@ -382,24 +382,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="error">{{ form.duration.errors }}</div>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <div class="checkbox-item">
                 {{ form.test_mode }}
                 <label for="{{ form.test_mode.id_for_label }}">Test Mode (Send only to me)</label>
             </div>
             <div class="help-text">{{ form.test_mode.help_text }}</div>
-            
+
             <div id="test-mode-warning" class="test-mode-warning" style="display: none;">
                 ⚠️ <strong>Test Mode Active:</strong> This notification will only be sent to you for testing purposes.
             </div>
         </div>
-        
+
         <!-- Submit -->
         <div class="submit-section">
             <h4>⚠️ Ready to Send Alert?</h4>
             <p>This will immediately send notifications to the selected users. Make sure your message is correct!</p>
-            
+
             <button type="submit" class="btn btn-primary">
                 📤 Send Alert Notification
             </button>

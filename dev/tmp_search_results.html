@@ -67,7 +67,7 @@
     .append-bottom { margin-bottom: 10px; }
     .fname { user-select: all; }
   </style>
-  
+
   <script>
     function hideAll(elems) {
       for (var e = 0; e < elems.length; e++) {
@@ -96,7 +96,7 @@
       return false;
     }
   </script>
-  
+
 </head>
 <body>
 <header id="summary">
@@ -184,63 +184,63 @@
   </h2>
   <div id="browserTraceback">
     <ul class="traceback">
-      
-        
-        <li class="frame django">
-          
-            <code class="fname">C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\core\handlers\exception.py</code>, line 55, in inner
-          
 
-          
+
+        <li class="frame django">
+
+            <code class="fname">C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\core\handlers\exception.py</code>, line 55, in inner
+
+
+
             <div class="context" id="c2691313561728">
-              
+
                 <ol start="48" class="pre-context" id="pre2691313561728">
-                
+
                   <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre></pre></li>
-                
+
                   <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>        return inner</pre></li>
-                
+
                   <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>    else:</pre></li>
-                
+
                   <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre></pre></li>
-                
+
                   <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>        @wraps(get_response)</pre></li>
-                
+
                   <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>        def inner(request):</pre></li>
-                
+
                   <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>            try:</pre></li>
-                
+
                 </ol>
-              
+
               <ol start="55" class="context-line">
                 <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>                response = get_response(request)
                                ^^^^^^^^^^^^^^^^^^^^^</pre> <span>…</span></li>
               </ol>
-              
-                <ol start='56' class="post-context" id="post2691313561728">
-                  
-                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>            except Exception as exc:</pre></li>
-                  
-                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>                response = response_for_exception(request, exc)</pre></li>
-                  
-                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>            return response</pre></li>
-                  
-                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre></pre></li>
-                  
-                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>        return inner</pre></li>
-                  
-                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre></pre></li>
-                  
-              </ol>
-              
-            </div>
-          
 
-          
-            
+                <ol start='56' class="post-context" id="post2691313561728">
+
+                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>            except Exception as exc:</pre></li>
+
+                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>                response = response_for_exception(request, exc)</pre></li>
+
+                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>            return response</pre></li>
+
+                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre></pre></li>
+
+                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre>        return inner</pre></li>
+
+                  <li onclick="toggle('pre2691313561728', 'post2691313561728')"><pre></pre></li>
+
+              </ol>
+
+            </div>
+
+
+
+
               <details>
                 <summary class="commands">Local vars</summary>
-            
+
             <table class="vars" id="v2691313561728">
               <thead>
                 <tr>
@@ -249,84 +249,84 @@
                 </tr>
               </thead>
               <tbody>
-                
+
                   <tr>
                     <td>exc</td>
                     <td class="code"><pre>DisallowedHost(&quot;Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need to add &#x27;testserver&#x27; to ALLOWED_HOSTS.&quot;)</pre></td>
                   </tr>
-                
+
                   <tr>
                     <td>get_response</td>
                     <td class="code"><pre>&lt;CommonMiddleware get_response=convert_exception_to_response.&lt;locals&gt;.inner&gt;</pre></td>
                   </tr>
-                
+
                   <tr>
                     <td>request</td>
                     <td class="code"><pre>&lt;WSGIRequest: GET &#x27;/workflow/job/search_results/&#x27;&gt;</pre></td>
                   </tr>
-                
+
               </tbody>
             </table>
             </details>
-          
-        </li>
-      
-        
-        <li class="frame django">
-          
-            <code class="fname">C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\utils\deprecation.py</code>, line 119, in __call__
-          
 
-          
+        </li>
+
+
+        <li class="frame django">
+
+            <code class="fname">C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\utils\deprecation.py</code>, line 119, in __call__
+
+
+
             <div class="context" id="c2691313560960">
-              
+
                 <ol start="112" class="pre-context" id="pre2691313560960">
-                
+
                   <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre></pre></li>
-                
+
                   <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>    def __call__(self, request):</pre></li>
-                
+
                   <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>        # Exit out to async mode, if needed</pre></li>
-                
+
                   <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>        if self.async_mode:</pre></li>
-                
+
                   <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>            return self.__acall__(request)</pre></li>
-                
+
                   <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>        response = None</pre></li>
-                
+
                   <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>        if hasattr(self, &quot;process_request&quot;):</pre></li>
-                
+
                 </ol>
-              
+
               <ol start="119" class="context-line">
                 <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>            response = self.process_request(request)
                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre> <span>…</span></li>
               </ol>
-              
-                <ol start='120' class="post-context" id="post2691313560960">
-                  
-                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>        response = response or self.get_response(request)</pre></li>
-                  
-                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>        if hasattr(self, &quot;process_response&quot;):</pre></li>
-                  
-                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>            response = self.process_response(request, response)</pre></li>
-                  
-                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>        return response</pre></li>
-                  
-                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre></pre></li>
-                  
-                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>    async def __acall__(self, request):</pre></li>
-                  
-              </ol>
-              
-            </div>
-          
 
-          
-            
+                <ol start='120' class="post-context" id="post2691313560960">
+
+                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>        response = response or self.get_response(request)</pre></li>
+
+                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>        if hasattr(self, &quot;process_response&quot;):</pre></li>
+
+                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>            response = self.process_response(request, response)</pre></li>
+
+                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>        return response</pre></li>
+
+                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre></pre></li>
+
+                  <li onclick="toggle('pre2691313560960', 'post2691313560960')"><pre>    async def __acall__(self, request):</pre></li>
+
+              </ol>
+
+            </div>
+
+
+
+
               <details>
                 <summary class="commands">Local vars</summary>
-            
+
             <table class="vars" id="v2691313560960">
               <thead>
                 <tr>
@@ -335,84 +335,84 @@
                 </tr>
               </thead>
               <tbody>
-                
+
                   <tr>
                     <td>request</td>
                     <td class="code"><pre>&lt;WSGIRequest: GET &#x27;/workflow/job/search_results/&#x27;&gt;</pre></td>
                   </tr>
-                
+
                   <tr>
                     <td>response</td>
                     <td class="code"><pre>None</pre></td>
                   </tr>
-                
+
                   <tr>
                     <td>self</td>
                     <td class="code"><pre>&lt;CommonMiddleware get_response=convert_exception_to_response.&lt;locals&gt;.inner&gt;</pre></td>
                   </tr>
-                
+
               </tbody>
             </table>
             </details>
-          
-        </li>
-      
-        
-        <li class="frame django">
-          
-            <code class="fname">C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\middleware\common.py</code>, line 48, in process_request
-          
 
-          
+        </li>
+
+
+        <li class="frame django">
+
+            <code class="fname">C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\middleware\common.py</code>, line 48, in process_request
+
+
+
             <div class="context" id="c2691313562048">
-              
+
                 <ol start="41" class="pre-context" id="pre2691313562048">
-                
+
                   <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>        user_agent = request.META.get(&quot;HTTP_USER_AGENT&quot;)</pre></li>
-                
+
                   <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>        if user_agent is not None:</pre></li>
-                
+
                   <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>            for user_agent_regex in settings.DISALLOWED_USER_AGENTS:</pre></li>
-                
+
                   <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>                if user_agent_regex.search(user_agent):</pre></li>
-                
+
                   <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>                    raise PermissionDenied(&quot;Forbidden user agent&quot;)</pre></li>
-                
+
                   <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre></pre></li>
-                
+
                   <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>        # Check for a redirect based on settings.PREPEND_WWW</pre></li>
-                
+
                 </ol>
-              
+
               <ol start="48" class="context-line">
                 <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>        host = request.get_host()
                    ^^^^^^^^^^^^^^^^^^</pre> <span>…</span></li>
               </ol>
-              
-                <ol start='49' class="post-context" id="post2691313562048">
-                  
-                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre></pre></li>
-                  
-                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>        if settings.PREPEND_WWW and host and not host.startswith(&quot;www.&quot;):</pre></li>
-                  
-                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>            # Check if we also need to append a slash so we can do it all</pre></li>
-                  
-                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>            # with a single redirect. (This check may be somewhat expensive,</pre></li>
-                  
-                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>            # so we only do it if we already know we&#x27;re sending a redirect,</pre></li>
-                  
-                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>            # or in process_response if we get a 404.)</pre></li>
-                  
-              </ol>
-              
-            </div>
-          
 
-          
-            
+                <ol start='49' class="post-context" id="post2691313562048">
+
+                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre></pre></li>
+
+                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>        if settings.PREPEND_WWW and host and not host.startswith(&quot;www.&quot;):</pre></li>
+
+                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>            # Check if we also need to append a slash so we can do it all</pre></li>
+
+                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>            # with a single redirect. (This check may be somewhat expensive,</pre></li>
+
+                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>            # so we only do it if we already know we&#x27;re sending a redirect,</pre></li>
+
+                  <li onclick="toggle('pre2691313562048', 'post2691313562048')"><pre>            # or in process_response if we get a 404.)</pre></li>
+
+              </ol>
+
+            </div>
+
+
+
+
               <details>
                 <summary class="commands">Local vars</summary>
-            
+
             <table class="vars" id="v2691313562048">
               <thead>
                 <tr>
@@ -421,84 +421,84 @@
                 </tr>
               </thead>
               <tbody>
-                
+
                   <tr>
                     <td>request</td>
                     <td class="code"><pre>&lt;WSGIRequest: GET &#x27;/workflow/job/search_results/&#x27;&gt;</pre></td>
                   </tr>
-                
+
                   <tr>
                     <td>self</td>
                     <td class="code"><pre>&lt;CommonMiddleware get_response=convert_exception_to_response.&lt;locals&gt;.inner&gt;</pre></td>
                   </tr>
-                
+
                   <tr>
                     <td>user_agent</td>
                     <td class="code"><pre>None</pre></td>
                   </tr>
-                
+
               </tbody>
             </table>
             </details>
-          
-        </li>
-      
-        
-        <li class="frame django">
-          
-            <code class="fname">C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\http\request.py</code>, line 202, in get_host
-          
 
-          
+        </li>
+
+
+        <li class="frame django">
+
+            <code class="fname">C:\Dev\Gold\gchub_db\.venv\Lib\site-packages\django\http\request.py</code>, line 202, in get_host
+
+
+
             <div class="context" id="c2691313559808">
-              
+
                 <ol start="195" class="pre-context" id="pre2691313559808">
-                
+
                   <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>            msg = &quot;Invalid HTTP_HOST header: %r.&quot; % host</pre></li>
-                
+
                   <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>            if domain:</pre></li>
-                
+
                   <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>                msg += &quot; You may need to add %r to ALLOWED_HOSTS.&quot; % domain</pre></li>
-                
+
                   <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>            else:</pre></li>
-                
+
                   <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>                msg += (</pre></li>
-                
+
                   <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>                    &quot; The domain name provided is not valid according to RFC 1034/1035.&quot;</pre></li>
-                
+
                   <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>                )</pre></li>
-                
+
                 </ol>
-              
+
               <ol start="202" class="context-line">
                 <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>            raise DisallowedHost(msg)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^</pre> <span>…</span></li>
               </ol>
-              
-                <ol start='203' class="post-context" id="post2691313559808">
-                  
-                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre></pre></li>
-                  
-                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>    def get_port(self):</pre></li>
-                  
-                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>        &quot;&quot;&quot;Return the port number for the request as a string.&quot;&quot;&quot;</pre></li>
-                  
-                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>        if settings.USE_X_FORWARDED_PORT and &quot;HTTP_X_FORWARDED_PORT&quot; in self.META:</pre></li>
-                  
-                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>            port = self.META[&quot;HTTP_X_FORWARDED_PORT&quot;]</pre></li>
-                  
-                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>        else:</pre></li>
-                  
-              </ol>
-              
-            </div>
-          
 
-          
-            
+                <ol start='203' class="post-context" id="post2691313559808">
+
+                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre></pre></li>
+
+                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>    def get_port(self):</pre></li>
+
+                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>        &quot;&quot;&quot;Return the port number for the request as a string.&quot;&quot;&quot;</pre></li>
+
+                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>        if settings.USE_X_FORWARDED_PORT and &quot;HTTP_X_FORWARDED_PORT&quot; in self.META:</pre></li>
+
+                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>            port = self.META[&quot;HTTP_X_FORWARDED_PORT&quot;]</pre></li>
+
+                  <li onclick="toggle('pre2691313559808', 'post2691313559808')"><pre>        else:</pre></li>
+
+              </ol>
+
+            </div>
+
+
+
+
               <details>
                 <summary class="commands">Local vars</summary>
-            
+
             <table class="vars" id="v2691313559808">
               <thead>
                 <tr>
@@ -507,44 +507,44 @@
                 </tr>
               </thead>
               <tbody>
-                
+
                   <tr>
                     <td>allowed_hosts</td>
                     <td class="code"><pre>[&#x27;localhost&#x27;, &#x27;127.0.0.1&#x27;, &#x27;172.23.8.29&#x27;, &#x27;10.211.55.4&#x27;, &#x27;192.168.7.214&#x27;]</pre></td>
                   </tr>
-                
+
                   <tr>
                     <td>domain</td>
                     <td class="code"><pre>&#x27;testserver&#x27;</pre></td>
                   </tr>
-                
+
                   <tr>
                     <td>host</td>
                     <td class="code"><pre>&#x27;testserver&#x27;</pre></td>
                   </tr>
-                
+
                   <tr>
                     <td>msg</td>
                     <td class="code"><pre>(&quot;Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need to add &#x27;testserver&#x27; to &quot;
  &#x27;ALLOWED_HOSTS.&#x27;)</pre></td>
                   </tr>
-                
+
                   <tr>
                     <td>port</td>
                     <td class="code"><pre>&#x27;&#x27;</pre></td>
                   </tr>
-                
+
                   <tr>
                     <td>self</td>
                     <td class="code"><pre>&lt;WSGIRequest: GET &#x27;/workflow/job/search_results/&#x27;&gt;</pre></td>
                   </tr>
-                
+
               </tbody>
             </table>
             </details>
-          
+
         </li>
-      
+
     </ul>
   </div>
 
@@ -647,28 +647,28 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
   <h2>Request information</h2>
 
 
-  
+
     <h3 id="user-info">USER</h3>
     <p>[unable to retrieve the current user]</p>
-  
+
 
   <h3 id="get-info">GET</h3>
-  
+
     <p>No GET data</p>
-  
+
 
   <h3 id="post-info">POST</h3>
-  
+
     <p>No POST data</p>
-  
+
 
   <h3 id="files-info">FILES</h3>
-  
+
     <p>No FILES data</p>
-  
+
 
   <h3 id="cookie-info">COOKIES</h3>
-  
+
     <table class="req">
       <thead>
         <tr>
@@ -677,15 +677,15 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
         </tr>
       </thead>
       <tbody>
-        
+
           <tr>
             <td>sessionid</td>
             <td class="code"><pre>&#x27;********************&#x27;</pre></td>
           </tr>
-        
+
       </tbody>
     </table>
-  
+
 
   <h3 id="meta-info">META</h3>
   <table class="req">
@@ -696,87 +696,87 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
       </tr>
     </thead>
     <tbody>
-      
+
         <tr>
           <td>HTTP_COOKIE</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>PATH_INFO</td>
           <td class="code"><pre>&#x27;/workflow/job/search_results/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>QUERY_STRING</td>
           <td class="code"><pre>&#x27;&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>REMOTE_ADDR</td>
           <td class="code"><pre>&#x27;127.0.0.1&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>REQUEST_METHOD</td>
           <td class="code"><pre>&#x27;GET&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SCRIPT_NAME</td>
           <td class="code"><pre>&#x27;&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SERVER_NAME</td>
           <td class="code"><pre>&#x27;testserver&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SERVER_PORT</td>
           <td class="code"><pre>&#x27;80&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SERVER_PROTOCOL</td>
           <td class="code"><pre>&#x27;HTTP/1.1&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>wsgi.errors</td>
           <td class="code"><pre>&lt;_io.BytesIO object at 0x000002729E9A3E70&gt;</pre></td>
         </tr>
-      
+
         <tr>
           <td>wsgi.input</td>
           <td class="code"><pre>&lt;django.test.client.FakePayload object at 0x000002729EC37F40&gt;</pre></td>
         </tr>
-      
+
         <tr>
           <td>wsgi.multiprocess</td>
           <td class="code"><pre>True</pre></td>
         </tr>
-      
+
         <tr>
           <td>wsgi.multithread</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>wsgi.run_once</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>wsgi.url_scheme</td>
           <td class="code"><pre>&#x27;http&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>wsgi.version</td>
           <td class="code"><pre>(1, 0)</pre></td>
         </tr>
-      
+
     </tbody>
   </table>
 
@@ -791,142 +791,142 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
       </tr>
     </thead>
     <tbody>
-      
+
         <tr>
           <td>ABSOLUTE_URL_OVERRIDES</td>
           <td class="code"><pre>{}</pre></td>
         </tr>
-      
+
         <tr>
           <td>ADMINS</td>
           <td class="code"><pre>((&#x27;Clemson Support&#x27;, &#x27;clemson.support@GraphicPkg.com&#x27;),)</pre></td>
         </tr>
-      
+
         <tr>
           <td>ALLOWED_HOSTS</td>
           <td class="code"><pre>[&#x27;localhost&#x27;, &#x27;127.0.0.1&#x27;, &#x27;172.23.8.29&#x27;, &#x27;10.211.55.4&#x27;, &#x27;192.168.7.214&#x27;]</pre></td>
         </tr>
-      
+
         <tr>
           <td>APPEND_SLASH</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>ARTREQFILES_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\DropFolders/ArtReqFiles/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>AUTHENTICATION_BACKENDS</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>AUTH_PASSWORD_VALIDATORS</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>AUTH_USER_MODEL</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>BACKUP_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\Backup&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>BACKUP_LIFE_DAYS</td>
           <td class="code"><pre>7</pre></td>
         </tr>
-      
+
         <tr>
           <td>BEVERAGE_DROP_FOLDER</td>
           <td class="code"><pre>&#x27;/mnt\\Beverage/Drop/From_Database/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>BIN_PATH</td>
           <td class="code"><pre>&#x27;C:\\Dev\\Gold\\gchub_db\\bin&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>CACHES</td>
           <td class="code"><pre>{&#x27;default&#x27;: {&#x27;BACKEND&#x27;: &#x27;django.core.cache.backends.locmem.LocMemCache&#x27;}}</pre></td>
         </tr>
-      
+
         <tr>
           <td>CACHE_MIDDLEWARE_ALIAS</td>
           <td class="code"><pre>&#x27;default&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>CACHE_MIDDLEWARE_KEY_PREFIX</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>CACHE_MIDDLEWARE_SECONDS</td>
           <td class="code"><pre>600</pre></td>
         </tr>
-      
+
         <tr>
           <td>CSRF_COOKIE_AGE</td>
           <td class="code"><pre>31449600</pre></td>
         </tr>
-      
+
         <tr>
           <td>CSRF_COOKIE_DOMAIN</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>CSRF_COOKIE_HTTPONLY</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>CSRF_COOKIE_NAME</td>
           <td class="code"><pre>&#x27;csrftoken&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>CSRF_COOKIE_PATH</td>
           <td class="code"><pre>&#x27;/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>CSRF_COOKIE_SAMESITE</td>
           <td class="code"><pre>&#x27;Lax&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>CSRF_COOKIE_SECURE</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>CSRF_FAILURE_VIEW</td>
           <td class="code"><pre>&#x27;django.views.csrf.csrf_failure&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>CSRF_HEADER_NAME</td>
           <td class="code"><pre>&#x27;HTTP_X_CSRFTOKEN&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>CSRF_TRUSTED_ORIGINS</td>
           <td class="code"><pre>[]</pre></td>
         </tr>
-      
+
         <tr>
           <td>CSRF_USE_SESSIONS</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>CYBER_GRAPHICS_FTP</td>
           <td class="code"><pre>{&#x27;HOST&#x27;: &#x27;exchange.graphicpkg.com&#x27;,
@@ -934,7 +934,7 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
  &#x27;ROOT_DIR&#x27;: &#x27;togpi&#x27;,
  &#x27;USERNAME&#x27;: &#x27;cybergraphics&#x27;}</pre></td>
         </tr>
-      
+
         <tr>
           <td>DATABASES</td>
           <td class="code"><pre>{&#x27;default&#x27;: {&#x27;ATOMIC_REQUESTS&#x27;: False,
@@ -955,32 +955,32 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
              &#x27;TIME_ZONE&#x27;: None,
              &#x27;USER&#x27;: &#x27;gchub&#x27;}}</pre></td>
         </tr>
-      
+
         <tr>
           <td>DATABASE_ROUTERS</td>
           <td class="code"><pre>[]</pre></td>
         </tr>
-      
+
         <tr>
           <td>DATA_UPLOAD_MAX_MEMORY_SIZE</td>
           <td class="code"><pre>2621440</pre></td>
         </tr>
-      
+
         <tr>
           <td>DATA_UPLOAD_MAX_NUMBER_FIELDS</td>
           <td class="code"><pre>1000</pre></td>
         </tr>
-      
+
         <tr>
           <td>DATA_UPLOAD_MAX_NUMBER_FILES</td>
           <td class="code"><pre>100</pre></td>
         </tr>
-      
+
         <tr>
           <td>DATETIME_FORMAT</td>
           <td class="code"><pre>&#x27;N j, Y, P&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DATETIME_INPUT_FORMATS</td>
           <td class="code"><pre>[&#x27;%Y-%m-%d %H:%M:%S&#x27;,
@@ -993,12 +993,12 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
  &#x27;%m/%d/%y %H:%M:%S.%f&#x27;,
  &#x27;%m/%d/%y %H:%M&#x27;]</pre></td>
         </tr>
-      
+
         <tr>
           <td>DATE_FORMAT</td>
           <td class="code"><pre>&#x27;N j, Y&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DATE_INPUT_FORMATS</td>
           <td class="code"><pre>[&#x27;%Y-%m-%d&#x27;,
@@ -1013,343 +1013,343 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
  &#x27;%d %B %Y&#x27;,
  &#x27;%d %B, %Y&#x27;]</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEBUG</td>
           <td class="code"><pre>True</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEBUG_PROPAGATE_EXCEPTIONS</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>DECIMAL_SEPARATOR</td>
           <td class="code"><pre>&#x27;.&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEFAULT_AUTO_FIELD</td>
           <td class="code"><pre>&#x27;django.db.models.BigAutoField&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEFAULT_CHARSET</td>
           <td class="code"><pre>&#x27;utf-8&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEFAULT_EXCEPTION_REPORTER</td>
           <td class="code"><pre>&#x27;django.views.debug.ExceptionReporter&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEFAULT_EXCEPTION_REPORTER_FILTER</td>
           <td class="code"><pre>&#x27;django.views.debug.SafeExceptionReporterFilter&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEFAULT_FROM_EMAIL</td>
           <td class="code"><pre>&#x27;webmaster@localhost&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEFAULT_INDEX_TABLESPACE</td>
           <td class="code"><pre>&#x27;&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEFAULT_TABLESPACE</td>
           <td class="code"><pre>&#x27;&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEV_DB_ENGINE</td>
           <td class="code"><pre>&#x27;django.db.backends.postgresql&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEV_DB_HOST</td>
           <td class="code"><pre>&#x27;127.0.0.1&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEV_DB_NAME</td>
           <td class="code"><pre>&#x27;gchub_dev&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEV_DB_PASSWORD</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEV_DB_PORT</td>
           <td class="code"><pre>&#x27;5433&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DEV_DB_USER</td>
           <td class="code"><pre>&#x27;gchub&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DISALLOWED_USER_AGENTS</td>
           <td class="code"><pre>[]</pre></td>
         </tr>
-      
+
         <tr>
           <td>DJANGO_SERVE_MEDIA</td>
           <td class="code"><pre>True</pre></td>
         </tr>
-      
+
         <tr>
           <td>DLOADER_URL</td>
           <td class="code"><pre>&#x27;http://172.23.8.59&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>DROPFOLDERS_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\DropFolders/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_BACKEND</td>
           <td class="code"><pre>&#x27;django.core.mail.backends.console.EmailBackend&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_FROM_ADDRESS</td>
           <td class="code"><pre>&#x27;clemson.support@graphicpkg.com&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_GCHUB</td>
           <td class="code"><pre>&#x27;gchub.clemson@graphicpkg.com&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_HOST</td>
           <td class="code"><pre>&#x27;apache1.na.graphicpkg.pri&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_HOST_PASSWORD</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_HOST_USER</td>
           <td class="code"><pre>&#x27;&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_PORT</td>
           <td class="code"><pre>25</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_SSL_CERTFILE</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_SSL_KEYFILE</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_SUBJECT_PREFIX</td>
           <td class="code"><pre>&#x27;[Django] &#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_SUPPORT</td>
           <td class="code"><pre>&#x27;clemson.support@graphicpkg.com&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_TIMEOUT</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_USE_LOCALTIME</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_USE_SSL</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>EMAIL_USE_TLS</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>ESKO_CMS_DATA_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\bg_data_cms_v010\\w\\idb&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>ETOOLS_ODBC_DSN</td>
           <td class="code"><pre>&#x27;DSN=etoolsnew;UID=clemson-gs;PWD=havaba11&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_ACCOUNT_NUM</td>
           <td class="code"><pre>&#x27;248430818&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_DOCTAB_LOCATION</td>
           <td class="code"><pre>&#x27;BOTTOM&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_DOMAIN</td>
           <td class="code"><pre>&#x27;gateway.fedex.com&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_KEY</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_LABEL_IMG_TYPE</td>
           <td class="code"><pre>&#x27;ELTRON&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_LABEL_ORIENTATION</td>
           <td class="code"><pre>&#x27;LEADING&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_LABEL_TYPE</td>
           <td class="code"><pre>&#x27;2DCOMMON&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_METER_NUM</td>
           <td class="code"><pre>&#x27;1301709&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_METER_NUM2</td>
           <td class="code"><pre>&#x27;101397836&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_PASSWORD</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_TEST_ACCOUNT_NUM</td>
           <td class="code"><pre>&#x27;510087780&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_TEST_KEY</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_TEST_METER_NUM</td>
           <td class="code"><pre>&#x27;118501898&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FEDEX_TEST_PASSWORD</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FILE_UPLOAD_DIRECTORY_PERMISSIONS</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>FILE_UPLOAD_HANDLERS</td>
           <td class="code"><pre>[&#x27;django.core.files.uploadhandler.MemoryFileUploadHandler&#x27;,
  &#x27;django.core.files.uploadhandler.TemporaryFileUploadHandler&#x27;]</pre></td>
         </tr>
-      
+
         <tr>
           <td>FILE_UPLOAD_MAX_MEMORY_SIZE</td>
           <td class="code"><pre>2621440</pre></td>
         </tr>
-      
+
         <tr>
           <td>FILE_UPLOAD_PERMISSIONS</td>
           <td class="code"><pre>420</pre></td>
         </tr>
-      
+
         <tr>
           <td>FILE_UPLOAD_TEMP_DIR</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>FIRST_DAY_OF_WEEK</td>
           <td class="code"><pre>0</pre></td>
         </tr>
-      
+
         <tr>
           <td>FIXTURE_DIRS</td>
           <td class="code"><pre>(&#x27;C:\\Dev\\Gold\\gchub_db\\fixtures/&#x27;,)</pre></td>
         </tr>
-      
+
         <tr>
           <td>FORCE_SCRIPT_NAME</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>FORMAT_MODULE_PATH</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>FORMS_URLFIELD_ASSUME_HTTPS</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>FORM_RENDERER</td>
           <td class="code"><pre>&#x27;django.forms.renderers.DjangoTemplates&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FSB_PROD_TEMPLATES</td>
           <td class="code"><pre>&#x27;/mnt\\Templates/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FSB_TEMPLATES</td>
           <td class="code"><pre>&#x27;/mnt\\Templates/PDF_Templates/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FSCORRUGATED_ODBC_DSN</td>
           <td class="code"><pre>&#x27;DSN=fscorrugated;UID=fs;PWD=fsacid&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FS_SERVER_HOST</td>
           <td class="code"><pre>&#x27;gcmaster.na.graphicpkg.pri&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FS_SERVER_PORT</td>
           <td class="code"><pre>8000</pre></td>
         </tr>
-      
+
         <tr>
           <td>FUSION_FLEXO_FTP</td>
           <td class="code"><pre>{&#x27;HOST&#x27;: &#x27;exchange.graphicpkg.com&#x27;,
@@ -1357,77 +1357,77 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
  &#x27;ROOT_DIR&#x27;: &#x27;togpi&#x27;,
  &#x27;USERNAME&#x27;: &#x27;fusionflexo&#x27;}</pre></td>
         </tr>
-      
+
         <tr>
           <td>FUSION_FLEXO_FTP_HOST</td>
           <td class="code"><pre>&#x27;exchange.graphicpkg.com&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FUSION_FLEXO_FTP_PASSWORD</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>FUSION_FLEXO_FTP_USERNAME</td>
           <td class="code"><pre>&#x27;fusionflexo&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>GCHUB_ADDRESS1</td>
           <td class="code"><pre>&#x27;155 Old Greenville Hwy&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>GCHUB_ADDRESS2</td>
           <td class="code"><pre>&#x27;Suite 103&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>GCHUB_CITY</td>
           <td class="code"><pre>&#x27;Clemson&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>GCHUB_COMPANY</td>
           <td class="code"><pre>&#x27;Graphic Packaging International&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>GCHUB_COUNTRY_CODE</td>
           <td class="code"><pre>&#x27;US&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>GCHUB_PERSON</td>
           <td class="code"><pre>&#x27;Donna Loudermilk&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>GCHUB_PHONE</td>
           <td class="code"><pre>&#x27;8646336000&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>GCHUB_STATE</td>
           <td class="code"><pre>&#x27;SC&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>GCHUB_ZIP</td>
           <td class="code"><pre>&#x27;29631&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>IGNORABLE_404_URLS</td>
           <td class="code"><pre>[]</pre></td>
         </tr>
-      
+
         <tr>
           <td>INK_COVERAGE_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\Production\\ink_coverage/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>INSTALLED_APPS</td>
           <td class="code"><pre>(&#x27;maintenance_mode&#x27;,
@@ -1474,37 +1474,37 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
  &#x27;gchub_db.apps.carton_billing&#x27;,
  &#x27;gchub_db.apps.catscanner&#x27;)</pre></td>
         </tr>
-      
+
         <tr>
           <td>INTERNAL_IPS</td>
           <td class="code"><pre>(&#x27;127.0.0.1&#x27;,)</pre></td>
         </tr>
-      
+
         <tr>
           <td>ITEM_TEMPLATE_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\Production\\templates/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>JDF_ROOT</td>
           <td class="code"><pre>&#x27;/mnt\\Production\\jdf_queue/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>JMF_GATEWAY</td>
           <td class="code"><pre>&#x27;172.23.8.55:4411&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>JMF_GATEWAY_PATH</td>
           <td class="code"><pre>&#x27;/JDFP/JMF/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>JOBSTORAGE_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\JobStorage/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>LANGUAGES</td>
           <td class="code"><pre>[(&#x27;af&#x27;, &#x27;Afrikaans&#x27;),
@@ -1607,57 +1607,57 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
  (&#x27;zh-hans&#x27;, &#x27;Simplified Chinese&#x27;),
  (&#x27;zh-hant&#x27;, &#x27;Traditional Chinese&#x27;)]</pre></td>
         </tr>
-      
+
         <tr>
           <td>LANGUAGES_BIDI</td>
           <td class="code"><pre>[&#x27;he&#x27;, &#x27;ar&#x27;, &#x27;ar-dz&#x27;, &#x27;ckb&#x27;, &#x27;fa&#x27;, &#x27;ug&#x27;, &#x27;ur&#x27;]</pre></td>
         </tr>
-      
+
         <tr>
           <td>LANGUAGE_CODE</td>
           <td class="code"><pre>&#x27;en-us&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>LANGUAGE_COOKIE_AGE</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>LANGUAGE_COOKIE_DOMAIN</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>LANGUAGE_COOKIE_HTTPONLY</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>LANGUAGE_COOKIE_NAME</td>
           <td class="code"><pre>&#x27;django_language&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>LANGUAGE_COOKIE_PATH</td>
           <td class="code"><pre>&#x27;/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>LANGUAGE_COOKIE_SAMESITE</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>LANGUAGE_COOKIE_SECURE</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>LOCALE_PATHS</td>
           <td class="code"><pre>[]</pre></td>
         </tr>
-      
+
         <tr>
           <td>LOGGING</td>
           <td class="code"><pre>{&#x27;disable_existing_loggers&#x27;: False,
@@ -1681,62 +1681,62 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
  &#x27;root&#x27;: {&#x27;handlers&#x27;: [&#x27;console&#x27;, &#x27;file&#x27;], &#x27;level&#x27;: &#x27;INFO&#x27;},
  &#x27;version&#x27;: 1}</pre></td>
         </tr>
-      
+
         <tr>
           <td>LOGGING_CONFIG</td>
           <td class="code"><pre>&#x27;logging.config.dictConfig&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>LOGIN_REDIRECT_URL</td>
           <td class="code"><pre>&#x27;/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>LOGIN_URL</td>
           <td class="code"><pre>&#x27;/accounts/login/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>LOGOUT_REDIRECT_URL</td>
           <td class="code"><pre>&#x27;/accounts/login/?next=/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>LOG_DIR</td>
           <td class="code"><pre>&#x27;C:\\Dev\\Gold\\gchub_db\\logs&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>MAINTENANCE_MODE</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>MAIN_PATH</td>
           <td class="code"><pre>&#x27;C:\\Dev\\Gold\\gchub_db&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>MANAGERS</td>
           <td class="code"><pre>((&#x27;Clemson Support&#x27;, &#x27;clemson.support@GraphicPkg.com&#x27;),)</pre></td>
         </tr>
-      
+
         <tr>
           <td>MEDIA_ROOT</td>
           <td class="code"><pre>&#x27;C:\\Dev\\Gold\\gchub_db\\media&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>MEDIA_URL</td>
           <td class="code"><pre>&#x27;/media/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>MESSAGE_STORAGE</td>
           <td class="code"><pre>&#x27;django.contrib.messages.storage.fallback.FallbackStorage&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>MIDDLEWARE</td>
           <td class="code"><pre>(&#x27;django.middleware.common.CommonMiddleware&#x27;,
@@ -1746,37 +1746,37 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
  &#x27;gchub_db.middleware.threadlocals.ThreadLocals&#x27;,
  &#x27;gchub_db.middleware.maintenance_mode.middleware.MaintenanceModeMiddleware&#x27;)</pre></td>
         </tr>
-      
+
         <tr>
           <td>MIGRATION_MODULES</td>
           <td class="code"><pre>{}</pre></td>
         </tr>
-      
+
         <tr>
           <td>MONTH_DAY_FORMAT</td>
           <td class="code"><pre>&#x27;F j&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>NUMBER_GROUPING</td>
           <td class="code"><pre>0</pre></td>
         </tr>
-      
+
         <tr>
           <td>NXPLATES_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\Perry/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>PASSWORD_HASHERS</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>PASSWORD_RESET_TIMEOUT</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>PHOTOTYPE_FTP</td>
           <td class="code"><pre>{&#x27;HOST&#x27;: &#x27;exchange.graphicpkg.com&#x27;,
@@ -1784,207 +1784,207 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
  &#x27;ROOT_DIR&#x27;: &#x27;togpi&#x27;,
  &#x27;USERNAME&#x27;: &#x27;phototype&#x27;}</pre></td>
         </tr>
-      
+
         <tr>
           <td>PREPEND_WWW</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>PRINTED_PROOFS_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\Tickets/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>PRODUCTION_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\Production&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>PROJECT_ROOT</td>
           <td class="code"><pre>&#x27;C:\\Dev\\Gold\\gchub_db&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>QAD_ODBC_DSN</td>
           <td class="code"><pre>&#x27;DSN=datawarehouse2014;UID=fsbuser;PWD=fsbIT2008&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>RICH_AVAILABLE</td>
           <td class="code"><pre>True</pre></td>
         </tr>
-      
+
         <tr>
           <td>ROOT_URLCONF</td>
           <td class="code"><pre>&#x27;gchub_db.urls&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECRET_KEY</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECRET_KEY_FALLBACKS</td>
           <td class="code"><pre>&#x27;********************&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECURE_CONTENT_TYPE_NOSNIFF</td>
           <td class="code"><pre>True</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECURE_CROSS_ORIGIN_OPENER_POLICY</td>
           <td class="code"><pre>&#x27;same-origin&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECURE_HSTS_INCLUDE_SUBDOMAINS</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECURE_HSTS_PRELOAD</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECURE_HSTS_SECONDS</td>
           <td class="code"><pre>0</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECURE_PROXY_SSL_HEADER</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECURE_REDIRECT_EXEMPT</td>
           <td class="code"><pre>[]</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECURE_REFERRER_POLICY</td>
           <td class="code"><pre>&#x27;same-origin&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECURE_SSL_HOST</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>SECURE_SSL_REDIRECT</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>SERVER_ADMIN</td>
           <td class="code"><pre>&#x27;noreply@gchub.graphicpkg.com&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SERVER_EMAIL</td>
           <td class="code"><pre>&#x27;clemson.support@graphicpkg.com&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_CACHE_ALIAS</td>
           <td class="code"><pre>&#x27;default&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_COOKIE_AGE</td>
           <td class="code"><pre>1209600</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_COOKIE_DOMAIN</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_COOKIE_HTTPONLY</td>
           <td class="code"><pre>True</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_COOKIE_NAME</td>
           <td class="code"><pre>&#x27;sessionid&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_COOKIE_PATH</td>
           <td class="code"><pre>&#x27;/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_COOKIE_SAMESITE</td>
           <td class="code"><pre>&#x27;Lax&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_COOKIE_SECURE</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_ENGINE</td>
           <td class="code"><pre>&#x27;django.contrib.sessions.backends.db&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_EXPIRE_AT_BROWSER_CLOSE</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_FILE_PATH</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_SAVE_EVERY_REQUEST</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>SESSION_SERIALIZER</td>
           <td class="code"><pre>&#x27;django.contrib.sessions.serializers.JSONSerializer&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SETTINGS_MODULE</td>
           <td class="code"><pre>&#x27;settings&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SHORT_DATETIME_FORMAT</td>
           <td class="code"><pre>&#x27;m/d/Y P&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SHORT_DATE_FORMAT</td>
           <td class="code"><pre>&#x27;m/d/Y&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SIGNING_BACKEND</td>
           <td class="code"><pre>&#x27;django.core.signing.TimestampSigner&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>SILENCED_SYSTEM_CHECKS</td>
           <td class="code"><pre>[]</pre></td>
         </tr>
-      
+
         <tr>
           <td>SITE_ID</td>
           <td class="code"><pre>1</pre></td>
         </tr>
-      
+
         <tr>
           <td>SOUTHERN_GRAPHIC_FTP</td>
           <td class="code"><pre>{&#x27;HOST&#x27;: &#x27;exchange.graphicpkg.com&#x27;,
@@ -1992,34 +1992,34 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
  &#x27;ROOT_DIR&#x27;: &#x27;togpi&#x27;,
  &#x27;USERNAME&#x27;: &#x27;southerngraphic&#x27;}</pre></td>
         </tr>
-      
+
         <tr>
           <td>STATICFILES_DIRS</td>
           <td class="code"><pre>[]</pre></td>
         </tr>
-      
+
         <tr>
           <td>STATICFILES_FINDERS</td>
           <td class="code"><pre>[&#x27;django.contrib.staticfiles.finders.FileSystemFinder&#x27;,
  &#x27;django.contrib.staticfiles.finders.AppDirectoriesFinder&#x27;]</pre></td>
         </tr>
-      
+
         <tr>
           <td>STATIC_ROOT</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>STATIC_URL</td>
           <td class="code"><pre>&#x27;/static/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>STORAGES</td>
           <td class="code"><pre>{&#x27;default&#x27;: {&#x27;BACKEND&#x27;: &#x27;django.core.files.storage.FileSystemStorage&#x27;},
  &#x27;staticfiles&#x27;: {&#x27;BACKEND&#x27;: &#x27;django.contrib.staticfiles.storage.StaticFilesStorage&#x27;}}</pre></td>
         </tr>
-      
+
         <tr>
           <td>TEMPLATES</td>
           <td class="code"><pre>[{&#x27;BACKEND&#x27;: &#x27;django.template.backends.django.DjangoTemplates&#x27;,
@@ -2039,22 +2039,22 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
               &#x27;loaders&#x27;: [&#x27;django.template.loaders.filesystem.Loader&#x27;,
                           &#x27;django.template.loaders.app_directories.Loader&#x27;]}}]</pre></td>
         </tr>
-      
+
         <tr>
           <td>TEST_NON_SERIALIZED_APPS</td>
           <td class="code"><pre>[]</pre></td>
         </tr>
-      
+
         <tr>
           <td>TEST_RUNNER</td>
           <td class="code"><pre>&#x27;django.test.runner.DiscoverRunner&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>THOUSAND_SEPARATOR</td>
           <td class="code"><pre>&#x27;,&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>TIFF_FTP</td>
           <td class="code"><pre>{&#x27;CYBER_GRAPHICS&#x27;: {&#x27;HOST&#x27;: &#x27;exchange.graphicpkg.com&#x27;,
@@ -2074,87 +2074,87 @@ Exception Value: Invalid HTTP_HOST header: &#x27;testserver&#x27;. You may need 
                       &#x27;ROOT_DIR&#x27;: &#x27;togpi&#x27;,
                       &#x27;USERNAME&#x27;: &#x27;southerngraphic&#x27;}}</pre></td>
         </tr>
-      
+
         <tr>
           <td>TIFF_NOISE_QUEUE_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\Production\\tiff_noise_queue/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>TIFF_TO_PDF_DIES_DIR</td>
           <td class="code"><pre>&#x27;/mnt\\Production\\1_bit_tiff_dies_backstage/&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>TIME_FORMAT</td>
           <td class="code"><pre>&#x27;P&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>TIME_INPUT_FORMATS</td>
           <td class="code"><pre>[&#x27;%H:%M:%S&#x27;, &#x27;%H:%M:%S.%f&#x27;, &#x27;%H:%M&#x27;]</pre></td>
         </tr>
-      
+
         <tr>
           <td>TIME_ZONE</td>
           <td class="code"><pre>&#x27;America/New_York&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>USE_I18N</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>USE_THOUSAND_SEPARATOR</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>USE_TZ</td>
           <td class="code"><pre>True</pre></td>
         </tr>
-      
+
         <tr>
           <td>USE_X_FORWARDED_HOST</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>USE_X_FORWARDED_PORT</td>
           <td class="code"><pre>False</pre></td>
         </tr>
-      
+
         <tr>
           <td>WEBSERVER_HOST</td>
           <td class="code"><pre>&#x27;http://apache1.na.graphicpkg.pri&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>WORKFLOW_ROOT_DIR</td>
           <td class="code"><pre>&#x27;/mnt&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>WSGI_APPLICATION</td>
           <td class="code"><pre>None</pre></td>
         </tr>
-      
+
         <tr>
           <td>X_FRAME_OPTIONS</td>
           <td class="code"><pre>&#x27;DENY&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>YEAR_MONTH_FORMAT</td>
           <td class="code"><pre>&#x27;F Y&#x27;</pre></td>
         </tr>
-      
+
         <tr>
           <td>YUI_URL</td>
           <td class="code"><pre>&#x27;/media/yui/&#x27;</pre></td>
         </tr>
-      
+
     </tbody>
   </table>
 

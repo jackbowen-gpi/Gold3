@@ -2,10 +2,51 @@
 
 import django.forms as forms
 from django.contrib import admin
+from django.contrib.auth.models import Permission, User
 
 from gchub_db.apps.workflow.models import PrintLocation
 
-from .models import *
+from .models import (
+    BevItemColorCodes,
+    BeverageBrandCode,
+    BeverageCenterCode,
+    CartonProfile,
+    CartonWorkflow,
+    Charge,
+    ChargeCategory,
+    ChargeType,
+    ColorWarning,
+    Customer,
+    InkSet,
+    Item,
+    ItemCatalog,
+    ItemColor,
+    ItemReview,
+    ItemSpec,
+    ItemTracker,
+    ItemTrackerCategory,
+    ItemTrackerType,
+    Job,
+    JobAddress,
+    JobComplexity,
+    LineScreen,
+    PlateOrder,
+    PlateOrderItem,
+    Platemaker,
+    Plant,
+    PlatePackage,
+    Press,
+    PrintCondition,
+    ProofTracker,
+    Revision,
+    SalesServiceRep,
+    SpecialMfgConfiguration,
+    StepSpec,
+    Substrate,
+    TiffCrop,
+    TrackedArt,
+    Trap,
+)
 
 
 class RevisionAdmin(admin.ModelAdmin):

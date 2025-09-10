@@ -50,7 +50,7 @@ def contact_info(request):
         if form.is_valid():
             # Save the UserProfile fields
             form.save()
-            
+
             # Save the User fields manually
             user = form.instance.user
             user.first_name = form.cleaned_data["first_name"]
@@ -58,7 +58,7 @@ def contact_info(request):
             user.email = form.cleaned_data["email"]
             # Username is not editable, so we don't update it
             user.save()
-            
+
             messages.add_message(request, messages.INFO, "Contact info updated.")
             return HttpResponseRedirect(reverse("preferences"))
     else:

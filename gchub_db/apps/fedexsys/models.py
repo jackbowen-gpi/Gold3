@@ -173,9 +173,7 @@ class Shipment(models.Model):
         country_code = countries.full_to_abbrev(self.address.country)
         shipment.RequestedShipment.Recipient.Address.CountryCode = country_code
 
-        shipment.RequestedShipment.ShippingChargesPayment.Payor.ResponsibleParty.AccountNumber = (
-            config_obj.account_number
-        )
+        shipment.RequestedShipment.ShippingChargesPayment.Payor.ResponsibleParty.AccountNumber = config_obj.account_number
         shipment.RequestedShipment.ShippingChargesPayment.PaymentType = "SENDER"
         shipment.RequestedShipment.LabelSpecification.LabelFormatType = "COMMON2D"
         shipment.RequestedShipment.LabelSpecification.ImageType = "EPL2"
@@ -218,15 +216,9 @@ class Shipment(models.Model):
             commod.UnitPrice.Amount = "1.00"
             shipment.RequestedShipment.CustomsClearanceDetail.Commodities.append(commod)
 
-            shipment.RequestedShipment.CustomsClearanceDetail.DutiesPayment.PaymentType = (
-                "SENDER"
-            )
-            shipment.RequestedShipment.CustomsClearanceDetail.DutiesPayment.Payor.ResponsibleParty.AccountNumber = (
-                config_obj.account_number
-            )
-            shipment.RequestedShipment.CustomsClearanceDetail.DutiesPayment.Payor.ResponsibleParty.Address.CountryCode = (
-                "US"
-            )
+            shipment.RequestedShipment.CustomsClearanceDetail.DutiesPayment.PaymentType = "SENDER"
+            shipment.RequestedShipment.CustomsClearanceDetail.DutiesPayment.Payor.ResponsibleParty.AccountNumber = config_obj.account_number
+            shipment.RequestedShipment.CustomsClearanceDetail.DutiesPayment.Payor.ResponsibleParty.Address.CountryCode = "US"
 
         # Un-comment this to see the other variables you may set on a package.
         # print package1

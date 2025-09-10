@@ -23,8 +23,8 @@ except Exception as e:
     print("Django setup failed:", e)
     raise
 
-from django.contrib.auth import get_user_model
-from django.contrib.sessions.backends.db import SessionStore
+from django.contrib.auth import get_user_model  # noqa: E402
+from django.contrib.sessions.backends.db import SessionStore  # noqa: E402
 
 User = get_user_model()
 

@@ -19,7 +19,13 @@ from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from gchub_db.apps.color_mgt.models import ColorDefinition
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import (
+    JOBLOG_TYPE_ITEM_APPROVED,
+    JOBLOG_TYPE_ITEM_FILED_OUT,
+    JOBLOG_TYPE_ITEM_PROOFED_OUT,
+    JOBLOG_TYPE_ITEM_REVISION,
+    JOBLOG_TYPE_JDF_ERROR,
+)
 from gchub_db.apps.joblog.models import JobLog
 from gchub_db.apps.workflow.models import (
     BeverageBrandCode,
@@ -565,7 +571,6 @@ class ItemFormProductionCON(ModelForm, JSONErrorForm):
 def item_production_detail(request, item_id):
     """Display production details for an item."""
     item = Item.objects.get(id=item_id)
-    logoform = False
     itemform = False
 
     if item.job.workflow.name == "Foodservice":
@@ -613,7 +618,6 @@ def item_production_detail(request, item_id):
 def item_sap_detail(request, item_id):
     """Display production details for an item."""
     item = Item.objects.get(id=item_id)
-    logoform = False
     itemform = False
 
     if item.job.workflow.name == "Foodservice":
@@ -1480,7 +1484,7 @@ def get_item_proof(request, job_num, item_num, quality="l", log_id=None):
 
         """
             This blurb will go get all of the filepaths in the proofs folder for an item of a job.
-            Sort them from oldest to newest, and return the file that was most recently modified. 
+            Sort them from oldest to newest, and return the file that was most recently modified.
             All of this is currently sorted off of the last modified time stamp.
         """
         # make an object to store the times and filepaths
@@ -1528,9 +1532,7 @@ def get_stepped_item_proof(request, job_num, item_num, quality="h", log_id=None)
 
 def get_item_finalfile(request, job_num, item_num):
     """Return a given item's final file/production pdf."""
-    job = Job.objects.get(id=job_num)
     item = Item.objects.get(job__id=job_num, num_in_job=item_num)
-    workflow = job.workflow.name
 
     extra = str(item.bev_nomenclature())
 
@@ -1549,8 +1551,6 @@ def get_item_finalfile(request, job_num, item_num):
 
 def get_item_preview_art(request, job_num, item_num):
     """Return a given item's proof pdf."""
-    job = Job.objects.get(id=job_num)
-    workflow = job.workflow.name
     try:
         filepath = fs_api.get_item_preview_art(job_num, item_num)
         with open(filepath, "rb") as f:
@@ -1567,8 +1567,6 @@ def get_item_preview_art(request, job_num, item_num):
 
 def get_item_print_seps(request, job_num, item_num):
     """Return a given item's printable separations PDF."""
-    job = Job.objects.get(id=job_num)
-    workflow = job.workflow.name
     try:
         filepath = fs_api.get_item_print_seps(job_num, item_num)
         with open(filepath, "rb") as f:
@@ -1587,8 +1585,6 @@ def get_item_print_seps(request, job_num, item_num):
 
 def get_item_approval_scan(request, job_num, item_num):
     """Return a given item's proof pdf."""
-    job = Job.objects.get(id=job_num)
-    workflow = job.workflow.name
     try:
         filepath = fs_api.get_item_approval_pdf(job_num, item_num)
         with open(filepath, "rb") as f:
@@ -1843,7 +1839,6 @@ class AddItemColorFormCart(ModelForm):
 def add_itemcolor(request, item_id):
     """Add an ItemColor object to an item."""
     item = Item.objects.get(id=item_id)
-    workflow = item.job.workflow.name
 
     if request.POST:
         if item.job.workflow.name == "Carton":
@@ -2190,7 +2185,7 @@ class RevisionForm(ModelForm):
         super(RevisionForm, self).__init__(*args, **kwargs)
         # This needs to be set here and not in the class definition.
         """
-        This set up checks the days between the current date and the date 
+        This set up checks the days between the current date and the date
         of the revision. If it sees any weekends it skips over them. This way
         the default due date won't land on a weekend and the production artist
         will have 5 business days to work on the revision.
@@ -2245,7 +2240,7 @@ class RevisionFormBev(ModelForm):
         super(RevisionFormBev, self).__init__(*args, **kwargs)
         # This needs to be set here and not in the class definition.
         """
-        This set up checks the days between the current date and the date 
+        This set up checks the days between the current date and the date
         of the revision. If it sees any weekends it skips over them. This way
         the default due date won't land on a weekend and the production artist
         will have 3 business days to work on the revision.

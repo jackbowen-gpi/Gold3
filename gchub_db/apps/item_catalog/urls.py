@@ -6,7 +6,13 @@ of the file for matching.
 
 from django.urls import re_path as url
 
-from gchub_db.apps.item_catalog.views import *
+from gchub_db.apps.item_catalog.views import (
+    catalog_search,
+    get_pdf_template,
+    home,
+    itemcat_popup,
+    list_templates,
+)
 
 urlpatterns = [
     url(r"^$", home, name="item_catalog_home"),

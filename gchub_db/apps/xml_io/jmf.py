@@ -86,7 +86,7 @@ class JMFKnownMessages(JMFMessage):
         query.setAttribute("ID", "Link1290_5")
         query.setAttribute("Type", "KnownMessages")
 
-        self.doc_root.appendChild(query)
+        self.doc_root.appendChild(query)  # type: ignore
         self.doc.appendChild(self.doc_root)
 
 
@@ -101,7 +101,7 @@ class JMFKnownDevices(JMFMessage):
         query.setAttribute("ID", "Link1290_5")
         query.setAttribute("Type", "KnownDevices")
 
-        self.doc_root.appendChild(query)
+        self.doc_root.appendChild(query)  # type: ignore
         self.doc.appendChild(self.doc_root)
 
 
@@ -121,7 +121,7 @@ class JMFSubscription(JMFMessage):
         subscription.setAttribute("URL", url)
         query.appendChild(subscription)
 
-        self.doc_root.appendChild(query)
+        self.doc_root.appendChild(query)  # type: ignore
         self.doc.appendChild(self.doc_root)
 
 
@@ -143,7 +143,7 @@ class JMFUnsubscribe(JMFMessage):
         subscription.setAttribute("URL", url)
         query.appendChild(subscription)
 
-        self.doc_root.appendChild(query)
+        self.doc_root.appendChild(query)  # type: ignore
         self.doc.appendChild(self.doc_root)
 
 
@@ -167,7 +167,7 @@ class JMFSubmitQueueEntry(JMFMessage):
         submission_params.setAttribute("ReturnJMF", "http://172.23.8.96:8001/xml/echo")
         command.appendChild(submission_params)
 
-        self.doc_root.appendChild(command)
+        self.doc_root.appendChild(command)  # type: ignore
         self.doc.appendChild(self.doc_root)
 
 

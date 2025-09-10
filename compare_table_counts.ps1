@@ -14,16 +14,16 @@ foreach ($table in $prodTables) {
         try {
             # Get count from production backup
             $prodCount = docker exec postgres-backup-temp psql -U thundercuddles -d thundercuddles -c "SELECT COUNT(*) FROM $table;" | Select-String "\d+" | ForEach-Object { $_.Matches[0].Value }
-            
+
             # Get count from dev
             $devCount = docker exec gchub_db-postgres-dev-1 psql -U gchub -d gchub_dev -c "SELECT COUNT(*) FROM $table;" | Select-String "\d+" | ForEach-Object { $_.Matches[0].Value }
-            
+
             if ($prodCount -and $devCount) {
                 $prodCountInt = [int]$prodCount
                 $devCountInt = [int]$devCount
                 $difference = $prodCountInt - $devCountInt
                 $status = if ($difference -eq 0) { "✓ MATCH" } elseif ($difference -gt 0) { "✗ MISSING" } else { "⚠ EXTRA" }
-                
+
                 $comparisonResults += [PSCustomObject]@{
                     Table = $table
                     Production = $prodCountInt

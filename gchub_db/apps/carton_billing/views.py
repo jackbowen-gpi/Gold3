@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic.list import ListView
 
 from gchub_db.apps.carton_billing.models import CartonSapEntry
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import JOBLOG_TYPE_NOTE
 from gchub_db.apps.joblog.models import JobLog
 from gchub_db.includes import general_funcs
 from gchub_db.middleware import threadlocals

@@ -30,7 +30,7 @@ CREATE TEMP TABLE temp_prod_groups AS SELECT * FROM auth_group WHERE false;
 
 -- Insert only groups that don't already exist
 INSERT INTO auth_group (name)
-SELECT name FROM temp_prod_groups 
+SELECT name FROM temp_prod_groups
 WHERE name NOT IN (SELECT name FROM auth_group);
 "
 
@@ -71,8 +71,8 @@ CREATE TEMP TABLE temp_prod_users AS SELECT * FROM auth_user WHERE false;
 
 -- Insert users that don't conflict with existing usernames
 INSERT INTO auth_user (password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined)
-SELECT password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined 
-FROM temp_prod_users 
+SELECT password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined
+FROM temp_prod_users
 WHERE username NOT IN (SELECT username FROM auth_user)
 AND username != 'dev_admin';
 "
@@ -101,7 +101,7 @@ FROM temp_user_groups ug
 JOIN auth_user u ON u.id = ug.user_id
 JOIN auth_group g ON g.id = ug.group_id
 WHERE NOT EXISTS (
-    SELECT 1 FROM auth_user_groups existing 
+    SELECT 1 FROM auth_user_groups existing
     WHERE existing.user_id = ug.user_id AND existing.group_id = ug.group_id
 );
 " 2>$null
@@ -111,10 +111,10 @@ Write-Host "`nStep 5: Ensuring dev_admin has all permissions..." -ForegroundColo
 
 docker exec gchub_db-postgres-dev-1 psql -U gchub -d gchub_dev -c "
 -- Make dev_admin a superuser with all permissions
-UPDATE auth_user SET 
-    is_superuser = true, 
-    is_staff = true, 
-    is_active = true 
+UPDATE auth_user SET
+    is_superuser = true,
+    is_staff = true,
+    is_active = true
 WHERE username = 'dev_admin';
 
 -- Add dev_admin to all groups (if not already there)
@@ -123,7 +123,7 @@ SELECT u.id, g.id
 FROM auth_user u, auth_group g
 WHERE u.username = 'dev_admin'
 AND NOT EXISTS (
-    SELECT 1 FROM auth_user_groups ug 
+    SELECT 1 FROM auth_user_groups ug
     WHERE ug.user_id = u.id AND ug.group_id = g.id
 );
 "

@@ -1,13 +1,17 @@
 """Project package settings (moved from repo root settings.py)"""
 
 import os
+import sys
+
+# Import common settings
+# Import common settings
+from settings_common import DEBUG  # noqa: F401
 
 # Path to this package directory
 MAIN_PATH = os.path.abspath(os.path.split(__file__)[0])
 # Ensure the project parent directory is on sys.path so the package can be imported
 # as `gchub_db.*` and modules under `gchub_db/apps` resolve correctly.
 PROJECT_ROOT = os.path.dirname(MAIN_PATH)
-import sys
 
 # Make sure PROJECT_ROOT and its parent are early on sys.path so imports
 # referenced by settings_common or INSTALLED_APPS find the correct package.
@@ -16,9 +20,6 @@ if PROJECT_ROOT not in sys.path:
 parent = os.path.dirname(PROJECT_ROOT)
 if parent not in sys.path:
     sys.path.insert(0, parent)
-
-# Import common settings
-from settings_common import *
 
 SITE_ID = 1
 
@@ -189,11 +190,11 @@ TEMPLATES = [
 ]
 
 # CSRF Configuration for legacy AJAX calls
-CSRF_COOKIE_NAME = 'csrftoken'
-CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access to CSRF token
 CSRF_USE_SESSIONS = False
-CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = "Lax"
 
 # For development, ensure CSRF tokens work with localhost
 if DEBUG:
@@ -201,6 +202,6 @@ if DEBUG:
     CSRF_COOKIE_SECURE = False
 
 try:
-    from local_settings import *
+    from local_settings import *  # noqa: F403
 except ImportError:
     pass

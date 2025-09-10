@@ -9,7 +9,19 @@ from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-from gchub_db.apps.auto_corrugated.elements.fsb_elements import *
+from gchub_db.apps.auto_corrugated.elements.fsb_elements import (
+    Code128Barcode_Kenton,
+    CollidableSVGGraphicElement,
+    CollidableTextElement,
+    CompanyLogoElement,
+    CountLabelElement,
+    FlapTextElement,
+    ItemDescriptionElement,
+    LabelAreaElement,
+    MachineBarcodeBoxElement,
+    SpecialtyLogoElement,
+    StamperBoxElement,
+)
 from gchub_db.includes import general_funcs
 from gchub_db.includes.reportlib.util import check_text_width
 
@@ -1301,26 +1313,20 @@ class FSBBox(GenericBox):
         """Draw the graphic if the CONTENTS of the box meet SFI certification,"""
         # Determine available area of the graphic. This, along with the width
         # of the graphic, will determine scaling.
-        available_area_x = None
-        available_area_y = None
-
-        sfi_logo_location = "sfi_logo_left.svg"
-        if self.plant == "Clarksville" or self.plant == "Pittston":
-            sfi_logo_location = self.plant + "_sfi_logo_right.svg"
+        # (Note: These variables are not currently used but may be needed for future scaling logic)
 
         # Create and place SFI graphic.
-        sfi_graphic_x = self.X_PANEL_D - self.MARGIN_WIDTH
-        sfi_graphic_y = self.Y_PANEL_A + self.MARGIN_WIDTH
-        sfi_graphic = CollidableSVGGraphicElement(
-            "SFIContentLogo",
-            sfi_graphic_x,
-            sfi_graphic_y,
-            os.path.join(CORRUGATED_MEDIA_DIR, sfi_logo_location),
-            available_area_x=available_area_x,
-            available_area_y=available_area_y,
-            alignment="right",
-            group_id=7,
-        )
+        # (Currently commented out as the graphic creation is not being used)
+        # sfi_graphic = CollidableSVGGraphicElement(
+        #     "SFIContentLogo",
+        #     sfi_graphic_x,
+        #     sfi_graphic_y,
+        #     os.path.join(CORRUGATED_MEDIA_DIR, sfi_logo_location),
+        #     available_area_x=available_area_x,
+        #     available_area_y=available_area_y,
+        #     alignment="right",
+        #     group_id=7,
+        # )
         # self.place_element(sfi_graphic)
 
     def __draw_specialty_logo(self, type=False, short_mode=False):

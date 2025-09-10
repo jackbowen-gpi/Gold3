@@ -13,6 +13,7 @@ Environment variables used:
 This script prefers `requests`. If it's not installed, it falls back to
 urllib but will print instructions to install requests for full support.
 """
+
 from __future__ import annotations
 
 import os
@@ -97,7 +98,7 @@ def main() -> int:
 
     headers = {"Referer": LOGIN_URL}
     try:
-        r2 = s.post(
+        s.post(
             LOGIN_URL, data=payload, headers=headers, timeout=5, allow_redirects=False
         )
     except Exception as exc:
@@ -118,7 +119,8 @@ def main() -> int:
     write_cookie(cookie_line)
     print(f"Wrote session cookie to {OUT_PATH}")
     print(
-        "To use this cookie in your browser, open DevTools -> Application -> Cookies -> 127.0.0.1 and add cookie 'sessionid' with the value above."
+        "To use this cookie in your browser, open DevTools -> Application -> Cookies -> "
+        "127.0.0.1 and add cookie 'sessionid' with the value above."
     )
     return 0
 

@@ -1,4 +1,4 @@
-{% extends "standard.html" %} 
+{% extends "standard.html" %}
 
 {% block extra_head %}
 	<!-- Load up jQuery -->
@@ -7,12 +7,12 @@
 	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
 
 	<!-- Javascript -->
-	<script type="text/javascript"> 	
+	<script type="text/javascript">
 		//prototype is loaded in GOLD's base html and it uses $ just like jQuery
-		//does. So we'll change $ to $j for the jQuery on this page using 
+		//does. So we'll change $ to $j for the jQuery on this page using
 		//jQuery.noConflict()
 		var $j = jQuery.noConflict();
-		
+
 		//Accordian effect.
 		$j( function() {
 			$j( "#accordion" ).accordion({heightStyle: 'content'});
@@ -21,7 +21,7 @@
 		//Date pickers
 		$j( function() {
 			var dateFormat = "mm/dd/yy",
-			
+
 			//From field
            	from = $j( "#id_end_date" )
            	.datepicker({
@@ -33,7 +33,7 @@
            	.on( "change", function() {
     	  		to.datepicker( "option", "minDate", getDate( this ) );
        		}),
-			
+
 			//To field
        		to = $j( "#id_start_date" ).datepicker({
   				changeMonth: true,
@@ -53,29 +53,29 @@
              		date = null;
           		}
 				return date;
-       		} 
-		} );//End date pickers 	
-	</script> 
+       		}
+		} );//End date pickers
+	</script>
 
 	<!--CSS (this is just copied from base.html to sidestep a conflict)-->
 	<style type="text/css">
 		a img {
 			border: none
 		}
-		a { 
-			color: #883333; 
+		a {
+			color: #883333;
 			text-decoration: none
 		}
 		/* This specifically overwrites the jquery a-tag css so we get to control the link color */
-		.ui-widget-content a { 
-			color: #883333; 
+		.ui-widget-content a {
+			color: #883333;
 			text-decoration: none
 		}
-		a:visited { 
+		a:visited {
 			color: #883333
 		}
-		a:hover { 
-			color: #222222 
+		a:hover {
+			color: #222222
 		}
 		#refresh {
 			border: none;
@@ -161,7 +161,7 @@
 			{% endif %}
 			<td>{{sheet.category}}</td>
 			<td>{{sheet.hours}}</td>
-			<td>{{sheet.comments}}</td>	
+			<td>{{sheet.comments}}</td>
 			<!-- Show the edit timesheet form if not in manager view. -->
 			{% if is_manager is False %}
 				<td><a href="edit/{{sheet.id}}/">Edit</a></td>

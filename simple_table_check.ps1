@@ -3,7 +3,7 @@ Write-Host "Checking key workflow tables..." -ForegroundColor Green
 
 $keyTables = @(
     "workflow_job",
-    "workflow_item", 
+    "workflow_item",
     "workflow_customer",
     "workflow_itemcatalog",
     "workflow_revision",
@@ -22,20 +22,20 @@ foreach ($table in $keyTables) {
         # Get production count
         $prodResult = docker exec postgres-backup-temp psql -U thundercuddles -d thundercuddles -c "SELECT COUNT(*) FROM $table;" -ErrorAction Stop
         $prodCount = ($prodResult | Select-String "\d+" | Select-Object -First 1).Matches[0].Value
-        
-        # Get dev count  
+
+        # Get dev count
         $devResult = docker exec gchub_db-postgres-dev-1 psql -U gchub -d gchub_dev -c "SELECT COUNT(*) FROM $table;" -ErrorAction Stop
         $devCount = ($devResult | Select-String "\d+" | Select-Object -First 1).Matches[0].Value
-        
+
         # Determine status
-        $status = if ([int]$devCount -eq 0 -and [int]$prodCount -gt 0) { 
-            "❌ MISSING DATA" 
-        } elseif ([int]$devCount -eq [int]$prodCount) { 
-            "✅ MATCH" 
-        } else { 
-            "⚠️  PARTIAL ($devCount/$prodCount)" 
+        $status = if ([int]$devCount -eq 0 -and [int]$prodCount -gt 0) {
+            "❌ MISSING DATA"
+        } elseif ([int]$devCount -eq [int]$prodCount) {
+            "✅ MATCH"
+        } else {
+            "⚠️  PARTIAL ($devCount/$prodCount)"
         }
-        
+
         Write-Host $table.PadRight(30) + $prodCount.PadRight(15) + $devCount.PadRight(15) + $status
     }
     catch {
@@ -45,13 +45,13 @@ foreach ($table in $keyTables) {
 
 Write-Host "`nChecking what data we DO have in dev..." -ForegroundColor Cyan
 $devTableCounts = docker exec gchub_db-postgres-dev-1 psql -U gchub -d gchub_dev -c "
-SELECT 
+SELECT
     schemaname,
     relname as table_name,
     n_tup_ins as row_count
-FROM pg_stat_user_tables 
-WHERE n_tup_ins > 0 
-ORDER BY n_tup_ins DESC 
+FROM pg_stat_user_tables
+WHERE n_tup_ins > 0
+ORDER BY n_tup_ins DESC
 LIMIT 15;
 "
 

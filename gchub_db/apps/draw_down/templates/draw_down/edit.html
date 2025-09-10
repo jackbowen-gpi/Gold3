@@ -36,12 +36,12 @@
 			</td>
 		</tr>
 	</table>
-    
+
     <h1 style="text-align:center">Drawdown Items</h1>
     <p style="text-align:center">This is information related to each individual item in the draw down request.
      Click the Edit Request button when you are finished editing this drawdown request</p>
  	<br />
- 	
+
     {{ drawdownItemForm.management_form }}
     {% for drawdownItem in drawdownItemForm %}
     {{ drawdownItem.id }}
@@ -82,8 +82,8 @@
 							<td>
 							Colors Needed:<br /><i style="font-size: 0.85em;">(250 characters)</i>
 							{{ drawdownItem.colors_needed }}
-							
-		
+
+
 							</td>
 						</tr>
 					</table>
@@ -92,10 +92,10 @@
 		 </table>
 	 </div>
     {% endfor %}
-   
+
 	{% if drawdownform.help_text %}<dd>{{ drawdownform.help_text }}</dd>{% endif %}
 	{% if drawdownform.errors %}<dd class="myerrors">{{ drawdownform.errors }}</dd>{% endif %}
-	
+
 	<div class="clearfix centered-submit">
 	    <div class="submit">
 	       <div class="submit"><input type="submit" value="Edit Request" onclick="drawdown_save('{{drawDownReqID}}');return false;" /></div>
@@ -103,8 +103,8 @@
 	    <div class="show-request">
 	        <a href="../../show/"><input value="Show Requests" /></a>
 	    </div>
-	</div>   
-	<div class="clearfix"></div>   
+	</div>
+	<div class="clearfix"></div>
 </form>
 </p>
 </div>

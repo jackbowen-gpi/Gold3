@@ -4,10 +4,10 @@ Write-Host "Getting table list from backup database..." -ForegroundColor Yellow
 
 # Get list of all tables from backup
 $tables = docker exec postgres-backup-temp psql -U thundercuddles -d thundercuddles -t -c "
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
-AND table_type = 'BASE TABLE' 
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
+AND table_type = 'BASE TABLE'
 ORDER BY table_name"
 
 # Clean up the table list (remove whitespace)
@@ -19,9 +19,9 @@ $results = @()
 
 foreach ($table in $tableList) {
     if ($table -eq "") { continue }
-    
+
     Write-Host "Checking $table..." -ForegroundColor Cyan
-    
+
     # Get count from backup
     $backupCount = docker exec postgres-backup-temp psql -U thundercuddles -d thundercuddles -t -c "SELECT COUNT(*) FROM $table" 2>$null
     if ($LASTEXITCODE -ne 0) {
@@ -29,7 +29,7 @@ foreach ($table in $tableList) {
     } else {
         $backupCount = $backupCount.Trim()
     }
-    
+
     # Get count from dev
     $devCount = docker exec gchub_db-postgres-dev-1 psql -U gchub -d gchub_dev -t -c "SELECT COUNT(*) FROM $table" 2>$null
     if ($LASTEXITCODE -ne 0) {
@@ -37,9 +37,9 @@ foreach ($table in $tableList) {
     } else {
         $devCount = $devCount.Trim()
     }
-    
+
     $match = if ($backupCount -eq $devCount) { "✓" } else { "✗" }
-    
+
     $results += [PSCustomObject]@{
         Table = $table
         Backup = $backupCount

@@ -1,6 +1,10 @@
 from django.urls import re_path as url
 
-from gchub_db.apps.error_tracking.views import *
+from gchub_db.apps.error_tracking.views import (
+    error_tracking_home,
+    error_tracking_add,
+    error_tracking_delete,
+)
 
 urlpatterns = [
     url(r"^$", error_tracking_home, name="error_tracking_home"),

@@ -3,6 +3,7 @@
 
 Creates a sample PDF file demonstrating barcode and SVG rendering.
 """
+
 import os
 
 import bin_functions
@@ -76,7 +77,7 @@ CORRUGATED_MEDIA_DIR = os.path.join(settings.MEDIA_ROOT, "autocorr_elements")
 vector_graphic = svglib.svg2rlg(os.path.join(CORRUGATED_MEDIA_DIR, "svgtest.svg"))
 
 if not vector_graphic:
-    raise InvalidPath()
+    raise ValueError("Invalid path or SVG file could not be loaded")
 
 # Calculate the width of this element.
 width = vector_graphic.getProperties()["width"] / 72.0

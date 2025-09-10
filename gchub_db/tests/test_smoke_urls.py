@@ -39,7 +39,7 @@ class SmokeURLTests(SimpleTestCase):
 
             urlpatterns.append(path(f"{nm}/", _v, name=nm))
 
-        mod.urlpatterns = urlpatterns
+        mod.urlpatterns = urlpatterns  # type: ignore[attr-defined]
         sys.modules["gchub_db._test_smoke_urls_local"] = mod
         set_urlconf(mod)
         # Ensure resolver cache is cleared so our module is used.

@@ -4,11 +4,13 @@
 This legacy script generates Excel reports for billing and was retained for
 reference; prefer the newer billing helpers for automated runs.
 """
+
 import calendar
 
 import django
 
-# openpyxl is now used instead of pyExcelerator because it supports python3 and pyexcelerator is deprecated
+# openpyxl is now used instead of pyExcelerator because it supports
+# python3 and pyexcelerator is deprecated
 import openpyxl
 from openpyxl.styles import NamedStyle
 
@@ -129,9 +131,13 @@ for plant in plants:
             item__printlocation__press__name="FSB",
         )
     #    elif plant == QADClark:
-    #        charge_set = billable_charges.filter(item__job__name__contains="QAD/Avante", item__printlocation__plant__name="Clarksville", item__printlocation__press__name="Other")
+    #        charge_set = billable_charges.filter(item__job__name__contains="QAD/Avante",
+    #                                             item__printlocation__plant__name="Clarksville",
+    #                                             item__printlocation__press__name="Other")
     #    elif plant == QADPitt:
-    #        charge_set = billable_charges.filter(item__job__name__contains="QAD/Avante", item__printlocation__plant__name="Pittston", item__printlocation__press__name="Other")
+    #        charge_set = billable_charges.filter(item__job__name__contains="QAD/Avante",
+    #                                             item__printlocation__plant__name="Pittston",
+    #                                             item__printlocation__press__name="Other")
     elif plant == "Avante-QAD":
         charge_set = billable_charges.filter(
             item__job__name__startswith="Letica - QAD/Avante"

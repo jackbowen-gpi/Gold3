@@ -21,37 +21,32 @@ import re
 import urllib.error
 import urllib.parse
 import urllib.request
-import xml.sax.saxutils
 
 try:
     import json
 
     assert hasattr(json, "loads") and hasattr(json, "dumps")
-    _json_decode = lambda s: json.loads(s)
-    _json_encode = lambda v: json.dumps(v)
+    _json_decode = json.loads
+    _json_encode = json.dumps
 except Exception:
     try:
-        import simplejson
+        import simplejson  # type: ignore
 
-        _json_decode = lambda s: simplejson.loads(_unicode(s))
-        _json_encode = lambda v: simplejson.dumps(v)
+        _json_decode = simplejson.loads
+        _json_encode = simplejson.dumps
     except ImportError:
-        try:
-            # For Google AppEngine
-            from django.utils import simplejson
-
-            _json_decode = lambda s: simplejson.loads(_unicode(s))
-            _json_encode = lambda v: simplejson.dumps(v)
-        except ImportError:
-            raise Exception(
-                "A JSON parser is required, e.g., simplejson at "
-                "http://pypi.python.org/pypi/simplejson/"
-            )
+        raise Exception(
+            "A JSON parser is required, e.g., simplejson at "
+            "http://pypi.python.org/pypi/simplejson/"
+        )
 
 
 def xhtml_escape(value):
-    """Escapes a string so it is valid within XML or XHTML."""
-    return utf8(xml.sax.saxutils.escape(value))
+    raise Exception(
+        "A JSON parser is required. Supported libraries are: "
+        "'json' (standard library), 'simplejson', or 'django.utils.simplejson'. "
+        "You can install simplejson from http://pypi.python.org/pypi/simplejson/"
+    )
 
 
 def xhtml_unescape(value):
@@ -76,7 +71,7 @@ def squeeze(value):
 
 def url_escape(value):
     """Returns a valid URL-encoded version of the given value."""
-    return urllib.parse.quote_plus(utf8(value))
+    return urllib.parse.quote_plus(value)
 
 
 def url_unescape(value):
@@ -84,18 +79,18 @@ def url_unescape(value):
     return _unicode(urllib.parse.unquote_plus(value))
 
 
+def _unicode(value):
+    if isinstance(value, bytes):
+        return value.decode("utf-8")
+    return str(value)
+
+
 def utf8(value):
+    if isinstance(value, bytes):
+        return value
     if isinstance(value, str):
         return value.encode("utf-8")
-    assert isinstance(value, str)
-    return value
-
-
-def _unicode(value):
-    if isinstance(value, str):
-        return value.decode("utf-8")
-    assert isinstance(value, str)
-    return value
+    raise TypeError("Expected bytes or str, got %r" % type(value))
 
 
 def _convert_entity(m):

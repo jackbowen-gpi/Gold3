@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Looks for Item objects in need of thumbnailing."""
 
-
 # Setup the Django environment
 import bin_functions
 from django.utils import timezone

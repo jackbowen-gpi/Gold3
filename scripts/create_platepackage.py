@@ -4,7 +4,8 @@ import os
 import sys
 from pathlib import Path
 
-# Add the repository root (parent of scripts/) to sys.path so the gchub_db package is importable
+# Add the repository root (parent of scripts/)
+# to sys.path so the gchub_db package is importable
 repo_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(repo_root))
 

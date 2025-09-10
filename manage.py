@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Entry point for Django management commands for the gchub_db project."""
+
 import os
 import sys
 

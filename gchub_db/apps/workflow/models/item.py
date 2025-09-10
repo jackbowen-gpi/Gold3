@@ -2,6 +2,7 @@ import os
 import re
 import shutil
 from datetime import date, timedelta
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission, User
@@ -20,14 +21,47 @@ from gchub_db.apps.auto_ftp.models import (
     DESTINATION_SOUTHERN_GRAPHIC,
 )
 
-# Normally this would be a bad idea, but these variables are uniquely named.
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import (
+    JOBLOG_TYPE_ITEM_9DIGIT,
+    JOBLOG_TYPE_ITEM_ADDED,
+    JOBLOG_TYPE_ITEM_APPROVED,
+    JOBLOG_TYPE_ITEM_DELETED,
+    JOBLOG_TYPE_ITEM_FILED_OUT,
+    JOBLOG_TYPE_ITEM_FORECAST,
+    JOBLOG_TYPE_ITEM_PREFLIGHT,
+    JOBLOG_TYPE_ITEM_PROOFED_OUT,
+    JOBLOG_TYPE_ITEM_REVISION,
+    JOBLOG_TYPE_ITEM_SAVED,
+    JOBLOG_TYPE_JOBLOG_DELETED,
+    JOBLOG_TYPE_NOTE,
+    JOBLOG_TYPE_PRODUCTION_EDITED,
+)
+from gchub_db.apps.joblog.models import JobLog
 from gchub_db.apps.qad_data import qad
 from gchub_db.apps.queues.models import ColorKeyQueue
 from gchub_db.apps.workflow import fsb_template_maker, workflow_funcs
-from gchub_db.apps.workflow.app_defs import *
+from gchub_db.apps.workflow.app_defs import (
+    COMPLEXITY_OPTIONS,
+    GDD_ORIGINS,
+    INKBOOKS,
+    KD_PRESSES,
+    PANTONE,
+    PLATE_TYPE_RUBBER_FLEXO,
+    PROOF_TYPES,
+    SITUATION_OPTIONS,
+)
 from gchub_db.apps.workflow.managers import ItemManager
-from gchub_db.apps.workflow.models import *
+from gchub_db.apps.workflow.models.general import (
+    BevItemColorCodes,
+    Charge,
+    ChargeType,
+    ItemCatalog,
+    ItemSpec,
+    PlateOrder,
+    PlateOrderItem,
+    Revision,
+    StepSpec,
+)
 from gchub_db.apps.workflow.models import ItemTracker
 from gchub_db.apps.xml_io.jdf_writer import ItemJDF
 from gchub_db.apps.xml_io.jmf import JMFSubmitQueueEntry
@@ -35,9 +69,18 @@ from gchub_db.includes import fs_api, general_funcs
 from gchub_db.includes.fs_api import InvalidPath
 from gchub_db.middleware import threadlocals
 
+if TYPE_CHECKING:
+    from .general import ItemColor, ItemReview
+
 
 class Item(models.Model):
     """Represents an Item, which is associated to a Job."""
+
+    # Type annotations for Django reverse relationships
+    if TYPE_CHECKING:
+        itemcolor_set: models.Manager[ItemColor]
+        itemreview_set: models.Manager[ItemReview]
+        steps_with_item: models.Manager["Item"]
 
     # Workflow FK unused currently, but may be usefull down the road. ie, job
     # with FSB and Cont. work.
@@ -306,7 +349,7 @@ class Item(models.Model):
         the beverage item nomenclature page.
         """
         try:
-            nut_facts = ItemTracker.objects.get(
+            ItemTracker.objects.get(
                 item=self, type__category__name="Beverage Nutrition"
             )
             nutrition_facts = True
@@ -338,7 +381,7 @@ class Item(models.Model):
         """Returns a URL to the item's display page."""
         return reverse("job_detail", args=[self.num_in_job])
 
-    def delete(self):
+    def delete(self, using=None, keep_parents=False):
         """Deleting Item objects causes a chain of deletions for all objects
         with Foreignkey fields pointing to Item. This results in a lot of data
         loss. Set an is_deleted flag on the item instead and filter out all
@@ -1589,7 +1632,7 @@ class Item(models.Model):
     def is_linked_proof(self):
         """Return True if there is a proof to link to."""
         try:
-            proof = fs_api.get_item_proof(self.job.id, self.num_in_job)
+            fs_api.get_item_proof(self.job.id, self.num_in_job)
             return True
         except Exception:
             return False
@@ -2566,9 +2609,9 @@ class Item(models.Model):
 
     def billing_warning(self):
         """Flag item if it appears to be under-billed."""
-        if check_too_few_charges:
+        if self.check_too_few_charges():
             return True
-        elif check_too_few_revision_charges():
+        elif self.check_too_few_revision_charges():
             return True
         else:
             return False
@@ -2939,18 +2982,6 @@ class Item(models.Model):
         """
         # Create the tiff folder in advance (required for this to work).
         fs_api.create_tiff_folder(self.job.id, self.num_in_job, self.bev_nomenclature())
-        # The base name within the 1_Bit_Tiffs folder to put the tiffs in.
-        folder_base_name = "%d-%d %s" % (
-            self.job.id,
-            self.num_in_job,
-            self.bev_nomenclature(),
-        )
-        # Where to move the finished tiffs to.
-        tiff_dir_name = "file://gcmaster/jobstorage/%d/%s/%s" % (
-            self.job.id,
-            fs_api.JOBDIR["tiffs"],
-            folder_base_name,
-        )
         # Extra Parameters passed with the ResourcePool.
         extra_vars = {
             "PLAFileList": {"Status": "Unavailable"},

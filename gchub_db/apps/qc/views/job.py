@@ -1,6 +1,5 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.template import RequestContext
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -17,7 +16,6 @@ def qc_manager(request, job_id):
     pagevars = {
         "job": job,
     }
-    context_instance = RequestContext(request)
     return render(request, "qc_manager/qc_overview.html", context=pagevars)
 
 
@@ -34,8 +32,6 @@ def select_and_create(request, job_id):
 
 def ajax_create_qc(request, job_id):
     """Sends the request to create a QC."""
-    job = get_object_or_404(Job, id=int(job_id))
-
     if not request.user.is_authenticated:
         return HttpResponse(
             JSMessage(
@@ -65,8 +61,6 @@ def ajax_create_qc(request, job_id):
 
 def ajax_create_qc2(request, job_id):
     """Sends the request to create a QC."""
-    job = get_object_or_404(Job, id=int(job_id))
-
     if not request.user.is_authenticated:
         return HttpResponse(
             JSMessage(

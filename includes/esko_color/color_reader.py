@@ -35,7 +35,7 @@ class EskoColor(object):
             raise InvalidColor(self.color_spec_res_path) from None
 
         self.config_parser = RawConfigParser()
-        self.config_parser.readfp(self.fobj)
+        self.config_parser.read_file(self.fobj)
 
     def __str__(self):
         return "EskoColor: %s" % self.name

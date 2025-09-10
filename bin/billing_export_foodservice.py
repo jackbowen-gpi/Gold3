@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """Export billing data for the Foodservice workflow into spreadsheet(s)."""
-# openpyxl is now used instead of pyExcelerator because it supports python3 and pyexcelerator is deprecated
+
+# openpyxl is now used instead of pyExcelerator because it supports
+# python3 and pyexcelerator is deprecated
 import calendar
 
 import bin_functions

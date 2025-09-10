@@ -47,10 +47,10 @@ try {
 }
 
 if (-not $isListening) {
-    Write-Host "Notification daemon not detected on ${daemonHost}:${daemonPort} — starting it now (detached, hidden)."
+    Write-Host "Notification daemon not detected on ${daemonHost}:${daemonPort} - starting it now (detached, hidden)."
     $daemonScript = Join-Path $PSScriptRoot '..\tools\notification_daemon.py'
     if (-not (Test-Path $daemonScript)) {
-        Write-Warning "Daemon script not found at $daemonScript — skipping daemon auto-start."
+        Write-Warning "Daemon script not found at $daemonScript - skipping daemon auto-start."
     } else {
     $argList = @($daemonScript, '--host', $daemonHost, '--port', [string]$daemonPort)
     $logsDir = Join-Path $PSScriptRoot '..\logs'

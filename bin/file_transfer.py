@@ -1,11 +1,12 @@
 #!/usr/bin/python
 """Transfer job folders between file servers and create junction points."""
+
 import shutil
 
 import bin_functions
 
 bin_functions.setup_paths()
-from gchub_db.apps.workflow.models import *
+from gchub_db.apps.workflow.models import Job
 
 """
 !!!Destination must be mounted with admin privilages first!

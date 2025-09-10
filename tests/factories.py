@@ -1,4 +1,6 @@
+import uuid
 from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 
 
 def create_user(username="testuser", password="password", is_staff=False, **kwargs):
@@ -20,10 +22,6 @@ When `factory_boy` is installed we use lightweight `DjangoModelFactory`
 factories. Otherwise provide minimal ORM-based fallbacks so tests run
 without extra dev dependencies.
 """
-
-import uuid
-
-from django.contrib.sites.models import Site
 
 User = get_user_model()
 
@@ -79,7 +77,8 @@ try:
             return UserFactory(username=username, password=password, **kwargs)
 
 except Exception:
-    # factory_boy isn't installed / import failed — provide tiny fallbacks so tests still run
+    # factory_boy isn't installed or
+    # import failed — provide tiny fallbacks so tests still run
     def create_site(name_prefix="site", domain=None, name=None, **kwargs):
         # Allow caller to specify full domain/name via kwargs
         if domain is None:

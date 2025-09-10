@@ -1,10 +1,10 @@
 # Test Suite Error Analysis and Solutions
 
-**Generated on:** September 7, 2025  
-**Test Suite:** Job Model Unit Tests  
-**Total Tests:** 52  
-**Passing Tests:** 46 (88.5%)  
-**Failing Tests:** 6 (11.5%)  
+**Generated on:** September 7, 2025
+**Test Suite:** Job Model Unit Tests
+**Total Tests:** 52
+**Passing Tests:** 46 (88.5%)
+**Failing Tests:** 6 (11.5%)
 
 ## Overview
 
@@ -15,7 +15,7 @@ This document provides a detailed analysis of the 6 failing tests in the Job mod
 ## Error 1: Concurrent Deletion Test Failure
 
 ### Test: `test_job_deletion_concurrent_access`
-**File:** `test_job_model_integration.py`  
+**File:** `test_job_model_integration.py`
 **Test Class:** `JobModelConcurrencyTests`
 
 ### Error Details
@@ -42,12 +42,12 @@ The test expects the job to still exist after deletion (soft delete), but the jo
 1. **Check Deletion Behavior**:
    - Verify if Job deletion is always soft delete (sets `is_deleted=True`)
    - Check if there are conditions where hard deletion occurs
-   
+
 2. **Update Test Logic**:
    ```python
    # Instead of expecting job to exist
    final_job = Job.objects.get(id=job_id)
-   
+
    # Check if job exists with proper filtering
    final_job = Job.objects.filter(id=job_id, is_deleted=False).first()
    if not final_job:
@@ -59,7 +59,7 @@ The test expects the job to still exist after deletion (soft delete), but the jo
 3. **Add Transaction Management**:
    ```python
    from django.db import transaction
-   
+
    with transaction.atomic():
        # Perform deletion test within transaction
    ```
@@ -69,7 +69,7 @@ The test expects the job to still exist after deletion (soft delete), but the jo
 ## Error 2: Job Completion Status Logic
 
 ### Test: `test_job_completion_status_integration`
-**File:** `test_job_model_integration.py`  
+**File:** `test_job_model_integration.py`
 **Test Class:** `JobModelIntegrationTests`
 
 ### Error Details
@@ -100,7 +100,7 @@ The test expects `all_items_complete()` to return `False` when items don't have 
    ```python
    # Create actual Item objects
    from gchub_db.apps.workflow.models import Item
-   
+
    item1 = Item.objects.create(job=job, name="Test Item 1")
    item2 = Item.objects.create(job=job, name="Test Item 2", final_file="test.pdf")
    ```
@@ -119,7 +119,7 @@ The test expects `all_items_complete()` to return `False` when items don't have 
 ## Error 3: Date Calculation Mismatch
 
 ### Test: `test_job_date_calculations_integration`
-**File:** `test_job_model_integration.py`  
+**File:** `test_job_model_integration.py`
 **Test Class:** `JobModelIntegrationTests`
 
 ### Error Details
@@ -151,7 +151,7 @@ The date calculation for food sites is off by one day. Expected August 28th but 
    # Test various day combinations
    test_dates = [
        date(2025, 8, 25),  # Monday
-       date(2025, 8, 29),  # Friday  
+       date(2025, 8, 29),  # Friday
        date(2025, 8, 30),  # Saturday
        date(2025, 8, 31),  # Sunday
    ]
@@ -169,7 +169,7 @@ The date calculation for food sites is off by one day. Expected August 28th but 
 ## Error 4: Soft Delete Cascade Behavior
 
 ### Test: `test_job_deletion_cascade_behavior`
-**File:** `test_job_model_integration.py`  
+**File:** `test_job_model_integration.py`
 **Test Class:** `JobModelIntegrationTests`
 
 ### Error Details
@@ -193,10 +193,10 @@ The test expects the job to still exist after deletion (soft delete), but it doe
    ```python
    # Use objects that include soft-deleted items
    from django.db import models
-   
+
    all_jobs = Job._base_manager.filter(id=job_id)  # Bypasses custom manager
    self.assertTrue(all_jobs.exists())
-   
+
    # Or check is_deleted flag specifically
    deleted_job = Job.objects.filter(id=job_id, is_deleted=True).first()
    self.assertIsNotNone(deleted_job)
@@ -221,7 +221,7 @@ The test expects the job to still exist after deletion (soft delete), but it doe
 ## Error 5: Icon URL Generation Logic
 
 ### Test: `test_job_icon_url_integration`
-**File:** `test_job_model_integration.py`  
+**File:** `test_job_model_integration.py`
 **Test Class:** `JobModelIntegrationTests`
 
 ### Error Details
@@ -252,7 +252,7 @@ The test expects `bullet_green.png` for a specific site type, but the actual ico
    # Test the actual icon mapping
    test_cases = [
        ('beverage', 'bullet_blue.png'),
-       ('carton', 'bullet_orange.png'), 
+       ('carton', 'bullet_orange.png'),
        ('foodservice', 'page_black.png'),  # Updated expectation
        ('regular', 'page_black.png')
    ]
@@ -272,7 +272,7 @@ The test expects `bullet_green.png` for a specific site type, but the actual ico
 ## Error 6: Keyword Generation Algorithm
 
 ### Test: `test_job_keyword_generation_integration`
-**File:** `test_job_model_integration.py`  
+**File:** `test_job_model_integration.py`
 **Test Class:** `JobModelIntegrationTests`
 
 ### Error Details
@@ -306,14 +306,14 @@ The test expects 'techcorp' to be included in generated keywords, but the actual
        brand_name="TechCorp Industries",
        customer_name="Important Client"
    )
-   
+
    job.save()  # Trigger keyword generation
    keywords = job.generated_keywords.lower()
-   
+
    # Test for name components
    self.assertIn('website', keywords)
    self.assertIn('redesign', keywords)
-   
+
    # Test for brand components (if included)
    if 'techcorp' in keywords:
        self.assertIn('techcorp', keywords)
@@ -324,7 +324,7 @@ The test expects 'techcorp' to be included in generated keywords, but the actual
    # Test the actual keyword generation logic
    expected_keywords = ['website', 'redesign', 'project']
    keywords_lower = job.generated_keywords.lower()
-   
+
    for keyword in expected_keywords:
        self.assertIn(keyword, keywords_lower)
    ```

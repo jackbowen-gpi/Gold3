@@ -1,6 +1,6 @@
 {% extends "standard.html" %}
 
-{% block extra_head %} 
+{% block extra_head %}
 	<style type="text/css">
 		input {
 			border: none;
@@ -16,12 +16,12 @@
 	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
 
 	<!-- Javascript happens here. -->
-	<script type="text/javascript"> 
+	<script type="text/javascript">
 		//prototype is loaded in GOLD's base html and it uses $ just like jquery
-		//does. So we'll change $ to $j for the jQuery on this page using 
+		//does. So we'll change $ to $j for the jQuery on this page using
 		//jQuery.noConflict()
 		var $j = jQuery.noConflict();
-		
+
 		//jQuery stuff.
 		$j(document).ready(function(){
 			// Busy inidcator
@@ -75,25 +75,25 @@
 <br />
 <h3>
 	{% for info in report.plant_info %}
-	<p>{{info.plant}}: <strong>{{info.count}}</strong></p>	
+	<p>{{info.plant}}: <strong>{{info.count}}</strong></p>
 	{% endfor %}
 </h3>
 <br />
 <!-- Data table -->
 <div class="grey_bordered">
-	<h2> 
+	<h2>
 		<form method="post">
 			{% csrf_token %}
 			Charges to invoice: {{report.charges_count}}
 		<input type="image" src="{{MEDIA_URL}}img/icons/arrow_refresh.png" alt="Submit" id="submit" />
 		</form>
 	</h2>
-	
+
 
 	<table class="rowHover">
 		<tr>
 			{% for field in report.warning_fields %}
-			<th>{{field}}</th>	
+			<th>{{field}}</th>
 			{% endfor %}
 		</tr>
 	{% for warning in report.warnings %}
@@ -104,7 +104,7 @@
 		</tr>
 	{% endfor %}
 </table>
-	
+
 </div>
 
 {% endblock %}

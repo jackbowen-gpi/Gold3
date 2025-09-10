@@ -3,16 +3,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <link rel="stylesheet" type="text/css" href="/media/yui/build/base/base-min.css" /> 
+  <link rel="stylesheet" type="text/css" href="/media/yui/build/base/base-min.css" />
   <link rel="stylesheet" href="/media/css/base.css" type="text/css" media="all" />
   <link rel="stylesheet" href="/media/css/print.css" type="text/css" media="print" />
   <title>GOLD v3 - Login</title>
   <script type="text/javascript" src="/media/js/prototype.js"></script>
   <script type="text/javascript" src="/media/js/general.js"></script>
-  
-  
+
+
 <style type="text/css">
   #login_outline {width:500px;margin-left:auto;margin-right:auto;
                   text-align:center;background-color:white;
@@ -28,7 +28,7 @@
     function focus_on_password() {
         $('id_password').focus();
     }
-    
+
     Event.observe(window, 'load', function() {
         // Focus on the password box from the beginning.
         focus_on_password();
@@ -44,7 +44,7 @@
 
 
 <div id="body_wrap">
-  
+
 <div class="outline" id="login_outline">
   <p><img src="/media/img/gold2logo.png" alt="GOLD Logo" /></p>
   <p>
@@ -53,9 +53,9 @@
     You must log in with a valid username and password.
     <br />
   </p>
-  
+
   <div class="graycontainer" id="login_form_container">
-	  <form method="post" action="/accounts/login/">		
+	  <form method="post" action="/accounts/login/">
 	    <p>
 	       <label>Username</label>
 		  	 <select name="username" style="width:174px" id="id_username">
@@ -64,12 +64,12 @@
 		   	 <input type="password" name="password" style="width:170px" required id="id_password">
 		   <br /><br />
 		   <input class="button" type="submit" value="Login" />
-	    </p>		
+	    </p>
 	  </form>
   </div>
   <div class="outline login_info_box">
     <img src="/media/img/icons/information.png" alt="Information" />
-    Email <a href="mailto:clemson.support@graphicpkg.com">clemson.support@graphicpkg.com</a> to request 
+    Email <a href="mailto:clemson.support@graphicpkg.com">clemson.support@graphicpkg.com</a> to request
     access.
   </div><br />
 </div>

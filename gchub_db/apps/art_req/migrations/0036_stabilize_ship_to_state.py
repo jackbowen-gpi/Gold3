@@ -72,7 +72,6 @@ STATE_CHOICES = (
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("art_req", "0035_alter_product_ship_to_state"),
     ]

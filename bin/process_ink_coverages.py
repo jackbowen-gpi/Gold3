@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Monitor the ink coverage folder, parse ink coverage XML files, and import data into the database."""
+"""Monitor ink coverage folder, parse XML files, import data."""
 
 import os
 import shutil
@@ -200,8 +200,8 @@ for xmfile in coverage_list:
 
         if not item.printlocation:
             error_msg = (
-                "An ink coverage was sent for %s-%s, but lacks a print location. Please set one and re-send the ink coverage."
-                % (job.id, item_num)
+                "An ink coverage was sent for %s-%s, but lacks a print location. "
+                "Please set one and re-send the ink coverage." % (job.id, item_num)
             )
             move_file_to_invalid(xmfile_fullpath, error_msg, job)
             continue

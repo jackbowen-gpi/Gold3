@@ -9,22 +9,22 @@ template for the sake of maintainability and consistency.
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/base/base-min.css" /> 
+  <link rel="stylesheet" type="text/css" href="{{YUI_URL}}build/base/base-min.css" />
   <link rel="stylesheet" href="{{MEDIA_URL}}css/base.css" type="text/css" media="all" />
   <link rel="stylesheet" href="{{MEDIA_URL}}css/print.css" type="text/css" media="print" />
   <title>GOLD v3 - {% block page_title %}{{page_title}}{% endblock %}</title>
   <script type="text/javascript" src="{{MEDIA_URL}}js/prototype.js"></script>
   <script type="text/javascript" src="{{MEDIA_URL}}js/general.js"></script>
-  
+
   {% block extra_head %}{% endblock %}
 </head>
 <body onload="on_load()" id="entire_body" class="override">
 &nbsp;
 {% if user.is_authenticated %}
   <div class="main_nav">
-  <div class="main_nav"> 
+  <div class="main_nav">
     <div class="menu">
 	<ul>
 		<li>

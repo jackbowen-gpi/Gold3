@@ -11,7 +11,10 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.cache import cache_page
 
-from gchub_db.apps.workflow.app_defs import *
+from gchub_db.apps.workflow.app_defs import (
+    PROD_SUBSTRATE_DOUBLE_POLY,
+    PROD_SUBSTRATE_SINGLE_POLY,
+)
 from gchub_db.apps.workflow.models import (
     BeverageBrandCode,
     BeverageCenterCode,

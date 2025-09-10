@@ -1,5 +1,6 @@
 #!/usr/bin/python
 """Audit job folders on disk and report inconsistencies to GOLD."""
+
 import os
 
 import bin_functions
@@ -12,7 +13,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 
-from gchub_db.apps.workflow.models import *
+from gchub_db.apps.workflow.models import Job, Item
 
 """
 !!! Make sure wherever this script is run that the job storage directory is

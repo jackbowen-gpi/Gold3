@@ -13,16 +13,16 @@ class MockCursor:
         self.data = data or []
         self.description = description or []
         self._fetched = False
-    
+
     def execute(self, query):
         pass
-    
+
     def fetchone(self):
         if not self._fetched and self.data:
             self._fetched = True
             return self.data[0]
         return None
-    
+
     def fetchall(self):
         return self.data
 
@@ -42,9 +42,9 @@ def _get_conn_cursor():
     and return the cursor for use in a query.
     """
     # Check if QAD is disabled for development
-    if not getattr(settings, 'QAD_ENABLED', True):
+    if not getattr(settings, "QAD_ENABLED", True):
         return MockCursor(), None
-    
+
     connection = pyodbc.connect(settings.QAD_ODBC_DSN, ansi=True)
     return connection.cursor(), connection
 
@@ -52,9 +52,9 @@ def _get_conn_cursor():
 def get_server_version():
     """Queries for the server's version info."""
     # Check if QAD is disabled for development
-    if not getattr(settings, 'QAD_ENABLED', True):
+    if not getattr(settings, "QAD_ENABLED", True):
         return "Mock QAD SQL Server 2019 - Development Environment"
-    
+
     cursor = _get_conn_cursor()[0]
     cursor.execute(
         "SELECT 'SQL Server ' + CONVERT(varchar(100),SERVERPROPERTY('productversion')) + ' - ' + CONVERT(varchar(100),SERVERPROPERTY('productlevel')) + ' - ' + CONVERT(varchar(100),SERVERPROPERTY('edition'))"
@@ -134,7 +134,7 @@ def get_email_data(nine_digit):
     digit notification email.
     """
     # Check if QAD is disabled for development
-    if not getattr(settings, 'QAD_ENABLED', True):
+    if not getattr(settings, "QAD_ENABLED", True):
         # Return mock data for development
         return (
             12,  # casepack
@@ -144,9 +144,9 @@ def get_email_data(nine_digit):
             0.85,  # cube
             "12.50",  # length
             "8.25",  # width
-            "6.75"  # height
+            "6.75",  # height
         )
-    
+
     # Gonna define these variables with an error message first. If they don't
     # get over-written with data from QAD the error message will be what gets
     # returned.

@@ -2,7 +2,7 @@
 support.
 """
 
-from gchub_db.includes.reportlib.elements.generic import (
+from includes.reportlib.elements.generic import (
     GenericElement,
     SVGGraphicElement,
     TextElement,

@@ -13,16 +13,16 @@
 	<!-- Load up jQuery -->
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
-	<!-- This is used to make fancy "busy" indicators while prepping the excel 
+	<!-- This is used to make fancy "busy" indicators while prepping the excel
 	downloads. Needs a special cookie in the http header to work. See the readme
 	in the js directory. --->
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery.fileDownload.js"></script>
 	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
 
 	<!-- Javascript happens here. -->
-	<script type="text/javascript"> 
+	<script type="text/javascript">
 		//prototype is loaded in GOLD's base html and it uses $ just like jquery
-		//does. So we'll change $ to $j for the jQuery on this page using 
+		//does. So we'll change $ to $j for the jQuery on this page using
 		//jQuery.noConflict()
 		var $j = jQuery.noConflict();
 
@@ -48,7 +48,7 @@
 		   .on( "change", function() {
 		      from.datepicker( "option", "maxDate", getDate( this ) );
 		   });
-		
+
 		   function getDate( element ) {
 		      var date;
 		      try {
@@ -56,11 +56,11 @@
 		      } catch( error ) {
 		         date = null;
 		      }
-		
+
 		      return date;
 		   }
 		} );//End date pickers
-		
+
 		$j(document).ready(function(){
 			// Used to cancel downloads.
 			var dlReq = null;
@@ -116,7 +116,7 @@
 
 <div style="width:50%">
 	<p>
-	Total un-invoiced charges for a given time span by sales person and pring group. 
+	Total un-invoiced charges for a given time span by sales person and pring group.
     </p>
 </div>
 
@@ -130,7 +130,7 @@
 
 <!-- Data table -->
 <div class="grey_bordered">
-	<h2> 
+	<h2>
 		<form method="post">
 			{% csrf_token %}
 			Un-invoiced charges from {{staleform.date_from}} to {{staleform.date_to}}
@@ -174,15 +174,15 @@
 						{% else %}
 							<tr class="{% cycle 'rowA' 'rowB' %}">
 								<td>{{print_group.0}}</td> <!--Name-->
-								<td style="text-align:right;">${{print_group.1|floatformat:2|intcomma}}</td> <!--Total-->					
+								<td style="text-align:right;">${{print_group.1|floatformat:2|intcomma}}</td> <!--Total-->
 							</tr>
 						{% endif %}
 					{% endfor %}
-				</table>			
+				</table>
 			{% endfor %}
 		{% else %}
 			<p>
-			No data to display. Remember that data from the last 31 days will 
+			No data to display. Remember that data from the last 31 days will
 			always be excluded to avoid jobs that are currently being worked on.
 			</p>
 		{% endif %}

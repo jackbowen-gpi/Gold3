@@ -3,7 +3,8 @@ item QCs, and item specification information.
 """
 
 import re
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+from typing import TYPE_CHECKING
 
 from colormath.color_conversions import convert_color
 from colormath.color_objects import LabColor, LCHabColor
@@ -13,20 +14,36 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMessage
 from django.db import models
-from django.db.models import signals
+from django.db.models import QuerySet, signals
 from django.template import loader
 
 from gchub_db.apps.address.models import Contact
 from gchub_db.apps.color_mgt.models import ColorDefinition
 from gchub_db.apps.fedexsys.models import AddressValidationModel, Shipment
-from gchub_db.apps.item_catalog.models import *
+from gchub_db.apps.item_catalog.models import (
+    ProductSubCategory,
+)
 
 # Normally this would be a bad idea, but these variables are uniquely named.
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import (
+    JOBLOG_TYPE_CRITICAL,
+)
 from gchub_db.apps.joblog.models import JobLog
-from gchub_db.apps.workflow.app_defs import *
+from gchub_db.apps.workflow.app_defs import (
+    COMPLEXITY_CATEGORIES,
+    COMPLEXITY_OPTIONS,
+    ITEM_TYPES,
+    PLATE_OPTIONS,
+    PROD_BOARDS,
+    PROD_SUBSTRATES,
+    RUSH_TYPES,
+    UNCOATED_SUBSTRATES,
+)
 from gchub_db.includes import fs_api, general_funcs
 from gchub_db.middleware import threadlocals
+
+if TYPE_CHECKING:
+    from .item import Item
 
 # This was used to limit the choices of the Plant:bev_controller field. Broke in 1.2
 # BEVERAGE_PERMISSION = Permission.objects.get(codename="beverage_access")
@@ -35,35 +52,35 @@ from gchub_db.middleware import threadlocals
 class Plant(models.Model):
     """Represents a Plant/Facility."""
 
-    name = models.CharField(max_length=100)
-    workflow = models.ForeignKey(Site, on_delete=models.CASCADE)
-    code = models.CharField(max_length=50, blank=True)
+    name: str = models.CharField(max_length=100)
+    workflow: Site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    code: str = models.CharField(max_length=50, blank=True)
     bev_controller = models.ManyToManyField(
         User, related_name="beverage_controllers", blank=True
     )
     # Does this plant show up in the automated corrugated system?
-    is_in_acs = models.BooleanField(default=False)
+    is_in_acs: bool = models.BooleanField(default=False)
 
     class Meta:
         app_label = "workflow"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class Press(models.Model):
     """Represents a Press. Will be coupled to Plant in PrintLocation model."""
 
-    name = models.CharField(max_length=100)
+    name: str = models.CharField(max_length=100)
     # For use with JDF ticket naming.
-    short_name = models.CharField(max_length=20)
-    workflow = models.ForeignKey(Site, on_delete=models.CASCADE)
+    short_name: str = models.CharField(max_length=20)
+    workflow: Site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     class Meta:
         app_label = "workflow"
         verbose_name_plural = "Presses"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -73,32 +90,32 @@ class PrintLocation(models.Model):
     plants tied to Sites.
     """
 
-    plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
-    press = models.ForeignKey(Press, on_delete=models.CASCADE)
-    active = models.BooleanField(default=True)
+    plant: Plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
+    press: Press = models.ForeignKey(Press, on_delete=models.CASCADE)
+    active: bool = models.BooleanField(default=True)
 
     class Meta:
         app_label = "workflow"
         ordering = ["plant"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.plant) + " - " + str(self.press)
 
 
 class ProofTracker(models.Model):
     """A record of a proof printed by Automation Engine."""
 
-    item = models.ForeignKey("Item", on_delete=models.CASCADE)
-    creation_date = models.DateTimeField("Date Printed")
-    copies = models.IntegerField(default=1)
-    xml_filename = models.CharField(max_length=255, blank=True)
-    proofer = models.CharField(max_length=255, blank=True)
+    item: "Item" = models.ForeignKey("Item", on_delete=models.CASCADE)
+    creation_date: datetime = models.DateTimeField("Date Printed")
+    copies: int = models.IntegerField(default=1)
+    xml_filename: str = models.CharField(max_length=255, blank=True)
+    proofer: str = models.CharField(max_length=255, blank=True)
 
 
 class Platemaker(models.Model):
     """Represents a Plate Maker."""
 
-    name = models.CharField(max_length=255, unique=True)
+    name: str = models.CharField(max_length=255, unique=True)
     workflow = models.ManyToManyField(
         Site, related_name="platemaking_sites", blank=True
     )
@@ -119,8 +136,8 @@ class SpecialMfgConfiguration(models.Model):
     Forms Somewhere Else, etc...
     """
 
-    name = models.CharField(max_length=255, unique=True)
-    workflow = models.ForeignKey(Site, on_delete=models.CASCADE)
+    name: str = models.CharField(max_length=255, unique=True)
+    workflow: Site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     class Meta:
         app_label = "workflow"
@@ -134,12 +151,12 @@ class PlatePackage(models.Model):
     For example Acme Plates makes Digital Flexo plates for Foodservice.
     """
 
-    platetype = models.CharField(max_length=50, choices=PLATE_OPTIONS)
+    platetype: str = models.CharField(max_length=50, choices=PLATE_OPTIONS)
     workflow = models.ManyToManyField(
         Site, related_name="platepackage_sites", blank=True
     )
-    platemaker = models.ForeignKey(Platemaker, on_delete=models.CASCADE)
-    active = models.BooleanField(default=True)
+    platemaker: Platemaker = models.ForeignKey(Platemaker, on_delete=models.CASCADE)
+    active: bool = models.BooleanField(default=True)
 
     class Meta:
         app_label = "workflow"
@@ -173,10 +190,10 @@ class ItemCatalog(models.Model):
         "MFG Name", max_length=20, blank=True, null=True, unique=True
     )
     template = models.CharField(max_length=100, blank=True)
-    photo = models.CharField(max_length=100, blank=True)
-    active = models.BooleanField(default=True)
-    last_edit = models.DateTimeField("Last Edit Date", auto_now=True)
-    workflow = models.ForeignKey(Site, on_delete=models.CASCADE)
+    photo: str = models.CharField(max_length=100, blank=True)
+    active: bool = models.BooleanField(default=True)
+    last_edit: datetime = models.DateTimeField("Last Edit Date", auto_now=True)
+    workflow: Site = models.ForeignKey(Site, on_delete=models.CASCADE)
     acts_like = models.ForeignKey(
         "self",
         on_delete=models.CASCADE,
@@ -186,8 +203,8 @@ class ItemCatalog(models.Model):
     )
     # Code used for Evergreen's new nomenclature: 10/2009
     # (A=4oz Eco, H=Half Gallon, Q=Quart, etc...)
-    bev_size_code = models.CharField(max_length=5, blank=True)
-    comments = models.TextField(max_length=500, blank=True, null=True)
+    bev_size_code: str = models.CharField(max_length=5, blank=True)
+    comments: str = models.TextField(max_length=500, blank=True, null=True)
 
     class Meta:
         app_label = "workflow"
@@ -197,7 +214,7 @@ class ItemCatalog(models.Model):
     def __str__(self):
         return self.size
 
-    def is_metric(self):
+    def is_metric(self) -> bool:
         """Returns True if the item is a metric size."""
         return self.size.lower().replace(" ", "") in [
             "250ml",
@@ -207,7 +224,7 @@ class ItemCatalog(models.Model):
             "1liter",
         ]
 
-    def is_bev_panel(self):
+    def is_bev_panel(self) -> bool:
         """Return True if item is a Beverage side panel."""
         if (
             self.workflow.name == "Beverage"
@@ -218,7 +235,7 @@ class ItemCatalog(models.Model):
         else:
             return False
 
-    def is_bev_carton(self):
+    def is_bev_carton(self) -> bool:
         """Return True if item is a Beverage side panel."""
         if (
             self.workflow.name == "Beverage"
@@ -229,19 +246,19 @@ class ItemCatalog(models.Model):
         else:
             return False
 
-    def pdf_template_exists(self):
+    def pdf_template_exists(self) -> bool:
         """Returns True if PDF template exists."""
         try:
-            pdf_file = fs_api.get_pdf_template(self.size)
+            fs_api.get_pdf_template(self.size)
             return True
         except Exception:
             return False
 
-    def get_stripped_size(self):
+    def get_stripped_size(self) -> str:
         """Returns the stripped and formatted size for use with scripts."""
         return self.size.replace(" ", "").lower()
 
-    def get_coating_type(self, return_abbrev=False):
+    def get_coating_type(self, return_abbrev: bool = False) -> str:
         """Returns a string representation of this item type's coating.
 
         Can be one of the following, abbreviations are in parenthesis:
@@ -263,11 +280,11 @@ class ItemCatalog(models.Model):
             else:
                 return "Coated"
 
-    def specs_with_item(self):
+    def specs_with_item(self) -> int:
         number = ItemSpec.objects.filter(size=self.id).count()
         return number
 
-    def active_specs(self):
+    def active_specs(self) -> QuerySet["ItemSpec"]:
         """Return active specs associated with catalog."""
         return ItemSpec.objects.filter(size=self.id, active=True).order_by(
             "printlocation__plant__name", "printlocation__press__name"
@@ -280,9 +297,9 @@ class BevItemColorCodes(models.Model):
     logic to it...
     """
 
-    size = models.ForeignKey("ItemCatalog", on_delete=models.CASCADE)
-    num_colors = models.IntegerField()
-    code = models.CharField(max_length=20)
+    size: "ItemCatalog" = models.ForeignKey("ItemCatalog", on_delete=models.CASCADE)
+    num_colors: int = models.IntegerField()
+    code: str = models.CharField(max_length=20)
 
     class Meta:
         app_label = "workflow"
@@ -296,11 +313,11 @@ class ItemCatalogPhoto(models.Model):
     Not currently in use -- will be a Phase 2 feature.
     """
 
-    size = models.ForeignKey("ItemCatalog", on_delete=models.CASCADE)
-    stock = models.CharField(max_length=20, blank=True)
-    photo = models.CharField(max_length=100, blank=True)
-    active = models.BooleanField(default=True)
-    last_edit = models.DateTimeField("Last Edit Date", auto_now=True)
+    size: "ItemCatalog" = models.ForeignKey("ItemCatalog", on_delete=models.CASCADE)
+    stock: str = models.CharField(max_length=20, blank=True)
+    photo: str = models.CharField(max_length=100, blank=True)
+    active: bool = models.BooleanField(default=True)
+    last_edit: datetime = models.DateTimeField("Last Edit Date", auto_now=True)
 
     class Meta:
         app_label = "workflow"
@@ -335,7 +352,7 @@ class ItemSpec(models.Model):
     case_wt = models.CharField("Case weight", max_length=100, blank=True)
     case_pack = models.IntegerField(blank=True, null=True)
     # Minimum case order quantities.
-    min_case = models.IntegerField(blank=True, null=True)
+    min_case: int = models.IntegerField(blank=True, null=True)
     #    step_around = models.IntegerField(blank=True, null=True)#moving to StepSpec model
     #    step_across = models.IntegerField(blank=True, null=True)#moving to StepSpec model
     # Calculated by multiplying step_around and step_across fields.
@@ -349,7 +366,7 @@ class ItemSpec(models.Model):
     def __str__(self):
         return str(self.size) + " - " + str(self.printlocation)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return "/workflow/itemcatalog/specs/edit/%d/" % self.id
 
 
@@ -374,10 +391,10 @@ class StepSpec(models.Model):
     step_around = models.IntegerField(blank=True, null=True)
     step_across = models.IntegerField(blank=True, null=True)
     print_repeat = models.FloatField(blank=True, null=True)
-    num_blanks = models.IntegerField("Number of blanks", blank=True, null=True)
-    comments = models.CharField(max_length=500, blank=True)
-    active = models.BooleanField(default=False)
-    creation_date = models.DateTimeField("Date created", auto_now_add=True)
+    num_blanks: int = models.IntegerField("Number of blanks", blank=True, null=True)
+    comments: str = models.CharField(max_length=500, blank=True)
+    active: bool = models.BooleanField(default=False)
+    creation_date: datetime = models.DateTimeField("Date created", auto_now_add=True)
     last_user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -385,7 +402,7 @@ class StepSpec(models.Model):
         null=True,
         related_name="stepspec_edits",
     )
-    last_edit = models.DateTimeField("Last edit date", auto_now=True)
+    last_edit: datetime = models.DateTimeField("Last edit date", auto_now=True)
 
     class Meta:
         app_label = "workflow"
@@ -412,8 +429,8 @@ signals.pre_save.connect(stepspec_pre_save, sender=StepSpec)
 class Substrate(models.Model):
     """Represents a carton substrate."""
 
-    name = models.CharField(max_length=100)
-    active = models.BooleanField(default=True)
+    name: str = models.CharField(max_length=100)
+    active: bool = models.BooleanField(default=True)
 
     class Meta:
         app_label = "workflow"
@@ -429,8 +446,8 @@ class CartonWorkflow(models.Model):
     like Foodservice and Beverage.
     """
 
-    name = models.CharField(max_length=100)
-    active = models.BooleanField(default=True)
+    name: str = models.CharField(max_length=100)
+    active: bool = models.BooleanField(default=True)
 
     class Meta:
         app_label = "workflow"
@@ -444,8 +461,8 @@ class CartonWorkflow(models.Model):
 class LineScreen(models.Model):
     """Represents a carton line screen."""
 
-    name = models.CharField(max_length=100)
-    active = models.BooleanField(default=True)
+    name: str = models.CharField(max_length=100)
+    active: bool = models.BooleanField(default=True)
 
     class Meta:
         app_label = "workflow"
@@ -459,8 +476,8 @@ class LineScreen(models.Model):
 class InkSet(models.Model):
     """Represents a carton ink set."""
 
-    name = models.CharField(max_length=100)
-    active = models.BooleanField(default=True)
+    name: str = models.CharField(max_length=100)
+    active: bool = models.BooleanField(default=True)
 
     class Meta:
         app_label = "workflow"
@@ -474,8 +491,8 @@ class InkSet(models.Model):
 class PrintCondition(models.Model):
     """Represents a carton print condition."""
 
-    name = models.CharField(max_length=100)
-    active = models.BooleanField(default=True)
+    name: str = models.CharField(max_length=100)
+    active: bool = models.BooleanField(default=True)
 
     class Meta:
         app_label = "workflow"
@@ -489,8 +506,8 @@ class PrintCondition(models.Model):
 class Trap(models.Model):
     """Represents a carton trap."""
 
-    name = models.CharField(max_length=100)
-    active = models.BooleanField(default=True)
+    name: str = models.CharField(max_length=100)
+    active: bool = models.BooleanField(default=True)
 
     class Meta:
         app_label = "workflow"
@@ -504,8 +521,8 @@ class Trap(models.Model):
 class CartonProfile(models.Model):
     """Represents a carton profile."""
 
-    name = models.CharField(max_length=100)
-    active = models.BooleanField(default=True)
+    name: str = models.CharField(max_length=100)
+    active: bool = models.BooleanField(default=True)
     carton_workflow = models.ManyToManyField(
         CartonWorkflow, related_name="carton_workflows"
     )
@@ -534,23 +551,23 @@ class TiffCrop(models.Model):
     to read them.
     """
 
-    size = models.ForeignKey("ItemCatalog", on_delete=models.CASCADE)
-    plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
-    num_up = models.IntegerField()
+    size: "ItemCatalog" = models.ForeignKey("ItemCatalog", on_delete=models.CASCADE)
+    plant: Plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
+    num_up: int = models.IntegerField()
     special_mfg = models.ForeignKey(
         "SpecialMfgConfiguration", on_delete=models.CASCADE, blank=True, null=True
     )
-    x_size = models.FloatField()
-    y_size = models.FloatField()
-    x_offset = models.FloatField()
-    y_offset = models.FloatField()
+    x_size: float = models.FloatField()
+    y_size: float = models.FloatField()
+    x_offset: float = models.FloatField()
+    y_offset: float = models.FloatField()
 
     class Meta:
         app_label = "workflow"
         verbose_name = "Tiff Crop Dimension"
         verbose_name_plural = "Tiff Crop Dimensions"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "%s - %s - %s - %s" % (
             str(self.size),
             str(self.plant),
@@ -576,14 +593,14 @@ class TrackedArt(models.Model):
         ("pefc", "PEFC Label"),
         ("misc_enviro", "Misc. Enviromental Messaging"),
     )
-    art_catagory = models.CharField(max_length=30, choices=art_types)
-    addition_comments = models.CharField(max_length=500, blank=True)
-    addition_date = models.DateField("Date Added", blank=True, null=True)
+    art_catagory: str = models.CharField(max_length=30, choices=art_types)
+    addition_comments: str = models.CharField(max_length=500, blank=True)
+    addition_date: date = models.DateField("Date Added", blank=True, null=True)
     edited_by = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=True, null=True, related_name="edited_by"
     )
-    removal_comments = models.CharField(max_length=500, blank=True)
-    removal_date = models.DateField("Date Removed", blank=True, null=True)
+    removal_comments: str = models.CharField(max_length=500, blank=True)
+    removal_date: date = models.DateField("Date Removed", blank=True, null=True)
     removed_by = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=True, null=True, related_name="removed_by"
     )
@@ -598,7 +615,7 @@ class TrackedArt(models.Model):
             str(self.art_catagory),
         )
 
-    def get_marketing_reviews(self):
+    def get_marketing_reviews(self) -> QuerySet["ItemReview"]:
         reviews = ItemReview.objects.filter(item=self.item, review_catagory="market")
         return reviews
 
@@ -619,8 +636,8 @@ class ItemTracker(models.Model):
     type = models.ForeignKey(
         "ItemTrackerType", on_delete=models.CASCADE
     )  # What in the item is being tracked.
-    addition_comments = models.CharField(max_length=500, blank=True, null=True)
-    addition_date = models.DateField("Date Added", blank=True, null=True)
+    addition_comments: str = models.CharField(max_length=500, blank=True, null=True)
+    addition_date: date = models.DateField("Date Added", blank=True, null=True)
     edited_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -628,8 +645,8 @@ class ItemTracker(models.Model):
         null=True,
         related_name="tracker_edited_by",
     )
-    removal_comments = models.CharField(max_length=500, blank=True, null=True)
-    removal_date = models.DateField("Date Removed", blank=True, null=True)
+    removal_comments: str = models.CharField(max_length=500, blank=True, null=True)
+    removal_date: date = models.DateField("Date Removed", blank=True, null=True)
     removed_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -653,9 +670,9 @@ class ItemTrackerType(models.Model):
     reporting purposes.
     """
 
-    name = models.CharField(max_length=50)
+    name: str = models.CharField(max_length=50)
     category = models.ForeignKey("ItemTrackerCategory", on_delete=models.CASCADE)
-    description = models.TextField(blank=True, null=True)
+    description: str = models.TextField(blank=True, null=True)
 
     class Meta:
         app_label = "workflow"
@@ -673,8 +690,8 @@ class ItemTrackerCategory(models.Model):
     reports the various trackers should show up in.
     """
 
-    name = models.CharField(max_length=50)
-    description = models.TextField(blank=True, null=True)
+    name: str = models.CharField(max_length=50)
+    description: str = models.TextField(blank=True, null=True)
 
     class Meta:
         app_label = "workflow"
@@ -1007,6 +1024,10 @@ class Charge(models.Model):
 
 class PlateOrder(models.Model):
     """Submission and tracking of plate order."""
+
+    # Type annotations for Django reverse relationships
+    if TYPE_CHECKING:
+        plateorderitem_set: models.Manager["PlateOrderItem"]
 
     item = models.ForeignKey("workflow.Item", on_delete=models.CASCADE)
     date_entered = models.DateField("Date Entered", auto_now_add=True)

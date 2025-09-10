@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Reads the ColorKeyJDF queue via the ColorKeyQueue model, searching for those that have no processed date."""
+"""Reads ColorKeyJDF queue, searches for items with no processed date."""
 
 import glob
 import os
@@ -50,7 +50,7 @@ for entry in pending_items:
     so that we can see if any jobs exist for an item/job
 
     this will check the number of attempts to process this and send an email if there are 5 or more.
-    most likely indicating that something i wrong
+    most likely indicating that something is wrong
     """
     entry.number_of_attempts += 1
     entry.save()

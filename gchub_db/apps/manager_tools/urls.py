@@ -1,6 +1,30 @@
 from django.urls import re_path as url
 
-from gchub_db.apps.manager_tools.views import *
+from gchub_db.apps.manager_tools.views import (
+    artist_loading,
+    artwork_excel,
+    artworktracking,
+    costavoidance,
+    home,
+    hoursbyplant,
+    jobcategory_all,
+    jobcategory_artists,
+    materials,
+    metrics_excel,
+    metrics_form,
+    metrics_pdf,
+    monthly_billing,
+    overview,
+    qc,
+    sick,
+    stalecharges,
+    stalecharges_excel,
+    timesheets,
+    turntime,
+    turntimes_by_artist,
+    turntimes_by_item,
+    vacation,
+)
 
 urlpatterns = [
     url(r"^$", home, name="manager_tools-home"),

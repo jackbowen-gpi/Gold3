@@ -1,5 +1,6 @@
 #!/usr/bin/python
 """Prepare beverage invoices by collecting billable charges and creating invoices."""
+
 import datetime
 
 import bin_functions

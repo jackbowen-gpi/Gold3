@@ -1,6 +1,6 @@
 {% extends "standard.html" %}
 
-{% block extra_head %} 
+{% block extra_head %}
 	<style type="text/css">
 		input {
 			border: none;
@@ -16,12 +16,12 @@
 	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
 
 	<!-- Javascript happens here. -->
-	<script type="text/javascript"> 
+	<script type="text/javascript">
 		//prototype is loaded in GOLD's base html and it uses $ just like jquery
-		//does. So we'll change $ to $j for the jQuery on this page using 
+		//does. So we'll change $ to $j for the jQuery on this page using
 		//jQuery.noConflict()
 		var $j = jQuery.noConflict();
-		
+
 		//jQuery stuff.
 		$j(document).ready(function(){
 			// Busy inidcator
@@ -67,8 +67,8 @@
 {% load humanize %}
 
 <div class="grey_bordered">
-<!-- Hours Per Activity table -->	
-	<h2> 
+<!-- Hours Per Activity table -->
+	<h2>
 		<form method="post">
 			{% csrf_token %}
 			Hours Per Activity for {{timesheetform.month}} {{timesheetform.year}}
@@ -88,8 +88,8 @@
 		<tr class="{% cycle 'rowA' 'rowB' %}">
 			{% for entry in employee_data %}
 				<!-- First entery is the name. Make it link to a detailed report. -->
-				{% ifequal entry employee_data.0 %}  
-					{% if entry.1 == "Total"%} 
+				{% ifequal entry employee_data.0 %}
+					{% if entry.1 == "Total"%}
 					<!-- No detailed report for Total -->
 						<th>
 							{{ entry.1 }}
@@ -109,14 +109,14 @@
 	</table>
 </div>
 
-<!-- Billable hours table -->	
+<!-- Billable hours table -->
 <div class="grey_bordered">
-	<h2> 
+	<h2>
 		Billable Hours
 	</h2>
-	
+
 	<p>Billable hours are totaled from timesheet entries assigned to jobs.</p>
-	
+
 	<table class="rowHover">
 		<tr>
 			<th>Employee</th>
@@ -150,13 +150,13 @@
 							<th> {{ cat }} </th>
 						{% endfor %}
 					</tr>
-			
+
 				{% for employee_data in data %}
 					<tr class="{% cycle 'rowA' 'rowB' %}">
 						{% for entry in employee_data %}
 							<!-- First entery is the name. Make it link to a detailed report. -->
-							{% ifequal entry employee_data.0 %}  
-								{% if entry.1 == "Total"%} 
+							{% ifequal entry employee_data.0 %}
+								{% if entry.1 == "Total"%}
 								<!-- No detailed report for Total -->
 									<th>
 										{{ entry.1 }}
@@ -171,7 +171,7 @@
 							{% endifequal %}
 						{% endfor %}
 					</tr>
-			
+
 				{% endfor %}
 				</table>
 			</div>

@@ -311,7 +311,7 @@ class OAuthMixin(object):
             callback(None)
             return
         access_token = _oauth_parse_response(response.body)
-        user = self._oauth_get_user(
+        self._oauth_get_user(
             access_token,
             self.async_callback(self._on_oauth_get_user, access_token, callback),
         )
@@ -452,7 +452,6 @@ class TwitterMixin(OAuthMixin):
             all_args = {}
             all_args.update(args)
             all_args.update(post_args or {})
-            consumer_token = self._oauth_consumer_token()
             method = "POST" if post_args is not None else "GET"
             oauth = self._oauth_request_parameters(
                 url, access_token, all_args, method=method
@@ -587,7 +586,6 @@ class FriendFeedMixin(OAuthMixin):
             all_args = {}
             all_args.update(args)
             all_args.update(post_args or {})
-            consumer_token = self._oauth_consumer_token()
             method = "POST" if post_args is not None else "GET"
             oauth = self._oauth_request_parameters(
                 url, access_token, all_args, method=method

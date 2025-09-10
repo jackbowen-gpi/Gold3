@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """Create a spreadsheet of inactive users and email the report to admins."""
-# openpyxl is now used instead of pyExcelerator because it supports python3 and pyexcelerator is deprecated
+
+# openpyxl is now used instead of pyExcelerator because it supports
+# python3 and pyexcelerator is deprecated
 import bin_functions
 import openpyxl
 
@@ -100,7 +102,8 @@ except Exception:
 
 email = EmailMessage(
     "Inactive Users Report",
-    "This is a report of inactive users in GOLD. Each page of the excel document represents a different time period starting with those who have never logged in.",
+    "This is a report of inactive users in GOLD. Each page of the excel document represents "
+    "a different time period starting with those who have never logged in.",
     settings.EMAIL_FROM_ADDRESS,
     mail_list,
     cc_mail_list,

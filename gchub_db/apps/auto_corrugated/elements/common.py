@@ -1,6 +1,6 @@
 """Common elements that may be useful for other generators."""
 
-from gchub_db.includes.reportlib.elements.collidables import CollidableElement
+from includes.reportlib.elements.collidables import CollidableElement
 
 
 class MarginElement(CollidableElement):

@@ -1,7 +1,11 @@
 from django.urls import re_path as url
 
-from gchub_db.apps.fedexsys.views import *
-from gchub_db.apps.fedexsys.views import ListShipments
+from gchub_db.apps.fedexsys.views import (
+    ship_request,
+    track_shipment,
+    delete_ship_request,
+    ListShipments,
+)
 
 urlpatterns = [
     # Request a Shipment/Label

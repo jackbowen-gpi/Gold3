@@ -1,6 +1,17 @@
 from django.urls import re_path as url
 
-from gchub_db.apps.draw_down.views import *
+from gchub_db.apps.draw_down.views import (
+    home,
+    show,
+    show_legacy,
+    delete_drawdown,
+    edit_drawdown,
+    view_drawdown,
+    drawdown_search,
+    drawdown_search_results,
+    complete_drawdown,
+    pending_drawdown,
+)
 
 urlpatterns = [
     url(r"^$", home, name="drawdown_home"),

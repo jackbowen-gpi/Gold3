@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Archive jobs that have not seen activity for extended periods and move their symlinks to the Archive directory."""
+"""Archive jobs with no activity, move symlinks to Archive dir."""
 
 import time
 from datetime import timedelta
@@ -15,7 +15,8 @@ from gchub_db.includes import fs_api
 
 # Jobs with no activity for more than this number of days will be archived.
 ARCHIVAL_CUTOFF_DATE = 180
-# Jobs with no activity that are complete for more than this number of days will be archived.
+# Jobs with no activity that are complete for more than this number
+# of days will be archived.
 COMPLETE_CUTOFF_DATE = 120
 
 JOB_SET = (

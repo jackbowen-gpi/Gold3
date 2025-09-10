@@ -92,7 +92,7 @@ for user in users:
 from includes.notification_manager import bulk_notify_users
 bulk_notify_users(
     users_queryset=users,
-    title="GOLD Change Announcement", 
+    title="GOLD Change Announcement",
     message=change.change,
     pref_field="growl_hear_gold_changes"
 )
@@ -122,13 +122,13 @@ user = User.objects.first()
 # Test basic notification
 user.profile.growl_at("Test", "Hello from Windows!")
 
-# Test sticky notification  
+# Test sticky notification
 user.profile.growl_at("Important", "This is important!", sticky=True)
 
 # Test with preferences
 user.profile.growl_at(
-    "Job Update", 
-    "New job available", 
+    "Job Update",
+    "New job available",
     pref_field="growl_hear_new_carton_jobs"
 )
 ```
@@ -140,7 +140,7 @@ user.profile.growl_at(
 - Add the notification manager files
 - Test basic functionality
 
-### Phase 2: Integration (Day 2-3)  
+### Phase 2: Integration (Day 2-3)
 - Update UserProfile.growl_at() method
 - Test existing notification workflows
 - Verify user preferences still work

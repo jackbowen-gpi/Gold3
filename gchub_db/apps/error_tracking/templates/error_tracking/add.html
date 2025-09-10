@@ -2,7 +2,7 @@
 
 {% block extra_head %}
   {% include "error_tracking/navbar_header.inc.html" %}
-{% endblock %} 
+{% endblock %}
 
 {% block body %}
 <img src="{{MEDIA_URL}}img/icons/error.png" alt="Error Tracking" /> <h1 class="inline">Report a Graphics Error</h1><br /><br />
@@ -15,11 +15,11 @@
 		<input type="hidden" id="id_job" name="job" value="{{item.job.id}}" />
 		<input type="hidden" id="id_item" name="item" value="{{item.id}}" />
 		<input type="hidden" id="id_reported_by" name="reported_by" value="{{user.id}}" />
-		
+
 		<label for="id_stage">Stage Caught:</label>{{form.stage}}<br />
 		<label for="id_description">Description:</label>{{form.description}}<br />
-		
+
 		<input type="submit" value="Submit Error" />
 	</form>
-	
+
 {% endblock %}

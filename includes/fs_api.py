@@ -240,7 +240,8 @@ def _send_fs_server_datagram(message):
 
     num_sent = 0
     while num_sent < len(message):
-        # encode makes this string byte-like so that s (socket) can send the message that must be byte-like
+        # encode makes this string byte-like so that s
+        # (socket) can send the message that must be byte-like
         num_sent += s.sendto(message.encode(), addr)
     s.close()
 
@@ -397,7 +398,7 @@ def find_item_folder(jobnum, itemnum, search_dir="final_files"):
     pattern = get_jobnum_itemnum_finder_regexp(jobnum, itemnum)
     ff_folder = os.path.join(get_job_folder(jobnum), JOBDIR[search_dir])
     retval = _generic_item_subfolder_search(ff_folder, pattern)
-    if retval == None:
+    if retval is None:
         raise InvalidItem()
     return retval
 
@@ -432,8 +433,9 @@ def create_item_folder(jobnum, itemnum, itemname):
 
 
 def rename_item_folders(jobnum, itemnum, itemname):
-    """Renmames the necessary folders for an item in the event of an intermixed job that has manual folder
-    creation components. This throws off the naming scheme and doesnt update folder names on the server.
+    """Renmames the necessary folders for an item in the event of an
+    intermixed job that has manual folder    creation components. This
+    throws off the naming scheme and doesnt update folder names on the server.
     """
     oldName = "%s-%s" % (jobnum, itemnum)
     message = ""
@@ -604,7 +606,6 @@ def get_thumbnail_item_finalfile(jobnum, itemnum, width=155):
     Returns the string path to the thumbnail, or a None value if none can
     be found.
     """
-    ff_file = get_item_finalfile(jobnum, itemnum)
     ff_folder = get_item_finalfile_folder(jobnum, itemnum)
     # Figure out where the .thumbnails folder should be.
     thumbnail_folder = os.path.join(ff_folder, THUMBNAIL_FOLDER_NAME)
@@ -760,7 +761,8 @@ def get_item_approval_pdf(jobnum, itemnum):
     """Pulls the approval PDF for a given item.
     JobFolder/DatabaseDocs/Approvals/xxx.pdf
     Only exists for FSB, and even then, not all the time.
-    Will need to first check the job folder directories, then look on the archive server for it.
+    Will need to first check the job folder directories,
+    then look on the archive server for it.
     """
     jobfolder = get_job_folder(jobnum)
     folder = os.path.join(jobfolder, JOBDIR["2_approval_scans"])
@@ -774,10 +776,10 @@ def get_item_preview_art(jobnum, itemnum):
     Will need to first check the job folder directories, then look on the archive server for it.
     """
     # Check if file system access is disabled for development
-    if not getattr(settings, 'FS_ACCESS_ENABLED', True):
+    if not getattr(settings, "FS_ACCESS_ENABLED", True):
         # Mock preview art for development environment
         raise NoResultsFound("Preview art access disabled in development mode")
-    
+
     jobfolder = get_job_folder(jobnum)
     folder = os.path.join(jobfolder, JOBDIR["3_preview_art"])
     pattern = re.compile(r"ap_(.*)_(%s)[.](pdf)$" % itemnum)
@@ -789,10 +791,10 @@ def get_item_print_seps(jobnum, itemnum):
     JobFolder/Database_Documents/Printable_Separations/jobnum-itemnum_size_Seps.pdf
     """
     # Check if file system access is disabled for development
-    if not getattr(settings, 'FS_ACCESS_ENABLED', True):
+    if not getattr(settings, "FS_ACCESS_ENABLED", True):
         # Mock print separations for development environment
         raise NoResultsFound("Print separations access disabled in development mode")
-    
+
     jobfolder = get_job_folder(jobnum)
     folder = os.path.join(jobfolder, JOBDIR["4_print_seps"])
     pattern = re.compile(r"(.*)-(%s)_(.*)_Seps[.](pdf)$" % itemnum)

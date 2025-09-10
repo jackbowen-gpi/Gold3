@@ -1,17 +1,17 @@
 """Generic corrugated documents."""
 
-"""
-This module contains high-level document classes for generating things such
-as Foodservice containerboard artwork and label images.
-"""
 from fractions import Fraction
-
 from reportlab.graphics import renderPDF
 from reportlab.lib.units import inch
 
 from gchub_db.apps.auto_corrugated.elements.common import MarginElement
 from gchub_db.includes.reportlib.documents.canvas import GenericCanvas
 from gchub_db.includes.reportlib.util import check_text_width
+
+"""
+This module contains high-level document classes for generating things such
+as Foodservice containerboard artwork and label images.
+"""
 
 
 class ElementGroup(object):
@@ -176,9 +176,6 @@ class GenericBox(GenericCanvas):
             drawing_bottom_left_x += element.width
             drawing_bottom_left_y += element.height
 
-        upper_right_x = drawing_bottom_left_x + element.width
-        upper_right_y = drawing_bottom_left_y + element.height
-
         # canvas.setStrokeColorCMYK(0, 0.5, 0, 0)
         # canvas.setFillColorCMYK(0, 0.5, 0, 0)
 
@@ -207,7 +204,6 @@ class GenericBox(GenericCanvas):
         bottom_left_x = element.bottom_left_x
         bottom_left_y = element.bottom_left_y
 
-        can_scale = element.can_scale
         fix_x = element.fix_x
         fix_y = element.fix_y
 
@@ -287,7 +283,6 @@ class GenericBox(GenericCanvas):
                     top_right_x >= existing_obj_top_right_x
                     and top_right_y >= existing_obj_top_right_y
                 ):
-                    collison = True
                     if self.DEBUG:
                         print(
                             "@>>>WARNING: Complete coverage of new object over existing!"
@@ -311,8 +306,6 @@ class GenericBox(GenericCanvas):
                         (top_right_y - bottom_left_y) / 2.0
                     ) + bottom_left_y
                     # Compare midpoints. Positive means object is below/left.
-                    delta_y = existing_midpoint_y - comp_midpoint_y
-                    delta_x = existing_midpoint_x - comp_midpoint_x
                     # TODO: account for equal differently?
                     # New object is up or down. Register both direction and distance.
                     # Distance is the OVERLAP amount.
@@ -403,22 +396,17 @@ class GenericBox(GenericCanvas):
 
         padding = element.padding
 
-        change_xy = False
         scaling = None
         # Move if allowed to move in the x direction.
         if direction == "RIGHT":
             draw_x += distance + padding
-            change_xy = True
         elif direction == "LEFT":
             draw_x -= distance + padding
-            change_xy = True
         # Move if allowed to move in the y direction.
         elif direction == "UP":
             draw_y += distance + padding
-            change_xy = True
         elif direction == "DOWN":
             draw_y -= distance + padding
-            change_xy = True
         # If XY is fixed, try to scale element.
         elif direction == "SCALE_DOWN":
             scaling = (element.height - padding - distance) / element.height

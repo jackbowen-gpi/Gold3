@@ -23,13 +23,19 @@ from gchub_db.apps.workflow.views.search_views import (
     InkCovReport,
     ItemFindSame,
     JobSearchResultsView,
+    job_todo_list,
     MktReviewReport,
 )
 
 """
 color-warning views
 """
-from gchub_db.apps.workflow.views.color_warning_views import *  # noqa: E402
+from gchub_db.apps.workflow.views.color_warning_views import (
+    add_warning,
+    color_warning,
+    edit_warning,
+    view_warning,
+)
 
 urlpatterns = [
     url(
@@ -54,7 +60,56 @@ urlpatterns = [
 """
 Job-related views
 """
-from gchub_db.apps.workflow.views.job_views import *  # noqa: E402
+from gchub_db.apps.workflow.views.job_views import (
+    add_item,
+    add_job_address,
+    ajax_job_save,
+    attach_address_to_job,
+    bev_item_nomenclature,
+    carton_invoice,
+    cartonprofile_lookup,
+    change_job_csr,
+    change_job_name,
+    change_platepackage,
+    change_printlocation,
+    copy_jobaddress_to_contacts,
+    create_job_creative_shortcut,
+    cycle_job_todo_list_mode,
+    db_doc_upload,
+    delete_job_address,
+    duplicate_job,
+    edit_all_billing,
+    edit_all_timeline,
+    edit_all_timeline_pageload,
+    edit_job_address,
+    etools_show_request,
+    extended_job_edit,
+    get_database_document,
+    get_zipfile_proof,
+    gps_connect_cust_info,
+    gps_connect_cust_info_json,
+    item_duplicate_list,
+    item_summary,
+    item_tracker_art,
+    item_tracker_mkt,
+    item_tracker_promo,
+    job_detail,
+    job_detail_main,
+    job_item_json,
+    job_specsheet_data,
+    misc_info,
+    new_beverage_item,
+    new_beverage_job,
+    new_carton_item,
+    new_carton_job,
+    new_container_item,
+    new_container_job,
+    remove_from_archive,
+    reset_permissions,
+    shipping_manager,
+    sync_folders,
+    timesheets,
+)
 
 urlpatterns += [
     url(r"^job/(?P<job_id>\d+)/$", job_detail, name="job_detail"),
@@ -215,7 +270,53 @@ urlpatterns += [
 """
 Item-related views
 """
-from gchub_db.apps.workflow.views.item_views import *  # noqa: E402
+from gchub_db.apps.workflow.views.item_views import (
+    add_item_charge,
+    add_itemcolor,
+    ajax_item_save,
+    bev_nomenclature_lookup,
+    change_itemcolor,
+    charge_lookup,
+    delete_billing,
+    delete_item,
+    delete_item_tracker,
+    delete_itemcolor,
+    delete_revision,
+    do_colorkey_queue,
+    do_copy_fsb_production_template,
+    do_copy_master_template,
+    do_copy_misregistration_pdf,
+    do_copy_nx_plates,
+    do_copy_qad_data,
+    do_item_import_qad,
+    do_item_make_bev_die,
+    do_item_tiff_to_pdf,
+    do_make_fsb_art_rectangle,
+    edit_bev_brand_code,
+    edit_billing,
+    enter_revision,
+    get_item_approval_scan,
+    get_item_finalfile,
+    get_item_preview_art,
+    get_item_print_seps,
+    get_item_proof,
+    get_single_tiff,
+    get_stepped_item_proof,
+    get_zipfile_tiff,
+    item_billing_detail,
+    item_ink_data,
+    item_internal_detail,
+    item_jdf_detail,
+    item_production_detail,
+    item_sap_detail,
+    item_thumbnail,
+    item_tiff_download_list,
+    item_timeline_detail,
+    json_get_item_specs,
+    tiff_rip,
+    transfer_files_to_concord,
+    view_bev_brand_code,
+)
 
 urlpatterns += [
     url(r"^item/(?P<item_id>\d+)/colorkey/$", do_colorkey_queue),
@@ -408,7 +509,25 @@ urlpatterns += [
 """
 Search-related views
 """
-from gchub_db.apps.workflow.views.search_views import *  # noqa: E402
+from gchub_db.apps.workflow.views.search_views import (
+    FSB_InkCovReport,
+    ReviewSearchResults,
+    bioengineered_excel,
+    fsb_inkcov_excel,
+    get_fedex_shipment_pdf,
+    inkcov_excel,
+    item_search,
+    items_rejected,
+    job_search,
+    list_reports,
+    makeship_excel,
+    mkt_review,
+    mkt_review_excel,
+    otifne_report,
+    pending_jobs,
+    process_review,
+    review,
+)
 from gchub_db.apps.workflow.views.autocomplete_views import (
     job_autocomplete,
     item_autocomplete,
@@ -491,7 +610,20 @@ urlpatterns += [
 """
 Item catalog related views.
 """
-from gchub_db.apps.workflow.views.itemcatalog_views import *  # noqa: E402
+from gchub_db.apps.workflow.views.itemcatalog_views import (
+    catalog_search,
+    edit_itemcatalog,
+    edit_itemspecs,
+    edit_stepspecs,
+    itemcatalog_home,
+    new_itemcatalog,
+    new_itemspecs,
+    new_itemspecs_dupe,
+    new_stepspecs,
+    new_stepspecs_dupe,
+    spec_search,
+    step_search,
+)
 
 urlpatterns += [
     url(r"^itemcatalog/$", itemcatalog_home, name="itemcatalog_home"),
@@ -554,7 +686,14 @@ urlpatterns += [
 """
 Platemaking views
 """
-from gchub_db.apps.workflow.views.platemaking_views import *  # noqa: E402
+from gchub_db.apps.workflow.views.platemaking_views import (
+    mark_plateorder_invoiced,
+    plate_reorder_form,
+    plate_reorder_search,
+    plate_reorder_submit,
+    platemaking_canceled,
+    platemaking_handle,
+)
 
 urlpatterns += [
     url(
@@ -608,7 +747,17 @@ urlpatterns += [
 """
 Misc. views
 """
-from gchub_db.apps.workflow.views.misc_views import *  # noqa: E402
+from gchub_db.apps.workflow.views.misc_views import (
+    add_centercode,
+    add_endcode,
+    code_manager,
+    code_manager_edit,
+    data_trends_cuptype,
+    data_trends_main,
+    data_trends_quality,
+    data_trends_volume,
+    gen_doc_upload,
+)
 
 urlpatterns += [
     url(

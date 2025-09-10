@@ -1,7 +1,9 @@
 """Account-Related Views"""
 
 import datetime
+import json
 from datetime import timedelta
+from types import SimpleNamespace
 
 from django import forms
 from django.conf import settings
@@ -13,16 +15,28 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
-from django.template import RequestContext
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from mwclient import Site
+
+from gchub_db.includes.notification_manager import send_user_notification
+from gchub_db.includes.windows_notifications import WindowsNotificationManager
 
 import gchub_db.apps.workflow.app_defs as workflow_defs
 from gchub_db.apps.calendar.models import Event
 from gchub_db.apps.error_tracking.models import Error
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import (
+    JOBLOG_TYPE_BILLING,
+    JOBLOG_TYPE_CRITICAL,
+    JOBLOG_TYPE_ITEM_9DIGIT,
+    JOBLOG_TYPE_ITEM_APPROVED,
+    JOBLOG_TYPE_ITEM_PROOFED_OUT,
+    JOBLOG_TYPE_ITEM_REVISION,
+    JOBLOG_TYPE_NOTE,
+)
 from gchub_db.apps.joblog.models import JobLog
 from gchub_db.apps.news.models import CodeChange
 from gchub_db.apps.workflow.models import ItemReview, Job
@@ -48,7 +62,7 @@ def preferences_settings(request):
         # Get the checkbox values
         use_legacy_search = request.POST.get("use_legacy_search") == "1"
         notifications_enabled = request.POST.get("notifications_enabled") == "1"
-        
+
         # Job search criteria
         job_search_brand = request.POST.get("job_search_brand") == "1"
         job_search_customer = request.POST.get("job_search_customer") == "1"
@@ -57,23 +71,25 @@ def preferences_settings(request):
         job_search_instructions = request.POST.get("job_search_instructions") == "1"
         job_search_salesperson = request.POST.get("job_search_salesperson") == "1"
         job_search_artist = request.POST.get("job_search_artist") == "1"
-        
+
         # Item search criteria
         item_search_description = request.POST.get("item_search_description") == "1"
         item_search_upc = request.POST.get("item_search_upc") == "1"
         item_search_brand = request.POST.get("item_search_brand") == "1"
         item_search_customer = request.POST.get("item_search_customer") == "1"
         item_search_comments = request.POST.get("item_search_comments") == "1"
-        item_search_specifications = request.POST.get("item_search_specifications") == "1"
+        item_search_specifications = (
+            request.POST.get("item_search_specifications") == "1"
+        )
 
         # Update user profile notifications setting
-        if hasattr(request.user, 'profile'):
+        if hasattr(request.user, "profile"):
             request.user.profile.notifications_enabled = notifications_enabled
             request.user.profile.save()
 
         # Store in session for now (until DB migration can be applied)
         request.session["use_legacy_search"] = use_legacy_search
-        
+
         # Store job search criteria
         request.session["job_search_brand"] = job_search_brand
         request.session["job_search_customer"] = job_search_customer
@@ -82,7 +98,7 @@ def preferences_settings(request):
         request.session["job_search_instructions"] = job_search_instructions
         request.session["job_search_salesperson"] = job_search_salesperson
         request.session["job_search_artist"] = job_search_artist
-        
+
         # Store item search criteria
         request.session["item_search_description"] = item_search_description
         request.session["item_search_upc"] = item_search_upc
@@ -90,7 +106,7 @@ def preferences_settings(request):
         request.session["item_search_customer"] = item_search_customer
         request.session["item_search_comments"] = item_search_comments
         request.session["item_search_specifications"] = item_search_specifications
-        
+
         request.session.modified = True  # Ensure session is saved
 
         # Add success message
@@ -102,8 +118,11 @@ def preferences_settings(request):
     pagevars = {
         "page_title": "Preferences - Settings",
         "use_legacy_search": request.session.get("use_legacy_search", True),
-        "notifications_enabled": getattr(request.user.profile, 'notifications_enabled', True) if hasattr(request.user, 'profile') else True,
-        
+        "notifications_enabled": getattr(
+            request.user.profile, "notifications_enabled", True
+        )
+        if hasattr(request.user, "profile")
+        else True,
         # Job search criteria
         "job_search_brand": request.session.get("job_search_brand", True),
         "job_search_customer": request.session.get("job_search_customer", True),
@@ -112,14 +131,15 @@ def preferences_settings(request):
         "job_search_instructions": request.session.get("job_search_instructions", True),
         "job_search_salesperson": request.session.get("job_search_salesperson", True),
         "job_search_artist": request.session.get("job_search_artist", True),
-        
         # Item search criteria
         "item_search_description": request.session.get("item_search_description", True),
         "item_search_upc": request.session.get("item_search_upc", True),
         "item_search_brand": request.session.get("item_search_brand", True),
         "item_search_customer": request.session.get("item_search_customer", True),
         "item_search_comments": request.session.get("item_search_comments", True),
-        "item_search_specifications": request.session.get("item_search_specifications", True),
+        "item_search_specifications": request.session.get(
+            "item_search_specifications", True
+        ),
     }
     return render(request, "preferences/settings.html", context=pagevars)
 
@@ -222,8 +242,6 @@ def _get_user_hold_job_list(request):
     ninety_days_ago = tomorrow + timedelta(days=-90)
     thirty_days_ago = tomorrow + timedelta(days=-30)
     fortyfive_days_ago = tomorrow + timedelta(days=-45)
-    five_days_ago = tomorrow + timedelta(days=-5)
-    ten_days_ago = tomorrow + timedelta(days=-10)
     this_user = request.user
     view_workflows = general_funcs.get_user_workflow_access(request)
 
@@ -503,7 +521,6 @@ def office_contacts(request):
         "page_title": "Clemson Hub Contacts",
     }
 
-    context_instance = RequestContext(request)
     return render(request, "accounts/office_contacts.html", context=pagevars)
 
 
@@ -585,15 +602,6 @@ def login_form(request):
 
 # ===== NOTIFICATION TEST VIEWS =====
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-import json
-
-from gchub_db.includes.windows_notifications import WindowsNotificationManager
-from gchub_db.includes.notification_manager import send_user_notification
-from types import SimpleNamespace
-
 
 @login_required
 def notification_test_page(request):
@@ -636,7 +644,13 @@ def test_notification(request):
                 description="This notification was sent via user.profile.growl_at() method.",
                 sticky=False,
             )
-            return JsonResponse({"success": True, "message": "UserProfile.growl_at() (stub) sent", "type": "user_profile"})
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": "UserProfile.growl_at() (stub) sent",
+                    "type": "user_profile",
+                }
+            )
 
         elif notification_type == "user_profile_sticky":
             stub_profile = SimpleNamespace(user=request.user)
@@ -646,7 +660,13 @@ def test_notification(request):
                 description="This is a persistent notification that requires user action to dismiss.",
                 sticky=True,
             )
-            return JsonResponse({"success": True, "message": "Sticky notification (stub) sent", "type": "user_profile_sticky"})
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": "Sticky notification (stub) sent",
+                    "type": "user_profile_sticky",
+                }
+            )
 
         elif notification_type == "notification_manager":
             # Avoid accessing request.user.profile directly; use stub
@@ -657,7 +677,13 @@ def test_notification(request):
                 description="This notification was sent via the send_user_notification function.",
                 sticky=False,
             )
-            return JsonResponse({"success": True, "message": f"Notification manager sent successfully: {result}", "type": "notification_manager"})
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": f"Notification manager sent successfully: {result}",
+                    "type": "notification_manager",
+                }
+            )
 
         elif notification_type == "code_change_simulation":
             # Simulate what bin/growl_code_changes.py does

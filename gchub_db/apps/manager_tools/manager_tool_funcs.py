@@ -69,7 +69,7 @@ def get_job_average_hours(supplied_category, supplied_type, supplied_artist=Fals
             average_hours = 0
 
         # Add the data to the list as a complexity/hours tuple.
-        data.append((str(current_complexity), average_hours))
+        data.append((str(current_complexity), str(average_hours)))
 
     return data
 
@@ -134,6 +134,6 @@ def get_item_average_hours(supplied_category, supplied_type, supplied_artist=Fal
             average_hours = 0
 
         # Add the data to the list as a complexity/hours tuple.
-        data.append((str(current_complexity), average_hours))
+        data.append((str(current_complexity), str(average_hours)))
 
     return data

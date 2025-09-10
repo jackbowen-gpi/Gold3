@@ -106,9 +106,9 @@ def monthly_by_plant(request, year_num, month_num, workflow, datatype):
         try:
             try:
                 # If dictionary key already exists, just add to the total.
-                plant_dict[charge.item.printlocation.plant.name][
-                    "total_charges"
-                ] += charge.amount
+                plant_dict[charge.item.printlocation.plant.name]["total_charges"] += (
+                    charge.amount
+                )
             except KeyError:
                 # If dictionary key does not exist, create it using the charge
                 # amount as the initial value.

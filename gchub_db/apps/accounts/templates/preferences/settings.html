@@ -286,12 +286,12 @@
             margin: 10px;
             padding: 15px;
         }
-        
+
         .search-criteria-grid {
             grid-template-columns: 1fr;
             gap: 15px;
         }
-        
+
         .save-button {
             width: 100%;
             text-align: center;
@@ -315,28 +315,28 @@ function selectAllItem(checked) {
 {% block body %}
 <div id="body">
     {% include "preferences/navbar_div.inc.html" %}
-    
+
     <div class="settings-container">
         <!-- Header Section matching home page style -->
         <div class="preferences-header">
             <h1>🔧 User Settings & Preferences</h1>
             <p>Customize your search experience and interface preferences</p>
         </div>
-        
+
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">{{ message }}</div>
             {% endfor %}
         {% endif %}
-        
+
         <form method="post" action="{% url 'preferences_settings' %}">
             {% csrf_token %}
-            
+
             <!-- Legacy Search Interface Section -->
             <div class="legacy-search-section">
                 <h3>🎨 Search Interface Style</h3>
                 <div class="legacy-checkbox">
-                    <input type="checkbox" id="id_use_legacy_search" name="use_legacy_search" value="1" 
+                    <input type="checkbox" id="id_use_legacy_search" name="use_legacy_search" value="1"
                            {% if use_legacy_search %}checked{% endif %}>
                     <label for="id_use_legacy_search">
                         <strong>Use Legacy Search Interface</strong>
@@ -352,7 +352,7 @@ function selectAllItem(checked) {
             <div class="legacy-search-section">
                 <h3>🔔 Desktop Notifications</h3>
                 <div class="legacy-checkbox">
-                    <input type="checkbox" id="id_notifications_enabled" name="notifications_enabled" value="1" 
+                    <input type="checkbox" id="id_notifications_enabled" name="notifications_enabled" value="1"
                            {% if notifications_enabled %}checked{% endif %}>
                     <label for="id_notifications_enabled">
                         <strong>Enable Desktop Notifications</strong>
@@ -372,55 +372,55 @@ function selectAllItem(checked) {
                         Select which fields should be included when performing searches. Unchecked fields will be excluded from search queries to improve performance and relevance.
                     </p>
                     </p>
-                    
+
                     <div class="search-criteria-grid">
                         <!-- Job Search Criteria -->
                         <div class="criteria-group job-criteria">
                             <h4>📋 Job Search Fields</h4>
-                            
+
                             <div class="select-all-controls">
                                 <button type="button" class="select-all-btn" onclick="selectAllJob(true)">Select All</button>
                                 <button type="button" class="select-all-btn" onclick="selectAllJob(false)">Clear All</button>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_job_search_brand" name="job_search_brand" value="1" 
+                                <input type="checkbox" id="id_job_search_brand" name="job_search_brand" value="1"
                                        {% if job_search_brand %}checked{% endif %}>
                                 <label for="id_job_search_brand">Brand</label>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_job_search_customer" name="job_search_customer" value="1" 
+                                <input type="checkbox" id="id_job_search_customer" name="job_search_customer" value="1"
                                        {% if job_search_customer %}checked{% endif %}>
                                 <label for="id_job_search_customer">Customer</label>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_job_search_po_number" name="job_search_po_number" value="1" 
+                                <input type="checkbox" id="id_job_search_po_number" name="job_search_po_number" value="1"
                                        {% if job_search_po_number %}checked{% endif %}>
                                 <label for="id_job_search_po_number">PO Number</label>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_job_search_comments" name="job_search_comments" value="1" 
+                                <input type="checkbox" id="id_job_search_comments" name="job_search_comments" value="1"
                                        {% if job_search_comments %}checked{% endif %}>
                                 <label for="id_job_search_comments">Comments</label>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_job_search_instructions" name="job_search_instructions" value="1" 
+                                <input type="checkbox" id="id_job_search_instructions" name="job_search_instructions" value="1"
                                        {% if job_search_instructions %}checked{% endif %}>
                                 <label for="id_job_search_instructions">Instructions</label>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_job_search_salesperson" name="job_search_salesperson" value="1" 
+                                <input type="checkbox" id="id_job_search_salesperson" name="job_search_salesperson" value="1"
                                        {% if job_search_salesperson %}checked{% endif %}>
                                 <label for="id_job_search_salesperson">Salesperson</label>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_job_search_artist" name="job_search_artist" value="1" 
+                                <input type="checkbox" id="id_job_search_artist" name="job_search_artist" value="1"
                                        {% if job_search_artist %}checked{% endif %}>
                                 <label for="id_job_search_artist">Artist</label>
                             </div>
@@ -429,44 +429,44 @@ function selectAllItem(checked) {
                         <!-- Item Search Criteria -->
                         <div class="criteria-group item-criteria">
                             <h4>📦 Item Search Fields</h4>
-                            
+
                             <div class="select-all-controls">
                                 <button type="button" class="select-all-btn" onclick="selectAllItem(true)">Select All</button>
                                 <button type="button" class="select-all-btn" onclick="selectAllItem(false)">Clear All</button>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_item_search_description" name="item_search_description" value="1" 
+                                <input type="checkbox" id="id_item_search_description" name="item_search_description" value="1"
                                        {% if item_search_description %}checked{% endif %}>
                                 <label for="id_item_search_description">Item Description</label>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_item_search_upc" name="item_search_upc" value="1" 
+                                <input type="checkbox" id="id_item_search_upc" name="item_search_upc" value="1"
                                        {% if item_search_upc %}checked{% endif %}>
                                 <label for="id_item_search_upc">UPC</label>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_item_search_brand" name="item_search_brand" value="1" 
+                                <input type="checkbox" id="id_item_search_brand" name="item_search_brand" value="1"
                                        {% if item_search_brand %}checked{% endif %}>
                                 <label for="id_item_search_brand">Brand</label>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_item_search_customer" name="item_search_customer" value="1" 
+                                <input type="checkbox" id="id_item_search_customer" name="item_search_customer" value="1"
                                        {% if item_search_customer %}checked{% endif %}>
                                 <label for="id_item_search_customer">Customer</label>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_item_search_comments" name="item_search_comments" value="1" 
+                                <input type="checkbox" id="id_item_search_comments" name="item_search_comments" value="1"
                                        {% if item_search_comments %}checked{% endif %}>
                                 <label for="id_item_search_comments">Comments</label>
                             </div>
-                            
+
                             <div class="checkbox-item">
-                                <input type="checkbox" id="id_item_search_specifications" name="item_search_specifications" value="1" 
+                                <input type="checkbox" id="id_item_search_specifications" name="item_search_specifications" value="1"
                                        {% if item_search_specifications %}checked{% endif %}>
                                 <label for="id_item_search_specifications">Specifications</label>
                             </div>

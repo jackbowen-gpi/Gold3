@@ -1,6 +1,11 @@
 from django.urls import re_path as url
 
-from gchub_db.apps.calendar.views import *
+from gchub_db.apps.calendar.views import (
+    month_overview,
+    event_add,
+    event_view,
+    event_delete,
+)
 
 urlpatterns = [
     url(r"^$", month_overview, name="event-overview"),

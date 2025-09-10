@@ -461,5 +461,3 @@ Ran 52 tests in 22.791s
 
 FAILED (failures=5, errors=1)
 Destroying test database for alias 'default' ('test_gchub_dev')...
-
-

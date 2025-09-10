@@ -9,7 +9,6 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db.models import Sum
 from django.template import loader
-from openpyxl.styles import NamedStyle
 
 from gchub_db.apps.budget import billing_funcs
 from gchub_db.apps.budget.models import Budget
@@ -38,8 +37,6 @@ def generate_monthly_billing_report_xlsx(month, year):
 
     # Set the month name for use in the file name.
     month_name = calendar.month_abbr[month_num]
-
-    date_style = NamedStyle(name="datetime", number_format="DD/MM/YYYY")
 
     if month_num == 12:
         next_month = 1
@@ -404,6 +401,10 @@ def get_billable_timeframe(startDate, endDate, workflow, plant=None, plates=Fals
     if workflow == "Beverage":
         # Beverage File Out stuff.
         # Previous Month Data
+        dateEndArr = endDate.split("/")
+        month_num = int(dateEndArr[0])
+        year_num = int(dateEndArr[2])
+
         if month_num == 1:
             last_month_num = 12
             last_year = year_num - 1
@@ -469,7 +470,7 @@ def get_billable_timeframe(startDate, endDate, workflow, plant=None, plates=Fals
             next_year = year_num
 
         cycle_end = date(next_year, next_month, 1)
-        cycle_start = date(year_num, h_num, 1)
+        cycle_start = date(year_num, month_num, 1)
 
         # Charges for items with file out during month (charges to invoice at end of month)
         # Returns items with a File Out action between the specificed date range.
@@ -519,7 +520,6 @@ def get_billable_data(year_num, month_num, workflow, plant=None, plates=False):
             next_year = year_num
 
         fsb_cycle_end = date(next_year, next_month, 1)
-        fsb_cycle_start = date(year_num, month_num, 1)
 
         # Charges for items with file out during month (charges to invoice at end of month)
         # Returns items with a File Out action between the specificed date range.
@@ -634,7 +634,7 @@ def get_billable_data(year_num, month_num, workflow, plant=None, plates=False):
             next_year = year_num
 
         cycle_end = date(next_year, next_month, 1)
-        cycle_start = date(year_num, h_num, 1)
+        cycle_start = date(year_num, month_num, 1)
 
         # Charges for items with file out during month (charges to invoice at end of month)
         # Returns items with a File Out action between the specificed date range.

@@ -37,6 +37,7 @@ docker compose -f .\dev\docker-compose.yml up -d postgres
 - [Recent Updates](#recent-updates)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
+- [Using Poetry](#using-poetry)
 - [Configuration](#configuration)
 - [External Systems & Mock Configuration](#external-systems--mock-configuration)
 - [Database Setup](#database-setup)
@@ -79,7 +80,7 @@ gchub_db is a comprehensive Django web application designed for managing job wor
 - ✅ **Production Data Compatibility**: Timezone-aware datetime handling for production data integration
 - ✅ **Automated Process Management**: PowerShell scripts for reliable development server startup and cleanup
 
-### Security & CSRF Implementation  
+### Security & CSRF Implementation
 - ✅ **Complete CSRF Protection**: Implemented comprehensive CSRF token support for legacy Prototype.js AJAX calls
 - ✅ **60+ JavaScript Files Updated**: Systematic CSRF token integration across all workflow JavaScript files
 - ✅ **Dual CSRF Approach**: JavaScript token injection + view-level exemptions for legacy compatibility
@@ -89,7 +90,7 @@ gchub_db is a comprehensive Django web application designed for managing job wor
 ### External System Mocking
 - ✅ **ETOOLS Mock System**: Complete mock implementation for production job tracking system
 - ✅ **QAD Mock System**: Comprehensive mock for packaging specifications and quality data
-- ✅ **Auto FTP Mock System**: Mock implementation for external platemaking FTP uploads  
+- ✅ **Auto FTP Mock System**: Mock implementation for external platemaking FTP uploads
 - ✅ **Email Mock System**: Console-based email backend for development
 - ✅ **Offline Development**: Complete application functionality without external dependencies
 
@@ -156,6 +157,58 @@ where python
 
 ---
 
+## 📦 Using Poetry
+
+Poetry is an alternative dependency management tool that can be used instead of pip for more advanced dependency management.
+
+### 1. Install Poetry
+
+```powershell
+pip install poetry
+```
+
+### 2. Install Dependencies
+
+```powershell
+# Install all dependencies from pyproject.toml
+poetry install
+
+# Or install with development dependencies
+poetry install --with dev
+```
+
+### 3. Activate Poetry Shell
+
+```powershell
+# Activate the Poetry-managed virtual environment
+poetry shell
+```
+
+### 4. Run Commands
+
+```powershell
+# Run Django commands
+poetry run python manage.py migrate
+poetry run python manage.py runserver
+
+# Run tests
+poetry run pytest
+```
+
+### 5. Add Dependencies
+
+```powershell
+# Add a new dependency
+poetry add package-name
+
+# Add a development dependency
+poetry add --group dev package-name
+```
+
+This approach keeps your dependencies in sync with `pyproject.toml` and provides better dependency resolution.
+
+---
+
 ## ⚙️ Configuration
 
 ### Environment Variables
@@ -200,7 +253,7 @@ DATABASES = {
 ETOOLS_ENABLED = False   # Disables real ETOOLS ODBC connection
 QAD_ENABLED = False      # Disables real QAD ODBC connection
 
-# Mock Auto FTP system for development  
+# Mock Auto FTP system for development
 AUTO_FTP_ENABLED = False # Disables real FTP uploads
 
 # Mock email system for development
@@ -222,7 +275,7 @@ For development environments, several external production systems are mocked to 
 
 **QAD (Quality Assurance Database)**
 - **Purpose**: Provides packaging specifications and quality control data
-- **Connection**: ODBC connection to corporate ERP system  
+- **Connection**: ODBC connection to corporate ERP system
 - **Usage**: Packaging specs, material requirements, quality metrics
 
 **Auto FTP System**
@@ -244,7 +297,7 @@ All external systems are controlled via settings in `local_settings.py`:
 ETOOLS_ENABLED = False   # Disables real ETOOLS ODBC connection
 QAD_ENABLED = False      # Disables real QAD ODBC connection
 
-# Mock Auto FTP system for development  
+# Mock Auto FTP system for development
 AUTO_FTP_ENABLED = False # Disables real FTP uploads
 
 # Mock file system access for development
@@ -262,7 +315,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 - **Coverage**: Handles all ETOOLS database queries with appropriate mock responses
 - **Usage**: Automatically activated when `ETOOLS_ENABLED = False`
 
-**QAD Mock System** (`gchub_db/apps/qad_data/qad.py`)  
+**QAD Mock System** (`gchub_db/apps/qad_data/qad.py`)
 - **MockCursor & MockRow Classes**: Simulate ODBC cursor operations
 - **Realistic Data**: Provides sample packaging specifications, material data
 - **Coverage**: Handles QAD packaging queries with mock specifications
@@ -289,7 +342,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # Verify ETOOLS mock is active
 .\.venv\Scripts\python.exe -c "from django.conf import settings; print('ETOOLS Mock:', not getattr(settings, 'ETOOLS_ENABLED', True))"
 
-# Verify QAD mock is active  
+# Verify QAD mock is active
 .\.venv\Scripts\python.exe -c "from django.conf import settings; print('QAD Mock:', not getattr(settings, 'QAD_ENABLED', True))"
 
 # Verify File System mock is active
@@ -326,7 +379,7 @@ For production deployment, enable real external systems:
 ```python
 # Production settings for real external connections
 ETOOLS_ENABLED = True
-QAD_ENABLED = True  
+QAD_ENABLED = True
 AUTO_FTP_ENABLED = True
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
@@ -337,7 +390,7 @@ QAD_ODBC_DSN = "DSN=production_qad;UID=user;PWD=password"
 # Configure real FTP credentials
 FUSION_FLEXO_FTP = {
     'HOST': 'exchange.graphicpkg.com',
-    'USERNAME': 'fusionflexo', 
+    'USERNAME': 'fusionflexo',
     'PASSWORD': 'production_password',
     'ROOT_DIR': '/platemaking/'
 }
@@ -762,7 +815,7 @@ LOGGING = {
 ### Code Standards
 
 - **Python Style**: Follow PEP 8 with Black formatting
-- **Django Patterns**: Use Django best practices and conventions  
+- **Django Patterns**: Use Django best practices and conventions
 - **Testing**: Write tests for new functionality
 - **Documentation**: Update README and inline docs as needed
 - **Security**: Maintain CSRF protection and secure practices
@@ -814,7 +867,7 @@ This project is licensed under the MIT License - see the `LICENSE` file for deta
 ### ✅ Completed Achievements
 
 - **🏭 Production Integration**: Complete migration of 2.16GB production database with 1,136 users
-- **🔒 Security Implementation**: 100% CSRF protection across 60+ JavaScript files and all endpoints  
+- **🔒 Security Implementation**: 100% CSRF protection across 60+ JavaScript files and all endpoints
 - **🔌 External Systems**: Complete mock implementations for ETOOLS, QAD, Auto FTP, and Email systems
 - **🚀 Development Automation**: Automated setup scripts and process management
 - **🧪 Testing Suite**: Comprehensive test coverage with production data scenarios

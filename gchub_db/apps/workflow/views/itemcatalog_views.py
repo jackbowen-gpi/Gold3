@@ -81,23 +81,23 @@ class ItemCatalogForm(ModelForm):
             queryset=ItemCatalog.objects.filter(active=True).order_by("size"),
             required=False,
         )
-        self.fields["acts_like"].help_text = (
-            "(JDF Stepping Only -- Item will use S&R of selected item.)"
-        )
+        self.fields[
+            "acts_like"
+        ].help_text = "(JDF Stepping Only -- Item will use S&R of selected item.)"
         self.fields["product_substrate"].label = "Proofing"
-        self.fields["product_substrate"].help_text = (
-            "(Determines substrate for proofing purposes.)"
-        )
-        self.fields["mfg_name"].help_text = (
-            "(QAD code, 8 characters. Example: SMR-0160)"
-        )
+        self.fields[
+            "product_substrate"
+        ].help_text = "(Determines substrate for proofing purposes.)"
+        self.fields[
+            "mfg_name"
+        ].help_text = "(QAD code, 8 characters. Example: SMR-0160)"
         self.fields["bev_size_code"].label = "Bev Size Code"
-        self.fields["bev_size_code"].help_text = (
-            "(Evergreen only. Example: Q=Quart, A=4oz Eco)"
-        )
-        self.fields["productsubcategory"].help_text = (
-            '(For sorting purposes in PDF Tempalte download page.) Hold down "Control", or "Command" on a Mac, to select more than one.'
-        )
+        self.fields[
+            "bev_size_code"
+        ].help_text = "(Evergreen only. Example: Q=Quart, A=4oz Eco)"
+        self.fields[
+            "productsubcategory"
+        ].help_text = '(For sorting purposes in PDF Tempalte download page.) Hold down "Control", or "Command" on a Mac, to select more than one.'
 
     class Meta:
         model = ItemCatalog
@@ -120,9 +120,9 @@ class ItemSpecsForm(ModelForm):
         #        self.fields["num_colors"].label = 'Max. Num. Colors'
         self.fields["horizontal"].help_text = "(Rectangle dimensions to build art to.)"
         self.fields["vertical"].help_text = "(Rectangle dimensions to build art to.)"
-        self.fields["total_print_area"].help_text = (
-            "(A.K.A inch squared from pack edge.)"
-        )
+        self.fields[
+            "total_print_area"
+        ].help_text = "(A.K.A inch squared from pack edge.)"
 
     #        self.fields["step_across"].help_text = '(Num. columns across the web.)'
     #        self.fields["step_around"].help_text = '(Num. rows around the plate cylinder.)'

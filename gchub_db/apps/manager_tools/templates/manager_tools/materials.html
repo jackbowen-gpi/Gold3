@@ -1,6 +1,6 @@
 {% extends "standard.html" %}
 
-{% block extra_head %} 
+{% block extra_head %}
 	<style type="text/css">
 		input {
 			border: none;
@@ -16,12 +16,12 @@
 	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
 
 	<!-- Javascript happens here. -->
-	<script type="text/javascript"> 
+	<script type="text/javascript">
 		//prototype is loaded in GOLD's base html and it uses $ just like jquery
-		//does. So we'll change $ to $j for the jQuery on this page using 
+		//does. So we'll change $ to $j for the jQuery on this page using
 		//jQuery.noConflict()
 		var $j = jQuery.noConflict();
-		
+
 		//jQuery stuff.
 		$j(document).ready(function(){
 			// Busy inidcator
@@ -65,8 +65,8 @@
 <br />
 
 <div class="grey_bordered">
-<!-- Proofs table -->	
-	<h2> 
+<!-- Proofs table -->
+	<h2>
 		<form method="post">
 			{% csrf_token %}
 			Proofs printed in {{materialsform.year}}

@@ -23,9 +23,7 @@ def job_autocomplete(request):
         | Q(po_number__icontains=term)
         | Q(customer_po_number__icontains=term)
         | Q(e_tools_id__icontains=term)
-    ).distinct()[
-        :10
-    ]  # Limit to 10 results
+    ).distinct()[:10]  # Limit to 10 results
 
     suggestions = []
     for job in jobs:

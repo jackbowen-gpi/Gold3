@@ -134,7 +134,7 @@ def load_translations(directory):
         for i, row in enumerate(csv.reader(f)):
             if not row or len(row) < 2:
                 continue
-            row = [c.decode("utf-8").strip() for c in row]
+            row = [c.decode("utf-8").strip() for c in row]  # type: ignore
             english, translation = row[:2]
             if len(row) > 2:
                 plural = row[2] or "unknown"
@@ -185,12 +185,12 @@ class Locale(object):
         If it is not supported, we raise an exception.
         """
         if not hasattr(cls, "_cache"):
-            cls._cache = {}
-        if code not in cls._cache:
+            cls._cache = {}  # type: ignore
+        if code not in cls._cache:  # type: ignore
             assert code in _supported_locales
             translations = _translations.get(code, {})
-            cls._cache[code] = Locale(code, translations)
-        return cls._cache[code]
+            cls._cache[code] = Locale(code, translations)  # type: ignore
+        return cls._cache[code]  # type: ignore
 
     def __init__(self, code, translations):
         self.code = code

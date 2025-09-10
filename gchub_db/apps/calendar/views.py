@@ -251,7 +251,7 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
             employee_override = str(event.cleaned_data["employee_override"])
             repeater = 1
             dater = event.cleaned_data["event_date"]
-            caldate = date = str(dater)
+            date = str(dater)
             date = date.replace("-", "")
 
             # Send Manager an email if vacation, leave, doctor, or out.
@@ -340,17 +340,11 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
                 this_event.save()
 
             if notice:
-                month = ""
-                day = ""
                 if int(month_num) < 10:
-                    month = "0" + str(month_num)
-                else:
-                    month = month_num
+                    month_num = "0" + str(month_num)
 
                 if int(day_num) < 10:
-                    day = "0" + str(day_num)
-                else:
-                    day = day_num
+                    day_num = "0" + str(day_num)
 
                 if start_time_hour == "":
                     start_time_hour = "08"

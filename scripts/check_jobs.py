@@ -4,7 +4,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
 import django
 
 django.setup()
-from workflow.models import Job
+from gchub_db.apps.workflow.models import Job
 
 print("workflow_job count:", Job.objects.count())
 print("Latest 5 jobs:")

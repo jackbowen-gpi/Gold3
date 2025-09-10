@@ -8,7 +8,7 @@ $prodTables = docker exec postgres-backup-temp psql -U thundercuddles -d thunder
 $skipTables = @(
     "django_site",           # Keep your current site config
     "auth_user",             # Keep your current users
-    "auth_group",            # Keep your current groups  
+    "auth_group",            # Keep your current groups
     "auth_user_groups",      # Keep your current user-group assignments
     "auth_user_user_permissions", # Keep your current permissions
     "accounts_userprofile",  # Keep your current user profiles
@@ -25,21 +25,21 @@ Write-Host "Skipping $($skipTables.Count) tables to preserve your dev setup" -Fo
 foreach ($table in $prodTables) {
     if ($table -and $table.Length -gt 0 -and $skipTables -notcontains $table) {
         Write-Host "Copying: $table" -ForegroundColor White
-        
+
         try {
             # Export from production
             docker exec postgres-backup-temp pg_dump -U thundercuddles -d thundercuddles -t $table --data-only --no-owner > "${table}_data.sql" 2>$null
-            
+
             # Copy file to dev container
             docker cp "${table}_data.sql" gchub_db-postgres-dev-1:/tmp/${table}_data.sql 2>$null
-            
+
             # Clear existing data and import (ignore errors)
             docker exec gchub_db-postgres-dev-1 psql -U gchub -d gchub_dev -c "TRUNCATE TABLE $table CASCADE;" 2>$null
             docker exec gchub_db-postgres-dev-1 psql -U gchub -d gchub_dev -f /tmp/${table}_data.sql 2>$null
-            
+
             # Clean up temp file
             Remove-Item "${table}_data.sql" -ErrorAction SilentlyContinue
-            
+
             Write-Host "  ✓ $table" -ForegroundColor Green
             $successCount++
         }

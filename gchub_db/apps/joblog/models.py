@@ -5,7 +5,32 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import signals
 
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import (
+    JOBLOG_TYPE_BILLING,
+    JOBLOG_TYPE_CRITICAL,
+    JOBLOG_TYPE_ERROR,
+    JOBLOG_TYPE_FEDEX,
+    JOBLOG_TYPE_FTP,
+    JOBLOG_TYPE_ITEM_ADDED,
+    JOBLOG_TYPE_ITEM_APPROVED,
+    JOBLOG_TYPE_ITEM_DELETED,
+    JOBLOG_TYPE_ITEM_FILED_OUT,
+    JOBLOG_TYPE_ITEM_FORECAST,
+    JOBLOG_TYPE_ITEM_PREFLIGHT,
+    JOBLOG_TYPE_ITEM_PROOFED_OUT,
+    JOBLOG_TYPE_ITEM_REJECTED,
+    JOBLOG_TYPE_ITEM_REVISION,
+    JOBLOG_TYPE_ITEM_SAVED,
+    JOBLOG_TYPE_JDF,
+    JOBLOG_TYPE_JDF_ERROR,
+    JOBLOG_TYPE_JOBLOG_DELETED,
+    JOBLOG_TYPE_JOB_CREATED,
+    JOBLOG_TYPE_JOB_SAVED,
+    JOBLOG_TYPE_NOTE,
+    JOBLOG_TYPE_PRODUCTION_EDITED,
+    JOBLOG_TYPE_WARNING,
+    JOBLOG_TYPES,
+)
 from gchub_db.middleware import threadlocals
 
 

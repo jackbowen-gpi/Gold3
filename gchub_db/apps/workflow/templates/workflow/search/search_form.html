@@ -206,7 +206,7 @@ function toggleSection(sectionId) {
 	const section = document.getElementById(sectionId);
 	if (section) {
 		section.classList.toggle('collapsed');
-        
+
 		// Save state to localStorage
 		const isCollapsed = section.classList.contains('collapsed');
 		localStorage.setItem('search-section-' + sectionId, isCollapsed ? 'collapsed' : 'expanded');
@@ -258,7 +258,7 @@ function initializeDatePickers() {
 		yearRange: '-20:+5',
 		showButtonPanel: true
 	});
-    
+
 	// Item search date fields
 	$j('#id_current_proof_date_start, #id_current_proof_date_end').datepicker({
 		dateFormat: 'mm/dd/yy',
@@ -267,7 +267,7 @@ function initializeDatePickers() {
 		yearRange: '-20:+5',
 		showButtonPanel: true
 	});
-    
+
 	$j('#id_all_proof_date_start, #id_all_proof_date_end').datepicker({
 		dateFormat: 'mm/dd/yy',
 		changeMonth: true,
@@ -275,7 +275,7 @@ function initializeDatePickers() {
 		yearRange: '-20:+5',
 		showButtonPanel: true
 	});
-    
+
 	$j('#id_approval_date_start, #id_approval_date_end').datepicker({
 		dateFormat: 'mm/dd/yy',
 		changeMonth: true,
@@ -283,7 +283,7 @@ function initializeDatePickers() {
 		yearRange: '-20:+5',
 		showButtonPanel: true
 	});
-    
+
 	$j('#id_final_file_date_start, #id_final_file_date_end').datepicker({
 		dateFormat: 'mm/dd/yy',
 		changeMonth: true,
@@ -291,7 +291,7 @@ function initializeDatePickers() {
 		yearRange: '-20:+5',
 		showButtonPanel: true
 	});
-    
+
 	// Initialize autocomplete for universal search boxes
 	$j('#id_search_all').autocomplete({
 		source: function(request, response) {
@@ -302,7 +302,7 @@ function initializeDatePickers() {
 			} else if (window.location.pathname.includes('/item/search/')) {
 				autocompleteUrl = '/workflow/api/item_autocomplete/';
 			}
-            
+
 			if (autocompleteUrl) {
 				$j.ajax({
 					url: autocompleteUrl,
@@ -355,7 +355,7 @@ function initializeDatePickers() {
 {% if type == "job" %}
 <div class="search-form-container">
  	<form method="get" action="" name="job_search" enctype="multipart/form-data">
-  	  
+
   	  <!-- Universal Search Section -->
   	  <div class="search-section universal-search" id="universal-search">
   	    <div class="search-section-header" onclick="toggleSection('universal-search')">
@@ -374,7 +374,7 @@ function initializeDatePickers() {
    	        <strong>Smart Search:</strong> Find jobs or items by typing any combination of words from job name, brand, customer, PO#, comments, instructions, item description, UPC, etc.<br />
    	        <strong>Example:</strong> "customer packaging rush" finds records containing all these words across multiple fields
    	      </div>
-   	      
+
    	      <!-- Search Preferences Information -->
    	      <div class="preferences-info" style="margin-top: 15px; padding: 12px; background: linear-gradient(135deg, #f5f2f0, #e8e1dd); border: 1px solid #663333; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
    	        <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -385,7 +385,7 @@ function initializeDatePickers() {
    	        </div>
    	        {% if request.session.job_search_brand == False or request.session.job_search_customer == False or request.session.job_search_po_number == False or request.session.job_search_comments == False or request.session.job_search_instructions == False or request.session.job_search_salesperson == False or request.session.job_search_artist == False %}
    	          <div style="color: #cc6600; font-size: 12px; font-weight: bold;">
-   	            ⚠️ Some job search fields are disabled: 
+   	            ⚠️ Some job search fields are disabled:
    	            {% if request.session.job_search_brand == False %}Brand {% endif %}
    	            {% if request.session.job_search_customer == False %}Customer {% endif %}
    	            {% if request.session.job_search_po_number == False %}PO# {% endif %}
@@ -420,7 +420,7 @@ function initializeDatePickers() {
   	          <label for="id_name">Job Name:</label>{{form.name}}
   	        </div>
   	      </div>
-  	      
+
   	      {% if perms.accounts.beverage_access %}
   	      <div class="field-group double">
   	        <div class="field-item">
@@ -433,7 +433,7 @@ function initializeDatePickers() {
   	        </div>
   	      </div>
   	      {% endif %}
-  	      
+
   	      <div class="field-group double">
   	        <div class="field-item">
   	          {{form.errors.customer}}
@@ -446,7 +446,7 @@ function initializeDatePickers() {
   	        </div>
   	        {% endif %}
   	      </div>
-  	      
+
   	      <div class="field-group double">
   	        <div class="field-item">
   	          {{form.errors.status}}
@@ -478,7 +478,7 @@ function initializeDatePickers() {
   	        <div></div>
   	      </div>
   	      {% endif %}
-  	      
+
   	      <div class="help-text">Use both fields to search a date range (MM/DD/YY format)</div>
   	      <div class="field-group double">
   	        <div class="field-item">
@@ -490,7 +490,7 @@ function initializeDatePickers() {
   	          <label for="id_date_in_end">Date In (End):</label>{{form.date_in_end}}
   	        </div>
   	      </div>
-  	      
+
   	      <div class="field-group double">
   	        <div class="field-item">
 				{{form.errors.date_needed_start}}
@@ -501,7 +501,7 @@ function initializeDatePickers() {
 				<label for="id_date_needed_end">Date Needed (End):</label>{{form.date_needed_end}}
   	        </div>
   	      </div>
-  	      
+
   	      <div class="field-group double">
   	        <div class="field-item">
   	          {{form.errors.artist}}
@@ -512,7 +512,7 @@ function initializeDatePickers() {
   	          <label for="id_salesperson">Salesperson:</label>{{form.salesperson}}
   	        </div>
   	      </div>
-  	      
+
   	      {% if perms.accounts.foodservice_access %}
   	      <div class="field-group">
   	        <div class="field-item">
@@ -541,7 +541,7 @@ function initializeDatePickers() {
   	        <div></div>
   	      </div>
   	      {% endif %}
-  	      
+
   	      <div class="field-group double">
   	        <div class="field-item">
   	          {{form.errors.keywords}}
@@ -554,7 +554,7 @@ function initializeDatePickers() {
   	        </div>
   	        {% endif %}
   	      </div>
-  	      
+
   	      <div class="field-group">
   	        <div class="field-item">
   	          {{form.errors.workflow}}
@@ -596,7 +596,7 @@ function initializeDatePickers() {
 {% if type == "item" %}
 <div class="search-form-container">
 	<form method="get" action="" name="item_search" enctype="multipart/form-data">
-	  
+
 	  <!-- Universal Search Section -->
 	  <div class="search-section universal-search" id="universal-search-item">
 	    <div class="search-section-header" onclick="toggleSection('universal-search-item')">
@@ -615,7 +615,7 @@ function initializeDatePickers() {
 	        📝 <strong>Smart Search:</strong> Find items by typing any combination of words from size, description, UPC, BOM, customer code, job details, etc.<br />
 	        💡 <strong>Example:</strong> "12oz bottle pepsi" finds items containing all these words across multiple fields
 	      </div>
-	      
+
 	      <!-- Search Preferences Information -->
 	      <div class="preferences-info" style="margin-top: 15px; padding: 12px; background: linear-gradient(135deg, #f5f2f0, #e8e1dd); border: 1px solid #663333; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
 	        <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -626,7 +626,7 @@ function initializeDatePickers() {
 	        </div>
 	        {% if request.session.item_search_description == False or request.session.item_search_upc == False or request.session.item_search_brand == False or request.session.item_search_customer == False or request.session.item_search_comments == False or request.session.item_search_specifications == False %}
 	          <div style="color: #cc6600; font-size: 12px; font-weight: bold;">
-	            ⚠️ Some item search fields are disabled: 
+	            ⚠️ Some item search fields are disabled:
 	            {% if request.session.item_search_description == False %}Description {% endif %}
 	            {% if request.session.item_search_upc == False %}UPC {% endif %}
 	            {% if request.session.item_search_brand == False %}Brand {% endif %}
@@ -660,7 +660,7 @@ function initializeDatePickers() {
 	          <label for="id_size">Size/Item:</label>{{form.size}}
 	        </div>
 	      </div>
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.name}}
@@ -673,7 +673,7 @@ function initializeDatePickers() {
 	        </div>
 	        {% endif %}
 	      </div>
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.description}}
@@ -705,7 +705,7 @@ function initializeDatePickers() {
 	          <label for="id_wrin_number">WRIN #:</label>{{form.wrin_number}}
 	        </div>
 	      </div>
-	      
+
 	      <div class="field-group">
 	        <div class="field-item">
 	          {{form.errors.quality}}
@@ -714,7 +714,7 @@ function initializeDatePickers() {
 	        <div></div>
 	      </div>
 	      {% endif %}
-	      
+
 	      {% if perms.accounts.beverage_access or perms.accounts.foodservice_access %}
 	      <div class="field-group">
 	        <div class="field-item">
@@ -724,7 +724,7 @@ function initializeDatePickers() {
 	        <div></div>
 	      </div>
 	      {% endif %}
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.case_pack}}
@@ -755,7 +755,7 @@ function initializeDatePickers() {
 	          <label for="id_press">Press:</label>{{form.press}}
 	        </div>
 	      </div>
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.specialmfg}}
@@ -766,7 +766,7 @@ function initializeDatePickers() {
 	          <label for="id_workflow">Workflow:</label>{{form.workflow}}
 	        </div>
 	      </div>
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.platemaker}}
@@ -777,7 +777,7 @@ function initializeDatePickers() {
 	          <label for="id_platetype">Platetype:</label>{{form.platetype}}
 	        </div>
 	      </div>
-	      
+
 	      {% if perms.accounts.beverage_access %}
 	      <div class="field-group">
 	        <div class="field-item">
@@ -808,7 +808,7 @@ function initializeDatePickers() {
 	          <label for="id_color_num_high"># Colors (High):</label>{{form.color_num_high}}
 	        </div>
 	      </div>
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.itemcolor}}
@@ -840,7 +840,7 @@ function initializeDatePickers() {
 	          <label for="id_date_in_end">Date In (End):</label>{{form.date_in_end}}
 	        </div>
 	      </div>
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.all_proof_date_start}}
@@ -851,7 +851,7 @@ function initializeDatePickers() {
 	          <label for="id_all_proof_date_end">Proof Out (End):</label>{{form.all_proof_date_end}}
 	        </div>
 	      </div>
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.approval_date_start}}
@@ -862,7 +862,7 @@ function initializeDatePickers() {
 	          <label for="id_approval_date_end">Approved (End):</label>{{form.approval_date_end}}
 	        </div>
 	      </div>
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.final_file_date_start}}
@@ -893,7 +893,7 @@ function initializeDatePickers() {
 	          <label for="id_salesperson">Salesperson:</label>{{form.salesperson}}
 	        </div>
 	      </div>
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.marketing}}
@@ -904,7 +904,7 @@ function initializeDatePickers() {
 	          <label for="id_nutrition">Nutrition:</label>{{form.nutrition}}
 	        </div>
 	      </div>
-	      
+
 	      {% if perms.accounts.foodservice_access %}
 	      <div class="field-group">
 	        <div class="field-item">
@@ -914,7 +914,7 @@ function initializeDatePickers() {
 	        <div></div>
 	      </div>
 	      {% endif %}
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.promo}}
@@ -925,7 +925,7 @@ function initializeDatePickers() {
 	          <label for="id_grn">GDD:</label>{{form.grn}}
 	        </div>
 	      </div>
-	      
+
 	      <div class="field-group double">
 	        <div class="field-item">
 	          {{form.errors.graphic_req_number}}
@@ -936,7 +936,7 @@ function initializeDatePickers() {
 	          <label for="id_one_up_die">One Up Die:</label>{{form.one_up_die}}
 	        </div>
 	      </div>
-	      
+
 	      <div class="field-group">
 	        <div class="field-item">
 	          {{form.errors.step_die}}
@@ -985,4 +985,3 @@ function initializeDatePickers() {
 </p>
 
 {% endblock %}
-

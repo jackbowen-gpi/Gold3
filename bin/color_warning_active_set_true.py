@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Activate color warning records that are inactive and not dismissed."""
+
 # Setup the Django environment
 import bin_functions
 

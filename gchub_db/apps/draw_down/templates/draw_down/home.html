@@ -6,19 +6,19 @@
     <script type="text/javascript" src="{{MEDIA_URL}}js/drawdown/drawdown.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}js/prototype.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}js/ckeditor/ckeditor.js"></script>
-    
+
     <!-- Load up jQuery -->
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-ui-1.9.2.custom.js"></script>
 	<link type="text/css" href="{{MEDIA_URL}}js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="Stylesheet" />
-	
+
 	<!-- Javascript happens here. -->
-	<script type="text/javascript"> 	
+	<script type="text/javascript">
 		//prototype is loaded in GOLD's base html and it uses $ just like jquery
-		//does. So we'll change $ to $j for the jQuery on this page using 
+		//does. So we'll change $ to $j for the jQuery on this page using
 		//jQuery.noConflict()
 		var $j = jQuery.noConflict();
-		
+
 		//jQuery document ready stuff.
 		$j(document).ready(function(){
 			var counter = 1;
@@ -28,29 +28,29 @@
 			        throw new Error(msg);
 			    }, 0);
 			}
-			
+
 		    $j('#add_more_drawdown').click(function() {
 		        cloneMore('div.drawdown:last', 'Drawdown');
 		    });
-		    
+
 		    $j(document).on('click', ".drawDownRemove", function() {
 		    	const id_to_remove = $j(this).attr("id").split('_')[1];
 		    	removeForm('div.drawdown:last', 'Drawdown', id_to_remove);
 		    });
-		   
+
 			//Adds an extra form to a formset dynamically.
 			function cloneMore(selector, type) {
 			    //Find out how many forms we're starting with.
 	            var total = parseInt($j('#id_' + type + '-TOTAL_FORMS').val());
 	            var total = parseInt(total);
-				//Create a clone of the selected form. Using clone(true) breaks 
+				//Create a clone of the selected form. Using clone(true) breaks
 				//auto completion for proof forms and has no other benefit.
 			    if (type=="Drawdown"){
 			   		var newElement = $j(selector).clone();
 			   		newElement.attr("id", 'drawdown_' + counter);
 			    }
 			    //Increase the cloned form's labels, names, and IDs by 1.
-		        newElement.find('td, th').find('*').each(function() {       
+		        newElement.find('td, th').find('*').each(function() {
 	   				if($j(this).attr('for')){
 	   					var new_for = $j(this).attr('for').replace((counter-1), counter);
 	   					$j(this).attr({'for': new_for});
@@ -64,7 +64,7 @@
 	   					$j(this).attr({'name': new_name});
 	   				}
 	            });
-	            //Increate the formset's total form count by 1.     
+	            //Increate the formset's total form count by 1.
 	            total++;
 	            $j('#id_' + type + '-TOTAL_FORMS').val(total);
 		        //Put the newly cloned form after the original.
@@ -83,9 +83,9 @@
 	            //This will increase the index number in the table's header by 1.
 	            $j(selector + ' .header_index').replaceWith("<span class='header_index'>"+ type + " " + total + "</span>");
 				counter++;
-			}//End formset cloning                
-		
-			//Remove the last form from a formset dynamically.	
+			}//End formset cloning
+
+			//Remove the last form from a formset dynamically.
 			function removeForm(selector, type, id_to_remove) {
 				//Check which form this is by it's index number.
 				var index = $j(selector + ' input').attr('id').split('-')[1];
@@ -93,16 +93,16 @@
 				//Make sure we don't remove the very last form from the formset.
 				if (id_to_remove > 0){
 					$j(element).remove();
-		            //Decreate the formset's total form count by 1.     
+		            //Decreate the formset's total form count by 1.
 		            var total = $j('#id_' + type + '-TOTAL_FORMS').val();
 		            //total--;
 		            $j('#id_' + type + '-TOTAL_FORMS').val(total);
 				}
 			}//End formset remover.
 		});
-	
-	</script> 
-	
+
+	</script>
+
 	<style type="text/css">
 		button#add_more_drawdown {
 			width: 150px;
@@ -113,23 +113,23 @@
 			height: 30px
 		}
 	</style>
-	
+
 {% endblock %}
 
 {% block body %}
 <div class="drawdownreq">
 <h1 class="title" style="text-align:center">{{page_title}}</h1>
-<p>Enter information to complete a Drawdown Request. If a job number is not known, leave the field blank. On completion, hit the <i><b>Enter Request</b></i> 
-button to submit your request. Other options are to hit the <b><i>Show Request</b></i> button to see all of the current Drawdown Request in the system or 
+<p>Enter information to complete a Drawdown Request. If a job number is not known, leave the field blank. On completion, hit the <i><b>Enter Request</b></i>
+button to submit your request. Other options are to hit the <b><i>Show Request</b></i> button to see all of the current Drawdown Request in the system or
 <i><b>Search Request</i></b> through previous requests. If you want to view the old system click the <i><b>Show Legacy Req</i></b> button. </p>
 
 <p style="text-align:center">
 	<b>INX</b>	<br />
 	<b>Email:</b> homewoodlab@inxintl.com <br />
 	<b>Address:</b> 1000 Maple Ave., Homewood, IL 60430 <br />
-	
-	
-</p>	
+
+
+</p>
 
 <br />
 
@@ -160,12 +160,12 @@ button to submit your request. Other options are to hit the <b><i>Show Request</
 			</td>
 		</tr>
 	</table>
-    
+
     <h1 style="text-align:center">Drawdown Items</h1>
     <p style="text-align:center">This is information related to each individual item in the draw down request.
      Click on add or remove below to add more items to the drawdown request.</p>
  	<br />
- 	
+
     {{ drawdownItemForm.management_form }}
     {% for drawdownItem in drawdownItemForm %}
     {{ drawdownItem.id }}
@@ -202,8 +202,8 @@ button to submit your request. Other options are to hit the <b><i>Show Request</
 							<td>
 							Colors Needed:<br /><i style="font-size: 0.85em;">(250 characters)</i>
 							{{ drawdownItem.colors_needed }}
-							
-		
+
+
 							</td>
 						</tr>
 					</table>
@@ -215,14 +215,14 @@ button to submit your request. Other options are to hit the <b><i>Show Request</
 		 </div>
 	 </div>
     {% endfor %}
-    <div style="width:80%;margin: 0 auto">	
+    <div style="width:80%;margin: 0 auto">
 	    <button type="button" id="add_more_drawdown" >Add Drawdown Item</button>
 	</div>
-   
+
         {% if drawdownform.help_text %}<dd>{{ drawdownform.help_text }}</dd>{% endif %}
         {% if drawdownform.errors %}<dd class="myerrors">{{ drawdownform.errors }}</dd>{% endif %}
 
-        <div class="clearfix centered-submit">		
+        <div class="clearfix centered-submit">
             <div class="submit">
                 <input type="submit" value="Enter Request" onclick="drawdown_add();return false;" />
             </div>
@@ -237,7 +237,7 @@ button to submit your request. Other options are to hit the <b><i>Show Request</
             </div>
             <div class="clearfix"></div>
         </div>
-        
+
 </form>
 </p>
 

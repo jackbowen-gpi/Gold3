@@ -1,5 +1,6 @@
 #!/usr/bin/python
 """Export invoice items into spreadsheet reports."""
+
 import bin_functions
 import openpyxl
 

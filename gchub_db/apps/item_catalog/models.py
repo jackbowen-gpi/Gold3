@@ -2,7 +2,7 @@
 
 from django.db import models
 
-from gchub_db.apps.workflow.app_defs import *
+from gchub_db.apps.workflow.app_defs import PRODUCT_CATEGORIES
 
 
 class ProductSubCategory(models.Model):

@@ -16,7 +16,6 @@ from django.db import models
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.template import RequestContext
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -25,7 +24,11 @@ from django.views.generic.list import ListView
 from gchub_db.apps.art_req.models import AdditionalInfo, ArtReq
 from gchub_db.apps.error_tracking.models import Error
 from gchub_db.apps.fedexsys.models import Shipment
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import (
+    JOBLOG_TYPE_ITEM_APPROVED,
+    JOBLOG_TYPE_ITEM_FILED_OUT,
+    JOBLOG_TYPE_ITEM_PROOFED_OUT,
+)
 from gchub_db.apps.joblog.models import JobLog
 from gchub_db.apps.manager_tools.manager_tool_funcs import get_item_average_hours
 from gchub_db.apps.qad_data.models import QAD_PrintGroups
@@ -443,7 +446,6 @@ class MktReviewReport(ListView):
                 .exclude(item__job=99999)
                 .order_by("-item__id")
             )
-            form = "Dummy form! This is shameful..."
 
         # Lists reviews that have been approvaed and filed out.
         elif type == "completed":
@@ -456,7 +458,6 @@ class MktReviewReport(ListView):
                 .exclude(item__job=99999)
                 .order_by("-item__id")
             )
-            form = "Dummy form! This is shameful..."
 
         return qset
 
@@ -616,11 +617,13 @@ class JobSearchForm(forms.Form):
     search_all = forms.CharField(
         required=False,
         help_text="Search across job number, job name, brand, customer, PO#, comments, and instructions",
-        widget=forms.TextInput(attrs={
-            'placeholder': 'Search all fields...',
-            'class': 'search-all-input',
-            'style': 'width: 400px; padding: 8px; font-size: 14px;'
-        })
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Search all fields...",
+                "class": "search-all-input",
+                "style": "width: 400px; padding: 8px; font-size: 14px;",
+            }
+        ),
     )
 
     job_num = forms.IntegerField(min_value=1, max_value=99999, required=False)
@@ -630,13 +633,21 @@ class JobSearchForm(forms.Form):
     customer_id = forms.IntegerField(required=False)
     po_number = forms.CharField(required=False)
     e_tools_id = forms.IntegerField(required=False)
-    
+
     # Phase 2: Additional key fields for enhanced search
     comments = forms.CharField(required=False, help_text="Search in job comments")
-    instructions = forms.CharField(required=False, help_text="Search in job instructions")
-    customer_email = forms.CharField(required=False, help_text="Search by customer email")
-    graphic_supplier = forms.CharField(required=False, help_text="Search by graphic supplier")
-    user_keywords = forms.CharField(required=False, help_text="Search in user-defined keywords")
+    instructions = forms.CharField(
+        required=False, help_text="Search in job instructions"
+    )
+    customer_email = forms.CharField(
+        required=False, help_text="Search by customer email"
+    )
+    graphic_supplier = forms.CharField(
+        required=False, help_text="Search by graphic supplier"
+    )
+    user_keywords = forms.CharField(
+        required=False, help_text="Search in user-defined keywords"
+    )
 
     status_choices = []
     status_choices.append(("", "---------"))
@@ -728,18 +739,18 @@ class JobSearchResultsView(ListView):
                 q = Q()
                 for word in search_words:
                     word_q = (
-                        Q(id__icontains=word) |  # Job number search
-                        Q(name__icontains=word) |
-                        Q(brand_name__icontains=word) |
-                        Q(customer_name__icontains=word) |
-                        Q(po_number__icontains=word) |
-                        Q(customer_po_number__icontains=word) |
-                        Q(comments__icontains=word) |
-                        Q(instructions__icontains=word) |
-                        Q(e_tools_id__icontains=word) |
-                        Q(customer_email__icontains=word) |
-                        Q(graphic_supplier__icontains=word) |
-                        Q(user_keywords__icontains=word)
+                        Q(id__icontains=word)  # Job number search
+                        | Q(name__icontains=word)
+                        | Q(brand_name__icontains=word)
+                        | Q(customer_name__icontains=word)
+                        | Q(po_number__icontains=word)
+                        | Q(customer_po_number__icontains=word)
+                        | Q(comments__icontains=word)
+                        | Q(instructions__icontains=word)
+                        | Q(e_tools_id__icontains=word)
+                        | Q(customer_email__icontains=word)
+                        | Q(graphic_supplier__icontains=word)
+                        | Q(user_keywords__icontains=word)
                     )
                     q &= word_q  # AND all words together
                 qset = qset.filter(q)
@@ -881,7 +892,9 @@ class JobSearchResultsView(ListView):
 
             s_graphic_supplier = self.form.cleaned_data.get("graphic_supplier", None)
             if s_graphic_supplier:
-                qset = qset.filter(graphic_supplier__icontains=s_graphic_supplier.strip())
+                qset = qset.filter(
+                    graphic_supplier__icontains=s_graphic_supplier.strip()
+                )
 
             s_user_keywords = self.form.cleaned_data.get("user_keywords", None)
             if s_user_keywords:
@@ -933,19 +946,23 @@ def job_search(request):
     """Displays the job search form."""
     form = JobSearchForm(request, data=request.GET or None)
 
-    if request.GET and form.is_valid() and not request.GET.get('legacy'):
+    if request.GET and form.is_valid() and not request.GET.get("legacy"):
         # Call the result view directly for display.
         return JobSearchResultsView.as_view(form=form)(request)
     else:
         # Check user preference for legacy interface (default to True)
-        use_legacy = request.session.get('use_legacy_search', True)
-        
+        use_legacy = request.session.get("use_legacy_search", True)
+
         # URL parameter overrides user preference (for toggle functionality)
-        if request.GET.get('legacy') is not None:
-            use_legacy = request.GET.get('legacy') == '1'
-        
-        template_name = "workflow/search/search_form_legacy.html" if use_legacy else "workflow/search/search_form.html"
-        
+        if request.GET.get("legacy") is not None:
+            use_legacy = request.GET.get("legacy") == "1"
+
+        template_name = (
+            "workflow/search/search_form_legacy.html"
+            if use_legacy
+            else "workflow/search/search_form.html"
+        )
+
         # This is the search page to be re-displayed if there's a problem or no
         # POST data.
         pagevars = {
@@ -972,11 +989,13 @@ class ItemSearchForm(forms.Form):
     search_all = forms.CharField(
         required=False,
         help_text="Search across job number, size, description, UPC, BOM, customer code, and more",
-        widget=forms.TextInput(attrs={
-            'placeholder': 'Search all fields...',
-            'class': 'search-all-input',
-            'style': 'width: 400px; padding: 8px; font-size: 14px;'
-        })
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Search all fields...",
+                "class": "search-all-input",
+                "style": "width: 400px; padding: 8px; font-size: 14px;",
+            }
+        ),
     )
 
     job_num = forms.IntegerField(min_value=1, max_value=99999, required=False)
@@ -990,13 +1009,19 @@ class ItemSearchForm(forms.Form):
     wrin_number = forms.CharField(required=False)
     case_pack = forms.IntegerField(required=False)
     size_id = forms.IntegerField(required=False)
-    
-    # Phase 2: Additional key fields for enhanced search  
+
+    # Phase 2: Additional key fields for enhanced search
     customer_code = forms.CharField(required=False, help_text="Search by customer code")
-    graphic_req_number = forms.CharField(required=False, help_text="Search by graphic request number")
-    plant_comments = forms.CharField(required=False, help_text="Search in plant comments")
-    mkt_review_comments = forms.CharField(required=False, help_text="Search in marketing review comments")
-    
+    graphic_req_number = forms.CharField(
+        required=False, help_text="Search by graphic request number"
+    )
+    plant_comments = forms.CharField(
+        required=False, help_text="Search in plant comments"
+    )
+    mkt_review_comments = forms.CharField(
+        required=False, help_text="Search in marketing review comments"
+    )
+
     plant = forms.ModelChoiceField(queryset=Plant.objects.none(), required=False)
     press = forms.ModelChoiceField(queryset=Press.objects.none(), required=False)
     platemaker = forms.ModelChoiceField(
@@ -1139,21 +1164,21 @@ class ItemSearchResultsView(ListView):
                 q = Q()
                 for word in search_words:
                     word_q = (
-                        Q(job__id__icontains=word) |  # Job number search
-                        Q(size__size__icontains=word) |
-                        Q(bev_item_name__icontains=word) |
-                        Q(description__icontains=word) |
-                        Q(upc_number__icontains=word) |
-                        Q(bom_number__icontains=word) |
-                        Q(wrin_number__icontains=word) |
-                        Q(customer_code__icontains=word) |
-                        Q(coating_pattern__icontains=word) |
-                        Q(graphic_req_number__icontains=word) |
-                        Q(plant_comments__icontains=word) |
-                        Q(mkt_review_comments__icontains=word) |
-                        Q(job__name__icontains=word) |
-                        Q(job__brand_name__icontains=word) |
-                        Q(job__customer_name__icontains=word)
+                        Q(job__id__icontains=word)  # Job number search
+                        | Q(size__size__icontains=word)
+                        | Q(bev_item_name__icontains=word)
+                        | Q(description__icontains=word)
+                        | Q(upc_number__icontains=word)
+                        | Q(bom_number__icontains=word)
+                        | Q(wrin_number__icontains=word)
+                        | Q(customer_code__icontains=word)
+                        | Q(coating_pattern__icontains=word)
+                        | Q(graphic_req_number__icontains=word)
+                        | Q(plant_comments__icontains=word)
+                        | Q(mkt_review_comments__icontains=word)
+                        | Q(job__name__icontains=word)
+                        | Q(job__brand_name__icontains=word)
+                        | Q(job__customer_name__icontains=word)
                     )
                     q &= word_q  # AND all words together
                 qset = qset.filter(q)
@@ -1430,7 +1455,9 @@ class ItemSearchResultsView(ListView):
                     q &= Q(plant_comments__icontains=word)
                 qset = qset.filter(q)
 
-            s_mkt_review_comments = self.form.cleaned_data.get("mkt_review_comments", None)
+            s_mkt_review_comments = self.form.cleaned_data.get(
+                "mkt_review_comments", None
+            )
             if s_mkt_review_comments:
                 search_words = s_mkt_review_comments.split(" ")
                 q = Q()
@@ -1503,19 +1530,23 @@ class ItemSearchResultsView(ListView):
 def item_search(request):
     """Displays the item search form."""
     form = ItemSearchForm(request, data=request.GET or None)
-    if request.GET and form.is_valid() and not request.GET.get('legacy'):
+    if request.GET and form.is_valid() and not request.GET.get("legacy"):
         # Call the result view directly for display.
         return ItemSearchResultsView.as_view(form=form)(request)
     else:
         # Check user preference for legacy interface (default to True)
-        use_legacy = request.session.get('use_legacy_search', True)
-        
+        use_legacy = request.session.get("use_legacy_search", True)
+
         # URL parameter overrides user preference (for toggle functionality)
-        if request.GET.get('legacy') is not None:
-            use_legacy = request.GET.get('legacy') == '1'
-        
-        template_name = "workflow/search/search_form_legacy.html" if use_legacy else "workflow/search/search_form.html"
-        
+        if request.GET.get("legacy") is not None:
+            use_legacy = request.GET.get("legacy") == "1"
+
+        template_name = (
+            "workflow/search/search_form_legacy.html"
+            if use_legacy
+            else "workflow/search/search_form.html"
+        )
+
         # This is the search page to be re-displayed if there's a problem or no
         # POST data.
         pagevars = {
@@ -2064,7 +2095,6 @@ def job_todo_list(request, manager_tools=False):
         "manager_tools": manager_tools,
     }
 
-    context_instance = RequestContext(request)
     return render(request, "workflow/search/todo_list.html", context=pagevars)
 
 
@@ -2139,7 +2169,6 @@ class GetReport(ListView):
 
         this_day = date.today()
         begin_day = this_day + timedelta(days=-7)
-        one_year_ago = this_day + timedelta(days=-365)
         two_years_ago = this_day + timedelta(days=-730)
 
         """
@@ -2655,12 +2684,6 @@ def inkcov_excel(request, plant):
     workBookDocument = openpyxl.Workbook()
 
     # Gather up the plants involved in this report. Exclude closed plants.
-    exclude_plants = ["Clinton", "Framingham", "Raleigh", "Plant City"]
-    bev_plants = (
-        Plant.objects.filter(workflow__name="Beverage")
-        .order_by("name")
-        .exclude(name__in=exclude_plants)
-    )
 
     # Get items that have filed out for the given plant.
     fileout_logs = JobLog.objects.filter(

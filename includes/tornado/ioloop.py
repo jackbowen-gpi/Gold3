@@ -115,8 +115,8 @@ class IOLoop(object):
                     self.io_loop = io_loop or IOLoop.instance()
         """
         if not hasattr(cls, "_instance"):
-            cls._instance = cls()
-        return cls._instance
+            cls._instance = cls()  # type: ignore
+        return cls._instance  # type: ignore
 
     @classmethod
     def initialized(cls):
@@ -274,8 +274,8 @@ class IOLoop(object):
             pass
 
     def _set_nonblocking(self, fd):
-        flags = fcntl.fcntl(fd, fcntl.F_GETFL)
-        fcntl.fcntl(fd, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+        flags = fcntl.fcntl(fd, fcntl.F_GETFL)  # type: ignore
+        fcntl.fcntl(fd, fcntl.F_SETFL, flags | os.O_NONBLOCK)  # type: ignore
 
 
 class _Timeout(object):
@@ -286,7 +286,7 @@ class _Timeout(object):
         self.callback = callback
 
     def __cmp__(self, other):
-        return cmp(
+        return cmp(  # type: ignore
             (self.deadline, id(self.callback)), (other.deadline, id(other.callback))
         )
 
@@ -347,17 +347,17 @@ class _KQueue(object):
     """A kqueue-based event loop for BSD/Mac systems."""
 
     def __init__(self):
-        self._kqueue = select.kqueue()
+        self._kqueue = select.kqueue()  # type: ignore
         self._filters = {}
 
     def register(self, fd, events):
         filter = 0
         if events & IOLoop.WRITE:
-            filter |= select.KQ_FILTER_WRITE
+            filter |= select.KQ_FILTER_WRITE  # type: ignore
         if events & IOLoop.READ or filter == 0:
-            filter |= select.KQ_FILTER_READ
+            filter |= select.KQ_FILTER_READ  # type: ignore
         self._filters[fd] = filter
-        kevent = select.kevent(fd, filter=filter)
+        kevent = select.kevent(fd, filter=filter)  # type: ignore
         self._kqueue.control([kevent], 0)
 
     def modify(self, fd, events):
@@ -365,7 +365,7 @@ class _KQueue(object):
         self.register(fd, events)
 
     def unregister(self, fd):
-        kevent = select.kevent(fd, filter=self._filters[fd], flags=select.KQ_EV_DELETE)
+        kevent = select.kevent(fd, filter=self._filters[fd], flags=select.KQ_EV_DELETE)  # type: ignore
         self._kqueue.control([kevent], 0)
 
     def poll(self, timeout):
@@ -374,11 +374,11 @@ class _KQueue(object):
         for kevent in kevents:
             fd = kevent.ident
             flags = 0
-            if kevent.filter & select.KQ_FILTER_READ:
+            if kevent.filter & select.KQ_FILTER_READ:  # type: ignore
                 flags |= IOLoop.READ
-            if kevent.filter & select.KQ_FILTER_WRITE:
+            if kevent.filter & select.KQ_FILTER_WRITE:  # type: ignore
                 flags |= IOLoop.WRITE
-            if kevent.flags & select.KQ_EV_ERROR:
+            if kevent.flags & select.KQ_EV_ERROR:  # type: ignore
                 flags |= IOLoop.ERROR
             events.append((fd, flags))
         return events
@@ -435,7 +435,7 @@ elif hasattr(select, "kqueue"):
 else:
     try:
         # Linux systems with our C module installed
-        import epoll
+        import epoll  # type: ignore
 
         _poll = _EPoll
     except:

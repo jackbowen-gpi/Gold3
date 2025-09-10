@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models import signals
 
 from gchub_db.apps.auto_corrugated.documents.fsb_box import FSBBox, FSBLabel
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import JOBLOG_TYPE_NOTE
 from gchub_db.apps.joblog.models import JobLog
 from gchub_db.apps.workflow.models import (
     Charge,

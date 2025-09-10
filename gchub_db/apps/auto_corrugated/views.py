@@ -28,9 +28,12 @@ from gchub_db.apps.auto_corrugated.models import (
     GeneratedLabel,
 )
 from gchub_db.apps.joblog.models import JobLog
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import JOBLOG_TYPE_NOTE
 from gchub_db.apps.workflow.models import Plant, PlatePackage, Job
-from gchub_db.apps.auto_corrugated.elements.fsb_elements import *
+from gchub_db.apps.auto_corrugated.elements.fsb_elements import (
+    barcodeFileExists,
+    triggerBarcodeCreation,
+)
 import threading
 import time
 
@@ -110,9 +113,9 @@ class GeneratedBoxForm(ModelForm, JSONErrorForm):
         )
         #        self.fields["make_slugs"].label = "Create Slugs"
         self.fields["platepackage"].label = "Platemaking"
-        self.fields["platepackage"].help_text = (
-            "If no platemaker is chosen, the job will file out on approval. Clemson will not make TIFFs."
-        )
+        self.fields[
+            "platepackage"
+        ].help_text = "If no platemaker is chosen, the job will file out on approval. Clemson will not make TIFFs."
         self.fields["dim_length"].help_text = "(Outer Dimensions)"
         self.fields["dim_width"].help_text = "(Outer Dimensions)"
         self.fields["dim_height"].help_text = "(Outer Dimensions)"

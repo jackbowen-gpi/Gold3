@@ -19,7 +19,7 @@ var $j = jQuery.noConflict();
 function on_load() {
     // Initialize date pickers
     initializeDatePickers();
-    
+
     // Focus on first field
     if (document.getElementById('id_search_all')) {
         document.getElementById('id_search_all').focus();
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
 {% if type == "job" %}
 <form method="get" action="" name="job_search" enctype="multipart/form-data">
     <input type="hidden" name="legacy" value="1">
-    
+
     <div class="outline_fancy" style="width:600px">
         <h2 class="inline">Search Parameters</h2><br />
         <table cellpadding="0" cellspacing="0" width="100%" border="0" style="border:none;">
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {% if form.printgroup.errors %}<tr><td colspan="2"><span class="field_error">{{ form.printgroup.errors|join:", " }}</span></td></tr>{% endif %}
         </table>
     </div>
-    
+
     <div class="outline_fancy" style="width:600px;">
         <h2 class="inline">Date Range Search</h2><br />
         <table cellpadding="0" cellspacing="0" width="100%" border="0" style="border:none;">
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {% if form.workflow.errors %}<tr><td colspan="2"><span class="field_error">{{ form.workflow.errors|join:", " }}</span></td></tr>{% endif %}
         </table>
     </div>
-    
+
     <div class="outline_fancy" style="width:600px; padding-bottom:15px;">
         <h2 class="inline">Sorting Options</h2><br />
         <table cellpadding="0" cellspacing="0" width="100%" border="0" style="border:none;">
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
 {% if type == "item" %}
 <form method="get" action="" name="item_search" enctype="multipart/form-data">
     <input type="hidden" name="legacy" value="1">
-    
+
     <div class="outline_fancy" style="width:600px">
         <h2 class="inline">Search Parameters</h2><br />
         <table cellpadding="0" cellspacing="0" width="100%" border="0" style="border:none;">
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {% if form.customer_code.errors %}<tr><td colspan="2"><span class="field_error">{{ form.customer_code.errors|join:", " }}</span></td></tr>{% endif %}
         </table>
     </div>
-    
+
     <div class="outline_fancy" style="width:600px; padding-bottom:15px;">
         <h2 class="inline">Sorting Options</h2><br />
         <table cellpadding="0" cellspacing="0" width="100%" border="0" style="border:none;">

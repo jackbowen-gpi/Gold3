@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Export ink coverage data for FSB into a spreadsheet."""
+
 import bin_functions
 
 bin_functions.setup_paths()
@@ -10,7 +11,10 @@ from datetime import date
 
 import openpyxl
 
-from gchub_db.apps.workflow.models import *
+from django.db import models
+
+from gchub_db.apps.joblog.app_defs import JOBLOG_TYPE_ITEM_FILED_OUT
+from gchub_db.apps.workflow.models import Item, ItemColor, JobLog
 
 # Set the plant and start date.
 plant = "Shelbyville"

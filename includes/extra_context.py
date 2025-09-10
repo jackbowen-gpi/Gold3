@@ -16,7 +16,8 @@ def common_urls(request):
         "EMAIL_SUPPORT": settings.EMAIL_SUPPORT,
         "EMAIL_GCHUB": settings.EMAIL_GCHUB,
         # Development-only: show all navigation links regardless of permissions.
-        # Default to True while developing; set to False in local_settings or env for testing.
+        # Default to True while developing; set to False in local_settings or env
+        # for testing.
         "SHOW_ALL_LINKS": getattr(settings, "DEV_SHOW_ALL_LINKS", True)
         and settings.DEBUG,
     }

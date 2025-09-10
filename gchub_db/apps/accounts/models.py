@@ -53,46 +53,46 @@ class UserProfile(models.Model):
     notifications_enabled = models.BooleanField(
         default=True,
         verbose_name="Enable All Notifications",
-        help_text="Master switch to enable/disable all desktop notifications"
+        help_text="Master switch to enable/disable all desktop notifications",
     )
-    
+
     # Theme preferences
     THEME_CHOICES = [
-        ('default', 'Default Theme'),
-        ('dark', 'Dark Theme'),
-        ('light', 'Light Theme'),
+        ("default", "Default Theme"),
+        ("dark", "Dark Theme"),
+        ("light", "Light Theme"),
     ]
-    
+
     preferred_theme = models.CharField(
         max_length=20,
         choices=THEME_CHOICES,
-        default='default',
+        default="default",
         verbose_name="Preferred Theme",
-        help_text="Choose your preferred color theme for the interface"
+        help_text="Choose your preferred color theme for the interface",
     )
-    
+
     enable_animations = models.BooleanField(
         default=True,
         verbose_name="Enable Animations",
-        help_text="Enable smooth transitions and animations in the interface"
+        help_text="Enable smooth transitions and animations in the interface",
     )
-    
+
     custom_primary_color = models.CharField(
         max_length=7,
         blank=True,
         null=True,
         verbose_name="Custom Primary Color",
-        help_text="Custom hex color code for primary theme color (e.g., #007bff)"
+        help_text="Custom hex color code for primary theme color (e.g., #007bff)",
     )
-    
+
     custom_accent_color = models.CharField(
         max_length=7,
         blank=True,
         null=True,
-        verbose_name="Custom Accent Color", 
-        help_text="Custom hex color code for accent theme color (e.g., #28a745)"
+        verbose_name="Custom Accent Color",
+        help_text="Custom hex color code for accent theme color (e.g., #28a745)",
     )
-    
+
     growl_hear_approvals = models.IntegerField(
         default=GROWL_STATUS_STICKY,
         choices=GROWL_STATUS_TYPES,
@@ -164,81 +164,81 @@ class UserProfile(models.Model):
         choices=GROWL_STATUS_TYPES,
         verbose_name="Today's Events",
     )
-    
+
     # Search interface preferences
     use_legacy_search = models.BooleanField(
         default=True,
         verbose_name="Use Legacy Search Interface",
-        help_text="When enabled, job and item search will use the original GOLD interface"
+        help_text="When enabled, job and item search will use the original GOLD interface",
     )
-    
+
     # Job search criteria preferences
     job_search_brand = models.BooleanField(
         default=True,
         verbose_name="Search Brand Field",
-        help_text="Include brand field in job searches"
+        help_text="Include brand field in job searches",
     )
     job_search_customer = models.BooleanField(
         default=True,
         verbose_name="Search Customer Field",
-        help_text="Include customer field in job searches"
+        help_text="Include customer field in job searches",
     )
     job_search_po_number = models.BooleanField(
         default=True,
         verbose_name="Search PO Number Field",
-        help_text="Include PO number field in job searches"
+        help_text="Include PO number field in job searches",
     )
     job_search_comments = models.BooleanField(
         default=True,
         verbose_name="Search Comments Field",
-        help_text="Include comments field in job searches"
+        help_text="Include comments field in job searches",
     )
     job_search_instructions = models.BooleanField(
         default=True,
         verbose_name="Search Instructions Field",
-        help_text="Include instructions field in job searches"
+        help_text="Include instructions field in job searches",
     )
     job_search_salesperson = models.BooleanField(
         default=True,
         verbose_name="Search Salesperson Field",
-        help_text="Include salesperson field in job searches"
+        help_text="Include salesperson field in job searches",
     )
     job_search_artist = models.BooleanField(
         default=True,
         verbose_name="Search Artist Field",
-        help_text="Include artist field in job searches"
+        help_text="Include artist field in job searches",
     )
-    
+
     # Item search criteria preferences
     item_search_description = models.BooleanField(
         default=True,
         verbose_name="Search Item Description",
-        help_text="Include item description field in item searches"
+        help_text="Include item description field in item searches",
     )
     item_search_upc = models.BooleanField(
         default=True,
         verbose_name="Search UPC Field",
-        help_text="Include UPC field in item searches"
+        help_text="Include UPC field in item searches",
     )
     item_search_brand = models.BooleanField(
         default=True,
         verbose_name="Search Brand Field",
-        help_text="Include brand field in item searches"
+        help_text="Include brand field in item searches",
     )
     item_search_customer = models.BooleanField(
         default=True,
         verbose_name="Search Customer Field",
-        help_text="Include customer field in item searches"
+        help_text="Include customer field in item searches",
     )
     item_search_comments = models.BooleanField(
         default=True,
         verbose_name="Search Comments Field",
-        help_text="Include comments field in item searches"
+        help_text="Include comments field in item searches",
     )
     item_search_specifications = models.BooleanField(
         default=True,
         verbose_name="Search Specifications Field",
-        help_text="Include specifications field in item searches"
+        help_text="Include specifications field in item searches",
     )
 
     class Meta:
@@ -510,7 +510,7 @@ class UserProfile(models.Model):
                 title=title,
                 description=description,
                 sticky=sticky,
-                pref_field=pref_field
+                pref_field=pref_field,
             )
         except Exception as error:
             print("Notification Error: %s" % str(error))

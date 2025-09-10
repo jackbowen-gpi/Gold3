@@ -15,23 +15,23 @@
     <script type="text/javascript" src="{{YUI_URL}}build/yahoo-dom-event/yahoo-dom-event.js"></script>
     <script type="text/javascript" src="{{YUI_URL}}build/animation/animation-min.js"></script>
     <script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
-	
+
     <!-- Javascript -->
     <script type="text/javascript">
        /*
         * prototype is loaded in GOLD's base html and it uses $ just like jquery
-        * does. So we'll change $ to $j for the jQuery on this page using 
+        * does. So we'll change $ to $j for the jQuery on this page using
         * jQuery.noConflict()
         */
         var $j = jQuery.noConflict();
-        
+
         //jQuery to be fired when the document is ready.
         $j(document).ready(function(){
            /*
             * This dialog asks the user what changes need to be made to a given
-            * box PDF. The dialog is displayed by the approve_box_changes 
+            * box PDF. The dialog is displayed by the approve_box_changes
             * funct further down.
-            */ 
+            */
          // Busy inidcator
 			$j( "#busy_dialog" ).dialog({
 				autoOpen: false,
@@ -39,7 +39,7 @@
 				resizable: false,
 				title: "Working",
 			});
-			
+
             $j('#pdf_approval_form #id_approvalSubmit').attr('checked', false);
             $j('#pdf_approval_form #id_approvalSubmit').hide();
             $j('#pdf_changes_form #id_approvalSubmit').hide();
@@ -60,12 +60,12 @@
                     },
                 },//End buttons
             });//End dialog()
-           
+
            /*
             * This dialog asks the user what changes need to be made to a given
-            * box PDF. The dialog is displayed by the approve_box_changes 
+            * box PDF. The dialog is displayed by the approve_box_changes
             * funct further down.
-            */ 
+            */
             $j( "#changes_dialog" ).dialog({
                 autoOpen: false,
                 width: 400,
@@ -83,7 +83,7 @@
                     },
                 },//End buttons
             });//End dialog()
-            
+
             // If there are form validation errors open the dialog on page load
             // so the user can see the errors.
             if (val_error) {
@@ -101,20 +101,20 @@
                 },
                 text: false
             });
-            
+
             //Runs cloneMore() when add button in the changes dialog is clicked.
             $j('#add_file1').click(function() {
                 cloneMore('div.file_field1:last');
             });
             $j('#add_file2').click(function() {
                 cloneMore('div.file_field2:last');
-            });  
-            
+            });
+
         });//End jQuery to be fire when the document is ready.
 
         val_error=false;
         val_error_ap=false;
-        
+
      	// Show busy indicator while prepping the PDF download
 		function PDFClick(box_id, method) {
 			// Set busy indicator text
@@ -129,11 +129,11 @@
 			    failCallback: function (responseHtml, url) {
 			    	alert("There was an error creating the PDF");
 			    	$j( "#busy_dialog" ).dialog( "close" );
-			    	
+
 			    }
 			});
 		};
-        
+
         // Add additional file upload fields to the changes dialog.
         function cloneMore(selector) {
             //Find out how many fields we're starting with.
@@ -149,7 +149,7 @@
             var head = newElement.children('input').attr('name').split(total-1)[0];
             var tail = newElement.children('input').attr('name').split(total-1)[1];
             newElement.children('input').attr({'name': head + total + tail});
-            //Increate the formset's total form count by 1.     
+            //Increate the formset's total form count by 1.
             total++;
             $j("[id$='TOTAL_FORMS']").val(total);
             //Put the newly cloned form after the original.
@@ -161,23 +161,23 @@
         function hide_modal_wait() {
             setTimeout("YAHOO.example.container.wait.hide()",1250);
         } // end hide_modal_wait()
-        
+
         function approve_box(box_id) {
            /*
             * Fired when he user hits the Approve button. Calls the validator
             * and sends off an AJAX request if all is good.
-            */  
+            */
 
             $j("#approve_dialog" ).dialog( "open" );
-            
+
         } // end approve_box()
-    
+
 
         function approve_box_changes(box_id) {
            /*
-            * Fired when he user hits the Change by Artist button. Displays a 
+            * Fired when he user hits the Change by Artist button. Displays a
             * dialog asking what changes should be made to the box PDF.
-            */  
+            */
             $j( "#changes_dialog" ).dialog( "open" );
         } // end approve_box_changes()
     </script>
@@ -194,14 +194,14 @@
 	  <p><div id="busy_dialog_text"></div></p>
 	  <img src="{{MEDIA_URL}}img/spinner.gif" />
   <center>
-</div>	 
+</div>
 
 <!-- This div is the contents of the pop-up dialog when a PDF is approved with
 changes. The jQuery in the header handles showing and hiding it.-->
 <div id="approve_dialog" title="PDF Approval Notes">
     <p>What notes do have have for the artist?</p>
     <form id="pdf_approval_form" method="post" enctype="multipart/form-data">
-        {{ approvalform.changes.errors }} 
+        {{ approvalform.changes.errors }}
         {{ approvalform.changes }}
         {{ approvalform.approvalSubmit }}
         <p>If you have a reference file for the artist upload it here.</p>
@@ -210,14 +210,14 @@ changes. The jQuery in the header handles showing and hiding it.-->
             {{ form.id }}
             {% for field in form %}
                 <div class="file_field1">
-                    {{ field.errors }} 
+                    {{ field.errors }}
                     {{ field }}
                 </div>
             {% endfor %}
         {% endfor %}
         <p><button type="button" id="add_file1">Add Another File</button><i> &nbsp; Click to add more files.</i></p>
     </form>
-    <!-- If there are validation errors in this form we want it to show on page 
+    <!-- If there are validation errors in this form we want it to show on page
     load so the user can see the errors. This might be a poor way to trigger it
     though.-->
     {% if approvalform.errors %}
@@ -232,7 +232,7 @@ changes. The jQuery in the header handles showing and hiding it.-->
 <div id="changes_dialog" title="PDF Changes">
     <p>What changes need to be made to this PDF?</p>
     <form id="pdf_changes_form" method="post" enctype="multipart/form-data">
-        {{ changeform.changes.errors }} 
+        {{ changeform.changes.errors }}
         {{ changeform.changes }}
         {{ changeform.approvalSubmit }}
         <p>If you have a reference file for the artist upload it here.</p>
@@ -241,14 +241,14 @@ changes. The jQuery in the header handles showing and hiding it.-->
             {{ form.id }}
             {% for field in form %}
                 <div class="file_field2">
-                    {{ field.errors }} 
+                    {{ field.errors }}
                     {{ field }}
                 </div>
             {% endfor %}
         {% endfor %}
         <p><button type="button" id="add_file2">Add Another File</button><i> &nbsp; Click to add more files.</i></p>
     </form>
-    <!-- If there are validation errors in this form we want it to show on page 
+    <!-- If there are validation errors in this form we want it to show on page
     load so the user can see the errors. This might be a poor way to trigger it
     though.-->
     {% if changeform.errors %}
@@ -364,7 +364,7 @@ changes. The jQuery in the header handles showing and hiding it.-->
 								<img src="{{MEDIA_URL}}img/icons/page_white_acrobat.png" style="vertical-align:text-bottom" />Download Preview PDF
                             </a></strong>
 					  		<p>(PDF is encrypted and watermarked.)</p>
-  	
+
   							<!--
                              <strong><a href='javascript:generate_box({{box.id}}, "reportlab")'>
                             <img src="{{MEDIA_URL}}img/icons/page_white_acrobat.png" style="vertical-align:text-bottom" /> Download PDF
@@ -373,20 +373,20 @@ changes. The jQuery in the header handles showing and hiding it.-->
                             <p>(PDF is encrypted and watermarked.)</p>
                              -->
                         {% endif %}
-                        
+
                         <span class="pdf_type">
                         {% ifequal box.pdf_type 0 %}
                           PDF Type: Box Graphics with Label
                         {% endifequal %}
-                        
+
                         {% ifequal box.pdf_type 1 %}
                           PDF Type: Box Graphics with NO Label
                         {% endifequal %}
-                        
+
                         {% ifequal box.pdf_type 2 %}
                           PDF Type: NO Box Graphics with Label
                         {% endifequal %}
-                        
+
                         {% ifequal box.pdf_type 3 %}
                           PDF Type: NO Box Graphics with NO Label
                         {% endifequal %}
@@ -394,7 +394,7 @@ changes. The jQuery in the header handles showing and hiding it.-->
                     </td>
                 </tr>
                 {% if box.approved %}
-                
+
                 {% else %}
                     <tr height="60px">
                         <td style="text-align:center;">

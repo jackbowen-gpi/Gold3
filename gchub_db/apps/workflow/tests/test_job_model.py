@@ -10,14 +10,6 @@ from gchub_db.apps.workflow.models.job import Job
 from tests.factories import create_site, create_user
 
 
-class FakeItem:
-    def __init__(self, final_file):
-        self._final = final_file
-
-    def final_file_date(self):
-        return self._final
-
-
 class JobModelTests(TestCase):
     def setUp(self):
         # use factory wrapper to create a minimal user
@@ -263,23 +255,6 @@ class TestJobModel(TestCase):
             )
             job_bev = Job.objects.create(name="IconJob2", workflow=site_bev)
             self.assertIn("bullet_green.png", job_bev.get_icon_url())
-
-            import uuid
-            from datetime import date, timedelta
-            from unittest.mock import patch
-
-            from django.test import TestCase
-
-            from gchub_db.apps.joblog.app_defs import JOBLOG_TYPE_JOB_CREATED
-            from gchub_db.apps.joblog.models import JobLog
-            from gchub_db.apps.workflow.models.job import Job
-
-            class FakeItem:
-                def __init__(self, final_file):
-                    self._final = final_file
-
-                def final_file_date(self):
-                    return self._final
 
             class JobModelTests(TestCase):
                 def setUp(self):

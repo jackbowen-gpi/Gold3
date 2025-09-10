@@ -23,16 +23,16 @@ class MockCursor:
         self.data = data or []
         self.description = description or []
         self._fetched = False
-    
+
     def execute(self, query):
         pass
-    
+
     def fetchone(self):
         if not self._fetched and self.data:
             self._fetched = True
             return self.data[0]
         return None
-    
+
     def fetchall(self):
         return self.data
 
@@ -74,9 +74,9 @@ def _get_conn_cursor():
     and return the cursor for use in a query.
     """
     # Check if ETOOLS is disabled for development
-    if not getattr(settings, 'ETOOLS_ENABLED', True):
+    if not getattr(settings, "ETOOLS_ENABLED", True):
         return MockCursor(), None
-    
+
     connection = pyodbc.connect(settings.ETOOLS_ODBC_DSN)
     return connection.cursor(), connection
 
@@ -84,9 +84,9 @@ def _get_conn_cursor():
 def get_server_version():
     """Queries for the server's version info."""
     # Check if ETOOLS is disabled for development
-    if not getattr(settings, 'ETOOLS_ENABLED', True):
+    if not getattr(settings, "ETOOLS_ENABLED", True):
         return "Mock SQL Server 2019 - Development Environment"
-    
+
     cursor = _get_conn_cursor()[0]
     cursor.execute(
         "SELECT 'SQL Server ' + CONVERT(varchar(100),SERVERPROPERTY('productversion')) + ' - ' + CONVERT(varchar(100),SERVERPROPERTY('productlevel')) + ' - ' + CONVERT(varchar(100),SERVERPROPERTY('edition'))"
@@ -117,9 +117,9 @@ def get_job_by_request_id(request_id):
     may iterate through.
     """
     request_id = int(request_id)
-    
+
     # Check if ETOOLS is disabled for development
-    if not getattr(settings, 'ETOOLS_ENABLED', True):
+    if not getattr(settings, "ETOOLS_ENABLED", True):
         # Return mock data for development
         mock_data = MockRow(
             Request_ID=request_id,
@@ -131,15 +131,22 @@ def get_job_by_request_id(request_id):
             Contact_Name="John Doe",
             Contact_Email="john.doe@mockcustomer.com",
             Contact_Phone="555-1234",
-            Notes="This is mock ETOOLS data for development environment"
+            Notes="This is mock ETOOLS data for development environment",
         )
         mock_description = [
-            ('Request_ID',), ('Customer_Name',), ('Project_Description',), 
-            ('Job_Status',), ('Request_Date',), ('Due_Date',), 
-            ('Contact_Name',), ('Contact_Email',), ('Contact_Phone',), ('Notes',)
+            ("Request_ID",),
+            ("Customer_Name",),
+            ("Project_Description",),
+            ("Job_Status",),
+            ("Request_Date",),
+            ("Due_Date",),
+            ("Contact_Name",),
+            ("Contact_Email",),
+            ("Contact_Phone",),
+            ("Notes",),
         ]
         return MockCursor(data=[mock_data], description=mock_description)
-    
+
     cursor = _get_conn_cursor()[0]
     query = (
         "SELECT TOP 1 * FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = %d" % request_id

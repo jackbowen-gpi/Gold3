@@ -39,7 +39,7 @@ def dump_backup():
         "--file=%s" % (BACKUP_FILE),
     ]
 
-    retcode = call(cmd_list)
+    call(cmd_list)
     print("Backup cycle complete.")
 
 

@@ -1,6 +1,6 @@
 {% extends "standard.html" %}
 
-{% block extra_head %} 
+{% block extra_head %}
 	<style type="text/css">
 		input {
 			border: none;
@@ -31,7 +31,7 @@
 
 <!-- General employee data table -->
 <div class="grey_bordered">
-	<h2> 
+	<h2>
 		<form method="post">
 			{% csrf_token %}
 			QC Errors for {{qcform.year}}
@@ -42,7 +42,7 @@
 
 	<table class="rowHover">
 		<tr>
-			<th style="text-align:center;">Name</th>			
+			<th style="text-align:center;">Name</th>
 			<th style="text-align:center;">Unresolved</th>
 			<th style="text-align:center;">Resolved</th>
 			<th style="text-align:center;">Invalid</th>
@@ -50,7 +50,7 @@
 		</tr>
 	{% for user in qc_metrics_by_user %}
 		<tr class="{% cycle 'rowA' 'rowB' %}">
-			<td>{{user.first_name}} {{user.last_name}}</td>	
+			<td>{{user.first_name}} {{user.last_name}}</td>
 			<td style="text-align:right;">{{user.num_unresolved}}</td>
 			<td style="text-align:right;">{{user.num_resolved}}</td>
 			<td style="text-align:right;">{{user.num_invalid}}</td>

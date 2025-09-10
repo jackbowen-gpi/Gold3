@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """Generate month-end beverage billing summary spreadsheet."""
-# openpyxl is now used instead of pyExcelerator because it supports python3 and pyexcelerator is deprecated
+
+# openpyxl is now used instead of pyExcelerator because it supports
+# python3 and pyexcelerator is deprecated
 import bin_functions
 import openpyxl
 

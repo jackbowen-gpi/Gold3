@@ -4,7 +4,7 @@
 
 {% block extra_head %}
   {% include "preferences/navbar_header.inc.html" %}
-{% endblock %} 
+{% endblock %}
 
 {% block body %}
 <h1>Preferences - Contact Info</h1>
@@ -27,7 +27,7 @@
 
 <form id="contact_info_form" action="{% url 'preferences_contact_info' %}" method="post">
   {% csrf_token %}
-  
+
   <table class="contact-form">
     <tr>
         <td class="label-cell">Username:</td>
@@ -126,7 +126,7 @@
     text-align: right;
 }
 
-.contact-form input[type="text"], 
+.contact-form input[type="text"],
 .contact-form input[type="email"] {
     width: 300px;
     padding: 4px 6px;
@@ -136,7 +136,7 @@
     outline: none;
 }
 
-.contact-form input[type="text"]:focus, 
+.contact-form input[type="text"]:focus,
 .contact-form input[type="email"]:focus {
     background-color: #fffacd;
 }
@@ -164,5 +164,5 @@
     padding: 8px;
     margin-bottom: 15px;
 }
-</style>  
+</style>
 {% endblock %}

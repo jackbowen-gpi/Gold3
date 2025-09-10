@@ -10,7 +10,12 @@ os.environ.setdefault("DEV_DB_PORT", os.environ.get("DEV_DB_PORT", "5432"))
 os.environ.setdefault("DEV_DB_USER", os.environ.get("DEV_DB_USER", "postgres"))
 os.environ.setdefault("DEV_DB_PASSWORD", os.environ.get("DEV_DB_PASSWORD", "postgres"))
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+# Set the Django settings module; override via env var if needed.
+# Assumes 'settings.py' is in the working directory
+# unless DJANGO_SETTINGS_MODULE is set.
+os.environ.setdefault(
+    "DJANGO_SETTINGS_MODULE", os.environ.get("DJANGO_SETTINGS_MODULE", "settings")
+)
 
 django.setup()
 
@@ -37,17 +42,17 @@ def main():
         user, user_created = User.objects.get_or_create(
             username="gchub", defaults=user_defaults
         )
-        # set password and flags for dev convenience
+        # WARNING: Hardcoded password for development use only.
+        # Do NOT use this script in production environments.
         user.set_password("gchub")
         user.is_staff = True
         user.is_superuser = True
-        user.save()
         user.groups.add(group)
         user.save()
-
-    print(
-        f"group_created={group_created} user_created={user_created} username={user.username} email={user.email}"
-    )
+        print(
+            f"group_created={group_created} user_created={user_created} "
+            f"username={user.username} email={user.email}"
+        )
 
 
 if __name__ == "__main__":

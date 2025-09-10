@@ -28,8 +28,8 @@ except Exception:
     for p in sys.path[:8]:
         print(p)
     raise
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Permission
+from django.contrib.auth import get_user_model  # noqa: E402
+from django.contrib.auth.models import Permission  # noqa: E402
 
 User = get_user_model()
 u, created = User.objects.get_or_create(

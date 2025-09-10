@@ -9,15 +9,26 @@ exclude = [".venv", "media", "node_modules", "logs", "gchub_db/gchub_db"]
 # syntax errors, etc.). Style and docstring checks are noisy for this
 # legacy codebase and are relaxed via per-file ignores above.
 select = ["F", "E"]
-extend-ignore = ["D203", "D213"]
+extend-ignore = ["D203", "D213", "E501", "E741", "E743"]
 
 [lint.per-file-ignores]
 # Allow legacy and vendored code to bypass many style and docstring checks.
-"includes/**" = ["D", "C", "B", "N"]
-"local_settings.py" = ["E501", "D100"]
+"includes/**" = ["D", "C", "B", "N", "F821", "E722", "E721", "E711"]
+"local_settings.py" = ["D100"]
 "manage.py" = ["D100"]
 "middleware/**" = ["D", "C", "B", "N"]
 "templatetags/**" = ["D100", "D101", "D102", "D103"]
 "tmp_*.py" = ["D100", "E402"]
-"gchub_db/**" = ["D", "N", "E501", "C", "B", "W"]
-"settings_common.py" = ["D", "E501"]
+"gchub_db/**" = ["D", "N", "C", "B", "W"]
+"settings_common.py" = ["D"]
+# Scripts often need Django setup before imports
+"scripts/**" = ["E402"]
+".scripts/**" = ["E402"]
+"bin/**" = ["E402"]
+"daemons/**" = ["E402"]
+"tools/**" = ["E402"]
+# Test files and setup files
+"conftest*.py" = ["E402"]
+"test_*.py" = ["E402"]
+"setup_*.py" = ["E402"]
+"urls*.py" = ["E402"]

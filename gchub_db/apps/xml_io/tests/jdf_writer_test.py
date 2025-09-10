@@ -7,7 +7,7 @@ sys.path.append("../../../../")
 os.environ["DJANGO_SETTINGS_MODULE"] = "gchub_db.settings"
 # Back to the ordinary imports
 from gchub_db.apps.workflow.models import Job
-from gchub_db.apps.xml_io.jdf_writer import *
+from gchub_db.apps.xml_io.jdf_writer import ItemJDF
 
 
 def test_new_fsb_ffo_proof(item):

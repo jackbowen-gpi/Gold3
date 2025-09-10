@@ -3,6 +3,7 @@
 
 Produces an Excel file summarizing QC catches by artist and category.
 """
+
 import bin_functions
 import openpyxl
 
@@ -13,7 +14,6 @@ django.setup()
 from django.contrib.auth.models import Permission, User
 
 from gchub_db.apps.qc.models import QCCategory, QCWhoops
-from gchub_db.apps.workflow.app_defs import *
 
 # Setup the Worksheet
 workBookDocument = openpyxl.Workbook()
@@ -70,9 +70,9 @@ def _do_qc_breakdown():
                 n += 1
             i += 1
 
+    # Freeze the top row of column headings.
+    docSheet1.panes_frozen = docSheet1["B2"]
 
-# Freeze the top row of column headings.
-docSheet1.panes_frozen = docSheet1["B2"]
 
 # Execute each breakdown.
 _do_qc_breakdown()

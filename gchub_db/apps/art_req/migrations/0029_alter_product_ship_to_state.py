@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("art_req", "0028_alter_product_ship_to_state"),
     ]

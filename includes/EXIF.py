@@ -1,4 +1,5 @@
 import collections
+import collections.abc
 
 # Library to extract EXIF information in digital camera image files
 #
@@ -777,7 +778,7 @@ class EXIF_header:
                 tag_name = tag_entry[0]
                 if len(tag_entry) != 1:
                     # optional 2nd tag element is present
-                    if isinstance(tag_entry[1], collections.Callable):
+                    if isinstance(tag_entry[1], collections.abc.Callable):
                         # call mapping function
                         printable = tag_entry[1](values)
                     else:
@@ -856,7 +857,6 @@ class EXIF_header:
     def decode_maker_note(self):
         note = self.tags["EXIF MakerNote"]
         make = self.tags["Image Make"].printable
-        model = self.tags["Image Model"].printable
 
         # Nikon
         if make == "NIKON":

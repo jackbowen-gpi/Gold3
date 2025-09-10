@@ -1,5 +1,6 @@
 #!/usr/bin/python
 """Generate custom FSB billing analysis spreadsheets."""
+
 import bin_functions
 import openpyxl
 
@@ -12,7 +13,6 @@ from datetime import date
 
 from django.db.models import Sum
 
-from gchub_db.apps.workflow.app_defs import *
 from gchub_db.apps.workflow.models import Charge, Job
 
 # Setup the Worksheet
@@ -79,9 +79,9 @@ def _do_billing_analysis():
             for plant in plant_set:
                 plant_charges = charges.filter(item__printlocation__plant__name=plant)
                 if plant_charges:
-                    docSheet8.cell(row=i + 1, column=plant_col + 1).value = (
-                        plant_charges.aggregate(total=Sum("amount"))["total"]
-                    )
+                    docSheet8.cell(
+                        row=i + 1, column=plant_col + 1
+                    ).value = plant_charges.aggregate(total=Sum("amount"))["total"]
                 plant_col += 1
             # Iterate row for new month/year
             i += 1

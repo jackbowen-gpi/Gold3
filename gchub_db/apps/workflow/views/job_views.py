@@ -3,7 +3,7 @@
 import json
 import os
 from abc import abstractstaticmethod
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from gchub_db.includes import general_funcs
 from django.utils import timezone
 from io import BytesIO
@@ -13,7 +13,6 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Permission, User
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
 from django.contrib.sites.models import Site
 from django.core import serializers
 from django.db.models import Q
@@ -25,8 +24,12 @@ from django.urls import reverse
 from django.views.generic.list import ListView
 from gchub_db.apps.art_req.models import AdditionalInfo, ArtReq
 from gchub_db.apps.color_mgt.models import ColorDefinition
-from gchub_db.apps.joblog.app_defs import *
-from gchub_db.apps.timesheet.models import TimeSheet, TimeSheetCategory
+from gchub_db.apps.joblog.app_defs import (
+    JOBLOG_TYPE_CRITICAL,
+    JOBLOG_TYPE_JOB_CREATED,
+    JOBLOG_TYPE_NOTE,
+)
+from gchub_db.apps.timesheet.models import TimeSheet
 from gchub_db.apps.workflow.carton_invoice_maker import generate_carton_invoice
 from gchub_db.apps.workflow.models import (
     BeverageBrandCode,
@@ -641,7 +644,7 @@ class JobFindRelated(ListView):
             try:
                 # Check to see if the 'word' is a number.
                 # We want to not search for stuff like '2009', or '5'
-                test = int(word)
+                int(word)
             except Exception:
                 # Word was not a number, include it in the search values.
                 # Also exclude all these roman numerals. Who likes Romans, anyway?
@@ -937,9 +940,9 @@ class NewBevJobForm(ModelForm, JSONErrorForm):
             self.fields["temp_printlocation"].queryset = self.fields[
                 "temp_printlocation"
             ].queryset.exclude(press__name="BHS")
-            self.fields["prepress_supplier"].choices = (
-                app_defs.PREPRESS_SUPPLIERS_EVERGREEN
-            )
+            self.fields[
+                "prepress_supplier"
+            ].choices = app_defs.PREPRESS_SUPPLIERS_EVERGREEN
 
 
 @login_required
@@ -1272,9 +1275,9 @@ class ItemFormCart(ItemForm):
         # Carton type specific labels
         if job.carton_type:
             if job.carton_type == "Imposition":
-                self.fields["graphic_req_number"].widget.attrs[
-                    "placeHolder"
-                ] = "(Portland Only)"
+                self.fields["graphic_req_number"].widget.attrs["placeHolder"] = (
+                    "(Portland Only)"
+                )
             if job.carton_type == "Prepress":
                 self.fields["grn"].widget.attrs["placeHolder"] = "(Not Required)"
 
@@ -1378,11 +1381,11 @@ def new_carton_item(request, job_id, type, item_id=0):
     # Check to see if job qualifies as a rush.
     today = date.today()
     if today + timedelta(days=0) >= job.due_date:
-        rush = "24 Hour"
+        pass
     elif today + timedelta(days=4) > job.due_date:
-        rush = "5 Day"
+        pass
     else:
-        rush = "No Rush"
+        pass
 
     if request.method == "POST":
         itemform = ItemFormCart(request, job, request.POST)
@@ -1948,7 +1951,6 @@ def item_tracker_promo(request, job_id):
                 # Use the counter to count through the supplied catagories
                 # and create a new tracker for each of them.
                 counter = len(catagory)
-                review_comments = ""
                 item = Item.objects.get(id=item_id)
                 # Use the counter to count through the supplied catagories
                 # and create a new tracker for each of them.
@@ -2021,7 +2023,6 @@ def item_tracker_art(request, job_id):
                 # Use the counter to count through the supplied catagories
                 # and create a new tracker for each of them.
                 counter = len(catagory)
-                review_comments = ""
                 item = Item.objects.get(id=item_id)
                 while counter > 0:
                     new_tracker = ItemTracker()
@@ -2108,7 +2109,6 @@ def timesheets(request, job_id):
     hours_cost = 150
 
     # Calculate the total hours per activity from this job's timesheet entries.
-    categories = TimeSheetCategory.objects.all()
     totals = {}
 
     for entry in timesheets:
@@ -2176,8 +2176,6 @@ def edit_all_timeline_pageload(request, job_id, event, action):
     """Make updates to all qualified items at once."""
     job = Job.objects.get(id=job_id)
     all_items = Item.objects.filter(job=job)
-
-    forecastform = ForecastAllForm()
 
     if action == "View":
         pagevars = {
@@ -2277,7 +2275,6 @@ def edit_all_timeline(request, job_id, event="View"):
     # Event determines display or action.
     if event == "View":
         # Display options for updated all items.
-        editallform = ForecastAllForm(request.POST)
 
         pagevars = {
             "page_title": "Update All Items - Timeline",
@@ -2981,7 +2978,6 @@ def return_job_item_info(item_id):
 
 
 def job_item_json(request, job_id, null_char):
-    job = Job.objects.get(id=job_id)
     item_list = Item.objects.filter(job=job_id)
 
     job_item_info = serializers.serialize(
@@ -3216,9 +3212,9 @@ class DupeBevJobForm(ModelForm, JSONErrorForm):
             self.fields["temp_printlocation"].queryset = self.fields[
                 "temp_printlocation"
             ].queryset.exclude(press__name="BHS")
-            self.fields["prepress_supplier"].choices = (
-                app_defs.PREPRESS_SUPPLIERS_EVERGREEN
-            )
+            self.fields[
+                "prepress_supplier"
+            ].choices = app_defs.PREPRESS_SUPPLIERS_EVERGREEN
 
     class Meta:
         model = Job

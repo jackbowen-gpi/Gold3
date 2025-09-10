@@ -9,6 +9,7 @@ from tempfile import NamedTemporaryFile
 # openpyxl is now used instead of pyExcelerator because it supports python3 and pyexcelerator is deprecated
 import openpyxl
 from django import forms
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
@@ -19,7 +20,12 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 from gchub_db.apps.budget import billing_funcs
-from gchub_db.apps.joblog.app_defs import *
+from gchub_db.apps.joblog.app_defs import (
+    JOBLOG_TYPE_ITEM_FILED_OUT,
+    JOBLOG_TYPE_ITEM_PREFLIGHT,
+    JOBLOG_TYPE_ITEM_PROOFED_OUT,
+    JOBLOG_TYPE_ITEM_REVISION,
+)
 from gchub_db.apps.joblog.models import JobLog
 from gchub_db.apps.manager_tools.manager_tool_funcs import (
     get_item_average_hours,
@@ -27,7 +33,10 @@ from gchub_db.apps.manager_tools.manager_tool_funcs import (
 )
 from gchub_db.apps.qc.models import QCCategory, QCResponseDoc, QCWhoops
 from gchub_db.apps.timesheet.models import TimeSheet, TimeSheetCategory
-from gchub_db.apps.workflow.app_defs import *
+from gchub_db.apps.workflow.app_defs import (
+    COMPLEXITY_CATEGORIES,
+    JOB_TYPES,
+)
 from gchub_db.apps.workflow.models import (
     Charge,
     Item,
@@ -143,10 +152,7 @@ def sick(request):
             # if profile/perms lookup fails for a user, skip them
             pass
 
-    pagevars = {
-        "page_title": "Sick Tool",
-        "clemson_employee_list": clemson_employee_list,
-    }
+    pass
 
 
 @login_required
@@ -745,7 +751,6 @@ def turntimes_by_item(request, month, year, workflow, artist_id):
     workflow = Site.objects.get(name=workflow)
 
     # Gather up all Clemson employees.
-    clemson_perm = Permission.objects.get(codename="clemson_employee")
     artist = User.objects.get(id=artist_id)
 
     data = []
@@ -1942,9 +1947,6 @@ def timesheets_by_date_span(start_date, end_date):
     for user in active_list:
         if user.has_perms(["accounts.clemson_employee"]):
             clemson_employee_list.append(user)
-
-    # Create a list for user metrics.
-    timesheets_by_user = []
 
     # Currently available time sheet activities.
     categories = TimeSheetCategory.objects.all().order_by("order")

@@ -7,14 +7,12 @@ from django.contrib.auth.models import User, Permission, Group
 
 # Get or create dev_admin user
 try:
-    admin_user = User.objects.get(username='dev_admin')
+    admin_user = User.objects.get(username="dev_admin")
     print(f"Found existing user: {admin_user.username}")
 except User.DoesNotExist:
     print("dev_admin user not found. Creating it...")
     admin_user = User.objects.create_superuser(
-        username='dev_admin',
-        email='dev_admin@localhost',
-        password='dev_admin'
+        username="dev_admin", email="dev_admin@localhost", password="dev_admin"
     )
     print("Created dev_admin user with password: dev_admin")
 
@@ -45,13 +43,13 @@ print(f"Added dev_admin to all {all_groups.count()} groups")
 
 # Check key permissions
 key_perms = [
-    'foodservice_access',
-    'beverage_access', 
-    'container_access',
-    'carton_access',
-    'in_artist_pulldown',
-    'salesperson',
-    'is_fsb_csr'
+    "foodservice_access",
+    "beverage_access",
+    "container_access",
+    "carton_access",
+    "in_artist_pulldown",
+    "salesperson",
+    "is_fsb_csr",
 ]
 
 print("\nKey permissions verified:")
@@ -63,4 +61,4 @@ for perm_code in key_perms:
     except Permission.DoesNotExist:
         print(f"  ✗ {perm_code}: NOT FOUND")
 
-print(f"\ndev_admin is ready to test all functionality!")
+print("\ndev_admin is ready to test all functionality!")

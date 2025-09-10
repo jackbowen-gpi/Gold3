@@ -33,7 +33,7 @@ def add_warning(request):
         if warningForm.is_valid():
             try:
                 # Check and see if a colorwarning with this definition exists already
-                warning = ColorWarning.objects.get(
+                ColorWarning.objects.get(
                     definition=warningForm.cleaned_data["definition"]
                 )
                 errors.append(

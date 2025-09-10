@@ -4,6 +4,7 @@
 Reports include yearly, monthly, and breakdowns by artist, salesperson,
 quality, and plant for Foodservice workflow data.
 """
+
 import bin_functions
 import openpyxl
 
@@ -18,7 +19,7 @@ from django.db.models import Q, Sum
 
 from gchub_db.apps.joblog import app_defs as joblog_defs
 from gchub_db.apps.joblog.models import JobLog
-from gchub_db.apps.workflow.app_defs import *
+from gchub_db.apps.workflow.app_defs import ITEM_TYPES
 from gchub_db.apps.workflow.models import Charge, Item, Job
 
 # Setup the Worksheet
@@ -333,7 +334,7 @@ def _do_monthly_breakdown():
 
         i += 1
     # Freeze the top row of column headings.
-    docSheet1.panes_frozen = docSheet1["B2"]
+    docSheet2.panes_frozen = docSheet2["B2"]
 
 
 def _do_artist_breakdown():
@@ -376,7 +377,7 @@ def _do_artist_breakdown():
         i += 1
 
     # Freeze the top row of column headings.
-    docSheet1.panes_frozen = docSheet1["B2"]
+    docSheet3.panes_frozen = docSheet3["B2"]
 
 
 def _do_salesperson_breakdown():
@@ -423,7 +424,7 @@ def _do_salesperson_breakdown():
         i += 1
 
     # Freeze the top row of column headings.
-    docSheet1.panes_frozen = docSheet1["B2"]
+    docSheet4.panes_frozen = docSheet4["B2"]
 
 
 def do_progress_breakdown():
@@ -494,7 +495,7 @@ def do_progress_breakdown():
     revised_item_count = revised_items.count()
     docSheet5.write(3, 1, revised_item_count)
     # Filed out count
-    revised_filed_items = revised_items.filter(id__in=all_filedout_items_ids)
+    revised_filed_items = revised_items.filter(id__in=file_outs)
     revised_filed_item_count = revised_filed_items.count()
     docSheet5.write(3, 2, revised_filed_item_count)
     # Calc hit ratio
@@ -515,7 +516,7 @@ def do_progress_breakdown():
     approved_item_count = approved_items.count()
     docSheet5.write(4, 1, approved_item_count)
     # Filed out count
-    approved_filed_items = approved_items.filter(id__in=all_filedout_items_ids)
+    approved_filed_items = approved_items.filter(id__in=file_outs)
     approved_filed_item_count = approved_filed_items.count()
     docSheet5.write(4, 2, approved_filed_item_count)
     # Calc hit ratio
@@ -529,7 +530,7 @@ def do_progress_breakdown():
     docSheet5.write(4, 6, billing["unbilled_percentage"])
 
     # Freeze the top row of column headings.
-    docSheet1.panes_frozen = docSheet1["B2"]
+    docSheet5.panes_frozen = docSheet5["B2"]
 
 
 def _do_general_stats():
@@ -752,7 +753,7 @@ def _do_monthly_itemtype():
         i += 1
 
     # Freeze the top row of column headings.
-    docSheet1.panes_frozen = docSheet1["B2"]
+    docSheet10.panes_frozen = docSheet10["B2"]
 
 
 def _do_case_estimates():

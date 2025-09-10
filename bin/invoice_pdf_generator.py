@@ -1,5 +1,6 @@
 #!/usr/bin/python
 """Generate PDF invoices from billing records for manual distribution."""
+
 import bin_functions
 
 bin_functions.setup_paths()
@@ -11,7 +12,6 @@ from reportlab.pdfgen import canvas
 
 from gchub_db.apps.budget import billing_funcs
 from gchub_db.apps.workflow.models import Job
-from gchub_db.tools.importer_functions import *
 
 # Set month and year to get invoiced charges from.
 month_num = 10
@@ -134,7 +134,8 @@ for job_id in job_set:
     c.drawCentredString(
         4.25 * inch,
         0.25 * inch,
-        "P: 864.633.6000  F: 864.653.5168    155 Old Greenville Hwy, Suite 103, Clemson, SC, 29631",
+        "P: 864.633.6000  F: 864.653.5168    155 Old Greenville Hwy, Suite 103, "
+        "Clemson, SC, 29631",
     )
 
     # Close and save the PDF

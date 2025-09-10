@@ -46,7 +46,7 @@ def run():
 
         # Create jobs (avoid get_or_create because Job.save overrides signature)
         jobs = []
-        # Temporarily disable pre_save and post_save processing that expect related items
+        # Temp disable pre_save and post_save processing that expect related items
         try:
             signals.pre_save.disconnect(job_pre_save, sender=Job)
         except Exception:

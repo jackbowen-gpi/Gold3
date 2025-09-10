@@ -1,6 +1,6 @@
-{% extends "standard.html" %} 
+{% extends "standard.html" %}
 
-{% block extra_head %}    
+{% block extra_head %}
 
 	<!-- Load up jQuery -->
 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery/js/jquery-1.8.3.js"></script>
@@ -12,9 +12,9 @@
 	<script type="text/javascript" src="{{YUI_URL}}build/animation/animation-min.js"></script>
 	<script type="text/javascript" src="{{YUI_URL}}build/container/container-min.js"></script>
 	{% include "yui_container_includes.html" %}
-	
+
 	<meta charset="utf-8">
-	
+
 	<!--CSS-->
 	<style type="text/css">
 		label { width:150px; }
@@ -24,7 +24,7 @@
 		#corr_help{ line-height:normal; }
 		#print_type_dialog{ line-height:normal; }
 	    alnright{ text-align: right; }
-		tr.corrigated th{ background-color: #A0A0A0; }		
+		tr.corrigated th{ background-color: #A0A0A0; }
 		tr.corrigated_all th{ background-color: #A0A0A0; }
 		tr.corrigated_preprint_field th{ background-color: #A0A0A0; }
 		tr.selector_corrigated th{ background-color: #A0A0A0; }
@@ -34,7 +34,7 @@
 			/* prevent horizontal scrollbar */
 			overflow-x: hidden;
 		}
-		
+
 		.saveButton {
 			margin-left:28px;
 			border-radius:9px;
@@ -43,7 +43,7 @@
 		.saveButton:hover {
 			background-color:darkgrey;
 		}
-		
+
 		.refreshButton {
 			background-color:lightgrey;
 			margin-left:10px;
@@ -51,11 +51,11 @@
 			padding-left:5px;
 			padding-right:5px;
 		}
-		
+
 		.refreshButton:hover {
 			background-color:darkgrey;
 		}
-		
+
 		.searchButton {
 			margin-left:28px;
 			border-radius:9px;
@@ -64,7 +64,7 @@
 		.searchButton:hover {
 			background-color:darkgrey;
 		}
-		
+
 		.ui-widget-content a {
 			color: #883333;
 		}
@@ -72,14 +72,14 @@
 			color: black;
 		}
 	</style>
-	
+
 	<!-- Javascript happens here. -->
-	<script type="text/javascript"> 	
+	<script type="text/javascript">
 		//prototype is loaded in GOLD's base html and it uses $ just like jquery
-		//does. So we'll change $ to $j for the jQuery on this page using 
+		//does. So we'll change $ to $j for the jQuery on this page using
 		//jQuery.noConflict()
 		var $j = jQuery.noConflict();
-		
+
 		//jQuery document ready stuff.
 		$j(document).ready(function(){
 
@@ -89,18 +89,18 @@
 			    function decode(s) {
 			        return decodeURIComponent(s.split("+").join(" "));
 			    }
-			
+
 			    $_GET[decode(arguments[1])] = decode(arguments[2]);
 			});
-			
+
 			if($_GET["page"]){
 				$j( "#tabs" ).tabs({active:1});
 			}else{
 				$j( "#tabs" ).tabs({active:{{focus}}});
 			}
-	        
+
 	        $j( "#report_tabs" ).tabs({active:0});
-	        
+
 	        //Date pickers
 			$j( "#id_date_observed" ).datepicker({
 	            showOn: "button",
@@ -112,7 +112,7 @@
 	            },
 	            text: false
 	        });//End date pickers.
-	        
+
 	        var bool = $j( "#id_communication" ).change(function() {
 	        	var box = $j( "#id_describe_communication" );
 	        	if($j(this)[0].checked == true){
@@ -123,22 +123,22 @@
 	        	}
 	        });
 	        $j( "#id_communication" ).trigger('change');
-	 
+
 		})
 	</script>
-	
+
 {% endblock %}
 
 {% block body %}
 	<p>
 	<h1 class="inline">
-		Behavior Based Safety Program	
+		Behavior Based Safety Program
 	</h1>
 	</p>
 	<p>What is a behavior?</p>
 	<p>It is an observable act or action.</p>
 	<p></p>
-	<p>By first determining what behavior or condition is safe or unsafe, then 
+	<p>By first determining what behavior or condition is safe or unsafe, then
 			correcting the unsafe, we can eliminate all causes of injury.</p>
 	<!-- warning tab -->
 	{% if errors %}
@@ -152,7 +152,7 @@
 		</div>
 	</div>
 	{% endif %}
-	
+
 	<!-- Start of tabs -->
 	<div id="tabs">
 	    <ul>
@@ -161,11 +161,11 @@
 	        <li><a href="#tabs-3"><h3>New SBO</h3></a></li>
 	        {% if manager %}
 	        	<li><a href="#tabs-4"><h3>{{year}} Reports</h3></a></li>
-	        {% else %}	
+	        {% else %}
 	        	<li style="display:none"><a href="#tabs-4"><h3>Reports</h3></a></li>
 	        {% endif %}
 	    </ul>
-		
+
 		<!-- Home-->
 		<div id="tabs-1">
 			<p>Please note that behaviors below are listed as examples. Behaviors are not limited to items on this list.</p>
@@ -188,7 +188,7 @@
 			<p>-Posture (sit with back straight).</p>
 			<p>-Stretching (stand up and walk around at least once every hour).</p>
 		</div>
-	
+
 		<!-- Search-->
 		<div id="tabs-2">
 			<form method="get" action="/sbo/search/" enctype="multipart/form-data">
@@ -210,7 +210,7 @@
 					  		<td>
 						  		{{search_form.start_date}}
 						  		thru
-						  		{{search_form.end_date}} 
+						  		{{search_form.end_date}}
 					  		</td>
 				  		</tr>
 				  		{% if manager %}
@@ -253,7 +253,7 @@
 			    {% include "pagination_bar.html" %}
   			</div>
 		</div>
-		
+
 		<!-- New SBO-->
 		<div id="tabs-3">
 			<p><h1>Enter a new Safety Based Observation</h1></p>
@@ -262,7 +262,7 @@
 			<table>
                 {% for field in newSBOform %}
 	                <tr>
-	                    <th>{{ field.label_tag }}</th> 
+	                    <th>{{ field.label_tag }}</th>
 	                    <td>
 	                        {{ field.errors }}
 	                        {% ifequal field.label "Communication" %}
@@ -270,10 +270,10 @@
 	                        {% else %}
 	                        	{% ifequal field.label "Person Observed" %}
 	                        		{{ field }} Leave blank for potential risks.
-		                        {% else %}	
+		                        {% else %}
 		                        	{{ field }}
 		                        {% endifequal %}
-	                        {% endifequal %}	                      
+	                        {% endifequal %}
 	                        {{ field.help_text }}
 	                    </td>
 	                </tr>
@@ -282,7 +282,7 @@
 			<input class="saveButton" type="submit" value="Add New SBO" />
 			</form>
 		</div>
-		
+
 		<!-- Reports-->
 		<div id="tabs-4">
 			<div id="report_tabs">
@@ -294,7 +294,7 @@
 				    	{% endfor %}
 			    	{% endfor %}
 			    </ul>
-				
+
 				{% for outer_array in sbo_annual_form %}
 				<div id="report_tabs-{{forloop.counter}}">
 				{% for month, month_value in outer_array.items %}
@@ -326,7 +326,7 @@
 								<td>{{month_value.user_completion}}%</td>
 							</tr>
 						</table>
-						
+
 						<p>Total User Participation % above is broken down further to the number of SBOs each person has submitted each month below.</p>
 						<table>
 							<tr>
@@ -369,12 +369,5 @@
 			</div>
 		</div><!-- End of tab 4 -->
 	</div><!-- End of tabs -->
-	
+
 {% endblock %}
-
-
-
-
-
-
-

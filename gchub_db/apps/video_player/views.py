@@ -2,8 +2,6 @@
 
 from django.shortcuts import render
 
-from gchub_db.apps.joblog.app_defs import *
-
 
 def home(request):
     """This is an experimental view to host videos"""

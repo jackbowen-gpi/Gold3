@@ -1,5 +1,6 @@
 #!/usr/bin/python
 """Export Ecotainer items and their color usage to a spreadsheet."""
+
 import bin_functions
 import openpyxl
 

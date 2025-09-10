@@ -3,7 +3,7 @@
 `gchub_db.bin.bin_functions`.
 """
 
-from gchub_db.bin import bin_functions as _bf
+from bin import bin_functions as _bf
 
 __all__ = [n for n in dir(_bf) if not n.startswith("_")]
 

@@ -8,7 +8,8 @@ import calendar
 
 import bin_functions
 
-# openpyxl is now used instead of pyExcelerator because it supports python3 and pyexcelerator is deprecated
+# openpyxl is now used instead of pyExcelerator because it supports
+# python3 and pyexcelerator is deprecated
 import openpyxl
 
 bin_functions.setup_paths()

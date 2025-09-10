@@ -16,7 +16,7 @@ def tiff_to_pdf_bin():
     The binary name is constructed from members of os.uname() including the
     kernel version and architecture.
     """
-    uname = os.uname()
+    uname = os.uname()  # type: ignore[attr-defined]
     # Just the kernel version.
     major_kernel = uname[2]
     # Split by the dot number scheme that most follow.

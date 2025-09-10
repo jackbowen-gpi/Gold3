@@ -16,8 +16,8 @@
       of its completion.
     <p>
       <hr />
-      <form id="file" name="file" method="post" action="" 
-            onsubmit="$('upload_form').hide();$('upload_feedback').show()" 
+      <form id="file" name="file" method="post" action=""
+            onsubmit="$('upload_form').hide();$('upload_feedback').show()"
             enctype="multipart/form-data">
         <input type="hidden" name="job" id="id_job" value="{{job.id}}" />
         <strong>File:</strong> {{ fileform.file }}<br />
@@ -26,7 +26,7 @@
       </form>
     </p>
   </div>
-  
+
   {% comment %}
     This div is used to show the user that the upload is progressing. It starts
     hidden, and is revealed when the user clicks the submit button above.

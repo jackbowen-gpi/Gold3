@@ -3,7 +3,7 @@
 {% block extra_head %}
 	{% include "yui_container_includes.html" %}
 	<script type="text/javascript" src="{{MEDIA_URL}}js/workflow/job_item_entry.js"></script>
-	
+
 	<style>
 		/* Modern responsive layout for beverage job form */
 		.beverage-job-container {
@@ -314,7 +314,7 @@
 		<!-- Left Column: Job Details -->
 		<div class="form-section">
 			<h2>📋 Job Details</h2>
-			
+
 			<div class="form-group">
 				<div class="form-row">
 					<label for="id_brand_name">Brand Name:</label>
@@ -333,7 +333,7 @@
 			<div class="form-group">
 				<div class="form-row">
 					<label for="id_due_date">Due Date:</label>
-					<input type="date" id="id_due_date" name="due_date" 
+					<input type="date" id="id_due_date" name="due_date"
 						   value="{% if jobform.due_date.value %}{{ jobform.due_date.value|date:'Y-m-d' }}{% endif %}"
 						   class="date-picker">
 				</div>

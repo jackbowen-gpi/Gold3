@@ -1,4 +1,4 @@
- schemaname |                tablename                | row_count 
+ schemaname |                tablename                | row_count
 ------------+-----------------------------------------+-----------
  public     | accounts_userprofile                    |         1
  public     | accounts_userprofile_backup             |         2
@@ -117,4 +117,3 @@
  public     | workflow_trackedart                     |       204
  public     | workflow_trap                           |         5
 (116 rows)
-
