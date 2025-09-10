@@ -567,9 +567,9 @@ urlpatterns += [
     # Autocomplete endpoints for enhanced search UI
     url(r"^api/job_autocomplete/$", job_autocomplete, name="job_autocomplete"),
     url(r"^api/item_autocomplete/$", item_autocomplete, name="item_autocomplete"),
-    url(r"^job/todo_list/$", job_todo_list, name="todo_list"),
+    url(r"^todo_list/$", job_todo_list, name="todo_list"),
     url(
-        r"^job/todo_list/manager_tools/$",
+        r"^todo_list/manager_tools/$",
         job_todo_list,
         {"manager_tools": True},
         name="todo_list_manager_tools",

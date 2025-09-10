@@ -20,6 +20,7 @@ class DrawDownRequest(models.Model):
 
     class Meta:
         ordering = ["customer_name"]
+        app_label = "draw_down"
 
     def __str__(self):
         """String representation."""

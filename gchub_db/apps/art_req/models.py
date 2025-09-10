@@ -45,6 +45,9 @@ class MarketSegment(models.Model):
     def __str__(self):
         return str(self.name)
 
+    class Meta:
+        app_label = "art_req"
+
 
 class ArtReq(models.Model):
     """Represents an Art Request which is used to create Jobs."""

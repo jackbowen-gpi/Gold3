@@ -16,18 +16,21 @@ except Exception as e:
 try:
     import importlib
 
-    mod = importlib.import_module("gchub_db.apps.workflow.urls")
+    m = importlib.import_module("gchub_db.apps.workflow.urls")
     print("imported gchub_db.apps.workflow.urls OK")
-    up = getattr(mod, "urlpatterns", None)
-    print("urlpatterns type:", type(up), "len:", len(up) if up is not None else "None")
+    print("Found urlpatterns length:", len(m.urlpatterns))
     names = []
-    if up:
-        for p in up[:200]:
-            try:
-                names.append(getattr(p, "name", None))
-            except Exception as e:
-                names.append(("err", repr(e)))
-    print("first 200 names:", names[:200])
+    for u in m.urlpatterns:
+        name = getattr(u, "name", None)
+        if name:
+            names.append(name)
+    print("Sample names:", names[:40])
+    for u in m.urlpatterns:
+        if getattr(u, "name", None) == "todo_list":
+            print("FOUND todo_list pattern:", u, getattr(u, "pattern", None))
+            break
+    else:
+        print("todo_list not found in workflow urlpatterns")
 except Exception:
     import traceback
 

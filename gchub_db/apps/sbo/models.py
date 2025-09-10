@@ -38,6 +38,7 @@ class SBO(models.Model):
 
     class Meta:
         ordering = ["date_added"]
+        app_label = "sbo"
 
     def __str__(self):
         return str(self.behavior_type)

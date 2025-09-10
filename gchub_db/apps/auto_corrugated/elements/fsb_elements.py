@@ -10,12 +10,12 @@ from reportlab.lib.colors import CMYKColor
 from reportlab.lib.units import inch, pica
 from svglib import svglib
 
-from gchub_db.includes.reportlib.elements.collidables import (
+from includes.reportlib.elements.collidables import (
     CollidableElement,
     CollidableSVGGraphicElement,
 )
-from gchub_db.includes.reportlib.elements.generic import MultiLineTextElement
-from gchub_db.includes.reportlib.util import convert_svg_to_color
+from includes.reportlib.elements.generic import MultiLineTextElement
+from includes.reportlib.util import convert_svg_to_color
 
 # this is the folder where created barcodes are placed when they are finished being created by automation engine
 CORRUGATED_BARCODE_DIR = os.path.join(settings.PRODUCTION_DIR, "barcodes")

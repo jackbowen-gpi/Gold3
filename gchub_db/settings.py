@@ -2,9 +2,11 @@
 
 import os
 import sys
+import pprint
 
 # Import common settings
-# Import common settings
+# Import all common settings
+from settings_common import *  # noqa: F403
 from settings_common import DEBUG  # noqa: F401
 
 # Path to this package directory
@@ -163,6 +165,9 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
+            # repo-root html (legacy location) so templates in <repo>/html are found
+            os.path.join(PROJECT_ROOT, "html"),
+            # package-local html/email_templates
             os.path.join(MAIN_PATH, "html"),
             os.path.join(MAIN_PATH, "email_templates"),
         ],
@@ -205,3 +210,12 @@ try:
     from local_settings import *  # noqa: F403
 except ImportError:
     pass
+
+# DEBUG: Print DATABASES config at runtime
+
+print("\n[DEBUG] settings.DATABASES at runtime:")
+pprint.pprint(globals().get("DATABASES", "<not set>"))
+
+# DEBUG: Print TEMPLATES config at runtime
+print("\n[DEBUG] settings.TEMPLATES at runtime:")
+pprint.pprint(globals().get("TEMPLATES", "<not set>"))

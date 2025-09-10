@@ -27,6 +27,7 @@ def _fallback_list_reports(request):
 
 from django.contrib import admin
 from django.views.generic import RedirectView
+from gchub_db.views import test_standard_template
 
 # Avoid calling admin.autodiscover() at import time. In some test
 # collection/import orders this forces access to the app registry or
@@ -80,12 +81,15 @@ urlpatterns.append(url(r"^reports/list/$", _fallback_list_reports, name="list_re
 def _try_include(regex, mod_str):
     try:
         urlpatterns.append(url(regex, include(mod_str)))
-    except Exception:
+        print(f"Successfully included {mod_str} at {regex}")
+    except Exception as e:
         # best-effort: skip failing includes during import
+        print(f"Failed to include {mod_str} at {regex}: {e}")
         return
 
 
 _try_include(r"^job/search/", "gchub_db.apps.workflow.urls")
+_try_include(r"^job/", "gchub_db.apps.workflow.urls")
 _try_include(r"^address/", "gchub_db.apps.address.urls")
 _try_include(r"^bev_billing/", "gchub_db.apps.bev_billing.urls")
 _try_include(r"^sbo/", "gchub_db.apps.sbo.urls")
@@ -176,3 +180,8 @@ if getattr(settings, "DEBUG", False):
     except Exception:
         # best-effort: don't break imports if something goes wrong
         pass
+
+# Add a URL pattern for testing the standard.html template
+urlpatterns.append(
+    url(r"^test-standard/$", test_standard_template, name="test_standard")
+)
