@@ -2,6 +2,9 @@ import os
 import logging
 from celery import Celery  # type: ignore[import-not-found]
 
+# Explicitly import tasks from bin package since it's not a Django app
+import bin.tasks  # noqa: F401
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
 
 app = Celery("Gold3")
