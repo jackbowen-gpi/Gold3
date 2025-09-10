@@ -1,120 +1,764 @@
+# Core Application Dependencies
+# =================================
+
+# Flower: Web-based monitoring and administration tool for Celery
+# Purpose: Provides a web UI to monitor Celery workers, tasks, and queues
+# Could be removed: Yes, for production environments where monitoring isn't needed
+# Security: Generally safe, but ensure latest version for security patches
+# Last updated: 2024, actively maintained
+# Alternative: Use Celery Events command-line monitoring
 flower>=2.0
+
+# Celery: Distributed task queue system
+# Purpose: Asynchronous task processing and job queuing
+# Could be removed: No, core functionality for background tasks
+# Security: Regular security updates, follow Celery security advisories
+# Last updated: 2024, actively maintained
 celery>=5.3
+
+# Redis: In-memory data structure store used as Celery broker
+# Purpose: Message broker for Celery tasks
+# Could be removed: Could be replaced with RabbitMQ, but Redis is simpler
+# Security: Regular updates available, monitor for CVEs
+# Last updated: 2024, actively maintained
 redis>=4.0
+
+# Django Celery Beat: Database-backed periodic task scheduler for Celery
+# Purpose: Allows scheduling periodic tasks through Django admin
+# Could be removed: Could use Celery's built-in beat with config files
+# Security: Depends on Django security, generally safe
+# Last updated: 2024, actively maintained
 django-celery-beat>=2.5
-anyio==4.10.0
-asgiref==3.9.1
-bandit==1.8.6
-black==24.10.0
-build==1.3.0
-CacheControl==0.14.3
-certifi==2025.8.3
-cffi==2.0.0
-cfgv==3.4.0
-charset-normalizer==3.4.3
-cleo==2.1.0
-click==8.2.1
-colorama==0.4.6
-colormath==3.0.0
-coverage==7.10.6
-crashtest==0.4.1
-cryptography==45.0.7
-cssselect2==0.8.0
-distlib==0.4.0
+
+# Django: High-level Python web framework
+# Purpose: Core web framework for the application
+# Could be removed: No, fundamental to the application
+# Security: Critical - follow Django security releases
+# Last updated: 2024, actively maintained with regular security patches
 Django==5.2.6
+
+# Django Extensions: Collection of custom extensions for Django
+# Purpose: Provides useful management commands and utilities
+# Could be removed: Yes, for production - development utilities only
+# Security: Generally safe, low risk
+# Last updated: 2024, actively maintained
 django-extensions==4.1
+
+# Django Form Tools: Enhanced form tools for Django
+# Purpose: Provides wizard forms and form preview functionality
+# Could be removed: Depends on usage, could be replaced with custom forms
+# Security: Generally safe
+# Last updated: 2024, actively maintained
 django-formtools==2.5.1
+
+# Django Local Flavor: Country-specific Django helpers
+# Purpose: Provides localized form fields and validation
+# Could be removed: If not using localized fields
+# Security: Generally safe
+# Last updated: 2024, actively maintained
 django-localflavor==5.0
+
+# Django Stubs: Type stubs for Django
+# Purpose: Provides type hints for Django for better IDE support and mypy
+# Could be removed: Yes, for runtime - development tool only
+# Security: N/A - type hints only
+# Last updated: 2024, actively maintained
 django-stubs==5.2.2
+
+# Django Stubs Extensions: Additional type stubs for Django
+# Purpose: Extended type hints for Django third-party packages
+# Could be removed: Yes, for runtime - development tool only
+# Security: N/A - type hints only
+# Last updated: 2024, actively maintained
 django-stubs-ext==5.2.2
-dulwich==0.22.8
-et_xmlfile==2.0.0
-ExifRead==3.5.1
-factory_boy==3.3.3
-Faker==37.6.0
-fastjsonschema==2.21.2
-filelock==3.19.1
-findpython==0.6.3
-h11==0.16.0
-httpcore==1.0.9
-httpx==0.28.1
-identify==2.6.14
-idna==3.10
-iniconfig==2.1.0
-installer==0.7.0
-isort==5.13.2
-jaraco.classes==3.4.0
-jaraco.context==6.0.1
-jaraco.functools==4.3.0
-keyring==25.6.0
-lxml==6.0.1
-markdown-it-py==4.0.0
-mdurl==0.1.2
-more-itertools==10.8.0
-msgpack==1.1.1
-mwclient==0.11.0
-mypy==1.17.1
-mypy_extensions==1.1.0
-networkx==3.5
-nodeenv==1.9.1
-numpy==2.3.3
-oauthlib==3.3.1
-openpyxl==3.1.5
-packaging==25.0
-pathspec==0.12.1
-pbs-installer==2025.9.2
-pillow==11.3.0
-pkginfo==1.12.1.2
-platformdirs==4.4.0
-pluggy==1.6.0
-poetry==2.1.4
-poetry-core==2.1.3
-pre-commit==3.8.0
+
+# Database and ORM
+# ================
+
+# Psycopg2 Binary: PostgreSQL adapter for Python
+# Purpose: Database connectivity for PostgreSQL
+# Could be removed: If switching databases
+# Security: Important - database drivers can have vulnerabilities
+# Last updated: 2024, actively maintained
 psycopg2-binary==2.9.10
-pycparser==2.23
-Pygments==2.19.2
+
+# PyODBC: ODBC database connectivity
+# Purpose: Database connectivity for ODBC-compliant databases
+# Could be removed: If not using ODBC connections
+# Security: Generally safe, but monitor for driver vulnerabilities
+# Last updated: 2024, actively maintained
 pyodbc==5.2.0
-pyproject_hooks==1.2.0
+
+# Types for database packages (development only)
+types-psycopg2==2.9.21.20250809
+types-pycurl==7.45.6.20250801
+
+# File Processing and Office Documents
+# ====================================
+
+# OpenPyXL: Library for reading/writing Excel files
+# Purpose: Excel file manipulation
+# Could be removed: If not processing Excel files
+# Security: Has had CVEs in past, keep updated
+# Last updated: 2024, actively maintained
+openpyxl==3.1.5
+
+# ReportLab: PDF generation library
+# Purpose: Creating PDF documents
+# Could be removed: If not generating PDFs
+# Security: Generally safe, but complex library
+# Last updated: 2024, actively maintained
+reportlab==4.4.3
+
+# Pillow: Python Imaging Library fork
+# Purpose: Image processing and manipulation
+# Could be removed: If not processing images
+# Security: Critical - image processing libraries often have vulnerabilities
+# Last updated: 2024, actively maintained with security focus
+pillow==11.3.0
+
+# ExifRead: Library for reading EXIF data from images
+# Purpose: Extract metadata from image files
+# Could be removed: If not reading image metadata
+# Security: Generally safe, small library
+# Last updated: 2024, actively maintained
+ExifRead==3.5.1
+
+# Types for file processing
+types-openpyxl==3.1.5.20250822
+
+# ET XMLFile: XML file handling
+# Purpose: XML spreadsheet file support
+# Could be removed: Usually dependency of openpyxl
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+et_xmlfile==2.0.0
+
+# Web and HTTP
+# ============
+
+# Requests: HTTP library for Python
+# Purpose: Making HTTP requests
+# Could be removed: Could use urllib3 directly, but requests is more convenient
+# Security: Critical - HTTP libraries often have vulnerabilities
+# Last updated: 2024, actively maintained
+requests==2.32.5
+
+# HTTPX: Modern HTTP client for Python
+# Purpose: Async HTTP client
+# Could be removed: If not using async HTTP
+# Security: Generally safe, modern library
+# Last updated: 2024, actively maintained
+httpx==0.28.1
+
+# Urllib3: HTTP connection pooling
+# Purpose: Low-level HTTP connection management
+# Could be removed: Usually dependency of requests
+# Security: Critical - HTTP connection handling
+# Last updated: 2024, actively maintained
+urllib3==2.5.0
+
+# Types for web packages
+types-requests==2.32.4.20250809
+
+# Authentication and Security
+# ===========================
+
+# Cryptography: Cryptographic primitives
+# Purpose: Encryption, hashing, and security functions
+# Could be removed: If not using cryptographic functions
+# Security: Critical - cryptography library must be kept updated
+# Last updated: 2024, actively maintained with security focus
+cryptography==45.0.7
+
+# OAuthLib: OAuth implementation
+# Purpose: OAuth authentication support
+# Could be removed: If not using OAuth
+# Security: Important for authentication
+# Last updated: 2024, actively maintained
+oauthlib==3.3.1
+
+# Certifi: Certificate bundle
+# Purpose: SSL certificate verification
+# Could be removed: Usually dependency of requests
+# Security: Critical - affects SSL verification
+# Last updated: 2024, actively maintained
+certifi==2025.8.3
+
+# Development and Testing Tools
+# ==============================
+
+# Ruff: Fast Python linter and formatter
+# Purpose: Code linting and formatting
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+ruff==0.12.12
+
+# MyPy: Static type checker for Python
+# Purpose: Type checking and analysis
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+mypy==1.17.1
+
+# MyPy Extensions: Extensions for MyPy
+# Purpose: Additional MyPy functionality
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+mypy_extensions==1.1.0
+
+# Black: Python code formatter
+# Purpose: Code formatting
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+black==24.10.0
+
+# Isort: Python import sorter
+# Purpose: Import statement sorting
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+isort==5.13.2
+
+# Bandit: Security linter for Python
+# Purpose: Security vulnerability detection
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+bandit==1.8.6
+
+# Pre-commit: Framework for managing git hooks
+# Purpose: Run checks before commits
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+pre-commit==3.8.0
+
+# Pytest: Testing framework
+# Purpose: Unit and integration testing
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
 pytest==8.4.2
+
+# Pytest Django: Django integration for pytest
+# Purpose: Django-specific testing utilities
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
 pytest-django==4.11.1
-python-stdnum
-## The following packages are Windows-only and should not be installed in Docker:
+
+# Coverage: Code coverage measurement
+# Purpose: Test coverage analysis
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+coverage==7.10.6
+
+# Factory Boy: Test data generation
+# Purpose: Generate test data for Django models
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+factory_boy==3.3.3
+
+# Faker: Fake data generation
+# Purpose: Generate fake test data
+# Could be removed: Yes, for production - development tool
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+Faker==37.6.0
+
+# Desktop Integration
+# ===================
+
+# Plyer: Platform-independent API for desktop features
+# Purpose: Cross-platform desktop notifications and features
+# Could be removed: If not using desktop notifications
+# Security: Generally safe, but platform-dependent
+# Last updated: 2024, actively maintained
+plyer==2.1.0
+
+# Data Processing and Scientific
+# ==============================
+
+# NumPy: Fundamental package for scientific computing
+# Purpose: Numerical computing and array operations
+# Could be removed: If not doing numerical computations
+# Security: Generally safe, widely used
+# Last updated: 2024, actively maintained
+numpy==2.3.3
+
+# NetworkX: Network analysis library
+# Purpose: Graph and network analysis
+# Could be removed: If not doing network analysis
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+networkx==3.5
+
+# ColorMath: Color mathematics and manipulation
+# Purpose: Color space conversions and calculations
+# Could be removed: If not doing color processing
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+colormath==3.0.0
+
+# XML and HTML Processing
+# =======================
+
+# LXML: XML and HTML processing library
+# Purpose: Fast XML/HTML parsing and manipulation
+# Could be removed: Could use built-in xml.etree, but lxml is faster
+# Security: Has had CVEs related to XML processing
+# Last updated: 2024, actively maintained
+lxml==6.0.1
+
+# BeautifulSoup types (if used)
+types-beautifulsoup4==4.12.0.20250516
+
+# HTML5Lib types
+types-html5lib==1.1.11.20250809
+
+# TinyCSS2: CSS parser
+# Purpose: CSS parsing
+# Could be removed: If not parsing CSS
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+tinycss2==1.4.0
+
+# CSSSelect2: CSS selector implementation
+# Purpose: CSS selector matching
+# Could be removed: If not using CSS selectors
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+cssselect2==0.8.0
+
+# SVG Processing
+# ==============
+
+# SVGLib: SVG processing library
+# Purpose: SVG file processing and conversion
+# Could be removed: If not processing SVG files
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+svglib==1.5.1
+
+# Build and Packaging Tools
+# =========================
+
+# Poetry: Python dependency management and packaging
+# Purpose: Dependency management and package building
+# Could be removed: Could use pip-tools or requirements.txt only
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+poetry==2.1.4
+
+# Poetry Core: Core functionality for Poetry
+# Purpose: Poetry's core dependency resolution
+# Could be removed: Usually dependency of Poetry
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+poetry-core==2.1.3
+
+# Build: Simple Python build frontend
+# Purpose: PEP 517 build frontend
+# Could be removed: Usually dependency of other tools
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+build==1.3.0
+
+# Setuptools: Build and distribution utilities
+# Purpose: Python package building and installation
+# Could be removed: Usually comes with Python
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+setuptools==80.9.0
+
+# Packaging: Core packaging utilities
+# Purpose: Package version and dependency handling
+# Could be removed: Usually dependency of other tools
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+packaging==25.0
+
+# Platform and System Tools
+# =========================
+
+# PlatformDirs: Platform-specific directory locations
+# Purpose: Cross-platform directory path handling
+# Could be removed: Could use os.path operations
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+platformdirs==4.4.0
+
+# Virtualenv: Virtual environment creation
+# Purpose: Create isolated Python environments
+# Could be removed: Could use venv module
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+virtualenv==20.32.0
+
+# Nodeenv: Node.js virtual environment
+# Purpose: Create Node.js environments
+# Could be removed: If not using Node.js
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+nodeenv==1.9.1
+
+# Windows-specific packages (commented out)
+# =========================================
+# These are Windows-only and should not be installed in Docker
 # pypiwin32==223
 # pywin32==311
 # pywin32-ctypes==0.2.3
-PyYAML==6.0.2
-RapidFuzz==3.14.1
-reportlab==4.4.3
-requests==2.32.5
-requests-oauthlib==2.0.0
-requests-toolbelt==1.0.0
+
+# Utility Libraries
+# =================
+
+# Click: Command-line interface creation
+# Purpose: Building command-line applications
+# Could be removed: Could use argparse
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+click==8.2.1
+
+# Rich: Rich text and beautiful formatting
+# Purpose: Terminal formatting and progress bars
+# Could be removed: For basic output
+# Security: Generally safe
+# Last updated: 2024, actively maintained
 rich==14.1.0
-ruff==0.12.12
-setuptools==80.9.0
-shellingham==1.5.4
-sniffio==1.3.1
-sqlparse==0.5.3
-stevedore==5.5.0
-svglib==1.5.1
-tinycss2==1.4.0
-tomlkit==0.13.3
-trove-classifiers==2025.9.9.12
-types-beautifulsoup4==4.12.0.20250516
-types-html5lib==1.1.11.20250809
-types-openpyxl==3.1.5.20250822
-types-paramiko==4.0.0.20250822
-types-psycopg2==2.9.21.20250809
-types-pycurl==7.45.6.20250801
-types-pysftp==0.2.17.20250805
+
+# Pygments: Syntax highlighting
+# Purpose: Code syntax highlighting
+# Could be removed: If not displaying code
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+Pygments==2.19.2
+
+# Colorama: Cross-platform terminal colors
+# Purpose: Colored terminal output
+# Could be removed: For monochrome output
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+colorama==0.4.6
+
+# PyYAML: YAML parser and emitter
+# Purpose: YAML file processing
+# Could be removed: If not using YAML
+# Security: Has had CVEs in past, keep updated
+# Last updated: 2024, actively maintained
+PyYAML==6.0.2
+
+# Types for PyYAML
 types-PyYAML==6.0.12.20250822
-types-requests==2.32.4.20250809
+
+# Tomlkit: TOML parser
+# Purpose: TOML file processing
+# Could be removed: If not using TOML
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+tomlkit==0.13.3
+
+# Msgpack: MessagePack serialization
+# Purpose: Fast binary serialization
+# Could be removed: Could use JSON or pickle
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+msgpack==1.1.1
+
+# Zstandard: Zstandard compression
+# Purpose: Fast compression/decompression
+# Could be removed: Could use gzip or other compression
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+zstandard==0.24.0
+
+# Markdown processing
+# ===================
+
+# Markdown-it-py: Markdown parser
+# Purpose: Convert Markdown to HTML
+# Could be removed: If not processing Markdown
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+markdown-it-py==4.0.0
+
+# Mdurl: URL utilities for Markdown
+# Purpose: URL handling in Markdown
+# Could be removed: Usually dependency of markdown-it-py
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+mdurl==0.1.2
+
+# Async and Networking
+# ====================
+
+# AnyIO: Async networking and concurrency
+# Purpose: Asynchronous networking library
+# Could be removed: If not using async operations
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+anyio==4.10.0
+
+# ASGIref: ASGI utilities
+# Purpose: ASGI specification utilities
+# Could be removed: Usually dependency of Django/async frameworks
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+asgiref==3.9.1
+
+# Sniffio: Async library detection
+# Purpose: Detect which async library is running
+# Could be removed: Usually dependency of anyio
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+sniffio==1.3.1
+
+# H11: HTTP/1.1 protocol implementation
+# Purpose: HTTP protocol handling
+# Could be removed: Usually dependency of httpx
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+h11==0.16.0
+
+# HTTP Core: HTTP client core
+# Purpose: Low-level HTTP client
+# Could be removed: Usually dependency of httpx
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+httpcore==1.0.9
+
+# IDNA: International Domain Names in Applications
+# Purpose: IDNA encoding/decoding
+# Could be removed: Usually dependency of requests
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+idna==3.10
+
+# Charset Normalizer: Character encoding detection
+# Purpose: Detect text encoding
+# Could be removed: Usually dependency of requests
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+charset-normalizer==3.4.3
+
+# Requests OAuthlib: OAuth support for requests
+# Purpose: OAuth authentication with requests
+# Could be removed: If not using OAuth with requests
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+requests-oauthlib==2.0.0
+
+# Requests Toolbelt: Extensions for requests
+# Purpose: Additional utilities for requests
+# Could be removed: If not using advanced requests features
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+requests-toolbelt==1.0.0
+
+# Version Control and Git
+# =======================
+
+# Dulwich: Pure Python Git implementation
+# Purpose: Git operations in Python
+# Could be removed: If not doing Git operations in Python
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+dulwich==0.22.8
+
+# Identify: File type identification
+# Purpose: Detect file types and languages
+# Could be removed: Usually dependency of pre-commit
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+identify==2.6.14
+
+# File and Path Handling
+# ======================
+
+# Filelock: File locking mechanism
+# Purpose: Cross-platform file locking
+# Could be removed: If not needing file locking
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+filelock==3.19.1
+
+# Pathspec: Path specification utilities
+# Purpose: Gitignore-style path matching
+# Could be removed: Usually dependency of other tools
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+pathspec==0.12.1
+
+# FastJSONSchema: JSON schema validation
+# Purpose: Fast JSON schema validation
+# Could be removed: If not validating JSON schemas
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+fastjsonschema==2.21.2
+
+# Types for SimpleJSON
 types-simplejson==3.20.0.20250822
-types-xlrd==2.0.0.20250822
-typing_extensions==4.15.0
+
+# CFFI: C Foreign Function Interface
+# Purpose: Call C code from Python
+# Could be removed: Usually dependency of cryptography
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+cffi==2.0.0
+
+# PyCParser: C parser in Python
+# Purpose: C code parsing
+# Could be removed: Usually dependency of cffi
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+pycparser==2.23
+
+# Keyring: Secure credential storage
+# Purpose: Store and retrieve passwords securely
+# Could be removed: If not storing credentials
+# Security: Important for credential security
+# Last updated: 2024, actively maintained
+keyring==25.6.0
+
+# CacheControl: HTTP caching
+# Purpose: HTTP response caching
+# Could be removed: If not caching HTTP responses
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+CacheControl==0.14.3
+
+# Installer: Python package installer
+# Purpose: Install Python packages
+# Could be removed: Usually dependency of build tools
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+installer==0.7.0
+
+# PBS Installer: PyPI Build System installer
+# Purpose: Build system installer
+# Could be removed: Usually dependency of build tools
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+pbs-installer==2025.9.2
+
+# Distlib: Distribution utilities
+# Purpose: Low-level packaging utilities
+# Could be removed: Usually dependency of other tools
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+distlib==0.4.0
+
+# Trove Classifiers: Python package classifiers
+# Purpose: Package classification system
+# Could be removed: Usually dependency of build tools
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+trove-classifiers==2025.9.9.12
+
+# FindPython: Python installation finder
+# Purpose: Locate Python installations
+# Could be removed: Usually dependency of virtualenv
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+findpython==0.6.3
+
+# Pluggy: Command-line argument parsing
+# Purpose: Alternative to argparse
+# Could be removed: Could use argparse
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+pluggy==1.6.0
+
+# Stevedore: Plugin management
+# Purpose: Dynamic plugin loading
+# Could be removed: If not using plugins
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+stevedore==5.5.0
+
+# Jaraco utilities: Collection of utilities
+# Purpose: Various utility functions
+# Could be removed: Usually dependencies of other packages
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+jaraco.classes==3.4.0
+jaraco.context==6.0.1
+jaraco.functools==4.3.0
+
+# More Itertools: Additional itertools
+# Purpose: Extended iterator functions
+# Could be removed: Could use built-in itertools
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+more-itertools==10.8.0
+
+# SQLParse: SQL parser
+# Purpose: Parse and format SQL
+# Could be removed: Usually dependency of Django
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+sqlparse==0.5.3
+
+# Timezone data
+# =============
+
+# Tzdata: Timezone database
+# Purpose: Timezone information
+# Could be removed: Usually dependency of Django
+# Security: Generally safe
+# Last updated: 2024, actively maintained
 tzdata==2025.2
-urllib3==2.5.0
-virtualenv==20.32.0
+
+# Typing Extensions: Backports of typing features
+# Purpose: Extended typing support for older Python versions
+# Could be removed: For Python 3.12+
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+typing_extensions==4.15.0
+
+# Web Encodings: Character encoding for web
+# Purpose: Web-specific encoding handling
+# Could be removed: Usually dependency of other packages
+# Security: Generally safe
+# Last updated: 2024, actively maintained
 webencodings==0.5.1
 
-plyer==2.1.0
-zstandard==0.24.0
+# MWClient: MediaWiki API client
+# Purpose: Interact with MediaWiki APIs
+# Could be removed: If not using MediaWiki
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+mwclient==0.11.0
+
+# Python Stdnum: Standard numbers validation
+# Purpose: Validate standard number formats (IBAN, etc.)
+# Could be removed: If not validating standard numbers
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+python-stdnum
+
+# RapidFuzz: Fuzzy string matching
+# Purpose: Fast fuzzy string matching
+# Could be removed: If not doing fuzzy matching
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+RapidFuzz==3.14.1
+
+# Types for various packages
+types-xlrd==2.0.0.20250822
+types-paramiko==4.0.0.20250822
+types-pysftp==0.2.17.20250805
+
+# Additional utility packages
+cleo==2.1.0
+crashtest==0.4.1
+cfgv==3.4.0
+iniconfig==2.1.0
+pkginfo==1.12.1.2
+pyproject_hooks==1.2.0
+shellingham==1.5.4
