@@ -32,7 +32,7 @@
 
 ## 📊 **Project Overview**
 
-**gchub_db** is a sophisticated Django web application designed for managing complex job workflows, comprehensive item catalogs, and advanced user preference systems in production printing and packaging environments. Built with modern Django 5.2.5, it features enterprise-grade security, production data integration, and a responsive user interface.
+**GOLD3** is a sophisticated Django web application designed for managing complex job workflows, comprehensive item catalogs, and advanced user preference systems in production printing and packaging environments. Built with modern Django 5.2.5, it features enterprise-grade security, production data integration, and a responsive user interface.
 
 ### 🏆 **Key Highlights**
 
