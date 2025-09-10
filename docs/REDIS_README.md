@@ -8,13 +8,13 @@ Redis is used as the Celery broker in this project. It handles task message tran
 ## Common checks
 - Verify Redis is running:
 ```pwsh
-docker-compose ps redis
-docker-compose logs redis
+docker-compose -f ../../config/docker-compose.yml ps redis
+docker-compose -f ../../config/docker-compose.yml logs redis
 ```
 
 ## Connect to Redis from a container
 ```pwsh
-docker-compose exec redis redis-cli ping
+docker-compose -f ../../config/docker-compose.yml exec redis redis-cli ping
 # Should reply: PONG
 ```
 

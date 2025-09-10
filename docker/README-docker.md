@@ -26,11 +26,11 @@ This project provides a `Dockerfile` to build the Django app and a `docker-compo
    - Make sure you have a `docker-compose.yml` (see below).
    - Start all services:
      ```sh
-     docker-compose up --build
+     docker-compose -f ../config/docker-compose.yml up --build
      ```
    - Stop services:
      ```sh
-     docker-compose down
+     docker-compose -f ../config/docker-compose.yml down
      ```
 
 ### Environment Variables
@@ -39,13 +39,13 @@ This project provides a `Dockerfile` to build the Django app and a `docker-compo
 ### Database Migrations
 After starting the containers, run migrations:
 ```sh
-docker-compose exec web python manage.py migrate
+docker-compose -f ../config/docker-compose.yml exec web python manage.py migrate
 ```
 
 ### Static Files
 If you use Django static files, you may need to run:
 ```sh
-docker-compose exec web python manage.py collectstatic --noinput
+docker-compose -f ../config/docker-compose.yml exec web python manage.py collectstatic --noinput
 ```
 
 ## Troubleshooting

@@ -25,8 +25,8 @@ PeriodicTask.objects.create(interval=sched, name='bin_test_every_min', task='bin
 
 ## Common commands
 ```pwsh
-docker-compose up -d celery-beat
-docker-compose logs -f celery-beat
+docker-compose -f ../../config/docker-compose.yml up -d celery-beat
+docker-compose -f ../../config/docker-compose.yml logs -f celery-beat
 ```
 
 ## Troubleshooting

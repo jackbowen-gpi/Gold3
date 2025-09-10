@@ -20,21 +20,21 @@ This document explains how Celery is used in this repository, how to run and man
 ## Common operations (PowerShell / pwsh)
 - Start worker (already in compose):
 ```pwsh
-docker-compose up -d celery
+docker-compose -f ../../config/docker-compose.yml up -d celery
 ```
 - Force recreate worker (so it re-autodiscovers tasks):
 ```pwsh
-docker-compose up -d --no-deps --force-recreate celery
+docker-compose -f ../../config/docker-compose.yml up -d --no-deps --force-recreate celery
 ```
 - See worker logs (follow):
 ```pwsh
-docker-compose logs -f celery
+docker-compose -f ../../config/docker-compose.yml logs -f celery
 ```
 
 ## Verifying tasks
 - From web container, publish a task:
 ```pwsh
-docker-compose exec web python manage.py shell -c "from bin.tasks import bin_test; bin_test.delay()"
+docker-compose -f ../../config/docker-compose.yml exec web python manage.py shell -c "from bin.tasks import bin_test; bin_test.delay()"
 ```
 - In the worker logs you should see the task received and executed.
 

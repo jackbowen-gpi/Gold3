@@ -10,7 +10,7 @@ Flower provides a web UI to inspect Celery workers, tasks, and events.
 
 ## Running
 ```pwsh
-docker-compose up -d flower
+docker-compose -f ../../config/docker-compose.yml up -d flower
 ```
 
 ## UI

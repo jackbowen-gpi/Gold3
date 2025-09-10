@@ -10,8 +10,8 @@ Prometheus is used to scrape metrics exposed by services (Flower, node_exporter,
 
 ## Running
 ```pwsh
-docker-compose up -d prometheus
-docker-compose logs -f prometheus
+docker-compose -f ../../config/docker-compose.yml up -d prometheus
+docker-compose -f ../../config/docker-compose.yml logs -f prometheus
 ```
 
 ## Verify targets
