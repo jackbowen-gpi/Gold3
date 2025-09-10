@@ -1,4 +1,4 @@
-# 🎯 gchub_db — Enterprise Django Web Application
+# 🎯 GOLD3 — Enterprise Django Web Application
 
 [![Django](https://img.shields.io/badge/Django-5.2.5-green.svg)](https://djangoproject.com/)
 [![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)](https://python.org/)
