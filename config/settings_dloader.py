@@ -1,7 +1,7 @@
 """This is used for the configuration of the downloader instance."""  # type: ignore
 
 # This imports a bunch of common stuff.
-from settings_common import *  # noqa: F403  # type: ignore
+from config.settings_common import *  # noqa: F403  # type: ignore
 from typing import Any, List, TYPE_CHECKING
 
 # Declare a module-level annotation so mypy treats `MIDDLEWARE` as
@@ -33,7 +33,7 @@ ROOT_URLCONF = "gchub_db.urls"
 SITE_ID = 2
 
 try:
-    from local_settings import *  # noqa: F403
+    from config.local_settings import *  # noqa: F403
 except ImportError:
     pass
 

@@ -58,6 +58,13 @@ django-formtools==2.5.1
 # Last updated: 2024, actively maintained
 django-localflavor==5.0
 
+# Django Maintenance Mode: Puts the site into maintenance mode
+# Purpose: Allows putting the Django site into maintenance mode for updates
+# Could be removed: Yes, for simple applications - maintenance mode functionality
+# Security: Generally safe
+# Last updated: 2024, actively maintained
+django-maintenance-mode==0.21.0
+
 # Django Stubs: Type stubs for Django
 # Purpose: Provides type hints for Django for better IDE support and mypy
 # Could be removed: Yes, for runtime - development tool only

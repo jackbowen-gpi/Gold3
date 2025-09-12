@@ -22,7 +22,7 @@ except Exception:
     traceback.print_exc()
 
 try:
-    import urls as repo_urls
+    import config.urls as repo_urls
 
     patterns = getattr(repo_urls, "urlpatterns", None)
     if patterns is None:

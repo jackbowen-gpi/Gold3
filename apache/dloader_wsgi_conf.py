@@ -1,8 +1,7 @@
-"""mod_wsgi configuration for Django dloader interface."""
+"""This is the mod_wsgi configuration that apache2 uses to interface with Django and the application."""
 
 import os
 import sys
-import django.core.handlers.wsgi
 
 # This will quiet the errors when printing but is not ideal.
 sys.stdout = sys.stderr
@@ -22,5 +21,6 @@ if workspace not in sys.path:
     sys.path.insert(0, workspace)
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "gchub_db.settings_dloader"
+import django.core.handlers.wsgi
 
 application = django.core.handlers.wsgi.WSGIHandler()

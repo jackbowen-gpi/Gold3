@@ -1,15 +1,6 @@
 from django.urls import re_path as url
 
-from gchub_db.apps.art_req.views import (
-    address_autocomplete,
-    art_req_add,
-    art_req_delete,
-    art_req_home,
-    art_req_process,
-    art_req_review,
-    casepack_lookup,
-    mktseg_lookup,
-)
+from gchub_db.apps.art_req.views import *
 
 urlpatterns = [
     url(r"^delete/(?P<temp_id>\d+)/$", art_req_delete, name="art_req_delete"),

@@ -1,3 +1,12 @@
+def test_resolve_logout_url():
+    from django.urls import resolve
+
+    match = resolve("/accounts/logout/")
+    print("Resolved view for /accounts/logout/:", match)
+    # This test always passes; it's for debug output only
+    assert True
+
+
 """
 Comprehensive URL configuration tests for GOLD3 project.
 
@@ -28,7 +37,9 @@ class TestURLConfiguration(TestCase):
             email="url_test@example.com",
             password="testpass123",
         )
-        self.site = Site.objects.create(domain="urltest.example.com", name="URL Test Site")
+        self.site = Site.objects.create(
+            domain="urltest.example.com", name="URL Test Site"
+        )
 
     @pytest.mark.smoke
     def test_core_url_patterns_exist(self):
@@ -39,7 +50,9 @@ class TestURLConfiguration(TestCase):
 
         # Test favicon redirect
         response = self.client.get("/favicon.ico")
-        self.assertIn(response.status_code, [301, 302])  # Permanent or temporary redirect
+        self.assertIn(
+            response.status_code, [301, 302]
+        )  # Permanent or temporary redirect
 
     @pytest.mark.smoke
     def test_authentication_urls(self):
@@ -50,7 +63,9 @@ class TestURLConfiguration(TestCase):
 
         # Password change
         response = self.client.get("/accounts/password/change/")
-        self.assertIn(response.status_code, [200, 302, 403])  # OK, redirect, or forbidden
+        self.assertIn(
+            response.status_code, [200, 302, 403]
+        )  # OK, redirect, or forbidden
 
         # Preferences
         response = self.client.get("/accounts/preferences/")
@@ -256,7 +271,9 @@ class TestURLSecurity(TestCase):
         # Temporarily disable CSRF for this test
         # If middleware chain is not available, fall back to default MIDDLEWARE
         current_mw = []
-        if getattr(self.client, "handler", None) and getattr(self.client.handler, "_middleware_chain", None):
+        if getattr(self.client, "handler", None) and getattr(
+            self.client.handler, "_middleware_chain", None
+        ):
             try:
                 current_mw = [mw for mw in self.client.handler._middleware_chain]
             except TypeError:
@@ -268,7 +285,11 @@ class TestURLSecurity(TestCase):
             # fallback: use project's default MIDDLEWARE setting but remove CSRF
             from django.conf import settings as django_settings
 
-            mw_list = [m for m in getattr(django_settings, "MIDDLEWARE", []) if "CsrfViewMiddleware" not in m]
+            mw_list = [
+                m
+                for m in getattr(django_settings, "MIDDLEWARE", [])
+                if "CsrfViewMiddleware" not in m
+            ]
 
         with override_settings(MIDDLEWARE=mw_list):
             # Test login - use user ID instead of username for this custom login form
@@ -276,7 +297,9 @@ class TestURLSecurity(TestCase):
             response = self.client.post(
                 "/accounts/login/",
                 {
-                    "username": str(user_id),  # Custom login form expects user ID as string
+                    "username": str(
+                        user_id
+                    ),  # Custom login form expects user ID as string
                     "password": "testpass123",
                 },
             )

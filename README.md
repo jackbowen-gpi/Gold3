@@ -73,6 +73,10 @@ python -m venv .venv
 python -m pip install --upgrade pip
 pip install -r config/requirements.txt
 
+# Or use the convenience script:
+.\activate_venv.bat  # Windows Command Prompt
+.\activate_venv.ps1  # Windows PowerShell
+
 # 2. Database setup
 docker compose -f .\dev\docker-compose.yml up -d postgres
 python manage.py migrate

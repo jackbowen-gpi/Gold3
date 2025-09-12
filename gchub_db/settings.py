@@ -6,8 +6,8 @@ import pprint
 
 # Import common settings
 # Import all common settings
-from settings_common import *  # noqa: F403
-from settings_common import DEBUG  # noqa: F401
+from config.settings_common import *  # noqa: F403
+from config.settings_common import DEBUG  # noqa: F401
 
 # Path to this package directory
 MAIN_PATH = os.path.abspath(os.path.split(__file__)[0])
@@ -36,7 +36,13 @@ MIDDLEWARE = (
     *(("gchub_db.middleware.dev_auto_login.DevAutoLoginMiddleware",) if DEBUG else ()),
     # In DEBUG, remove Permissions-Policy / Feature-Policy to avoid blocking
     # legacy vendor scripts that register `unload` handlers (prototype/YUI/etc.).
-    *(("gchub_db.middleware.remove_permissions_policy.RemovePermissionsPolicyHeaderMiddleware",) if DEBUG else ()),
+    *(
+        (
+            "gchub_db.middleware.remove_permissions_policy.RemovePermissionsPolicyHeaderMiddleware",
+        )
+        if DEBUG
+        else ()
+    ),
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -122,7 +128,11 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "class": ("logging.StreamHandler" if not RICH_AVAILABLE else "rich.logging.RichHandler"),
+            "class": (
+                "logging.StreamHandler"
+                if not RICH_AVAILABLE
+                else "rich.logging.RichHandler"
+            ),
             "formatter": "verbose",
         },
         "file": {
@@ -198,7 +208,7 @@ if DEBUG:
     CSRF_COOKIE_SECURE = False
 
 try:
-    from local_settings import *  # noqa: F403
+    from config.local_settings import *  # noqa: F403
 except ImportError:
     pass
 

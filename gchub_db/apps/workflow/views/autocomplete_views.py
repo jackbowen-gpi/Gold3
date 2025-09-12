@@ -84,7 +84,11 @@ def item_autocomplete(request):
             label += f" ({item.job.name})"
 
         # For items, we might want to search by job number or item details
-        value = str(item.job.id) if term.isdigit() else (item.description or str(item.job.id))
+        value = (
+            str(item.job.id)
+            if term.isdigit()
+            else (item.description or str(item.job.id))
+        )
 
         suggestions.append({"id": item.id, "label": label, "value": value})
 

@@ -1,0 +1,34 @@
+line-length = 88
+exclude = [".venv", "media", "node_modules", "logs", "gchub_db/gchub_db"]
+
+# Narrow enforcement to error classes that indicate actual runtime or
+# import-time failures. Keep per-file ignores for legacy/third-party code.
+[lint]
+# Only enforce fatal/syntax (E999) and pyflakes (F) checks which are most
+# likely to point to real runtime or import-time failures (undefined names,
+# syntax errors, etc.). Style and docstring checks are noisy for this
+# legacy codebase and are relaxed via per-file ignores above.
+select = ["F", "E"]
+extend-ignore = ["D203", "D213"]
+
+[lint.per-file-ignores]
+# Allow legacy and vendored code to bypass many style and docstring checks.
+"includes/**" = ["D", "C", "B", "N"]
+"local_settings.py" = ["E501", "D100"]
+"manage.py" = ["D100"]
+"middleware/**" = ["D", "C", "B", "N"]
+"templatetags/**" = ["D100", "D101", "D102", "D103"]
+"tmp_*.py" = ["D100", "E402"]
+"gchub_db/**" = ["D", "N", "E501", "C", "B", "W"]
+"settings_common.py" = ["D", "E501"]
+# Scripts often need Django setup before imports
+"scripts/**" = ["E402"]
+".scripts/**" = ["E402"]
+"bin/**" = ["E402"]
+"daemons/**" = ["E402"]
+"tools/**" = ["E402"]
+# Test files and setup files
+"conftest*.py" = ["E402"]
+"test_*.py" = ["E402"]
+"setup_*.py" = ["E402"]
+"urls*.py" = ["E402"]

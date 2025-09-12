@@ -14,7 +14,8 @@ import openpyxl
 from django.db import models
 
 from gchub_db.apps.joblog.app_defs import JOBLOG_TYPE_ITEM_FILED_OUT
-from gchub_db.apps.workflow.models import Item, ItemColor, JobLog
+from gchub_db.apps.joblog.models import JobLog
+from gchub_db.apps.workflow.models import Item, ItemColor
 
 # Set the plant and start date.
 plant = "Shelbyville"

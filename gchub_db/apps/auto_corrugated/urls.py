@@ -1,20 +1,6 @@
 from django.urls import re_path as url
 
-from gchub_db.apps.auto_corrugated.views import (
-    pdf_generation_form,
-    pdf_generation_form_edit,
-    pdf_label_generation_form,
-    json_get_boxitem_specs,
-    json_get_boxitem_dimensions,
-    box_search_form,
-    label_search_form,
-    view_box_data,
-    approve_box,
-    view_label_data,
-    generate_box,
-    generate_label,
-    help,
-)
+from gchub_db.apps.auto_corrugated.views import *
 
 urlpatterns = [
     url(

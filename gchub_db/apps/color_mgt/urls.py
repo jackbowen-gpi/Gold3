@@ -1,6 +1,6 @@
 from django.urls import re_path as url
 
-from gchub_db.apps.color_mgt.views import color_home, color_stats, color_stats_sorted
+from gchub_db.apps.color_mgt.views import *
 
 urlpatterns = [
     # Example for displaying a job.

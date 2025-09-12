@@ -1,5 +1,4 @@
-"""
-Minimal test settings that extend the project's settings and fill gaps for CI.
+"""Minimal test settings that extend the project's settings and fill gaps for CI.
 This shim imports the real settings then ensures minimal values for tests to run
 locally (database, secret key, essential contrib apps, WORKFLOW_ROOT_DIR).
 """
@@ -20,23 +19,10 @@ for p in (repo_root, repo_parent):
 
 from .settings import *  # noqa: F401,F403
 
-# Disable debug output for tests
-import sys
-from io import StringIO
-
-# Capture stdout to suppress debug prints
-old_stdout = sys.stdout
-sys.stdout = StringIO()
-
-try:
-    # Import the rest of settings (this will trigger the debug prints)
-    pass
-finally:
-    # Restore stdout
-    sys.stdout = old_stdout
-
 # Base dir (inner package) -> project base
-BASE_DIR = globals().get("BASE_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = globals().get(
+    "BASE_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 
 # Ensure a SECRET_KEY for test runs
 if not globals().get("SECRET_KEY"):
@@ -50,9 +36,15 @@ if not globals().get("SECRET_KEY"):
 # workflow.
 TEST_PG_NAME = os.environ.get("TEST_PG_NAME") or os.environ.get("PG_TEST_DB")
 TEST_PG_USER = os.environ.get("TEST_PG_USER") or os.environ.get("PG_TEST_USER")
-TEST_PG_PASSWORD = os.environ.get("TEST_PG_PASSWORD") or os.environ.get("PG_TEST_PASSWORD")
-TEST_PG_HOST = os.environ.get("TEST_PG_HOST") or os.environ.get("PG_TEST_HOST") or "localhost"
-TEST_PG_PORT = os.environ.get("TEST_PG_PORT") or os.environ.get("PG_TEST_PORT") or "5432"
+TEST_PG_PASSWORD = os.environ.get("TEST_PG_PASSWORD") or os.environ.get(
+    "PG_TEST_PASSWORD"
+)
+TEST_PG_HOST = (
+    os.environ.get("TEST_PG_HOST") or os.environ.get("PG_TEST_HOST") or "localhost"
+)
+TEST_PG_PORT = (
+    os.environ.get("TEST_PG_PORT") or os.environ.get("PG_TEST_PORT") or "5432"
+)
 
 if TEST_PG_NAME:
     DATABASES = {
@@ -67,18 +59,15 @@ if TEST_PG_NAME:
             # 'test_' unless TEST.NAME is explicitly provided); we set TEST
             # name only when the caller explicitly requests the same DB name
             # for tests.
-            "TEST": {"NAME": TEST_PG_NAME},  # type: ignore[dict-item]
+            "TEST": {"NAME": TEST_PG_NAME},
         }
     }
 else:
-    # No explicit test DB provided via env vars. Use SQLite for tests
-    # to avoid requiring PostgreSQL setup for running tests.
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": ":memory:",
-        }
-    }
+    # No explicit test DB provided via env vars. If the project already
+    # defines DATABASES in its settings we leave that in place; otherwise
+    # tests will surface a clear error rather than silently creating a
+    # sqlite DB file.
+    pass
 
 # Ensure essential contrib apps are present (ContentType & Sites needed by many apps/tests)
 essential = [
@@ -138,7 +127,9 @@ if not globals().get("__TESTING_OVERRIDE__"):
 # write a resolver state dump at request time to help reproduce ordering issues.
 if os.environ.get("DIAG_RESOLVER") == "1":
     # Prepend so it runs early in the request cycle
-    MIDDLEWARE = ["gchub_db.middleware.diagnostic_resolver_dump.DiagnosticResolverDumpMiddleware"] + MIDDLEWARE
+    MIDDLEWARE = [
+        "gchub_db.middleware.diagnostic_resolver_dump.DiagnosticResolverDumpMiddleware"
+    ] + MIDDLEWARE
 
 # Make sure WORKFLOW_ROOT_DIR exists and is set
 if not globals().get("WORKFLOW_ROOT_DIR"):
@@ -163,7 +154,7 @@ EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 # Default to the top-level `test_urls` module to avoid ambiguity between
 # the repository root and the nested package when Python resolves
 # `gchub_db.test_urls` in different sys.path orderings.
-ROOT_URLCONF = globals().get("TEST_ROOT_URLCONF", "urls")
+ROOT_URLCONF = globals().get("TEST_ROOT_URLCONF", "gchub_db.test_urls")
 
 # If diagnostics are enabled, attempt to force population of the URL resolver
 # now and write a small diagnostic file with the result. This helps catch
@@ -208,7 +199,10 @@ if os.environ.get("DIAG_RESOLVER") == "1":
                         if subp is not None:
                             sf.write("subpatterns sample (first 20):\n")
                             for sp in list(subp)[:20]:
-                                sf.write("  -> %r (name=%r)\n" % (repr(sp), getattr(sp, "name", None)))
+                                sf.write(
+                                    "  -> %r (name=%r)\n"
+                                    % (repr(sp), getattr(sp, "name", None))
+                                )
                     except Exception as e:
                         sf.write("error dumping pattern %d: %r\n" % (i, e))
         except Exception:

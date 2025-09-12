@@ -17,7 +17,7 @@ if not os.environ.get("DJANGO_SETTINGS_MODULE"):
     os.environ["DJANGO_SETTINGS_MODULE"] = "gchub_db.settings"
 
 try:
-    import urls as repo_urls
+    import config.urls as repo_urls
 
     patterns = getattr(repo_urls, "urlpatterns", None)
     if patterns is None:

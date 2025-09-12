@@ -42,23 +42,33 @@ class ModelSBOForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ModelSBOForm, self).__init__(*args, **kwargs)
         permission = Permission.objects.get(codename="in_artist_pulldown")
-        artists = User.objects.filter(is_active=True, groups__in=permission.group_set.all()).order_by("username")
+        artists = User.objects.filter(
+            is_active=True, groups__in=permission.group_set.all()
+        ).order_by("username")
 
-        self.fields["task"].widget.attrs["placeholder"] = "What was the task being performed?"
+        self.fields["task"].widget.attrs["placeholder"] = (
+            "What was the task being performed?"
+        )
         self.fields["task"].label = "Task Performed"
         self.fields["task"].widget.attrs["height"] = 50
         self.fields["task"].widget.attrs["width"] = 200
         self.fields["behavior_type"].label = "Behavior Type"
-        self.fields["behavior"].widget.attrs["placeholder"] = "How was the task being performed?"
+        self.fields["behavior"].widget.attrs["placeholder"] = (
+            "How was the task being performed?"
+        )
         self.fields["behavior"].label = "Behavior Observed"
-        self.fields["reason"].widget.attrs["placeholder"] = "Why was the task performed safe or at risk?"
+        self.fields["reason"].widget.attrs["placeholder"] = (
+            "Why was the task performed safe or at risk?"
+        )
         self.fields["reason"].label = "Reason"
         self.fields["communication"].label = "Communication"
         self.fields["describe_communication"].widget.attrs["placeholder"] = (
             "How did you communicate with the person involved in performing the task"
         )
         self.fields["describe_communication"].label = "Describe Communication"
-        self.fields["additional_comments"].widget.attrs["placeholder"] = "Any additional comments for this safety behavior observation"
+        self.fields["additional_comments"].widget.attrs["placeholder"] = (
+            "Any additional comments for this safety behavior observation"
+        )
         self.fields["additional_comments"].label = "Additional Comments"
         self.fields["additional_comments"].required = False
         self.fields["date_observed"].label = "Date Observed"
@@ -81,7 +91,9 @@ def _get_artist_qs():
     perm = _get_artist_permission()
     if perm is None:
         return User.objects.none()
-    return User.objects.filter(is_active=True, groups__in=perm.group_set.all()).order_by("username")
+    return User.objects.filter(
+        is_active=True, groups__in=perm.group_set.all()
+    ).order_by("username")
 
 
 class SearchSBOForm(forms.Form):
@@ -90,11 +102,15 @@ class SearchSBOForm(forms.Form):
         ("at_risk", "At Risk"),
         ("safe", "Safe"),
     ]
-    status = behavior_type = forms.ChoiceField(choices=risk_safe_choices, required=False)
+    status = behavior_type = forms.ChoiceField(
+        choices=risk_safe_choices, required=False
+    )
     start_date = forms.DateField(widget=GCH_SelectDateWidget, required=False)
     end_date = forms.DateField(widget=GCH_SelectDateWidget, required=False)
     # Defer DB access; populate artist choices in __init__.
-    observed = forms.ChoiceField(choices=(("", "----"), ("Potential Risk", "Potential Risk")), required=False)
+    observed = forms.ChoiceField(
+        choices=(("", "----"), ("Potential Risk", "Potential Risk")), required=False
+    )
 
     class Meta:
         model = SBO
@@ -133,7 +149,9 @@ class SBOHome(ListView):
 
         self.object_list = SBO.objects.all().order_by("-date_observed")
 
-        context = self.get_context_data(object_list=self.object_list, errors=errors, focus=focus, sboForm=sboForm)
+        context = self.get_context_data(
+            object_list=self.object_list, errors=errors, focus=focus, sboForm=sboForm
+        )
 
         return render(self.request, self.template_name, context=context)
 
@@ -151,7 +169,9 @@ class SBOHome(ListView):
 
         self.object_list = SBO.objects.all().order_by("-date_observed")
 
-        context = self.get_context_data(object_list=self.object_list, errors=errors, focus=focus, sboForm=sboForm)
+        context = self.get_context_data(
+            object_list=self.object_list, errors=errors, focus=focus, sboForm=sboForm
+        )
 
         return render(self.request, self.template_name, context=context)
 
@@ -250,7 +270,9 @@ class SBOSearch(ListView):
         except Exception:
             date_in_start = 0
         try:
-            date_in_end = date(int(date_in_end_year), int(date_in_end_month), int(date_in_end_day))
+            date_in_end = date(
+                int(date_in_end_year), int(date_in_end_month), int(date_in_end_day)
+            )
         except Exception:
             date_in_end = 0
 
@@ -333,16 +355,24 @@ def get_sbo_annual_data(year):
         sbo_annual = {}
 
         permission = Permission.objects.get(codename="in_artist_pulldown")
-        artists = User.objects.filter(is_active=True, groups__in=permission.group_set.all()).order_by("username")
+        artists = User.objects.filter(
+            is_active=True, groups__in=permission.group_set.all()
+        ).order_by("username")
 
-        sbos = SBO.objects.filter(date_observed__year=year, date_observed__month=month_counter + 1).order_by("-date_observed")
+        sbos = SBO.objects.filter(
+            date_observed__year=year, date_observed__month=month_counter + 1
+        ).order_by("-date_observed")
 
         sbo_annual["total_count"] = sbos.count()
         sbo_annual["total_communicated"] = sbos.filter(communication=True).count()
         sbo_annual["safe_count"] = sbos.filter(behavior_type="safe").count()
-        sbo_annual["safe_communicated"] = sbos.filter(behavior_type="safe", communication=True).count()
+        sbo_annual["safe_communicated"] = sbos.filter(
+            behavior_type="safe", communication=True
+        ).count()
         sbo_annual["risky_count"] = sbos.filter(behavior_type="at_risk").count()
-        sbo_annual["risky_communicated"] = sbos.filter(behavior_type="at_risk", communication=True).count()
+        sbo_annual["risky_communicated"] = sbos.filter(
+            behavior_type="at_risk", communication=True
+        ).count()
 
         user_check = {}
         temp_total = 0

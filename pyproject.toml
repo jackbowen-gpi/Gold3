@@ -27,7 +27,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
-Django = "4.2.23"
+Django = "5.2.6"
 
 # Note: This pyproject is intentionally minimal. Use the instructions in
 # README_POETRY.md to migrate the current `requirements.txt` into Poetry's

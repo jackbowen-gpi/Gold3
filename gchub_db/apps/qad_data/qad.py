@@ -84,7 +84,7 @@ def _get_new_records():
 def get_nine_digit_data(nine_digit):
     """Return data for the given nine-digit number from QAD>"""
     cursor = _get_conn_cursor()[0]
-    cursor.execute("SELECT UPC, SCC FROM ProductSpecs where Part='%s'" % str(nine_digit))
+    cursor.execute("SELECT UPC, SCC FROM ProductSpecs where Part=?", (str(nine_digit),))
 
     if DEBUG:
         # Show a list of columns + their data types.
@@ -111,13 +111,18 @@ def get_specsheet_description(nine_digit):
         cursor = _get_conn_cursor()[0]
 
         # Lines 1 and 2
-        cursor.execute("SELECT Description, Description2 FROM ProductSpecs where Part='%s'" % str(nine_digit))
+        cursor.execute(
+            "SELECT Description, Description2 FROM ProductSpecs where Part='%s'"
+            % str(nine_digit)
+        )
         data_first_attmpt = cursor.fetchone()
         description_list.append(data_first_attmpt[0])
         description_list.append(data_first_attmpt[1])
 
         # Line 3
-        cursor.execute("SELECT cd_cmmt##1 FROM cd_det WHERE cd_ref = '%s'" % str(nine_digit))
+        cursor.execute(
+            "SELECT cd_cmmt##1 FROM cd_det WHERE cd_ref = '%s'" % str(nine_digit)
+        )
         data_second_attmpt = cursor.fetchone()
         description_list.append(data_second_attmpt[0])
 

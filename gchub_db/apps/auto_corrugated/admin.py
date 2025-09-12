@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from .models import BoxItem, BoxItemSpec, GeneratedBox, GeneratedLabel
+from .models import *
 
 
 class BoxItemSpecInline(admin.TabularInline):

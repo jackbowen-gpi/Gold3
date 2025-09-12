@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.join(MAIN_PATH, "middleware"))
 DEBUG = True
 
 # Serve media files through Django dev server. Never use in production.
-DJANGO_SERVE_MEDIA = False
+DJANGO_SERVE_MEDIA = True
 
 # allowed_hosts determins which addresses are allowed to serve up django
 ALLOWED_HOSTS = [
@@ -130,7 +130,9 @@ DATABASES_RAW_DEV = {
     # Default to the 'gchub' role and the PostgreSQL default port so compose
     # services and the local Postgres image work without further edits.
     "USER": os.environ.get("DEV_DB_USER", os.environ.get("POSTGRES_USER", "gchub")),
-    "PASSWORD": os.environ.get("DEV_DB_PASSWORD", os.environ.get("POSTGRES_PASSWORD", "gchub")),
+    "PASSWORD": os.environ.get(
+        "DEV_DB_PASSWORD", os.environ.get("POSTGRES_PASSWORD", "gchub")
+    ),
     "HOST": os.environ.get("DEV_DB_HOST", "127.0.0.1"),
     "PORT": os.environ.get("DEV_DB_PORT", os.environ.get("POSTGRES_PORT", "5432")),
 }
@@ -283,7 +285,7 @@ USE_I18N = False
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = os.path.join(MAIN_PATH, "media")
+MEDIA_ROOT = os.path.join(MAIN_PATH, "..", "media")
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).

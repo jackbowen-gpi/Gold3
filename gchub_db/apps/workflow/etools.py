@@ -102,7 +102,10 @@ def _get_new_jobs():
     may iterate through.
     """
     cursor = _get_conn_cursor()[0]
-    cursor.execute("SELECT TOP 5 * FROM tb_FSAR_Data_SampArtReq WHERE Job_Status = 'New'" " ORDER BY Request_ID ASC")
+    cursor.execute(
+        "SELECT TOP 5 * FROM tb_FSAR_Data_SampArtReq WHERE Job_Status = 'New'"
+        " ORDER BY Request_ID ASC"
+    )
     # cursor.execute(
     #     "SELECT TOP 10 * FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = 104249"
     # )
@@ -180,7 +183,10 @@ def _get_etools_job_status(job_etools_id):
     may iterate through.
     """
     cursor = _get_conn_cursor()[0]
-    cursor.execute("SELECT Job_Status FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = %d" % job_etools_id)
+    cursor.execute(
+        "SELECT Job_Status FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = ?",
+        (job_etools_id,),
+    )
 
     return cursor
 
@@ -269,7 +275,10 @@ def _ensure_item_record_exists(cursor, connection, item):
             (item.job.id, item.num_in_job),
         )
         connection.commit()
-        print("Item record for job %s item %s does not exist, creating." % (item.job.id, item.num_in_job))
+        print(
+            "Item record for job %s item %s does not exist, creating."
+            % (item.job.id, item.num_in_job)
+        )
         return False
     else:
         return True
@@ -290,7 +299,13 @@ def push_job(job):
     """
     >>> Begin assembling the query <<<
     """
-    query_string = "UPDATE tb_FSAR_Data_SampArtReq SET " "Job_ID = ?, " "Job_Status = ?, " "Assigned_To = ? " "WHERE Request_ID = ?"
+    query_string = (
+        "UPDATE tb_FSAR_Data_SampArtReq SET "
+        "Job_ID = ?, "
+        "Job_Status = ?, "
+        "Assigned_To = ? "
+        "WHERE Request_ID = ?"
+    )
     cursor.execute(query_string, (job.id, job.status, assigned_to, job.e_tools_id))
     connection.commit()
     connection.commit()
@@ -436,10 +451,14 @@ def _send_item_replaces_email(items_replacing_designs, job):
         mail_context = {"items": items_replacing_designs, "job": job}
         mail_send_to = []
         mail_send_to.append(settings.EMAIL_GCHUB)
-        group_members = User.objects.filter(groups__name="EmailGCHubNewItems", is_active=True)
+        group_members = User.objects.filter(
+            groups__name="EmailGCHubNewItems", is_active=True
+        )
         for user in group_members:
             mail_send_to.append(user.email)
-        general_funcs.send_info_mail(mail_subject, mail_body.render(mail_context), mail_send_to)
+        general_funcs.send_info_mail(
+            mail_subject, mail_body.render(mail_context), mail_send_to
+        )
 
 
 def _populate_items(job, ejob):
@@ -506,7 +525,10 @@ def _populate_items(job, ejob):
         try:
             replace_bool = str(ejob.replaces_previous_design).strip()
             # Normalize string and compare, since ETools doesn't cleanse their data.
-            if replace_bool.lower() in ("1", "true", "yes") or item.replaces.strip() != "":
+            if (
+                replace_bool.lower() in ("1", "true", "yes")
+                or item.replaces.strip() != ""
+            ):
                 # if item.replaces.strip() != '':
                 # This item replaces a design.
                 items_replacing_designs.append(item)
@@ -566,7 +588,9 @@ def _populate_joblog(job, ejob):
             parts.append(f"Description: {str(proj)[:200]}")
 
         if parts:
-            job.do_create_joblog_entry(joblog_defs.JOBLOG_TYPE_JOB_CREATED, " | ".join(parts))
+            job.do_create_joblog_entry(
+                joblog_defs.JOBLOG_TYPE_JOB_CREATED, " | ".join(parts)
+            )
     except Exception:
         # Intentionally ignore joblog failures during import to avoid
         # failing the whole import process for non-critical logging issues.
@@ -638,7 +662,9 @@ def import_new_jobs():
             pass
         # Try to match the print group from etools with one imported from QAD.
         try:
-            job.printgroup, created = QAD_PrintGroups.objects.get_or_create(name=ejob.printgroup)
+            job.printgroup, created = QAD_PrintGroups.objects.get_or_create(
+                name=ejob.printgroup
+            )
         except Exception:
             pass
         # Search for salesperson by email address. Email someone in IT if not

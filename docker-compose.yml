@@ -96,10 +96,22 @@ services:
       - redis
 
   flower:
-    image: mher/flower:2.0
-    command: flower --broker=redis://redis:6379/0 --port=5555
+    build: .
+    command: sh -c "celery -A gchub_db flower --port=5555"
     ports:
       - "5555:5555"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      DEV_DB_HOST: db
+      DEV_DB_PORT: "5432"
+      DEV_DB_USER: gchub
+      DEV_DB_PASSWORD: gchub
+      PYTHONPATH: /app
+      DJANGO_SETTINGS_MODULE: gchub_db.settings
     depends_on:
       - redis
       - celery

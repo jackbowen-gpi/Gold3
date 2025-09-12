@@ -22,55 +22,44 @@ from gchub_db.includes import fs_api
 from gchub_db.includes.gold_json import JSMessage
 from gchub_db.includes.widgets import GCH_SelectDateWidget
 
+# These are cached once when the server is started to avoid future queries.
+ARTIST_PERMISSION = Permission.objects.get(codename="in_artist_pulldown")
+CLEMSON_ARTIST = (
+    User.objects.filter(groups__in=ARTIST_PERMISSION.group_set.all())
+    .order_by("username")
+    .filter(is_active=True)
+)
 
-# Avoid DB access at import time: provide lazy defaults and populate
-# runtime querysets/choices in form __init__.
-def _get_artist_permission():
-    try:
-        return Permission.objects.get(codename="in_artist_pulldown")
-    except Exception:
-        return None
-
-
-def _get_clemson_artist_qs():
-    perm = _get_artist_permission()
-    if perm is None:
-        return User.objects.none()
-    return User.objects.filter(groups__in=perm.group_set.all()).order_by("username").filter(is_active=True)
-
-
-# PrintLocation-based choices are expensive at import time; defer to runtime.
-def _get_plant_list_qs():
-    try:
-        PLANT = PrintLocation.objects.all()
-        PLANT_PRESS_QUERY = (
-            Q(plant__name="Pittston")
-            | Q(plant__name="Clarksville")
-            | Q(plant__name="Kenton")
-            | Q(plant__name="Shelbyville")
-            | Q(plant__name="Visalia")
-        ) & (
-            Q(press__name="Vision")
-            | Q(press__name="PMC")
-            | Q(press__name="Uteco")
-            | Q(press__name="FK")
-            | Q(press__name="Unknown")
-            | Q(press__name="Comco")
-            | Q(press__name="Webtron")
-            | Q(press__name="Kidder")
-            | Q(press__name="In-Line")
-        )
-        PLANT_PRESS_EXCLUDE = (
-            (Q(plant__name="Kenton") | Q(plant__name="Visalia")) & (Q(press__name="Kidder"))
-            | (Q(plant__name="Kenton") & Q(press__name="In-Line"))
-            | (Q(plant__name="Visalia") & Q(press__name="Kidder"))
-            | (Q(plant__name="Visalia") & Q(press__name="Webtron"))
-            | (Q(plant__name="Visalia") & Q(press__name="In-Line"))
-        )
-        return PLANT.filter(PLANT_PRESS_QUERY).exclude(PLANT_PRESS_EXCLUDE)
-    except Exception:
-        return PrintLocation.objects.none()
-
+# Making a queryset for the PrintLocation
+# This will only show the Plant + Press combinations used for Ink Drawdowns
+PLANT = PrintLocation.objects.all()
+# These are all plants and presses we want to include individually
+PLANT_PRESS_QUERY = (
+    Q(plant__name="Pittston")
+    | Q(plant__name="Clarksville")
+    | Q(plant__name="Kenton")
+    | Q(plant__name="Shelbyville")
+    | Q(plant__name="Visalia")
+) & (
+    Q(press__name="Vision")
+    | Q(press__name="PMC")
+    | Q(press__name="Uteco")
+    | Q(press__name="FK")
+    | Q(press__name="Unknown")
+    | Q(press__name="Comco")
+    | Q(press__name="Webtron")
+    | Q(press__name="Kidder")
+    | Q(press__name="In-Line")
+)
+# These are the specific plant / press combos we want to exclude from the possible combos above
+PLANT_PRESS_EXCLUDE = (
+    (Q(plant__name="Kenton") | Q(plant__name="Visalia")) & (Q(press__name="Kidder"))
+    | (Q(plant__name="Kenton") & Q(press__name="In-Line"))
+    | (Q(plant__name="Visalia") & Q(press__name="Kidder"))
+    | (Q(plant__name="Visalia") & Q(press__name="Webtron"))
+    | (Q(plant__name="Visalia") & Q(press__name="In-Line"))
+)
+PLANT_LIST = PLANT.filter(PLANT_PRESS_QUERY).exclude(PLANT_PRESS_EXCLUDE)
 
 SUBSTRATE_CHOICES = (
     #    ('-----------', '-----------'),
@@ -86,6 +75,13 @@ SUBSTRATE_CHOICES = (
 )
 
 PLANT_CHOICES = ()
+for printLoc in PLANT_LIST:
+    PLANT_CHOICES += (
+        (
+            printLoc.plant.name + " - " + printLoc.press.name,
+            printLoc.plant.name + " - " + printLoc.press.name,
+        ),
+    )
 
 # SUBSTRATE_CHOICES_2 = ['PLA 1/S', 'PLA 2/S', 'Kraft Cup Buddy', 'White Cup Buddy', 'Poly 1/S', 'Poly 2/S', 'SDR', 'Clay Coated']
 
@@ -93,8 +89,7 @@ PLANT_CHOICES = ()
 class DrawDownRequestForm(ModelForm):
     """These are the attributes that will not change for each item request"""
 
-    # Use lazy defaults; populate in __init__ to avoid import-time DB queries.
-    requested_by = forms.ModelChoiceField(queryset=User.objects.none())
+    requested_by = forms.ModelChoiceField(queryset=CLEMSON_ARTIST)
     customer_name = forms.CharField()
     send_prints_to = forms.CharField(widget=forms.Textarea)
     comments = forms.CharField(widget=forms.Textarea, required=False)
@@ -116,21 +111,12 @@ class DrawDownRequestForm(ModelForm):
             "send_prints_to",
         )
 
-    def __init__(self, *args, **kwargs):
-        super(DrawDownRequestForm, self).__init__(*args, **kwargs)
-        # Populate requested_by queryset at runtime.
-        try:
-            self.fields["requested_by"].queryset = _get_clemson_artist_qs()
-        except Exception:
-            self.fields["requested_by"].queryset = User.objects.none()
-
 
 class DrawDownItemForm(ModelForm):
     """These attributes will be different for each requested item on the draw drown"""
 
     substrate = forms.ChoiceField(choices=SUBSTRATE_CHOICES)
-    # Defer evaluation of PrintLocation queryset to runtime in __init__.
-    print_location = forms.ModelChoiceField(queryset=PrintLocation.objects.none())
+    print_location = forms.ModelChoiceField(queryset=PLANT_LIST)
     colors_needed = forms.CharField(widget=forms.Textarea)
     item_number = forms.IntegerField(min_value=1, max_value=50, required=False)
     number_copies = forms.IntegerField(initial=1, min_value=1, max_value=100)
@@ -155,7 +141,9 @@ class DrawDownItemForm(ModelForm):
         self.fields["substrate"].widget.attrs["size"] = 11
 
 
-class DrawDownItemHomeFormSet(modelformset_factory(DrawDownItem, form=DrawDownItemForm, extra=1)):
+class DrawDownItemHomeFormSet(
+    modelformset_factory(DrawDownItem, form=DrawDownItemForm, extra=1)
+):
     def clean(self):
         super(DrawDownItemHomeFormSet, self).clean()
 
@@ -165,7 +153,9 @@ class DrawDownItemHomeFormSet(modelformset_factory(DrawDownItem, form=DrawDownIt
                 form.add_error("substrate", "substrate is a required field")
 
 
-class DrawDownItemEditFormSet(modelformset_factory(DrawDownItem, form=DrawDownItemForm, extra=0)):
+class DrawDownItemEditFormSet(
+    modelformset_factory(DrawDownItem, form=DrawDownItemForm, extra=0)
+):
     def clean(self):
         super(DrawDownItemEditFormSet, self).clean()
 
@@ -180,8 +170,8 @@ class DrawDownSearchForm(forms.Form):
 
     job_number = forms.IntegerField(min_value=1, max_value=99999, required=False)
     customer_name = forms.CharField(required=False)
-    requested_by = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
-    print_location = forms.ModelChoiceField(queryset=PrintLocation.objects.none(), required=False)
+    requested_by = forms.ModelChoiceField(queryset=CLEMSON_ARTIST, required=False)
+    print_location = forms.ModelChoiceField(queryset=PLANT_LIST, required=False)
     date_in_start = forms.DateField(widget=GCH_SelectDateWidget, required=False)
     date_in_end = forms.DateField(widget=GCH_SelectDateWidget, required=False)
     date_needed_start = forms.DateField(widget=GCH_SelectDateWidget, required=False)
@@ -190,13 +180,6 @@ class DrawDownSearchForm(forms.Form):
     def __init__(self, request, *args, **kwargs):
         """Populate some of the relational fields."""
         super(DrawDownSearchForm, self).__init__(*args, **kwargs)
-        # Populate choices at runtime.
-        try:
-            self.fields["requested_by"].queryset = _get_clemson_artist_qs()
-            self.fields["print_location"].queryset = _get_plant_list_qs()
-        except Exception:
-            self.fields["requested_by"].queryset = User.objects.none()
-            self.fields["print_location"].queryset = PrintLocation.objects.none()
 
     def clean(self):
         if any(self.errors):
@@ -220,6 +203,7 @@ def home(request, job_id=None):
                 try:
                     # this checks for bad forms, if it is not valid but has the number_copies field then it
                     # just needs some data entered
+                    num_copies = ddiform.cleaned_data["number_copies"]
                     flag = False
                 except Exception:
                     # If the whole number_copies field is missing, this is a blank form
@@ -228,6 +212,7 @@ def home(request, job_id=None):
             drawdown = ddform.save()
             for ddiform in ddiformSet:
                 try:
+                    num_copies = ddiform.cleaned_data["number_copies"]
                     drawdownitem = ddiform.save()
                     drawdownitem.draw_down_request = drawdown
                     drawdownitem.save()
@@ -277,16 +262,25 @@ def home(request, job_id=None):
                 jobfolder = fs_api.get_job_folder(jobnum)
                 folder = os.path.join(jobfolder, fs_api.JOBDIR["3_preview_art"])
 
+                fileArray = []
                 for drawdownItem in drawdownItems:
                     if drawdownItem.artwork and drawdownItem.item_number:
                         try:
                             itemnum = drawdownItem.item_number
                             pattern = re.compile(r"ap_(.*)_(%s)[.](pdf)$" % itemnum)
                             file = fs_api._generic_item_file_search(folder, pattern)
-                            file2 = os.path.join(folder, "testPreviewArt" + str(itemnum))
+                            file2 = os.path.join(
+                                folder, "testPreviewArt" + str(itemnum)
+                            )
                             removeFileArray.append(file2)
                             os.system("convert " + file + " " + file2 + ".jpg")
-                            os.system("convert " + file2 + ".jpg -format JPG -quality 30 " + file2 + ".pdf")
+                            os.system(
+                                "convert "
+                                + file2
+                                + ".jpg -format JPG -quality 30 "
+                                + file2
+                                + ".pdf"
+                            )
                             os.system("rm " + file2 + ".jpg")
 
                             # ATTACH THE ARTWORK IF THERE IS ANY
@@ -322,7 +316,9 @@ def home(request, job_id=None):
 
                 return HttpResponse(JSMessage("Saved/Email Sent."))
             else:
-                return HttpResponse(JSMessage("Error has occurred sending the drawdown"))
+                return HttpResponse(
+                    JSMessage("Error has occurred sending the drawdown")
+                )
         else:
             errorSet = ""
             for error in ddform.errors:
@@ -330,7 +326,9 @@ def home(request, job_id=None):
             for error in ddiformSet.errors:
                 for key, value in list(error.items()):
                     errorSet += " - " + str(key)
-            return HttpResponse(JSMessage("Invalid value for field(s):" + errorSet, is_error=True))
+            return HttpResponse(
+                JSMessage("Invalid value for field(s):" + errorSet, is_error=True)
+            )
     else:
         user = request.user
         date_plus3 = date.today() + timedelta(days=3)
@@ -354,7 +352,9 @@ def home(request, job_id=None):
             }
 
         drawdownReqForm = DrawDownRequestForm(initial=drawDownObj)
-        drawdownItemForm = DrawDownItemHomeFormSet(queryset=DrawDownItem.objects.none(), prefix="Drawdown")
+        drawdownItemForm = DrawDownItemHomeFormSet(
+            queryset=DrawDownItem.objects.none(), prefix="Drawdown"
+        )
 
         pagevars = {
             "page_title": "Add New Drawdown Request",
@@ -392,6 +392,7 @@ def show_legacy(request):
 def edit_drawdown(request, contact_id):
     """Saves edited Drawdown Request data."""
     current_data = DrawDownRequest.objects.get(id=contact_id)
+    current_items = DrawDownItem.objects.filter(draw_down_request=current_data.id)
 
     if request.method == "POST":  # save form
         ddform = DrawDownRequestForm(request.POST, instance=current_data)
@@ -414,10 +415,14 @@ def edit_drawdown(request, contact_id):
             for error in ddiformSet.errors:
                 for key, value in list(error.items()):
                     errorSet += " - " + str(key)
-            return HttpResponse(JSMessage("Invalid value for field(s):" + errorSet, is_error=True))
+            return HttpResponse(
+                JSMessage("Invalid value for field(s):" + errorSet, is_error=True)
+            )
     else:  # present form
         drawdownReqForm = DrawDownRequestForm(instance=current_data)
-        drawdownItemForm = DrawDownItemEditFormSet(queryset=DrawDownItem.objects.filter(draw_down_request=current_data.id))
+        drawdownItemForm = DrawDownItemEditFormSet(
+            queryset=DrawDownItem.objects.filter(draw_down_request=current_data.id)
+        )
         pagevars = {
             "page_title": "Edit Drawdown Request",
             "drawdownReqform": drawdownReqForm,
@@ -429,8 +434,7 @@ def edit_drawdown(request, contact_id):
 
 
 def view_drawdown(request, contact_id):
-    """
-    View drawdown request and the drawdown items associated with the request.
+    """View drawdown request and the drawdown items associated with the request.
     This is an attempt to make the legacy draw down system work with the new one, if the id cannot be found in the
     new system then it tries the legacy system and returns that object / builds the page the old way instead.
     """
@@ -457,8 +461,7 @@ def view_drawdown(request, contact_id):
 
 
 def delete_drawdown(request, contact_id):
-    """
-    Delete a drawdown request from the Request Drawdown Forms as well as all of the drawdown items
+    """Delete a drawdown request from the Request Drawdown Forms as well as all of the drawdown items
     associated with that request.
     """
     drawdownrequest = DrawDownRequest.objects.get(id=contact_id)
@@ -504,8 +507,7 @@ def pending_drawdown(request, drawdown_id):
 
 
 def drawdown_search_results(request, form=None):
-    """
-    Displays Drawdown search results.
+    """Displays Drawdown search results.
     Filters through search request from results.
     """
     qset = DrawDownRequest.objects.all()
@@ -539,7 +541,9 @@ def drawdown_search_results(request, form=None):
         s_draw_date_in_end = form.cleaned_data.get("date_in_end", None)
         if s_draw_date_in_end:
             if s_draw_date_in_start:
-                qset = qset.filter(creation_date__range=(s_draw_date_in_start, s_draw_date_in_end))
+                qset = qset.filter(
+                    creation_date__range=(s_draw_date_in_start, s_draw_date_in_end)
+                )
         elif s_draw_date_in_start:
             qset = qset.filter(creation_date=s_draw_date_in_start)
 
