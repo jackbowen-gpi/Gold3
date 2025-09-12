@@ -775,4 +775,24 @@ LOGGING = {
 
 ---
 
+## 📚 **Documentation**
+
+For detailed information about specific components and features, please refer to the documentation in the `docs/` folder:
+
+### **Core Documentation**
+- **[Celery Configuration](docs/CELERY-README.md)** - Task queue setup and management
+- **[External Database Integration](docs/EXTERNAL_DB_README.md)** - Database connection and integration guides
+
+### **Data Management**
+- **[Data Masking Guide](docs/DATA_MASKING_README.md)** - Data protection and masking procedures
+- **[Comprehensive Masking](docs/COMPREHENSIVE_MASKING_README.md)** - Advanced data masking techniques
+- **[Masking Coverage Report](docs/MASKING_COVERAGE_REPORT.md)** - Coverage analysis and reporting
+
+### **Additional Resources**
+- **[Developer Guide](docs/DEVELOPER.md)** - Development setup and best practices
+- **[Contributing Guidelines](docs/CONTRIBUTING.md)** - How to contribute to the project
+- **[Poetry Setup](docs/README_POETRY.md)** - Dependency management with Poetry
+
+---
+
 *Last Updated: September 10, 2025 | Django 5.2.5 | Python 3.13+ | PostgreSQL 15+*
