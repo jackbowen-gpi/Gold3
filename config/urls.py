@@ -79,18 +79,32 @@ urlpatterns.append(url(r"^reports/list/$", _fallback_list_reports, name="list_re
 # Include various app URLConfs. Wrap each include in try/except so a single
 # failing app import doesn't prevent the rest of the URL registry from
 # being constructed.
-def _try_include(regex, mod_str):
+def _try_include(regex, mod_str, namespace=None, app_name=None):
     try:
-        urlpatterns.append(url(regex, include(mod_str)))
-        print(f"Successfully included {mod_str} at {regex}")
+        if namespace and app_name:
+            urlpatterns.append(
+                url(regex, include((mod_str, app_name), namespace=namespace))
+            )
+        elif namespace:
+            urlpatterns.append(
+                url(regex, include((mod_str, namespace), namespace=namespace))
+            )
+        else:
+            urlpatterns.append(url(regex, include(mod_str)))
+        print(
+            f"Successfully included {mod_str} at {regex}"
+            + (f" with namespace {namespace}" if namespace else "")
+        )
     except Exception as e:
         # best-effort: skip failing includes during import
         print(f"Failed to include {mod_str} at {regex}: {e}")
         return
 
 
-_try_include(r"^job/search/", "gchub_db.apps.workflow.urls")
-_try_include(r"^job/", "gchub_db.apps.workflow.urls")
+_try_include(
+    r"^job/search/", "gchub_db.apps.workflow.urls", "workflow_job_search", "workflow"
+)
+_try_include(r"^job/", "gchub_db.apps.workflow.urls", "workflow_job", "workflow")
 _try_include(r"^address/", "gchub_db.apps.address.urls")
 _try_include(r"^bev_billing/", "gchub_db.apps.bev_billing.urls")
 _try_include(r"^sbo/", "gchub_db.apps.sbo.urls")
@@ -100,7 +114,7 @@ _try_include(r"^qc/", "gchub_db.apps.qc.urls")
 _try_include(r"^color_mgt/", "gchub_db.apps.color_mgt.urls")
 _try_include(r"^archives/", "gchub_db.apps.archives.urls")
 _try_include(r"^error_tracking/", "gchub_db.apps.error_tracking.urls")
-_try_include(r"^workflow/", "gchub_db.apps.workflow.urls")
+_try_include(r"^workflow/", "gchub_db.apps.workflow.urls", "workflow_main", "workflow")
 _try_include(r"^item_catalog/", "gchub_db.apps.item_catalog.urls")
 _try_include(r"^joblog/", "gchub_db.apps.joblog.urls")
 _try_include(r"^calendar/", "gchub_db.apps.calendar.urls")
@@ -115,6 +129,9 @@ _try_include(r"^video_player/", "gchub_db.apps.video_player.urls")
 # Accounts app handles the root URL (it registers a name 'home' at the empty
 # path). Include it here so the accounts index serves '/'.
 _try_include(r"^", "gchub_db.apps.accounts.urls")
+
+# Include workflow URLs at root level for todo_list and other root-level workflow URLs
+_try_include(r"^", "gchub_db.apps.workflow.urls")
 
 _try_include(r"^su/", "gchub_db.apps.django_su.urls")
 _try_include(r"^art_req/", "gchub_db.apps.art_req.urls")
