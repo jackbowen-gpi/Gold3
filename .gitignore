@@ -48,6 +48,9 @@ Thumbs.db
 .history/
 
 # Local diagnostic dumps and tool outputs
+
+# Media files (documentation, examples, etc.)
+media/
 resolver_dump_*.txt
 resolver_*.txt
 resolver_debug*.txt
