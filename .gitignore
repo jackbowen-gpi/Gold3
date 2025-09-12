@@ -30,14 +30,9 @@ var/
 # Pytest
 .pytest_cache/
 
-# Django
-*.log
-local_settings.py
-/media/
-/staticfiles/
-# db.sqlite3 (legacy) - project now defaults to Postgres for local development
-/media/
-/staticfiles/
+# Database backups
+backup.sql
+backup_before_masking_*.sql
 
 # IDEs
 .vscode/
