@@ -14,14 +14,10 @@ class ItemTestMixin:
     def setUp(self):
         """Set up basic test data."""
         # Create test user
-        self.test_user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
-        )
+        self.test_user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass123")
 
         # Create test site (workflow)
-        self.test_site = Site.objects.create(
-            name="Test Site", full_name="Test Site Full Name", active=True
-        )
+        self.test_site = Site.objects.create(name="Test Site", full_name="Test Site Full Name", active=True)
 
         # Create test item catalog (size)
         self.test_item_catalog = ItemCatalog.objects.create(

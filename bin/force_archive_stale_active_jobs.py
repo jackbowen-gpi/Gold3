@@ -870,9 +870,7 @@ def main():
         last_joblog = job.job_set.all().order_by("-event_time")
         if last_joblog:
             last_joblog_date = last_joblog[0].event_time
-            if last_joblog_date < archival_cutoff_date or (
-                last_joblog_date < complete_cutoff_date and job.status == "Complete"
-            ):
+            if last_joblog_date < archival_cutoff_date or (last_joblog_date < complete_cutoff_date and job.status == "Complete"):
                 print("Archiving", job)
                 try:
                     job.delete_folder_symlink()

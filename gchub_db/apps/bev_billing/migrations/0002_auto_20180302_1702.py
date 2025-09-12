@@ -20,9 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="bevinvoice",
             name="job",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="workflow.Job"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="workflow.Job"),
         ),
         migrations.AddField(
             model_name="bevinvoice",

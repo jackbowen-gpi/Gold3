@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-"""UPDATE
+"""
+UPDATE
 
 It was decided that we no longer want QAD to auto-sync corrugated specs with
 GOLD due to things like rounding errors in QAD. This functionality has been

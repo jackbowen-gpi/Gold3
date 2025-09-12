@@ -51,9 +51,7 @@ class BevInvoice(models.Model):
     def total_graphics(self):
         """Return total amount charges for graphics on this invoice."""
         plate_charges = ["Plates", "Films"]
-        total = self.charge_set.exclude(description__type__in=plate_charges).aggregate(
-            Sum("amount")
-        )["amount__sum"]
+        total = self.charge_set.exclude(description__type__in=plate_charges).aggregate(Sum("amount"))["amount__sum"]
         if total:
             return total
         else:
@@ -62,9 +60,7 @@ class BevInvoice(models.Model):
     def total_plates(self):
         """Return total amount charges for plates on this invoice."""
         plate_charges = ["Plates", "Films"]
-        total = self.charge_set.filter(description__type__in=plate_charges).aggregate(
-            Sum("amount")
-        )["amount__sum"]
+        total = self.charge_set.filter(description__type__in=plate_charges).aggregate(Sum("amount"))["amount__sum"]
         if total:
             return total
         else:

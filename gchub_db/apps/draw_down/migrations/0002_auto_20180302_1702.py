@@ -20,15 +20,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="drawdown",
             name="print_location",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="workflow.PrintLocation"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="workflow.PrintLocation"),
         ),
         migrations.AddField(
             model_name="drawdown",
             name="requested_by",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
     ]

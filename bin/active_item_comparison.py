@@ -1,4 +1,5 @@
-"""Active Item Comparison -- Which currently active items use 'bad colors'.
+"""
+Active Item Comparison -- Which currently active items use 'bad colors'.
 
 This script imports two XLS files - one containing colors divided into two sets,
 Coated and Uncoated. These colors were ones in which the PMS Digital standard

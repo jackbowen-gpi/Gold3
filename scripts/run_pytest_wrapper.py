@@ -1,4 +1,5 @@
-"""Run pytest with repo root prepended to sys.path to avoid import-order races
+"""
+Run pytest with repo root prepended to sys.path to avoid import-order races
 that prevent Django settings and apps from being imported during pytest startup.
 
 Usage: python scripts/run_pytest_wrapper.py [pytest-args]

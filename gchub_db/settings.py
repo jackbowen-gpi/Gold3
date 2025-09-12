@@ -36,13 +36,7 @@ MIDDLEWARE = (
     *(("gchub_db.middleware.dev_auto_login.DevAutoLoginMiddleware",) if DEBUG else ()),
     # In DEBUG, remove Permissions-Policy / Feature-Policy to avoid blocking
     # legacy vendor scripts that register `unload` handlers (prototype/YUI/etc.).
-    *(
-        (
-            "gchub_db.middleware.remove_permissions_policy.RemovePermissionsPolicyHeaderMiddleware",
-        )
-        if DEBUG
-        else ()
-    ),
+    *(("gchub_db.middleware.remove_permissions_policy.RemovePermissionsPolicyHeaderMiddleware",) if DEBUG else ()),
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -128,11 +122,7 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "class": (
-                "logging.StreamHandler"
-                if not RICH_AVAILABLE
-                else "rich.logging.RichHandler"
-            ),
+            "class": ("logging.StreamHandler" if not RICH_AVAILABLE else "rich.logging.RichHandler"),
             "formatter": "verbose",
         },
         "file": {
@@ -213,10 +203,21 @@ except ImportError:
     pass
 
 # DEBUG: Print DATABASES config at runtime
+import os
 
-print("\n[DEBUG] settings.DATABASES at runtime:")
-pprint.pprint(globals().get("DATABASES", "<not set>"))
+if (
+    not os.environ.get("PYTEST_CURRENT_TEST")
+    and not os.environ.get("DJANGO_SETTINGS_MODULE", "").endswith("test_settings")
+    and "test" not in sys.argv
+):
+    print("\n[DEBUG] settings.DATABASES at runtime:")
+    pprint.pprint(globals().get("DATABASES", "<not set>"))
 
 # DEBUG: Print TEMPLATES config at runtime
-print("\n[DEBUG] settings.TEMPLATES at runtime:")
-pprint.pprint(globals().get("TEMPLATES", "<not set>"))
+if (
+    not os.environ.get("PYTEST_CURRENT_TEST")
+    and not os.environ.get("DJANGO_SETTINGS_MODULE", "").endswith("test_settings")
+    and "test" not in sys.argv
+):
+    print("\n[DEBUG] settings.TEMPLATES at runtime:")
+    pprint.pprint(globals().get("TEMPLATES", "<not set>"))

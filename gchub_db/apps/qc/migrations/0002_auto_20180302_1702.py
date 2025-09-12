@@ -48,36 +48,26 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="qcresponsedoc",
             name="reviewer",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name="qcresponse",
             name="category",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="qc.QCCategory"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="qc.QCCategory"),
         ),
         migrations.AddField(
             model_name="qcresponse",
             name="qcdoc",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="qc.QCResponseDoc"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="qc.QCResponseDoc"),
         ),
         migrations.AddField(
             model_name="qcquestiondefinition",
             name="category",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="qc.QCCategory"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="qc.QCCategory"),
         ),
         migrations.AddField(
             model_name="qcquestiondefinition",
             name="workflow",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="sites.Site"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="sites.Site"),
         ),
     ]

@@ -34,7 +34,8 @@ except ImportError:
 
 
 class HTTPServer(object):
-    """A non-blocking, single-threaded HTTP server.
+    """
+    A non-blocking, single-threaded HTTP server.
 
     A server is defined by a request callback that takes an HTTPRequest
     instance as an argument and writes a valid HTTP response with
@@ -106,7 +107,8 @@ class HTTPServer(object):
         xheaders=False,
         ssl_options=None,
     ):
-        """Initializes the server with the given request callback.
+        """
+        Initializes the server with the given request callback.
 
         If you use pre-forking/start() instead of the listen() method to
         start your server, you should not pass an IOLoop instance to this
@@ -122,7 +124,8 @@ class HTTPServer(object):
         self._started = False
 
     def listen(self, port, address=""):
-        """Binds to the given port and starts the server in a single process.
+        """
+        Binds to the given port and starts the server in a single process.
 
         This method is a shortcut for:
 
@@ -134,7 +137,8 @@ class HTTPServer(object):
         self.start(1)
 
     def bind(self, port, address=""):
-        """Binds this server to the given port on the given IP address.
+        """
+        Binds this server to the given port on the given IP address.
 
         To start the server, call start(). If you want to run this server
         in a single process, you can call listen() as a shortcut to the
@@ -151,7 +155,8 @@ class HTTPServer(object):
         self._socket.listen(128)
 
     def start(self, num_processes=None):
-        """Starts this server in the IOLoop.
+        """
+        Starts this server in the IOLoop.
 
         By default, we detect the number of cores available on this machine
         and fork that number of child processes. If num_processes is given, we
@@ -224,7 +229,8 @@ class HTTPServer(object):
 
 
 class HTTPConnection(object):
-    """Handles a connection to an HTTP client, executing HTTP requests.
+    """
+    Handles a connection to an HTTP client, executing HTTP requests.
 
     We parse HTTP headers and bodies, and execute the request callback
     until the HTTP conection is closed.
@@ -361,7 +367,8 @@ class HTTPConnection(object):
 
 
 class HTTPRequest(object):
-    """A single HTTP request.
+    """
+    A single HTTP request.
 
     GET/POST arguments are available in the arguments property, which
     maps arguments names to lists of values (to support multiple values

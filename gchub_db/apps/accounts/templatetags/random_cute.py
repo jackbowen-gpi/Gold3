@@ -13,7 +13,8 @@ register = template.Library()
 
 @register.filter
 def random_cute_img_url(blah):
-    """Selects a random adorable image from the media/img/cute directory.
+    """
+    Selects a random adorable image from the media/img/cute directory.
     Returns the URL to it.
     """
     cute_dir = os.path.join(settings.MEDIA_ROOT, "img", "cute")

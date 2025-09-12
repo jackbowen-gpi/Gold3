@@ -1,4 +1,5 @@
-"""Administrative log model. This records errors and information that is helpful
+"""
+Administrative log model. This records errors and information that is helpful
 in diagnosing problems and monitoring things.
 """
 
@@ -22,7 +23,8 @@ LOG_TYPES = (
 
 
 class AdminLogCreatorManager(models.Manager):
-    """Used to provide shortcuts to creating new log entries. For example:
+    """
+    Used to provide shortcuts to creating new log entries. For example:
 
     AdminLog.create.warning('Some message')
     AdminLog.create.error('Some message', origin=some_job)
@@ -30,9 +32,7 @@ class AdminLogCreatorManager(models.Manager):
 
     def new_entry(self, log_type, message, origin=None):
         """Creates a new log entry of the desired type."""
-        AdminLog = ContentType.objects.get(
-            app_label="admin_log", model="adminlog"
-        ).model_class()
+        AdminLog = ContentType.objects.get(app_label="admin_log", model="adminlog").model_class()
 
         # It's silly we have to do this, but apparently the origin field can't
         # accept a None argument through the constructor.
@@ -61,9 +61,7 @@ class AdminLog(models.Model):
     """An administrative log entry."""
 
     # Stores the ID of the model the 'origin' field is relating to.
-    content_type = models.ForeignKey(
-        ContentType, on_delete=models.CASCADE, blank=True, null=True
-    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, blank=True, null=True)
     # Stores the ID of the object that the 'origin' field is relating to.
     object_id = models.PositiveIntegerField(blank=True, null=True)
     # Where the error came from, can be just about any model class.

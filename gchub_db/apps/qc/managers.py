@@ -4,7 +4,8 @@ from django.db import models
 
 class QCResponseDocManager(models.Manager):
     def start_qc_for_items(self, items, reviewer, parent=None):
-        """This is the function that should be used to start QCs. It creates the
+        """
+        This is the function that should be used to start QCs. It creates the
         QCResponseDoc for the QC, populates the items list, and creates all of
         the QCResponse objects through a method call.
 
@@ -13,9 +14,7 @@ class QCResponseDocManager(models.Manager):
         parent: (QCResponseDoc) If this is not the first QC, point to first QC.
         """
         # Avoid the circular import.
-        QCResponseDoc = ContentType.objects.get(
-            app_label="qc", model="qcresponsedoc"
-        ).model_class()
+        QCResponseDoc = ContentType.objects.get(app_label="qc", model="qcresponsedoc").model_class()
 
         new_qc = QCResponseDoc(parent=parent, reviewer=reviewer)
         # The QCDoc must be saved before we can mess with the items field.

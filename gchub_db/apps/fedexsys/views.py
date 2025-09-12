@@ -133,7 +133,8 @@ def clean_phone_number(phone_num):
 
 
 def ship_request(request, jobaddress_id=None, contact_id=None, delivery=None):
-    """Send out a Fedex shipping request.
+    """
+    Send out a Fedex shipping request.
 
     jobaddress_id: (str) ID number of a JobAddress object to ship. This is
                          specific to jobs, and is used for automatically
@@ -174,9 +175,7 @@ def ship_request(request, jobaddress_id=None, contact_id=None, delivery=None):
     # This is handled in the address and jobaddress entry
     new_ship.address.phone = clean_phone_number(new_ship.address.phone)
     new_ship.address.country = countries.full_to_abbrev(new_ship.address.country)
-    new_ship.address.state = countries.country_state_to_abbrev(
-        new_ship.address.country, new_ship.address.state
-    )
+    new_ship.address.state = countries.country_state_to_abbrev(new_ship.address.country, new_ship.address.state)
 
     # Depending on the shipment service value from the URL string, set the
     # shipment request object up accordingly.
@@ -213,26 +212,14 @@ def ship_request(request, jobaddress_id=None, contact_id=None, delivery=None):
     # print ship_req.response
 
     # Get the tracking number back from FedEx
-    new_ship.tracking_num = str(
-        ship_req.response.CompletedShipmentDetail.CompletedPackageDetails[0]
-        .TrackingIds[0]
-        .TrackingNumber
-    )
+    new_ship.tracking_num = str(ship_req.response.CompletedShipmentDetail.CompletedPackageDetails[0].TrackingIds[0].TrackingNumber)
     # Store ASCII representation of the label for re-print
-    ascii_label_data = (
-        ship_req.response.CompletedShipmentDetail.CompletedPackageDetails[0]
-        .Label.Parts[0]
-        .Image
-    )
+    ascii_label_data = ship_req.response.CompletedShipmentDetail.CompletedPackageDetails[0].Label.Parts[0].Image
     # Convert the ASCII data to binary. The FedEx label printing machine
     # will read this, convert it to base64, and pipe that to the label printer.
     new_ship.label_data = str(ascii_label_data)
     # Determine the total cost of shipping the proof.
-    new_ship.net_shipping_cost = (
-        ship_req.response.CompletedShipmentDetail.ShipmentRating.ShipmentRateDetails[
-            0
-        ].TotalNetCharge.Amount
-    )
+    new_ship.net_shipping_cost = ship_req.response.CompletedShipmentDetail.ShipmentRating.ShipmentRateDetails[0].TotalNetCharge.Amount
     new_ship.save()
 
     if jobaddress_id and new_ship.job.customer_email:
@@ -244,9 +231,7 @@ def ship_request(request, jobaddress_id=None, contact_id=None, delivery=None):
         mail_subject = "Artwork Tracking # for %s" % new_ship.job
         mail_body = loader.get_template("emails/fedex_tracking.txt")
         mail_context = {"job": new_ship.job, "track_number": new_ship.tracking_num}
-        general_funcs.send_info_mail(
-            mail_subject, mail_body.render(mail_context), email_list
-        )
+        general_funcs.send_info_mail(mail_subject, mail_body.render(mail_context), email_list)
 
     return HttpResponse(JSMessage("Shipment completed."))
 

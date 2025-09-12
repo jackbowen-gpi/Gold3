@@ -9,7 +9,8 @@ from PIL import Image
 
 
 def apply_flexo_noise(tiff_path, noise_mode, saving_path, dest_path):
-    """tiff_path: (str) Full path to the tiff to apply noise to.
+    """
+    tiff_path: (str) Full path to the tiff to apply noise to.
     noise_mode: (str) Either 'heavy' or 'light. Applies different noise tiffs.
     saving_path: (str) The full path to where the tiff with noise should
                        be saved to. This is not the final path for the tiff,

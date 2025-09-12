@@ -18,9 +18,7 @@ for p in getattr(pkg, "__path__", []):
 candidate = os.path.join(list(pkg.__path__)[0], "test_models.py")
 print("\nCandidate path =", candidate, "exists=", os.path.exists(candidate))
 try:
-    spec: Optional[ModuleSpec] = importlib.util.spec_from_file_location(
-        "gchub_db.apps.fedexsys.test_models", candidate
-    )
+    spec: Optional[ModuleSpec] = importlib.util.spec_from_file_location("gchub_db.apps.fedexsys.test_models", candidate)
     if spec is not None and spec.loader is not None:
         mod = importlib.util.module_from_spec(spec)
         # loader may be None per stubs; guarded above

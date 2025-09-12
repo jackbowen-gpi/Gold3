@@ -65,9 +65,7 @@ for event in proofed_events:
     # send out a reminder.
     elif (
         event.item.job.status == "Active"
-        and reminder_end_time
-        < event.item.current_proof_date().date()
-        < reminder_start_time
+        and reminder_end_time < event.item.current_proof_date().date() < reminder_start_time
         and event.item.proof_reminder_email_sent is None
     ):
         # Just here for convenience.
@@ -104,9 +102,7 @@ for job_num, items in list(jobs_for_reminders.items()):
         "item_count": len(items),
     }
     mail_send_to = [salesperson.email]
-    send_info_mail(
-        mail_subject, mail_body.render(econtext), mail_send_to, fail_silently=True
-    )
+    send_info_mail(mail_subject, mail_body.render(econtext), mail_send_to, fail_silently=True)
 
     # Set the proof_reminder_email_sent field on the item to prevent
     # future repeats of the email.

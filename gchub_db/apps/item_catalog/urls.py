@@ -1,4 +1,5 @@
-"""The urls.py file handles URL dispatching for the workflow module. Requests
+"""
+The urls.py file handles URL dispatching for the workflow module. Requests
 that begin with /workflow are sent here. The major models get their own
 URL matching sections below, which are combined into urlpatterns at the end
 of the file for matching.

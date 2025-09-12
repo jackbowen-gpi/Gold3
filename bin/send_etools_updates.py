@@ -13,9 +13,7 @@ from gchub_db.apps.workflow import etools
 # Back to the ordinary imports
 from gchub_db.apps.workflow.models import Job
 
-jobs_needing_updates = Job.objects.filter(
-    workflow__name="Foodservice", needs_etools_update=True, id__lt=99999
-)[:30]
+jobs_needing_updates = Job.objects.filter(workflow__name="Foodservice", needs_etools_update=True, id__lt=99999)[:30]
 for job in jobs_needing_updates:
     print("Sending updates for %s" % job)
     try:

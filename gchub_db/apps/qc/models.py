@@ -1,3 +1,7 @@
+"""
+Module gchub_db\apps\\qc\\models.py
+"""
+
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db import models
@@ -8,7 +12,8 @@ from gchub_db.apps.workflow.models import Item, Job
 
 
 class QCCategory(models.Model):
-    """QC Categories serve to group sets of QCQuestions. Users approve or reject
+    """
+    QC Categories serve to group sets of QCQuestions. Users approve or reject
     QCCategories instead of addressing each question.
     """
 
@@ -33,7 +38,8 @@ class QCCategory(models.Model):
 
 
 class QCQuestionDefinition(models.Model):
-    """Questions are individual line items grouped beneath a QCCategory. They
+    """
+    Questions are individual line items grouped beneath a QCCategory. They
     are not responded to individually. Users approve or reject QCCategories.
     """
 
@@ -61,7 +67,8 @@ class QCQuestionDefinition(models.Model):
 
 
 class QCResponseDoc(models.Model):
-    """This model is what all of the QCResponse objects point to for grouping.
+    """
+    This model is what all of the QCResponse objects point to for grouping.
     It is best to think of a QCResponseDoc as one individual QC instance.
 
     A QCResponseDoc with a None value for 'parent' is the first QC in the
@@ -70,15 +77,11 @@ class QCResponseDoc(models.Model):
     """
 
     # If this is not the first QC in a series, point to the first one.
-    parent = models.ForeignKey(
-        "self", on_delete=models.CASCADE, blank=True, null=True, editable=False
-    )
+    parent = models.ForeignKey("self", on_delete=models.CASCADE, blank=True, null=True, editable=False)
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
     items = models.ManyToManyField(Item, editable=False)
     # This is a convenience de-normalization. Make sure to keep it up to date.
-    job = models.ForeignKey(
-        Job, on_delete=models.CASCADE, blank=True, null=True, editable=False
-    )
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, blank=True, null=True, editable=False)
     # This is None until the QC is finished.
     review_date = models.DateTimeField(blank=True, null=True)
 
@@ -105,7 +108,8 @@ class QCResponseDoc(models.Model):
         )
 
     def populate_new_qc(self):
-        """Performs some setup work on new QCResponseDoc objects. For example,
+        """
+        Performs some setup work on new QCResponseDoc objects. For example,
         creates QCResponse objects for all of the categories in advance, to
         make the QC Editing views' job a lot easier.
         """
@@ -131,19 +135,19 @@ class QCResponseDoc(models.Model):
                 new_response.save()
 
     def create_review_qc(self, reviewer):
-        """Creates a QCResponseDoc and sets its parent to this QC. This done for
+        """
+        Creates a QCResponseDoc and sets its parent to this QC. This done for
         Review QCs (not done by the artist).
         """
         items = self.items.all()
         return QCResponseDoc.objects.start_qc_for_items(items, reviewer, parent=self)
 
     def get_unresolved_whoops(self):
-        """Returns all QCWhoops objects on this QC document that have not yet been
+        """
+        Returns all QCWhoops objects on this QC document that have not yet been
         resolved via fixing the noted problem or invalidation of the Whoops.
         """
-        return QCWhoops.objects.filter(
-            qc_response__qcdoc=self, resolution_date__isnull=True
-        )
+        return QCWhoops.objects.filter(qc_response__qcdoc=self, resolution_date__isnull=True)
 
     def is_whoopsless(self):
         """Checks to make sure the review is free of unresolved QCWhoops."""
@@ -181,9 +185,7 @@ class QCResponse(models.Model):
     category = models.ForeignKey(QCCategory, on_delete=models.CASCADE)
     qcdoc = models.ForeignKey(QCResponseDoc, on_delete=models.CASCADE)
     # See the response table above, but this can be several different things.
-    response = models.IntegerField(
-        choices=RESPONSE_TYPES, default=RESPONSE_TYPE_NORESPONSE
-    )
+    response = models.IntegerField(choices=RESPONSE_TYPES, default=RESPONSE_TYPE_NORESPONSE)
     comments = models.TextField(blank=True, null=True)
     # Has the artist been notified of QC completion?
     artist_notified = models.BooleanField(default=False)
@@ -197,7 +199,8 @@ class QCResponse(models.Model):
         return self.category.title
 
     def get_parent_qcresponse_comments(self):
-        """In the case of a second or third (or fourth) QC, look to the parent
+        """
+        In the case of a second or third (or fourth) QC, look to the parent
         QC on the corresponding QCResponse object for artist comments.
         """
         if self.qcdoc.parent:
@@ -208,13 +211,15 @@ class QCResponse(models.Model):
         return False
 
     def get_active_whoops_qset(self):
-        """Returns a QuerySet of the current Whoops entries that are in need
+        """
+        Returns a QuerySet of the current Whoops entries that are in need
         of attention from the artist.
         """
         return self.qcwhoops_set.filter(resolution_date__isnull=True)
 
     def get_response_icon_filename(self):
-        """Returns the filename for the icon that will show up on tabs for the
+        """
+        Returns the filename for the icon that will show up on tabs for the
         QCResponse's response attribute.
         """
         filename = ""
@@ -232,17 +237,17 @@ class QCResponse(models.Model):
         return "img/icons/%s" % filename
 
     def get_workflow_questions(self):
-        """Returns all of a Category's questions based on the specified workflow.
+        """
+        Returns all of a Category's questions based on the specified workflow.
 
         workflow: (Site) The workflow to filter by.
         """
-        return self.category.qcquestiondefinition_set.filter(
-            workflow=self.qcdoc.job.workflow
-        )
+        return self.category.qcquestiondefinition_set.filter(workflow=self.qcdoc.job.workflow)
 
 
 class QCWhoops(models.Model):
-    """In the event that an error is found on a redundant (second or more) QC
+    """
+    In the event that an error is found on a redundant (second or more) QC
     that the artist did not catch, the reviewer will report a Whoops.
     """
 

@@ -11,7 +11,7 @@ from io import BytesIO
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import Permission, User, Group
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.models import Site
 from django.core import serializers
@@ -96,6 +96,12 @@ class _LazyPermission:
     def __getattr__(self, name):
         obj = self._resolve()
         if obj is None:
+            # Some callers access the `group_set` on Permission objects
+            # (eg. Permission.group_set.all()). Return a safe empty queryset
+            # for that attribute to avoid raising at import time when the
+            # permission hasn't been created in the test DB yet.
+            if name == "group_set":
+                return Group.objects.none()
             raise AttributeError(f"Permission '{self._codename}' not available")
         return getattr(obj, name)
 
@@ -117,7 +123,8 @@ PCSS_PERMISSION = _LazyPermission("pcss")
 
 
 class JobForm(ModelForm, JSONErrorForm):
-    """Main form for Job editing. Displayed in upper left corner of the job
+    """
+    Main form for Job editing. Displayed in upper left corner of the job
     detail page.
     """
 
@@ -125,67 +132,35 @@ class JobForm(ModelForm, JSONErrorForm):
     # query here. Do it per-instance.
     artist = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
     salesperson = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
-    purchase_request_number = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "25"}), required=False
-    )
-    customer_name = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "25"}), required=False
-    )
-    customer_email = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "25"}), required=False
-    )
+    purchase_request_number = forms.CharField(widget=forms.TextInput(attrs={"size": "25"}), required=False)
+    customer_name = forms.CharField(widget=forms.TextInput(attrs={"size": "25"}), required=False)
+    customer_email = forms.CharField(widget=forms.TextInput(attrs={"size": "25"}), required=False)
     due_date = forms.DateField(widget=GCH_SelectDateWidget)
 
     def __init__(self, request, *args, **kwargs):
         super(JobForm, self).__init__(*args, **kwargs)
         if self.instance.id:
             # Select users who are a member of the set of groups with the given permission.
-            self.grouped_artist_users = User.objects.filter(
-                groups__in=ARTIST_PERMISSION.group_set.all()
-            ).order_by("username")
-            self.grouped_sales_users = User.objects.filter(
-                groups__in=SALES_PERMISSION.group_set.all()
-            ).order_by("username")
-            self.grouped_csr_users = User.objects.filter(
-                groups__in=CSR_PERMISSION.group_set.all()
-            ).order_by("username")
-            self.grouped_pcss_users = User.objects.filter(
-                groups__in=PCSS_PERMISSION.group_set.all()
-            ).order_by("username")
-            self.grouped_graphic_specialist_users = User.objects.filter(
-                groups__in=GRAPHIC_SPECIALIST_PERMISSION.group_set.all()
-            ).order_by("username")
+            self.grouped_artist_users = User.objects.filter(groups__in=ARTIST_PERMISSION.group_set.all()).order_by("username")
+            self.grouped_sales_users = User.objects.filter(groups__in=SALES_PERMISSION.group_set.all()).order_by("username")
+            self.grouped_csr_users = User.objects.filter(groups__in=CSR_PERMISSION.group_set.all()).order_by("username")
+            self.grouped_pcss_users = User.objects.filter(groups__in=PCSS_PERMISSION.group_set.all()).order_by("username")
+            self.grouped_graphic_specialist_users = User.objects.filter(groups__in=GRAPHIC_SPECIALIST_PERMISSION.group_set.all()).order_by(
+                "username"
+            )
 
-            grouped_artist_users = self.instance.filter_user_association(
-                self.grouped_artist_users, "Artist"
-            )
-            self.fields["artist"] = forms.ModelChoiceField(
-                queryset=grouped_artist_users, required=False
-            )
-            grouped_sales_users = self.instance.filter_user_association(
-                self.grouped_sales_users, "Salesperson"
-            )
-            self.fields["salesperson"] = forms.ModelChoiceField(
-                queryset=grouped_sales_users.distinct(), required=False
-            )
-            grouped_csr_users = self.instance.filter_user_association(
-                self.grouped_csr_users, "CSR"
-            )
-            self.fields["csr"] = forms.ModelChoiceField(
-                queryset=grouped_csr_users, required=False
-            )
-            grouped_pcss_users = self.instance.filter_user_association(
-                self.grouped_pcss_users, "PCSS"
-            )
-            self.fields["pcss"] = forms.ModelChoiceField(
-                queryset=grouped_pcss_users, required=False
-            )
+            grouped_artist_users = self.instance.filter_user_association(self.grouped_artist_users, "Artist")
+            self.fields["artist"] = forms.ModelChoiceField(queryset=grouped_artist_users, required=False)
+            grouped_sales_users = self.instance.filter_user_association(self.grouped_sales_users, "Salesperson")
+            self.fields["salesperson"] = forms.ModelChoiceField(queryset=grouped_sales_users.distinct(), required=False)
+            grouped_csr_users = self.instance.filter_user_association(self.grouped_csr_users, "CSR")
+            self.fields["csr"] = forms.ModelChoiceField(queryset=grouped_csr_users, required=False)
+            grouped_pcss_users = self.instance.filter_user_association(self.grouped_pcss_users, "PCSS")
+            self.fields["pcss"] = forms.ModelChoiceField(queryset=grouped_pcss_users, required=False)
             grouped_graphic_specialist_users = self.instance.filter_user_association(
                 self.grouped_graphic_specialist_users, "Graphic Specialist"
             )
-            self.fields["graphic_specialist"] = forms.ModelChoiceField(
-                queryset=grouped_graphic_specialist_users, required=False
-            )
+            self.fields["graphic_specialist"] = forms.ModelChoiceField(queryset=grouped_graphic_specialist_users, required=False)
 
     class Meta:
         # Inherit fields from the Job mode.
@@ -209,7 +184,8 @@ class JobForm(ModelForm, JSONErrorForm):
 
 
 class JobComplexityForm(ModelForm, JSONErrorForm):
-    """Form for adding and editing job complexities. Displayed in upper left corner
+    """
+    Form for adding and editing job complexities. Displayed in upper left corner
     of the job detail page in line with the JobForm.
     """
 
@@ -231,11 +207,7 @@ class ItemFormFSB(ItemForm):
     """This form is used for entering new FSB items."""
 
     workflow = _safe_get_site("Foodservice")
-    size = forms.ModelChoiceField(
-        queryset=ItemCatalog.objects.filter(workflow=workflow, active=True).order_by(
-            "size"
-        )
-    )
+    size = forms.ModelChoiceField(queryset=ItemCatalog.objects.filter(workflow=workflow, active=True).order_by("size"))
 
 
 class ItemFormBEV(ItemForm):
@@ -262,17 +234,11 @@ class ItemFormBEV(ItemForm):
     workflow = _safe_get_site("Beverage")
 
     size = forms.ModelChoiceField(
-        queryset=ItemCatalog.objects.filter(workflow=workflow, active=True).order_by(
-            "size"
-        ),
+        queryset=ItemCatalog.objects.filter(workflow=workflow, active=True).order_by("size"),
         required=True,
     )
 
-    printlocation = forms.ModelChoiceField(
-        queryset=PrintLocation.objects.filter(plant__workflow=workflow).order_by(
-            "plant__name"
-        )
-    )
+    printlocation = forms.ModelChoiceField(queryset=PrintLocation.objects.filter(plant__workflow=workflow).order_by("plant__name"))
 
     upc_ink_color = forms.ChoiceField(
         choices=[
@@ -330,32 +296,22 @@ class ItemFormBEV(ItemForm):
     screened6 = forms.BooleanField(required=False)
 
     # Begin billing fields.
-    charge_types = ChargeType.objects.filter(workflow=workflow, active=True).order_by(
-        "type"
-    )
+    charge_types = ChargeType.objects.filter(workflow=workflow, active=True).order_by("type")
     type = forms.ModelChoiceField(queryset=charge_types, required=True)
 
     # Item tracker fields.
-    label_tracker = forms.ModelChoiceField(
-        ItemTrackerType.objects.filter(category__name="Beverage Label"), required=False
-    )
-    fiber_tracker = forms.ModelChoiceField(
-        ItemTrackerType.objects.filter(category__name="Beverage Fiber"), required=False
-    )
+    label_tracker = forms.ModelChoiceField(ItemTrackerType.objects.filter(category__name="Beverage Label"), required=False)
+    fiber_tracker = forms.ModelChoiceField(ItemTrackerType.objects.filter(category__name="Beverage Fiber"), required=False)
     nutrition_facts = forms.BooleanField(required=False)
 
     def __init__(self, request, job, *args, **kwargs):
-        """Here we populate some of the fields based on certain conditions.
+        """
+        Here we populate some of the fields based on certain conditions.
         Also, update some of the choice field querysets.
         """
         super(ItemFormBEV, self).__init__(*args, **kwargs)
-        if job.temp_printlocation and (
-            job.temp_printlocation.plant.name in ("Plant City")
-            or job.temp_printlocation.press.name in ("BHS")
-        ):
-            self.fields["bev_alt_code"] = forms.CharField(
-                widget=forms.TextInput(attrs={"size": "20"}), required=True
-            )
+        if job.temp_printlocation and (job.temp_printlocation.plant.name in ("Plant City") or job.temp_printlocation.press.name in ("BHS")):
+            self.fields["bev_alt_code"] = forms.CharField(widget=forms.TextInput(attrs={"size": "20"}), required=True)
         else:
             if job.use_new_bev_nomenclature:
                 # New nomenclature would pull from a different list of
@@ -364,9 +320,7 @@ class ItemFormBEV(ItemForm):
                     queryset=BeverageBrandCode.objects.all().order_by("code"),
                     required=True,
                 )
-                self.fields["bev_end_code"] = forms.CharField(
-                    widget=forms.TextInput(attrs={"size": "20"}), required=True
-                )
+                self.fields["bev_end_code"] = forms.CharField(widget=forms.TextInput(attrs={"size": "20"}), required=True)
             else:
                 # Old nomenclature.
                 self.fields["bev_center_code"] = forms.ModelChoiceField(
@@ -378,15 +332,11 @@ class ItemFormBEV(ItemForm):
                     required=True,
                 )
             # This will be used for panel prefix codes.
-            self.fields["bev_alt_code"] = forms.CharField(
-                widget=forms.TextInput(attrs={"size": "20"}), required=False
-            )
+            self.fields["bev_alt_code"] = forms.CharField(widget=forms.TextInput(attrs={"size": "20"}), required=False)
 
         # Plate quantities should default to 2 under these conditions.
         if job.temp_printlocation and job.temp_platepackage:
-            if job.temp_printlocation.plant.name in (
-                "Kalamazoo"
-            ) and job.temp_platepackage.platemaker.name in ("Shelbyville"):
+            if job.temp_printlocation.plant.name in ("Kalamazoo") and job.temp_platepackage.platemaker.name in ("Shelbyville"):
                 self.fields["num_plates1"].initial = 2
                 self.fields["num_plates2"].initial = 2
                 self.fields["num_plates3"].initial = 2
@@ -402,9 +352,7 @@ class ItemFormBEV(ItemForm):
             # This counter is used to form dictionary key strings.
             color_counter = 1
             # Update the list of colordefs.
-            colordef_queryset = ColorDefinition.objects.filter(coating="C").order_by(
-                "name"
-            )
+            colordef_queryset = ColorDefinition.objects.filter(coating="C").order_by("name")
             for color in cur_colors:
                 colorfield_str = "color%d" % color_counter
 
@@ -439,7 +387,8 @@ class ItemFormBEV(ItemForm):
                 color_counter += 1
 
     def clean(self):
-        """Check all of the fields for general errors such as duplicate
+        """
+        Check all of the fields for general errors such as duplicate
         sequence ids. Validation happening in this method should not be
         specific to any one field, it should involve at leaast two fields.
         """
@@ -459,10 +408,7 @@ class ItemFormBEV(ItemForm):
             dupe_counter[seq_val] = dupe_counter.get(seq_val, 0) + 1
             # The counter is greater than 1, we have a duplicate somewhere.
             if dupe_counter[seq_val] > 1:
-                msg = (
-                    "There is more than one color with a sequence value of %s."
-                    % seq_val
-                )
+                msg = "There is more than one color with a sequence value of %s." % seq_val
                 # This gets thrown back to the view for handling.
                 raise forms.ValidationError(msg)
 
@@ -568,7 +514,8 @@ def create_job_creative_shortcut(request, job_id):
 
 
 def sync_folders(request, job_id):
-    """Rename item folders on the server - proof, final file, 1bit tiffs, to match the items
+    """
+    Rename item folders on the server - proof, final file, 1bit tiffs, to match the items
     that are listed in GOLD.
     """
     items = Item.objects.filter(job__id=job_id)
@@ -596,9 +543,7 @@ def get_zipfile_proof(request, job_id):
         # Set the response up to return the zip with the correct mime type.
         response = HttpResponse(zip_contents, content_type="application/zip")
         # Headers change the file name and how the browser handles the download.
-        response["Content-Disposition"] = (
-            'attachment; filename="' + send_name + ".zip" + '"'
-        )
+        response["Content-Disposition"] = 'attachment; filename="' + send_name + ".zip" + '"'
         return response
     else:
         return HttpResponse("No proofs found.")
@@ -734,13 +679,7 @@ def change_job_name(request, job_id):
         new_name = new_name.decode("utf-8")
         if jobform.is_valid():
             jobform.save()
-            logchanges = (
-                "<strong>Job name changed:</strong> ("
-                + str(old_name)
-                + " to "
-                + str(new_name)
-                + "). "
-            )
+            logchanges = "<strong>Job name changed:</strong> (" + str(old_name) + " to " + str(new_name) + "). "
             job.do_create_joblog_entry(JOBLOG_TYPE_CRITICAL, logchanges)
             return HttpResponse(JSMessage("Saved."))
         else:
@@ -770,12 +709,8 @@ class JobFormCSRChange(ModelForm, JSONErrorForm):
         super(JobFormCSRChange, self).__init__(*args, **kwargs)
         if self.instance.id:
             # Select users who are a member of the set of groups with the given permission.
-            self.grouped_csr_users = User.objects.filter(
-                groups__in=CSR_PERMISSION.group_set.all()
-            ).order_by("username")
-            grouped_csr_users = self.instance.filter_user_association(
-                self.grouped_csr_users, "CSR"
-            )
+            self.grouped_csr_users = User.objects.filter(groups__in=CSR_PERMISSION.group_set.all()).order_by("username")
+            grouped_csr_users = self.instance.filter_user_association(self.grouped_csr_users, "CSR")
             self.fields["csr"].queryset = grouped_csr_users
 
     class Meta:
@@ -792,9 +727,7 @@ class JobFormCartonCSRChange(ModelForm, JSONErrorForm):
         super(JobFormCartonCSRChange, self).__init__(*args, **kwargs)
         if self.instance.id:
             # Select users who are a member of the set of groups with the given permission.
-            self.grouped_csr_users = User.objects.filter(
-                groups__in=CARTON_CSR_PERMISSION.group_set.all()
-            ).order_by("username")
+            self.grouped_csr_users = User.objects.filter(groups__in=CARTON_CSR_PERMISSION.group_set.all()).order_by("username")
             self.fields["csr"].queryset = self.grouped_csr_users
 
     class Meta:
@@ -826,13 +759,7 @@ def change_job_csr(request, job_id):
 
         if jobform.is_valid():
             jobform.save()
-            logchanges = (
-                "<strong>CSR changed:</strong> ("
-                + str(old_name)
-                + " to "
-                + str(new_name)
-                + "). "
-            )
+            logchanges = "<strong>CSR changed:</strong> (" + str(old_name) + " to " + str(new_name) + "). "
             job.do_create_joblog_entry(JOBLOG_TYPE_CRITICAL, logchanges)
             return HttpResponse(JSMessage("Saved."))
         else:
@@ -872,33 +799,24 @@ class NewBevJobForm(ModelForm, JSONErrorForm):
     brand_name = forms.CharField(required=True)
     name = forms.CharField(required=True)
     workflow = _safe_get_site("Beverage")
-    instructions = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "14"}), required=False
-    )
-    sales_service_rep = forms.ModelChoiceField(
-        queryset=SalesServiceRep.objects.all().order_by("name"), required=False
-    )
+    instructions = forms.CharField(widget=forms.Textarea(attrs={"rows": "14"}), required=False)
+    sales_service_rep = forms.ModelChoiceField(queryset=SalesServiceRep.objects.all().order_by("name"), required=False)
     prepress_supplier = forms.ChoiceField(choices=app_defs.PREPRESS_SUPPLIERS)
-    # Select users who are a member of the set of groups with the given permission.
-    sales_users = User.objects.filter(
-        groups__in=SALES_PERMISSION.group_set.all()
-    ).order_by("username")
-    # group_set returns Group objects; ordering should apply to users, not groups.
-    beverage_sales_users = sales_users.filter(
-        groups__in=BEVERAGE_PERMISSION.group_set.all()
-    ).distinct()
-    salesperson = forms.ModelChoiceField(queryset=sales_users, required=False)
+    # Avoid DB access at import time: use empty querysets here and populate
+    # the real querysets in __init__ when the app is running and the DB is
+    # available. This prevents Permission lookups from running during
+    # django.setup() / test collection.
+    sales_users = User.objects.none()
+    # group_set returns Group objects; apply filters at runtime instead.
+    beverage_sales_users = User.objects.none()
+    salesperson = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
     temp_printlocation = forms.ModelChoiceField(
-        queryset=PrintLocation.objects.filter(
-            plant__workflow=workflow, active=True
-        ).order_by("plant__name")
+        queryset=PrintLocation.objects.filter(plant__workflow=workflow, active=True).order_by("plant__name")
     )
     # There's an old unused cyber graphics platemaker that we've been asked to
     # hide from this field.
     temp_platepackage = forms.ModelChoiceField(
-        queryset=PlatePackage.objects.filter(workflow=workflow, active=True)
-        .order_by("platemaker__name")
-        .exclude(platemaker__id=18)
+        queryset=PlatePackage.objects.filter(workflow=workflow, active=True).order_by("platemaker__name").exclude(platemaker__id=18)
     )
 
     class Meta:
@@ -937,12 +855,22 @@ class NewBevJobForm(ModelForm, JSONErrorForm):
         )
         # Hide some stuff from Evergreen.
         if request.user.groups.filter(name="Evergreen Analyst"):
-            self.fields["temp_printlocation"].queryset = self.fields[
-                "temp_printlocation"
-            ].queryset.exclude(press__name="BHS")
-            self.fields[
-                "prepress_supplier"
-            ].choices = app_defs.PREPRESS_SUPPLIERS_EVERGREEN
+            self.fields["temp_printlocation"].queryset = self.fields["temp_printlocation"].queryset.exclude(press__name="BHS")
+            self.fields["prepress_supplier"].choices = app_defs.PREPRESS_SUPPLIERS_EVERGREEN
+
+        # Populate sales/beverage user querysets now that we're at runtime.
+        try:
+            sales_qs = User.objects.filter(groups__in=SALES_PERMISSION.group_set.all()).order_by("username")
+            beverage_qs = sales_qs.filter(groups__in=BEVERAGE_PERMISSION.group_set.all()).distinct()
+        except Exception:
+            # If permissions or DB aren't available, fall back to empty queryset.
+            sales_qs = User.objects.none()
+            beverage_qs = User.objects.none()
+
+        # Set the field querysets for runtime use.
+        self.fields["salesperson"].queryset = sales_qs
+        # Keep a named attribute if other code expects it on the form instance.
+        self.beverage_sales_users = beverage_qs
 
 
 @login_required
@@ -959,9 +887,7 @@ def new_beverage_job(request):
             job.name = fs_api.strip_for_valid_filename(job.name)
             job.customer_name = job.name
             if "instructions" in request.POST:
-                job.do_create_joblog_entry(
-                    JOBLOG_TYPE_NOTE, request.POST["instructions"], is_editable=False
-                )
+                job.do_create_joblog_entry(JOBLOG_TYPE_NOTE, request.POST["instructions"], is_editable=False)
             job.save()
             # Create folder after saving, must strip bad characters from job name.
             job.create_folder()
@@ -981,7 +907,8 @@ def new_beverage_job(request):
 
 
 def new_beverage_item(request, job_id, type, item_id=0):
-    """Form and save function for creating a new Beverage item via the
+    """
+    Form and save function for creating a new Beverage item via the
     New Job Entry, not the job detail page.
     This will be used by analysts.
     """
@@ -1004,9 +931,7 @@ def new_beverage_item(request, job_id, type, item_id=0):
             for ink_num in range(1, 7):
                 if request.POST["color%s" % ink_num] != "":
                     ic = ItemColor(item=item)
-                    color_id = ColorDefinition.objects.get(
-                        id=request.POST["color%s" % ink_num]
-                    )
+                    color_id = ColorDefinition.objects.get(id=request.POST["color%s" % ink_num])
                     ic.definition = color_id
                     ic.color = color_id.name
                     # Check if this is a "screened" ink
@@ -1032,9 +957,7 @@ def new_beverage_item(request, job_id, type, item_id=0):
                     type = ChargeType.objects.get(type="24 Hour Rush")
                 r_charge.description = type
                 r_charge.amount = type.base_amount
-                r_charge.comments = (
-                    "Charge applied during initial Beverage job request."
-                )
+                r_charge.comments = "Charge applied during initial Beverage job request."
                 r_charge.save()
             # Apply required billing charge depending on type of art.
             charge = Charge(item=item)
@@ -1058,9 +981,7 @@ def new_beverage_item(request, job_id, type, item_id=0):
                 new_tracker.save()
             if request.POST.get("nutrition_facts"):
                 new_tracker = ItemTracker(item=item)
-                new_tracker.type = ItemTrackerType.objects.get(
-                    id=31, name="Nutrition Facts"
-                )
+                new_tracker.type = ItemTrackerType.objects.get(id=31, name="Nutrition Facts")
                 new_tracker.addition_date = general_funcs._utcnow_naive().date()
                 new_tracker.edited_by = threadlocals.get_current_user()
                 new_tracker.save()
@@ -1099,9 +1020,7 @@ def new_beverage_item(request, job_id, type, item_id=0):
                 "nutrition_facts": nutrition_facts,
             }
             # Render the form
-            itemform = ItemFormBEV(
-                request, job, instance=prev_item, initial=tracker_data
-            )
+            itemform = ItemFormBEV(request, job, instance=prev_item, initial=tracker_data)
 
         pagevars = {
             "page_title": "Add Item to Beverage Job",
@@ -1118,29 +1037,15 @@ def new_beverage_item(request, job_id, type, item_id=0):
 class ItemFormCart(ItemForm):
     """This form is used for entering new carton items."""
 
-    size = forms.ModelChoiceField(
-        queryset=ItemCatalog.objects.filter(workflow__name="Carton")
-    )
-    one_up_die = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=True
-    )
-    step_die = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
-    grn = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
+    size = forms.ModelChoiceField(queryset=ItemCatalog.objects.filter(workflow__name="Carton"))
+    one_up_die = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=True)
+    step_die = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
+    grn = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
     gdd_origin = forms.ChoiceField(choices=app_defs.GDD_ORIGINS, required=False)
-    customer_code = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
-    graphic_req_number = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
+    customer_code = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
+    graphic_req_number = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
     print_repeat = forms.DecimalField(max_digits=10, decimal_places=4, required=False)
-    coating_pattern = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
+    coating_pattern = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
     proof_type = forms.ChoiceField(choices=app_defs.PROOF_TYPES, required=False)
     proof_type_notes = forms.CharField(
         widget=forms.Textarea(
@@ -1152,51 +1057,27 @@ class ItemFormCart(ItemForm):
         ),
         required=False,
     )
-    upc = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=True
-    )
-    product_group = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
-    printlocation = forms.ModelChoiceField(
-        queryset=None
-    )  # queryset defined below in __init__
+    upc = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=True)
+    product_group = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
+    printlocation = forms.ModelChoiceField(queryset=None)  # queryset defined below in __init__
     location = forms.ChoiceField(choices=app_defs.LOCATION_OPTIONS)  # Inside/Outside
-    plate_thickness = forms.ChoiceField(
-        choices=app_defs.PLATE_THICKNESS, required=False
-    )
+    plate_thickness = forms.ChoiceField(choices=app_defs.PLATE_THICKNESS, required=False)
     platepackage = forms.ModelChoiceField(
-        queryset=PlatePackage.objects.filter(
-            workflow=_safe_get_site("Foodservice")
-        ).order_by("platemaker__name"),
+        queryset=PlatePackage.objects.filter(workflow=_safe_get_site("Foodservice")).order_by("platemaker__name"),
         required=False,
     )
-    substrate = forms.ModelChoiceField(
-        queryset=Substrate.objects.filter(active=True), required=False
-    )
+    substrate = forms.ModelChoiceField(queryset=Substrate.objects.filter(active=True), required=False)
     gcr = forms.BooleanField(required=False)
     ecg = forms.BooleanField(required=False)
-    carton_workflow = forms.ModelChoiceField(
-        queryset=CartonWorkflow.objects.filter(active=True), required=False
-    )
-    line_screen = forms.ModelChoiceField(
-        queryset=LineScreen.objects.filter(active=True), required=False
-    )
-    ink_set = forms.ModelChoiceField(
-        queryset=InkSet.objects.filter(active=True), required=False
-    )
-    print_condition = forms.ModelChoiceField(
-        queryset=PrintCondition.objects.filter(active=True), required=False
-    )
-    trap = forms.ModelChoiceField(
-        queryset=Trap.objects.filter(active=True), required=False
-    )
+    carton_workflow = forms.ModelChoiceField(queryset=CartonWorkflow.objects.filter(active=True), required=False)
+    line_screen = forms.ModelChoiceField(queryset=LineScreen.objects.filter(active=True), required=False)
+    ink_set = forms.ModelChoiceField(queryset=InkSet.objects.filter(active=True), required=False)
+    print_condition = forms.ModelChoiceField(queryset=PrintCondition.objects.filter(active=True), required=False)
+    trap = forms.ModelChoiceField(queryset=Trap.objects.filter(active=True), required=False)
     # A read-only field to show the user which carton profile has been selected.
     # The actual carton profile will be set via a hidden field.
     carton_profile_display = forms.CharField(
-        widget=forms.TextInput(
-            attrs={"size": "45", "maxsize": "255", "readonly": "True"}
-        ),
+        widget=forms.TextInput(attrs={"size": "45", "maxsize": "255", "readonly": "True"}),
         required=False,
     )
 
@@ -1264,7 +1145,8 @@ class ItemFormCart(ItemForm):
     )
 
     def __init__(self, request, job, *args, **kwargs):
-        """Here we populate some of the fields based on certain conditions.
+        """
+        Here we populate some of the fields based on certain conditions.
         Also, update some of the choice field querysets.
         """
         super(ItemFormCart, self).__init__(*args, **kwargs)
@@ -1275,16 +1157,12 @@ class ItemFormCart(ItemForm):
         # Carton type specific labels
         if job.carton_type:
             if job.carton_type == "Imposition":
-                self.fields["graphic_req_number"].widget.attrs["placeHolder"] = (
-                    "(Portland Only)"
-                )
+                self.fields["graphic_req_number"].widget.attrs["placeHolder"] = "(Portland Only)"
             if job.carton_type == "Prepress":
                 self.fields["grn"].widget.attrs["placeHolder"] = "(Not Required)"
 
         # Use the job's workflow to decide which print locations to show.
-        self.fields["printlocation"].queryset = PrintLocation.objects.filter(
-            plant__workflow=job.workflow
-        ).order_by("plant__name")
+        self.fields["printlocation"].queryset = PrintLocation.objects.filter(plant__workflow=job.workflow).order_by("plant__name")
         self.fields["color1"].widget.attrs["style"] = "width:80px"
         self.fields["color2"].widget.attrs["style"] = "width:80px"
         self.fields["color3"].widget.attrs["style"] = "width:80px"
@@ -1321,51 +1199,29 @@ class ItemFormCart(ItemForm):
             # Check fields required for imposition jobs.
             if check_job.carton_type == "Imposition":
                 if not cleaned_data.get("step_die"):
-                    raise forms.ValidationError(
-                        "Step Die required for imposition carton jobs."
-                    )
+                    raise forms.ValidationError("Step Die required for imposition carton jobs.")
                 if not cleaned_data.get("coating_pattern"):
-                    raise forms.ValidationError(
-                        "Coating Pattern required for imposition carton jobs."
-                    )
+                    raise forms.ValidationError("Coating Pattern required for imposition carton jobs.")
                 if not cleaned_data.get("plate_thickness"):
-                    raise forms.ValidationError(
-                        "Plate Thickness required for imposition carton jobs."
-                    )
+                    raise forms.ValidationError("Plate Thickness required for imposition carton jobs.")
                 if not cleaned_data.get("print_repeat"):
-                    raise forms.ValidationError(
-                        "Print Repeat required for imposition carton jobs."
-                    )
+                    raise forms.ValidationError("Print Repeat required for imposition carton jobs.")
                 if not cleaned_data.get("grn"):
-                    raise forms.ValidationError(
-                        "GDD required for imposition carton jobs."
-                    )
+                    raise forms.ValidationError("GDD required for imposition carton jobs.")
                 if not cleaned_data.get("platepackage"):
-                    raise forms.ValidationError(
-                        "Plate Package required for imposition carton jobs."
-                    )
+                    raise forms.ValidationError("Plate Package required for imposition carton jobs.")
             # Check fields required for prepress jobs.
             if check_job.carton_type == "Prepress":
                 if not cleaned_data.get("proof_type"):
-                    raise forms.ValidationError(
-                        "Proof Type required for prepress carton jobs."
-                    )
+                    raise forms.ValidationError("Proof Type required for prepress carton jobs.")
                 if not cleaned_data.get("graphic_req_number"):
-                    raise forms.ValidationError(
-                        "Graphic Req # required for prepress carton jobs."
-                    )
+                    raise forms.ValidationError("Graphic Req # required for prepress carton jobs.")
                 if not cleaned_data.get("substrate"):
-                    raise forms.ValidationError(
-                        "Substrate required for prepress carton jobs."
-                    )
+                    raise forms.ValidationError("Substrate required for prepress carton jobs.")
                 if not cleaned_data.get("line_screen"):
-                    raise forms.ValidationError(
-                        "Line Screen required for prepress carton jobs."
-                    )
+                    raise forms.ValidationError("Line Screen required for prepress carton jobs.")
                 if not cleaned_data.get("ink_set"):
-                    raise forms.ValidationError(
-                        "Ink Set required for prepress carton jobs."
-                    )
+                    raise forms.ValidationError("Ink Set required for prepress carton jobs.")
 
     @abstractstaticmethod
     def label_from_instance(self):
@@ -1373,7 +1229,8 @@ class ItemFormCart(ItemForm):
 
 
 def new_carton_item(request, job_id, type, item_id=0):
-    """Form and save function for creating a new Carton item via the
+    """
+    Form and save function for creating a new Carton item via the
     New Job Entry, not the job detail page.
     """
     job = Job.objects.get(id=job_id)
@@ -1397,9 +1254,7 @@ def new_carton_item(request, job_id, type, item_id=0):
                     ic = ItemColor(item=item)
                     ic.color = request.POST["color%s" % ink_num]
 
-                    colorDef = ColorDefinition.objects.filter(
-                        id=request.POST["colorDef%s" % ink_num]
-                    )
+                    colorDef = ColorDefinition.objects.filter(id=request.POST["colorDef%s" % ink_num])
                     if colorDef:
                         colorDef = colorDef[0]
                         if colorDef.name == "Match Color":
@@ -1419,9 +1274,7 @@ def new_carton_item(request, job_id, type, item_id=0):
             # Create folder after item colors are added, so that bev_nomenclature()
             # creates nomenclature properly.
             item.create_folder()
-            return HttpResponse(
-                JSMessage("Saved Item #" + str(item.num_in_job) + " successfully")
-            )
+            return HttpResponse(JSMessage("Saved Item #" + str(item.num_in_job) + " successfully"))
         else:
             # Use the JSONErrorForm subclass to send any errors via JSON.
             return itemform.serialize_errors()
@@ -1452,37 +1305,17 @@ class NewCartJobForm(ModelForm, JSONErrorForm):
     # Name will be labeled as customer name.
     name = forms.CharField(required=True)
     workflow = _safe_get_site("Carton")
-    instructions = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "16"}), required=False
-    )
+    instructions = forms.CharField(widget=forms.Textarea(attrs={"rows": "16"}), required=False)
     pcss = forms.ModelChoiceField(
-        queryset=User.objects.filter(
-            is_active=True, groups__in=PCSS_PERMISSION.group_set.all()
-        ).order_by("username"),
+        queryset=User.objects.none(),
         required=False,
     )
     # Just show carton salespeople.
-    carton_users = User.objects.filter(groups__in=CARTON_PERMISSION.group_set.all())
-    grouped_sales_users = (
-        User.objects.filter(groups__in=SALES_PERMISSION.group_set.all())
-        .order_by("username")
-        .distinct()
-    )
-    salesperson = forms.ModelChoiceField(
-        queryset=grouped_sales_users.distinct(), required=False
-    )
-    csr = forms.ModelChoiceField(
-        User.objects.filter(
-            is_active=True, groups__in=CARTON_CSR_PERMISSION.group_set.all()
-        ).order_by("username"),
-        required=False,
-    )
-    graphic_specialist = forms.ModelChoiceField(
-        User.objects.filter(
-            is_active=True, groups__in=GRAPHIC_SPECIALIST_PERMISSION.group_set.all()
-        ).order_by("username"),
-        required=False,
-    )
+    carton_users = User.objects.none()
+    grouped_sales_users = User.objects.none()
+    salesperson = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
+    csr = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
+    graphic_specialist = forms.ModelChoiceField(queryset=User.objects.none(), required=False)
     graphic_supplier = forms.CharField(required=True)
     customer_identifier = forms.CharField(required=True)
     customer_name = forms.CharField(required=True)
@@ -1509,6 +1342,27 @@ class NewCartJobForm(ModelForm, JSONErrorForm):
         super(NewCartJobForm, self).__init__(*args, **kwargs)
         # Try to set the current user as the initial value for PCSS.
         self.fields["pcss"].initial = request.user.id
+
+        # Populate runtime user querysets now that apps and DB are ready.
+        try:
+            pcss_qs = User.objects.filter(is_active=True, groups__in=PCSS_PERMISSION.group_set.all()).order_by("username")
+            carton_qs = User.objects.filter(groups__in=CARTON_PERMISSION.group_set.all())
+            grouped_sales_qs = User.objects.filter(groups__in=SALES_PERMISSION.group_set.all()).order_by("username").distinct()
+            csr_qs = User.objects.filter(is_active=True, groups__in=CARTON_CSR_PERMISSION.group_set.all()).order_by("username")
+            graphic_qs = User.objects.filter(is_active=True, groups__in=GRAPHIC_SPECIALIST_PERMISSION.group_set.all()).order_by("username")
+        except Exception:
+            pcss_qs = User.objects.none()
+            carton_qs = User.objects.none()
+            grouped_sales_qs = User.objects.none()
+            csr_qs = User.objects.none()
+            graphic_qs = User.objects.none()
+
+        self.fields["pcss"].queryset = pcss_qs
+        self.carton_users = carton_qs
+        self.grouped_sales_users = grouped_sales_qs
+        self.fields["salesperson"].queryset = grouped_sales_qs
+        self.fields["csr"].queryset = csr_qs
+        self.fields["graphic_specialist"].queryset = graphic_qs
 
 
 @login_required
@@ -1564,27 +1418,15 @@ class NewConJobForm(ModelForm, JSONErrorForm):
         initial=general_funcs._utcnow_naive().date() + timedelta(days=1),
     )
     workflow = _safe_get_site("Container")
-    instructions = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "16"}), required=False
-    )
+    instructions = forms.CharField(widget=forms.Textarea(attrs={"rows": "16"}), required=False)
     # Select users who are a member of the set of groups with the given permission.
-    grouped_sales_users = (
-        User.objects.filter(groups__in=SALES_PERMISSION.group_set.all())
-        .order_by("username")
-        .distinct()
-    )
-    salesperson = forms.ModelChoiceField(
-        queryset=grouped_sales_users.distinct(), required=False
-    )
+    grouped_sales_users = User.objects.filter(groups__in=SALES_PERMISSION.group_set.all()).order_by("username").distinct()
+    salesperson = forms.ModelChoiceField(queryset=grouped_sales_users.distinct(), required=False)
     temp_printlocation = forms.ModelChoiceField(
-        queryset=PrintLocation.objects.filter(
-            plant__workflow=workflow, active=True
-        ).order_by("plant__name")
+        queryset=PrintLocation.objects.filter(plant__workflow=workflow, active=True).order_by("plant__name")
     )
     temp_platepackage = forms.ModelChoiceField(
-        queryset=PlatePackage.objects.filter(workflow=workflow, active=True).order_by(
-            "platemaker__name"
-        )
+        queryset=PlatePackage.objects.filter(workflow=workflow, active=True).order_by("platemaker__name")
     )
 
     class Meta:
@@ -1597,17 +1439,13 @@ def new_container_job(request):
     if request.POST:
         jobform = NewConJobForm(request, request.POST)
         if jobform.is_valid():
-            jobform.instance.name = fs_api.strip_for_valid_filename(
-                jobform.instance.name
-            )
+            jobform.instance.name = fs_api.strip_for_valid_filename(jobform.instance.name)
             jobform.save()
             job_id = jobform.instance.id
             job = Job.objects.get(id=job_id)
             job.create_folder()
             if "instructions" in request.POST:
-                job.do_create_joblog_entry(
-                    JOBLOG_TYPE_NOTE, request.POST["instructions"]
-                )
+                job.do_create_joblog_entry(JOBLOG_TYPE_NOTE, request.POST["instructions"])
             return HttpResponse(JSMessage(job_id))
         else:
             return jobform.serialize_errors()
@@ -1627,34 +1465,18 @@ class ItemFormCON(forms.Form, JSONErrorForm):
 
     workflow = _safe_get_site("Container")
     die = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=True)
-    description = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
-    upc_number = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
+    description = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
+    upc_number = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
     length = forms.DecimalField(required=True)
     width = forms.DecimalField(required=True)
     height = forms.DecimalField(required=True)
-    num_up = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
-    material = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
+    num_up = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
+    material = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
     ect = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
-    color1 = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=True
-    )
-    color2 = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
-    color3 = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
-    color4 = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
+    color1 = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=True)
+    color2 = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
+    color3 = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
+    color4 = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
 
 
 def new_container_item(request, job_id):
@@ -1726,9 +1548,7 @@ class ChargeTypeModelChoiceField(ModelChoiceField):
 class AddBillingAllItems(forms.Form, JSONErrorForm):
     """Form for adding billing charges to all items."""
 
-    charge_type = ChargeTypeModelChoiceField(
-        ChargeType.objects.all().order_by("-category", "type"), required=True
-    )
+    charge_type = ChargeTypeModelChoiceField(ChargeType.objects.all().order_by("-category", "type"), required=True)
 
 
 @csrf_exempt
@@ -1737,15 +1557,11 @@ def edit_all_billing(request, job_id):
     job = Job.objects.get(id=job_id)
     items = Item.objects.filter(job=job)
     permission = Permission.objects.get(codename="in_artist_pulldown")
-    artists = User.objects.filter(
-        is_active=True, groups__in=permission.group_set.all()
-    ).order_by("username")
+    artists = User.objects.filter(is_active=True, groups__in=permission.group_set.all()).order_by("username")
     current_artist = threadlocals.get_current_user()
 
     form = AddBillingAllItems()
-    charge_options = ChargeType.objects.filter(
-        workflow=job.workflow, active=True
-    ).order_by("-category", "type")
+    charge_options = ChargeType.objects.filter(workflow=job.workflow, active=True).order_by("-category", "type")
     form.fields["charge_type"].queryset = charge_options
 
     if request.POST:
@@ -1799,14 +1615,10 @@ def item_tracker_mkt(request, job_id):
     """Flags items with marketing item trackers using the ItemTracker() model."""
     job = Job.objects.get(id=job_id)
     item_list = Item.objects.filter(job=job)
-    mkttracklist = ItemTracker.objects.filter(
-        item__in=item_list, type__category__name="Marketing", removal_date__isnull=True
-    )
+    mkttracklist = ItemTracker.objects.filter(item__in=item_list, type__category__name="Marketing", removal_date__isnull=True)
 
     viewer_list = []
-    manager_members = User.objects.filter(
-        groups__name="EmailGCHubManager", is_active=True
-    )
+    manager_members = User.objects.filter(groups__name="EmailGCHubManager", is_active=True)
     super_members = User.objects.filter(groups__name="GCHubSupervisor", is_active=True)
     for viewer in manager_members:
         viewer_list.append(viewer.username)
@@ -1835,13 +1647,9 @@ def item_tracker_mkt(request, job_id):
                 while counter > 0:
                     new_tracker = ItemTracker()
                     new_tracker.item = item
-                    new_tracker.type = ItemTrackerType.objects.get(
-                        id=catagory[counter - 1].id
-                    )
+                    new_tracker.type = ItemTrackerType.objects.get(id=catagory[counter - 1].id)
                     types += str(new_tracker.type) + ", "
-                    new_tracker.addition_comments = form.cleaned_data[
-                        "addition_comments"
-                    ]
+                    new_tracker.addition_comments = form.cleaned_data["addition_comments"]
                     new_tracker.addition_date = date.today()
                     new_tracker.edited_by = threadlocals.get_current_user()
                     new_tracker.save()
@@ -1866,9 +1674,7 @@ def item_tracker_mkt(request, job_id):
                 # notify via email the marketers that will accept / reject
                 site_link = "http://gchub.graphicpkg.com/workflow/mkt_review/"
                 mail_body = loader.get_template("emails/marketing_review_ready.txt")
-                mail_subject = "GOLD Marketing approval required for Job: %s" % (
-                    item.job.id
-                )
+                mail_subject = "GOLD Marketing approval required for Job: %s" % (item.job.id)
                 econtext = {
                     "job_name": item.job,
                     "item_num": item.num_in_job,
@@ -1882,24 +1688,18 @@ def item_tracker_mkt(request, job_id):
                 # In an effort to just email Lena we have to hardcode cause there is no group
                 # composed of just them
                 # for contact in User.objects.filter(is_active=True, groups__name='FSB Marketing'):
-                group_members = User.objects.filter(
-                    groups__name="EmailItemTrackers", is_active=True
-                )
+                group_members = User.objects.filter(groups__name="EmailItemTrackers", is_active=True)
                 for user in group_members:
                     mail_send_to.append(user.email)
 
                 if len(mail_send_to) > 0:
-                    general_funcs.send_info_mail(
-                        mail_subject, mail_body.render(econtext), mail_send_to
-                    )
+                    general_funcs.send_info_mail(mail_subject, mail_body.render(econtext), mail_send_to)
 
             # Done creating art trackers and reviews and sending email.
             return HttpResponse(JSMessage("Saved."))
         else:
             for error in form.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         form = ItemTrackerMktForm()
         pagevars = {
@@ -1910,9 +1710,7 @@ def item_tracker_mkt(request, job_id):
             "mkttracklist": mkttracklist,
             "can_view": can_view,
         }
-        return render(
-            request, "workflow/item/ajax/subview_tracked_mkt.html", context=pagevars
-        )
+        return render(request, "workflow/item/ajax/subview_tracked_mkt.html", context=pagevars)
 
 
 def item_tracker_promo(request, job_id):
@@ -1926,9 +1724,7 @@ def item_tracker_promo(request, job_id):
     )
 
     viewer_list = []
-    manager_members = User.objects.filter(
-        groups__name="EmailGCHubManager", is_active=True
-    )
+    manager_members = User.objects.filter(groups__name="EmailGCHubManager", is_active=True)
     super_members = User.objects.filter(groups__name="GCHubSupervisor", is_active=True)
     for viewer in manager_members:
         viewer_list.append(viewer.username)
@@ -1957,12 +1753,8 @@ def item_tracker_promo(request, job_id):
                 while counter > 0:
                     new_tracker = ItemTracker()
                     new_tracker.item = item
-                    new_tracker.type = ItemTrackerType.objects.get(
-                        id=catagory[counter - 1].id
-                    )
-                    new_tracker.addition_comments = form.cleaned_data[
-                        "addition_comments"
-                    ]
+                    new_tracker.type = ItemTrackerType.objects.get(id=catagory[counter - 1].id)
+                    new_tracker.addition_comments = form.cleaned_data["addition_comments"]
                     new_tracker.addition_date = date.today()
                     new_tracker.edited_by = threadlocals.get_current_user()
                     new_tracker.save()
@@ -1971,9 +1763,7 @@ def item_tracker_promo(request, job_id):
             return HttpResponse(JSMessage("Saved."))
         else:
             for error in form.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         form = ItemTrackerPromoForm()
         pagevars = {
@@ -1984,9 +1774,7 @@ def item_tracker_promo(request, job_id):
             "promotracklist": promotracklist,
             "can_view": can_view,
         }
-        return render(
-            request, "workflow/item/ajax/subview_promotrack.html", context=pagevars
-        )
+        return render(request, "workflow/item/ajax/subview_promotrack.html", context=pagevars)
 
 
 @csrf_exempt
@@ -1994,14 +1782,10 @@ def item_tracker_art(request, job_id):
     """Flags items with promotional item trackers using the ItemTracker() model."""
     job = Job.objects.get(id=job_id)
     item_list = Item.objects.filter(job=job)
-    arttracklist = ItemTracker.objects.filter(
-        item__in=item_list, type__category__name="Artwork", removal_date__isnull=True
-    )
+    arttracklist = ItemTracker.objects.filter(item__in=item_list, type__category__name="Artwork", removal_date__isnull=True)
 
     viewer_list = []
-    manager_members = User.objects.filter(
-        groups__name="EmailGCHubManager", is_active=True
-    )
+    manager_members = User.objects.filter(groups__name="EmailGCHubManager", is_active=True)
     super_members = User.objects.filter(groups__name="GCHubSupervisor", is_active=True)
     for viewer in manager_members:
         viewer_list.append(viewer.username)
@@ -2027,12 +1811,8 @@ def item_tracker_art(request, job_id):
                 while counter > 0:
                     new_tracker = ItemTracker()
                     new_tracker.item = item
-                    new_tracker.type = ItemTrackerType.objects.get(
-                        id=catagory[counter - 1].id
-                    )
-                    new_tracker.addition_comments = form.cleaned_data[
-                        "addition_comments"
-                    ]
+                    new_tracker.type = ItemTrackerType.objects.get(id=catagory[counter - 1].id)
+                    new_tracker.addition_comments = form.cleaned_data["addition_comments"]
                     new_tracker.addition_date = date.today()
                     new_tracker.edited_by = threadlocals.get_current_user()
                     new_tracker.save()
@@ -2041,9 +1821,7 @@ def item_tracker_art(request, job_id):
             return HttpResponse(JSMessage("Saved."))
         else:
             for error in form.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         form = ItemTrackerArtForm()
         pagevars = {
@@ -2054,49 +1832,38 @@ def item_tracker_art(request, job_id):
             "arttracklist": arttracklist,
             "can_view": can_view,
         }
-    return render(
-        request, "workflow/item/ajax/subview_tracked_art.html", context=pagevars
-    )
+    return render(request, "workflow/item/ajax/subview_tracked_art.html", context=pagevars)
 
 
 class ItemTrackerMktForm(forms.Form):
-    """The form at the bottom of an item's marketing review page. Used to track
+    """
+    The form at the bottom of an item's marketing review page. Used to track
     elements that marketing needs to keep up with like SFI logos. Uses the
     ItemTracker() model to flag items for tracking.
     """
 
-    addition_comments = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "3"}), required=False
-    )
-    catagory = ModelMultipleChoiceField(
-        ItemTrackerType.objects.filter(category__name="Marketing").order_by("name")
-    )
+    addition_comments = forms.CharField(widget=forms.Textarea(attrs={"rows": "3"}), required=False)
+    catagory = ModelMultipleChoiceField(ItemTrackerType.objects.filter(category__name="Marketing").order_by("name"))
 
 
 class ItemTrackerPromoForm(forms.Form):
-    """The form at the bottom of an item's promo review page. Used to track
+    """
+    The form at the bottom of an item's promo review page. Used to track
     promotional work. Uses the ItemTracker() model to flag items for tracking.
     """
 
-    addition_comments = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "3"}), required=False
-    )
-    catagory = ModelMultipleChoiceField(
-        ItemTrackerType.objects.filter(category__name="Promotional").order_by("name")
-    )
+    addition_comments = forms.CharField(widget=forms.Textarea(attrs={"rows": "3"}), required=False)
+    catagory = ModelMultipleChoiceField(ItemTrackerType.objects.filter(category__name="Promotional").order_by("name"))
 
 
 class ItemTrackerArtForm(forms.Form):
-    """The form at the bottom of an item's promo review page. Used to track
+    """
+    The form at the bottom of an item's promo review page. Used to track
     promotional work. Uses the ItemTracker() model to flag items for tracking.
     """
 
-    addition_comments = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "3"}), required=False
-    )
-    catagory = ModelMultipleChoiceField(
-        ItemTrackerType.objects.filter(category__name="Artwork").order_by("name")
-    )
+    addition_comments = forms.CharField(widget=forms.Textarea(attrs={"rows": "3"}), required=False)
+    catagory = ModelMultipleChoiceField(ItemTrackerType.objects.filter(category__name="Artwork").order_by("name"))
 
 
 @csrf_exempt
@@ -2213,12 +1980,8 @@ def edit_all_timeline_pageload(request, job_id, event, action):
                         forecast_text = forecast_text[0]
                         item.do_forecast()
                         forecast_arr.append(item.num_in_job)
-                pre_forecast_text = (
-                    "Item(s) " + str(forecast_arr)[1:-1] + " forecast set as "
-                )
-                job.do_create_joblog_entry(
-                    JOBLOG_TYPE_NOTE, pre_forecast_text + request.POST["items_forecast"]
-                )
+                pre_forecast_text = "Item(s) " + str(forecast_arr)[1:-1] + " forecast set as "
+                job.do_create_joblog_entry(JOBLOG_TYPE_NOTE, pre_forecast_text + request.POST["items_forecast"])
         elif event == "File Out":
             for item in all_items:
                 if item.can_file_out() and str(item.id) in values:
@@ -2287,9 +2050,7 @@ def edit_all_timeline(request, job_id, event="View"):
             "forecastform": forecastform,
         }
 
-        return render(
-            request, "workflow/job/ajax/editall_timeline.html", context=pagevars
-        )
+        return render(request, "workflow/job/ajax/editall_timeline.html", context=pagevars)
     else:
         print(event)
 
@@ -2314,13 +2075,7 @@ def ajax_job_save(request, job_id):
             new_due_date = new_due_date_strtodate.strftime("%Y-%m-%d")
             old_due_date = str(job.due_date)
             if new_due_date != old_due_date:
-                logchanges = (
-                    "<strong>Due date changed:</strong> ("
-                    + str(old_due_date)
-                    + " to "
-                    + str(new_due_date)
-                    + "). "
-                )
+                logchanges = "<strong>Due date changed:</strong> (" + str(old_due_date) + " to " + str(new_due_date) + "). "
                 job.do_create_joblog_entry(JOBLOG_TYPE_CRITICAL, logchanges)
 
         if "status" in request.POST:
@@ -2329,11 +2084,7 @@ def ajax_job_save(request, job_id):
             if new_status != old_status:
                 if old_status != "Pending":
                     logchanges = (
-                        "<strong>The status of the job has changed:</strong> ("
-                        + str(old_status)
-                        + " to "
-                        + str(new_status)
-                        + "). "
+                        "<strong>The status of the job has changed:</strong> (" + str(old_status) + " to " + str(new_status) + "). "
                     )
                     job.do_create_joblog_entry(JOBLOG_TYPE_CRITICAL, logchanges)
                 else:
@@ -2351,13 +2102,7 @@ def ajax_job_save(request, job_id):
                 new_artist = None
             old_artist = job.artist
             if new_artist != old_artist:
-                logchanges = (
-                    "<strong>The assigned artist has changed:</strong> ("
-                    + str(old_artist)
-                    + " to "
-                    + str(new_artist)
-                    + "). "
-                )
+                logchanges = "<strong>The assigned artist has changed:</strong> (" + str(old_artist) + " to " + str(new_artist) + "). "
                 job.do_create_joblog_entry(JOBLOG_TYPE_CRITICAL, logchanges)
                 change_artist = True
             else:
@@ -2373,13 +2118,7 @@ def ajax_job_save(request, job_id):
                 new_csr = None
             old_csr = job.csr
             if new_csr != old_csr:
-                logchanges = (
-                    "<strong>The assigned CSR has changed:</strong> ("
-                    + str(old_csr)
-                    + " to "
-                    + str(new_csr)
-                    + "). "
-                )
+                logchanges = "<strong>The assigned CSR has changed:</strong> (" + str(old_csr) + " to " + str(new_csr) + "). "
                 job.do_create_joblog_entry(JOBLOG_TYPE_CRITICAL, logchanges)
                 job.csr = new_csr
 
@@ -2390,10 +2129,7 @@ def ajax_job_save(request, job_id):
             jobcomplexform.save()
         else:  # We're saving a new job complexity.
             # Make sure the user actually selected something.
-            if (
-                jobcomplexform.cleaned_data["category"]
-                or jobcomplexform.cleaned_data["complexity"]
-            ):
+            if jobcomplexform.cleaned_data["category"] or jobcomplexform.cleaned_data["complexity"]:
                 # Set the job for the job complexity before saving.
                 jobcomplexform = jobcomplexform.save(commit=False)
                 jobcomplexform.job = job
@@ -2408,15 +2144,14 @@ def ajax_job_save(request, job_id):
 
 
 class PrintLocationForm(ModelForm, JSONErrorForm):
-    """Form with only the printlocation in it.
+    """
+    Form with only the printlocation in it.
     This will be used for plant/press changes in Beverage.
     """
 
     workflow = _safe_get_site("Beverage")
     temp_printlocation = forms.ModelChoiceField(
-        queryset=PrintLocation.objects.filter(plant__workflow=workflow, active=True)
-        .distinct()
-        .order_by("plant__name")
+        queryset=PrintLocation.objects.filter(plant__workflow=workflow, active=True).distinct().order_by("plant__name")
     )
 
     class Meta:
@@ -2455,13 +2190,12 @@ def change_printlocation(request, job_id):
             "job": job,
         }
 
-    return render(
-        request, "workflow/job/ajax/change_printlocation.html", context=pagevars
-    )
+    return render(request, "workflow/job/ajax/change_printlocation.html", context=pagevars)
 
 
 class PlatePackageForm(ModelForm, JSONErrorForm):
-    """Form with only the platepackage in it.
+    """
+    Form with only the platepackage in it.
     This will be used for platemaker/platetype changes in Beverage.
     """
 
@@ -2513,9 +2247,7 @@ def change_platepackage(request, job_id):
             "job": job,
         }
 
-    return render(
-        request, "workflow/job/ajax/change_platepackage.html", context=pagevars
-    )
+    return render(request, "workflow/job/ajax/change_platepackage.html", context=pagevars)
 
 
 def remove_from_archive(request, job_id):
@@ -2538,7 +2270,8 @@ def remove_from_archive(request, job_id):
 
 @csrf_exempt
 def misc_info(request, job_id):
-    """Display the extended job information.
+    """
+    Display the extended job information.
     This is the default view when a job is first loaded.
     """
     job = Job.objects.get(id=job_id)
@@ -2549,13 +2282,12 @@ def misc_info(request, job_id):
         "database_docs": database_docs,
     }
 
-    return render(
-        request, "workflow/job/job_detail/lower/job_misc_info.html", context=pagevars
-    )
+    return render(request, "workflow/job/job_detail/lower/job_misc_info.html", context=pagevars)
 
 
 class ExtendedCartonJobForm(ModelForm, JSONErrorForm):
-    """For editing extended job information that doesn't fit in the upper left
+    """
+    For editing extended job information that doesn't fit in the upper left
     div of the job detail.
     """
 
@@ -2566,7 +2298,8 @@ class ExtendedCartonJobForm(ModelForm, JSONErrorForm):
 
 
 class ExtendedBeverageJobForm(ModelForm, JSONErrorForm):
-    """For editing extended job information that doesn't fit in the upper left
+    """
+    For editing extended job information that doesn't fit in the upper left
     div of the job detail.
     """
 
@@ -2645,9 +2378,7 @@ def carton_invoice(request, job_id):
         dd_folder = os.path.join(jobfolder, fs_api.JOBDIR["1_documents"])
         if os.path.exists(dd_folder):  # Don't save if we can't see the dd folder.
             invoices_folder = os.path.join(dd_folder, "carton_graphics_invoices")
-            if not os.path.exists(
-                invoices_folder
-            ):  # Make an invoices folder if needed.
+            if not os.path.exists(invoices_folder):  # Make an invoices folder if needed.
                 fs_api.g_mkdir(invoices_folder)
             pdf_name = "%s_invc_" % (str(job.id))
             pdf_name += "%s%s" % (timezone.now().strftime("%m_%d_%y-%H_%M"), ".pdf")
@@ -2688,7 +2419,8 @@ def cartonprofile_lookup(
     printlocation_id,
     printcondition_id,
 ):
-    """Returns a carton profile id and name for a given size via json. Print
+    """
+    Returns a carton profile id and name for a given size via json. Print
     condition is an optional field that should only be used when supplied.
     Returns a list of lists:
         carton_profile[0][0] is the name.
@@ -2728,9 +2460,7 @@ def cartonprofile_lookup(
                 found_carton_profiles = False
     except Exception:
         found_carton_profiles = False
-    return HttpResponse(
-        json.dumps(found_carton_profiles), content_type="application/json"
-    )
+    return HttpResponse(json.dumps(found_carton_profiles), content_type="application/json")
 
 
 def etools_show_request(request, job_id):
@@ -2778,7 +2508,8 @@ def gps_connect_cust_info(request, job_id):
 
 
 def gps_connect_cust_info_json(request, cust_id):
-    """Fetches customer info from GPS connect and returns it as a json object.
+    """
+    Fetches customer info from GPS connect and returns it as a json object.
     Mostly used by javascript to auto fill some form fields.
     """
     cust_info = gps_connect._get_customer_data(cust_id)
@@ -2788,7 +2519,8 @@ def gps_connect_cust_info_json(request, cust_id):
 
 
 def item_duplicate_list(request, job_id):
-    """If the job is duplicated from an existing one, list all items available
+    """
+    If the job is duplicated from an existing one, list all items available
     to the user for duplicated from the parent job (job.duplicated_from)
     """
     job = Job.objects.get(id=job_id)
@@ -2801,9 +2533,7 @@ def item_duplicate_list(request, job_id):
         "parent_items": parent_items,
     }
 
-    return render(
-        request, "workflow/job/ajax/item_duplicate_list.html", context=pagevars
-    )
+    return render(request, "workflow/job/ajax/item_duplicate_list.html", context=pagevars)
 
 
 class ItemFormAdd(ModelForm, JSONErrorForm):
@@ -2858,9 +2588,7 @@ def add_item(request, job_id):
             "itemform": itemform,
         }
 
-        return render(
-            request, "workflow/job/job_detail/lower/add_item.html", context=pagevars
-        )
+        return render(request, "workflow/job/job_detail/lower/add_item.html", context=pagevars)
 
 
 class FileUploadForm(forms.Form, JSONErrorForm):
@@ -2888,23 +2616,16 @@ def db_doc_upload(request, job_id):
             )
             try:
                 # Email notifcation to Donna (New Items) if the uploader is a FSB CSR.
-                grouped_csr_users = User.objects.filter(
-                    groups__in=CSR_PERMISSION.group_set.all()
-                )
+                grouped_csr_users = User.objects.filter(groups__in=CSR_PERMISSION.group_set.all())
                 print(grouped_csr_users)
                 if request.user in grouped_csr_users:
                     mail_subject = "PO Upload Notice: %s" % job
                     mail_send_to = []
                     mail_send_to.append(settings.EMAIL_GCHUB)
-                    group_members = User.objects.filter(
-                        groups__name="EmailGCHubNewItems", is_active=True
-                    )
+                    group_members = User.objects.filter(groups__name="EmailGCHubNewItems", is_active=True)
                     for user in group_members:
                         mail_send_to.append(user.email)
-                    mail_body = (
-                        "A PO has been uploaded for job %s. File name is: %s"
-                        % (job, request.FILES["file"].name)
-                    )
+                    mail_body = "A PO has been uploaded for job %s. File name is: %s" % (job, request.FILES["file"].name)
                     general_funcs.send_info_mail(mail_subject, mail_body, mail_send_to)
             # Try/Except to catch other crap...
             except Exception:
@@ -2959,9 +2680,7 @@ def bev_item_nomenclature(request, job_id):
         "job": job,
     }
 
-    return render(
-        request, "workflow/job/ajax/bev_all_nomenclature.html", context=pagevars
-    )
+    return render(request, "workflow/job/ajax/bev_all_nomenclature.html", context=pagevars)
 
 
 def return_job_item_info(item_id):
@@ -3006,9 +2725,7 @@ def shipping_manager(request, job_id):
         "addresses": jobaddresses,
         "job_id": job_id,
     }
-    return render(
-        request, "workflow/job/job_detail/lower/shipmgr.html", context=pagevars
-    )
+    return render(request, "workflow/job/job_detail/lower/shipmgr.html", context=pagevars)
 
 
 class JobAddressForm(ModelForm, JSONErrorForm):
@@ -3020,7 +2737,8 @@ class JobAddressForm(ModelForm, JSONErrorForm):
 
 
 class CartJobAddressForm(ModelForm, JSONErrorForm):
-    """Just like JobAddressForm but the job field is set to optional since we want
+    """
+    Just like JobAddressForm but the job field is set to optional since we want
     the user to enter an address and a job at the same time. We just need
     to be sure we manually set the job before we save the form.
     """
@@ -3132,30 +2850,18 @@ class DupeFSBJobForm(ModelForm):
     """Form used for adding a job - Foodservice"""
 
     name = forms.CharField(widget=forms.TextInput(attrs={"size": "30"}), required=True)
-    due_date = forms.DateField(
-        widget=GCH_SelectDateWidget, initial=date.today() + timedelta(days=1)
-    )
+    due_date = forms.DateField(widget=GCH_SelectDateWidget, initial=date.today() + timedelta(days=1))
     # customer_name = forms.CharField(widget=forms.TextInput(attrs={'size':'50'}), required=True)
     workflow = _safe_get_site("Foodservice")
-    instructions = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "10"}), required=False
-    )
+    instructions = forms.CharField(widget=forms.Textarea(attrs={"rows": "10"}), required=False)
     # Select users who are a member of the set of groups with the given permission.
-    grouped_sales_users = (
-        User.objects.filter(groups__in=SALES_PERMISSION.group_set.all())
-        .order_by("username")
-        .distinct()
-    )
-    salesperson = forms.ModelChoiceField(
-        queryset=grouped_sales_users.distinct(), required=False
-    )
+    grouped_sales_users = User.objects.filter(groups__in=SALES_PERMISSION.group_set.all()).order_by("username").distinct()
+    salesperson = forms.ModelChoiceField(queryset=grouped_sales_users.distinct(), required=False)
 
     def __init__(self, request, *args, **kwargs):
         super(DupeFSBJobForm, self).__init__(*args, **kwargs)
         if self.instance.id:
-            self.fields["due_date"] = forms.DateField(
-                widget=GCH_SelectDateWidget, initial=date.today() + timedelta(days=1)
-            )
+            self.fields["due_date"] = forms.DateField(widget=GCH_SelectDateWidget, initial=date.today() + timedelta(days=1))
 
     class Meta:
         model = Job
@@ -3178,30 +2884,18 @@ class DupeBevJobForm(ModelForm, JSONErrorForm):
     customer_name = forms.CharField(required=True)
     brand_name = forms.CharField(required=True)
     workflow = _safe_get_site("Beverage")
-    instructions = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "14"}), required=False
-    )
+    instructions = forms.CharField(widget=forms.Textarea(attrs={"rows": "14"}), required=False)
     prepress_supplier = forms.ChoiceField(choices=app_defs.PREPRESS_SUPPLIERS)
     # Select users who are a member of the set of groups with the given permission.
-    grouped_sales_users = (
-        User.objects.filter(groups__in=SALES_PERMISSION.group_set.all())
-        .order_by("username")
-        .distinct()
-    )
-    salesperson = forms.ModelChoiceField(
-        queryset=grouped_sales_users.distinct(), required=False
-    )
+    grouped_sales_users = User.objects.filter(groups__in=SALES_PERMISSION.group_set.all()).order_by("username").distinct()
+    salesperson = forms.ModelChoiceField(queryset=grouped_sales_users.distinct(), required=False)
     temp_printlocation = forms.ModelChoiceField(
-        queryset=PrintLocation.objects.filter(
-            plant__workflow=workflow, active=True
-        ).order_by("plant__name")
+        queryset=PrintLocation.objects.filter(plant__workflow=workflow, active=True).order_by("plant__name")
     )
     # There's an old unused cyber graphics platemaker that we've been asked to
     # hide from this field.
     temp_platepackage = forms.ModelChoiceField(
-        queryset=PlatePackage.objects.filter(workflow=workflow, active=True)
-        .order_by("platemaker__name")
-        .exclude(platemaker__id=18)
+        queryset=PlatePackage.objects.filter(workflow=workflow, active=True).order_by("platemaker__name").exclude(platemaker__id=18)
     )
 
     def __init__(self, request, *args, **kwargs):
@@ -3209,12 +2903,8 @@ class DupeBevJobForm(ModelForm, JSONErrorForm):
 
         # Hide some stuff from Evergreen.
         if request.user.groups.filter(name="Evergreen Analyst"):
-            self.fields["temp_printlocation"].queryset = self.fields[
-                "temp_printlocation"
-            ].queryset.exclude(press__name="BHS")
-            self.fields[
-                "prepress_supplier"
-            ].choices = app_defs.PREPRESS_SUPPLIERS_EVERGREEN
+            self.fields["temp_printlocation"].queryset = self.fields["temp_printlocation"].queryset.exclude(press__name="BHS")
+            self.fields["prepress_supplier"].choices = app_defs.PREPRESS_SUPPLIERS_EVERGREEN
 
     class Meta:
         model = Job
@@ -3237,7 +2927,8 @@ class DupeBevJobForm(ModelForm, JSONErrorForm):
 
 
 def duplicate_job(request, job_id, dupe_type):
-    """Duplicates a job in the database, resetting certain fields depending on the
+    """
+    Duplicates a job in the database, resetting certain fields depending on the
     type.
 
     Types:
@@ -3288,10 +2979,7 @@ def duplicate_job(request, job_id, dupe_type):
             job_new.carton_type = "Imposition"
         job_new.save()
 
-        if (
-            job_original.workflow.name == "Foodservice"
-            or job_original.workflow.name == "Carton"
-        ):
+        if job_original.workflow.name == "Foodservice" or job_original.workflow.name == "Carton":
             """
             Foodservice/carton specific fields. In this case, copy all checked items.
             """
@@ -3339,13 +3027,9 @@ def duplicate_job(request, job_id, dupe_type):
                             itemcolor.save()
                     # Copy some files for carton jobs.
                     if dupe_type == "carton_imp":
-                        fs_api.copy_carton_imp_files(
-                            job_id, old_itemnum, job_new.id, new_item.num_in_job
-                        )
+                        fs_api.copy_carton_imp_files(job_id, old_itemnum, job_new.id, new_item.num_in_job)
                     if dupe_type == "carton_imp" or dupe_type == "carton_prepress":
-                        fs_api.copy_carton_diestruct(
-                            job_id, job_new.id, item.one_up_die
-                        )
+                        fs_api.copy_carton_diestruct(job_id, job_new.id, item.one_up_die)
             # Set steps_with for each item now that they're all copied.
             if dupe_type == "carton_imp" or dupe_type == "carton_prepress":
                 duped_items = Item.objects.filter(job=job_new)
@@ -3356,16 +3040,12 @@ def duplicate_job(request, job_id, dupe_type):
                     if old_item.steps_with:
                         # See if a new item was created from that old steps_with item.
                         try:
-                            new_stepped_item_id = old_to_new_items.get(
-                                old_item.steps_with.id
-                            )
+                            new_stepped_item_id = old_to_new_items.get(old_item.steps_with.id)
                         except Exception:
                             new_stepped_item_id = None
                         # If so, have the decendants step with each other like their forebears
                         if new_stepped_item_id:
-                            new_stepped_item_stepped = Item.objects.get(
-                                id=new_stepped_item_id
-                            )
+                            new_stepped_item_stepped = Item.objects.get(id=new_stepped_item_id)
                             new_item.steps_with = new_stepped_item_stepped
                             new_item.save()
 
@@ -3383,30 +3063,20 @@ def duplicate_job(request, job_id, dupe_type):
                 job_new.bill_to_type = request.POST["bill_to_type"]
                 job_new.business_type = request.POST["business_type"]
                 try:
-                    job_new.sales_service_rep = SalesServiceRep.objects.get(
-                        id=request.POST["sales_service_rep"]
-                    )
+                    job_new.sales_service_rep = SalesServiceRep.objects.get(id=request.POST["sales_service_rep"])
                 except ValueError:
                     pass
                 job_new.prepress_supplier = request.POST["prepress_supplier"]
-                job_new.temp_printlocation = PrintLocation.objects.get(
-                    id=request.POST["temp_printlocation"]
-                )
-                job_new.temp_platepackage = PlatePackage.objects.get(
-                    id=request.POST["temp_platepackage"]
-                )
+                job_new.temp_printlocation = PrintLocation.objects.get(id=request.POST["temp_printlocation"])
+                job_new.temp_platepackage = PlatePackage.objects.get(id=request.POST["temp_platepackage"])
                 # Build the new PO Number based on plant code and new job id.
                 job_new.po_number = form.cleaned_data.get("po_number", None)
                 # This is where new PO# are being auto generated ^^^^
                 # update to be the current PO# (Currently being reused as the olmstead PO field)
                 # may want to just hide and use another seperate field.
                 job_new.olmsted_po_number = form.cleaned_data.get("po_number", None)
-                job_new.purchase_request_number = form.cleaned_data.get(
-                    "purchase_request_number", None
-                )
-                job_new.use_new_bev_nomenclature = form.cleaned_data.get(
-                    "use_new_bev_nomenclature", False
-                )
+                job_new.purchase_request_number = form.cleaned_data.get("purchase_request_number", None)
+                job_new.use_new_bev_nomenclature = form.cleaned_data.get("use_new_bev_nomenclature", False)
                 job_new.save()
                 # Create folders here for Beverage. Needs to be done after name
                 # is assigned to customer name.
@@ -3419,9 +3089,7 @@ def duplicate_job(request, job_id, dupe_type):
         logtext = "Job duplicated from job number " + str(job_id) + "."
         job_new.do_create_joblog_entry(logtype, logtext)
         if "instructions" in request.POST:
-            job_new.do_create_joblog_entry(
-                JOBLOG_TYPE_NOTE, request.POST["instructions"]
-            )
+            job_new.do_create_joblog_entry(JOBLOG_TYPE_NOTE, request.POST["instructions"])
 
         # Copy addresses from old job.
         addresses_original = JobAddress.objects.filter(job__id=job_id)
@@ -3432,10 +3100,7 @@ def duplicate_job(request, job_id, dupe_type):
             new_address.save()
         return HttpResponse(JSMessage(job_new.id))
     else:
-        if (
-            job_original.workflow.name == "Foodservice"
-            or job_original.workflow.name == "Carton"
-        ):
+        if job_original.workflow.name == "Foodservice" or job_original.workflow.name == "Carton":
             jobform = DupeFSBJobForm(request, instance=job_original)
         if job_original.workflow.name == "Beverage":
             jobform = DupeBevJobForm(request, instance=job_original)

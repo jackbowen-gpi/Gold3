@@ -5,7 +5,8 @@ from django.db import models
 
 class ItemManager(models.Manager):
     def not_deleted(self):
-        """Returns a list of Item objects that have not been soft deleted (had
+        """
+        Returns a list of Item objects that have not been soft deleted (had
         their is_deleted field set to True).
         """
         return self.filter(is_deleted=False)

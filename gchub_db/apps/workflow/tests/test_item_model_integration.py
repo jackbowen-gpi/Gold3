@@ -182,9 +182,7 @@ class ItemModelIntegrationTests(TestCase, ItemTestMixin):
         Item.objects.filter(job=self.test_job).update(item_status="Updated")
 
         # Verify all updated
-        updated_count = Item.objects.filter(
-            job=self.test_job, item_status="Updated"
-        ).count()
+        updated_count = Item.objects.filter(job=self.test_job, item_status="Updated").count()
         self.assertEqual(updated_count, 10)
 
     def test_item_user_relationship_tracking(self):

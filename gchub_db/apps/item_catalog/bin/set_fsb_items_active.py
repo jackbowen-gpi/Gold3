@@ -174,7 +174,8 @@ PORTION_CUP_LIDS = ["LPP-1", "LPP-2", "LPP-4/5"]
 
 
 def main():
-    """For boxitem in BoxItem.objects.exclude(item_name=''):
+    """
+    For boxitem in BoxItem.objects.exclude(item_name=''):
     try:
         itemcat = ItemCatalog.objects.get(size=boxitem.item_name)
     except ItemCatalog.DoesNotExist:

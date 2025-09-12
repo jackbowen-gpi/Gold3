@@ -22,9 +22,7 @@ class Command(BaseCommand):
         for app_label, model_name, field_name in TARGETS:
             model = apps.get_model(app_label, model_name)
             if model is None:
-                self.stdout.write(
-                    self.style.WARNING(f"Model {app_label}.{model_name} not found")
-                )
+                self.stdout.write(self.style.WARNING(f"Model {app_label}.{model_name} not found"))
                 continue
             qs = model.objects.all()
             count = 0
@@ -38,8 +36,4 @@ class Command(BaseCommand):
                     setattr(obj, field_name, aware)
                     obj.save(update_fields=[field_name])
                     count += 1
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"Updated {count} rows on {app_label}.{model_name}.{field_name}"
-                )
-            )
+            self.stdout.write(self.style.SUCCESS(f"Updated {count} rows on {app_label}.{model_name}.{field_name}"))

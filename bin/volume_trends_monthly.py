@@ -1,5 +1,6 @@
 #!/usr/bin/python
-"""Create monthly volume and charges report across workflows.
+"""
+Create monthly volume and charges report across workflows.
 
 Generates an Excel file with monthly items and charge totals.
 """
@@ -45,9 +46,7 @@ for x in range(126):
     str_date = str(month) + "-" + str(year)
     print(str_date)
     docSheet1.cell(row=x + 2, column=1).value = str_date
-    monthly_items = item_set.filter(
-        creation_date__year=year, creation_date__month=month
-    )
+    monthly_items = item_set.filter(creation_date__year=year, creation_date__month=month)
     docSheet1.cell(row=x + 2, column=2).value = monthly_items.count()
     # Total charges for these items.
     monthly_charges = Charge.objects.filter(item__in=monthly_items)

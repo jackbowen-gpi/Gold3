@@ -24,6 +24,7 @@ def growl_at(self, title, description, sticky=False, pref_field=None):
         pref_field: (str) The name of one of the growl_ fields on the
                           UserProfile model. If it evaluates to True, send
                           the notification.
+
     """
     return send_user_notification(
         user_profile=self,

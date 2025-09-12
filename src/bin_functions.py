@@ -1,4 +1,5 @@
-"""Compatibility shim for legacy imports that expect a top-level
+"""
+Compatibility shim for legacy imports that expect a top-level
 `bin_functions` module. Re-exports the implementation from
 `gchub_db.bin.bin_functions`.
 """

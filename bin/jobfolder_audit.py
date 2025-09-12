@@ -373,9 +373,7 @@ if empty_folders or missing_folders or errors:
         "errors": errors,
     }
     # send the email
-    msg = EmailMultiAlternatives(
-        mail_subject, mail_body.render(mail_context), mail_from, mail_send_to
-    )
+    msg = EmailMultiAlternatives(mail_subject, mail_body.render(mail_context), mail_from, mail_send_to)
     msg.content_subtype = "html"
     msg.send()
     print("Email sent.")

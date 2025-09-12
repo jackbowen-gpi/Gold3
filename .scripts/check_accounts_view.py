@@ -1,3 +1,7 @@
+r"""
+Module .scripts\check_accounts_view.py
+"""
+
 import os
 import sys
 import traceback
@@ -27,9 +31,7 @@ spec = importlib.util.find_spec(modname)
 print("spec=", spec)
 if spec:
     print("origin=", getattr(spec, "origin", None))
-    print(
-        "submodule_search_locations=", getattr(spec, "submodule_search_locations", None)
-    )
+    print("submodule_search_locations=", getattr(spec, "submodule_search_locations", None))
 
 try:
     mod = importlib.import_module(modname)
@@ -74,10 +76,7 @@ try:
     username = "devadmin"
     u = User.objects.filter(username=username).first()
     if u:
-        print(
-            "\nDEVADMIN FOUND: username=%s, is_superuser=%s, is_staff=%s"
-            % (u.username, u.is_superuser, u.is_staff)
-        )
+        print("\nDEVADMIN FOUND: username=%s, is_superuser=%s, is_staff=%s" % (u.username, u.is_superuser, u.is_staff))
         try:
             perms = u.user_permissions.count()
             print("explicit user_permissions count:", perms)

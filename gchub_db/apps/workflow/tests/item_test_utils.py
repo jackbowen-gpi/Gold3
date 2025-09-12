@@ -30,14 +30,10 @@ class ItemTestMixin:
         super().setUp()
 
         # Create test user
-        self.test_user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
-        )
+        self.test_user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass123")
 
         # Create test site/workflow
-        self.test_site = Site.objects.create(
-            name="Test Workflow", domain="test.example.com"
-        )
+        self.test_site = Site.objects.create(name="Test Workflow", domain="test.example.com")
 
         # Create test job
         self.test_job = Job.objects.create(
@@ -52,10 +48,8 @@ class ItemTestMixin:
 
         # Create test item catalog
         self.test_item_catalog = ItemCatalog.objects.create(
-            name="Test Size",
-            width=Decimal("10.5"),
-            height=Decimal("8.5"),
-            depth=Decimal("2.0"),
+            size="Test Size 12oz",
+            workflow=self.test_site,
         )
 
     def create_test_item(self, **kwargs):
@@ -105,13 +99,9 @@ class ItemTestMixin:
         )
 
         # Create beverage-specific related objects
-        bev_center_code = BeverageCenterCode.objects.create(
-            code="TEST", name="Test Center Code"
-        )
+        bev_center_code = BeverageCenterCode.objects.create(code="TEST", name="Test Center Code")
 
-        bev_liquid_code = BeverageLiquidContents.objects.create(
-            code="COLA", name="Cola Beverage"
-        )
+        bev_liquid_code = BeverageLiquidContents.objects.create(code="COLA", name="Cola Beverage")
 
         bev_brand_code = BeverageBrandCode.objects.create(code="CC", name="Coca Cola")
 
@@ -134,9 +124,7 @@ class ItemTestMixin:
     def create_fsb_item(self, **kwargs):
         """Create a test Item specifically for FSB workflow."""
         # Set up FSB workflow
-        fsb_site = Site.objects.create(
-            name="Food Service Board", domain="fsb.example.com"
-        )
+        fsb_site = Site.objects.create(name="Food Service Board", domain="fsb.example.com")
 
         fsb_job = Job.objects.create(
             name="FSB Job",

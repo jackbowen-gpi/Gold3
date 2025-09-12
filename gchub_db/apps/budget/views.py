@@ -27,9 +27,7 @@ def billing_home(request):
 
     # Get full billing report for current month and previous month.
     current_month_report = billing_funcs.monthly_report(month_num, year_num)
-    previous_month_report = billing_funcs.monthly_report(
-        last_month_num, last_year, activity=False, billable=False
-    )
+    previous_month_report = billing_funcs.monthly_report(last_month_num, last_year, activity=False, billable=False)
 
     # array of years used to display yearly reports
     start_year = 2008
@@ -106,9 +104,7 @@ def monthly_by_plant(request, year_num, month_num, workflow, datatype):
         try:
             try:
                 # If dictionary key already exists, just add to the total.
-                plant_dict[charge.item.printlocation.plant.name]["total_charges"] += (
-                    charge.amount
-                )
+                plant_dict[charge.item.printlocation.plant.name]["total_charges"] += charge.amount
             except KeyError:
                 # If dictionary key does not exist, create it using the charge
                 # amount as the initial value.
@@ -166,9 +162,7 @@ def line_item_monthly(request, year_num, month_num, workflow, datatype):
 
 def display_pricing_tables(request, workflow):
     """Display pricing tables for a given workflow -- price at # of colors, etc..."""
-    charge_set = ChargeType.objects.filter(
-        workflow__name=workflow, active=True
-    ).order_by("-category__id")
+    charge_set = ChargeType.objects.filter(workflow__name=workflow, active=True).order_by("-category__id")
     charge_data = {}
     for type in charge_set:
         rush_charges = {}
@@ -185,9 +179,7 @@ def display_pricing_tables(request, workflow):
             else:
                 ink_range = 2
             for ink in range(1, ink_range):
-                bycolor_charges[ink] = type.actual_charge(
-                    num_colors=ink, rush_days=rush_days
-                )
+                bycolor_charges[ink] = type.actual_charge(num_colors=ink, rush_days=rush_days)
             rush_charges[rush_days] = bycolor_charges
         charge_data[type] = rush_charges
     print(charge_data)

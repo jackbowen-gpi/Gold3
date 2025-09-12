@@ -14,7 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""A module to automatically restart the server when a module is modified.
+"""
+A module to automatically restart the server when a module is modified.
 
 This module depends on IOLoop, so it will not work in WSGI applications
 and Google AppEngine.
@@ -30,7 +31,8 @@ from . import ioloop
 
 
 def start(io_loop=None, check_time=500):
-    """Restarts the process automatically when a module is modified.
+    """
+    Restarts the process automatically when a module is modified.
 
     We run on the I/O loop, and restarting is a destructive operation,
     so will terminate any pending requests.

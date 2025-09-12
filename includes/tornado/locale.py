@@ -14,7 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Translation methods for generating localized strings.
+"""
+Translation methods for generating localized strings.
 
 To load a locale and generate a translated string:
 
@@ -42,7 +43,8 @@ import os.path
 
 
 def _utcnow_naive():
-    """Return a naive UTC datetime, preferring Django's timezone when present.
+    """
+    Return a naive UTC datetime, preferring Django's timezone when present.
 
     Same approach as in vendored tornado.web: try django.utils.timezone.now()
     and convert to naive UTC; fall back to datetime.datetime.utcnow().
@@ -64,7 +66,8 @@ _supported_locales = frozenset([_default_locale])
 
 
 def get(*locale_codes):
-    """Returns the closest match for the given locale codes.
+    """
+    Returns the closest match for the given locale codes.
 
     We iterate over all given locale codes in order. If we have a tight
     or a loose match for the code (e.g., "en" for "en_US"), we return
@@ -78,7 +81,8 @@ def get(*locale_codes):
 
 
 def set_default_locale(code):
-    """Sets the default locale, used in get_closest_locale().
+    """
+    Sets the default locale, used in get_closest_locale().
 
     The default locale is assumed to be the language used for all strings
     in the system. The translations loaded from disk are mappings from
@@ -92,7 +96,8 @@ def set_default_locale(code):
 
 
 def load_translations(directory):
-    """Loads translations from CSV files in a directory.
+    """
+    Loads translations from CSV files in a directory.
 
     Translations are strings with optional Python-style named placeholders
     (e.g., "My name is %(name)s") and their associated translations.
@@ -180,7 +185,8 @@ class Locale(object):
 
     @classmethod
     def get(cls, code):
-        """Returns the Locale for the given locale code.
+        """
+        Returns the Locale for the given locale code.
 
         If it is not supported, we raise an exception.
         """
@@ -229,7 +235,8 @@ class Locale(object):
         ]
 
     def translate(self, message, plural_message=None, count=None):
-        """Returns the translation for the given message for this locale.
+        """
+        Returns the translation for the given message for this locale.
 
         If plural_message is given, you must also provide count. We return
         plural_message when count != 1, and we return the singular form
@@ -249,7 +256,8 @@ class Locale(object):
     def format_date(
         self, date, gmt_offset=0, relative=True, shorter=False, full_format=False
     ):
-        """Formats the given date (which should be GMT).
+        """
+        Formats the given date (which should be GMT).
 
         By default, we return a relative time (e.g., "2 minutes ago"). You
         can return an absolute date string with relative=False.
@@ -336,7 +344,8 @@ class Locale(object):
         }
 
     def format_day(self, date, gmt_offset=0, dow=True):
-        """Formats the given date as a day of week.
+        """
+        Formats the given date as a day of week.
 
         Example: "Monday, January 22". You can remove the day of week with
         dow=False.
@@ -356,7 +365,8 @@ class Locale(object):
             }
 
     def list(self, parts):
-        """Returns a comma-separated list for the given list of parts.
+        """
+        Returns a comma-separated list for the given list of parts.
 
         The format is, e.g., "A, B and C", "A and B" or just "A" for lists
         of size 1.

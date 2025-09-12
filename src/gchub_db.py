@@ -28,9 +28,7 @@ if os.path.exists(_inner_pkg_init):
         pkg = importlib.import_module("gchub_db")
     except Exception:
         # Load inner package by path to ensure correct module object
-        spec: Optional[ModuleSpec] = importlib.util.spec_from_file_location(
-            "gchub_db", _inner_pkg_init
-        )
+        spec: Optional[ModuleSpec] = importlib.util.spec_from_file_location("gchub_db", _inner_pkg_init)
         if spec is not None and spec.loader is not None:
             pkg = importlib.util.module_from_spec(spec)
             sys.modules["gchub_db"] = pkg

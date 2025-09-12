@@ -1,3 +1,7 @@
+"""
+Module src\test_urls.py
+"""
+
 from django.http import HttpResponse
 from django.urls import path
 

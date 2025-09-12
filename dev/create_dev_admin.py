@@ -1,3 +1,7 @@
+r"""
+Module dev\create_dev_admin.py
+"""
+
 import os
 import sys
 
@@ -32,9 +36,7 @@ from django.contrib.auth import get_user_model  # noqa: E402
 from django.contrib.auth.models import Permission  # noqa: E402
 
 User = get_user_model()
-u, created = User.objects.get_or_create(
-    username="dev_admin", defaults={"email": "dev_admin@example.com"}
-)
+u, created = User.objects.get_or_create(username="dev_admin", defaults={"email": "dev_admin@example.com"})
 u.is_staff = True
 u.is_superuser = True
 u.set_password("pass123")

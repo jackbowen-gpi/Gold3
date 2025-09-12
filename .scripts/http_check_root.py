@@ -1,3 +1,7 @@
+r"""
+Module .scripts\http_check_root.py
+"""
+
 import requests
 
 resp = requests.get("http://127.0.0.1:8000/")
@@ -8,9 +12,7 @@ for k, v in resp.headers.items():
         print(k + ":", v)
 print(
     "\nHas session cookie:",
-    any(
-        "sessionid" in h.lower() for h in resp.headers.get("set-cookie", "").split(",")
-    ),
+    any("sessionid" in h.lower() for h in resp.headers.get("set-cookie", "").split(",")),
 )
 # Print a small snippet of the body to look for the username
 text = resp.text

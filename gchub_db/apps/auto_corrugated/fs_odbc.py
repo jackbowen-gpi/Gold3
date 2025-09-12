@@ -38,9 +38,11 @@ disabled but left in GOLD just in case we need to dust it off again later.
 #     may iterate through.
 #     """
 #     cursor = _get_conn_cursor()[0]
-# #     cursor.execute("SELECT DISTINCT PartType, CasePack, SleeveCount, Length, Width, Height from ProductSpecs WHERE Width != 'null' ORDER BY PartType")
+# #     cursor.execute("SELECT DISTINCT PartType, CasePack, SleeveCount, Length, Width, "
+#                    "Height from ProductSpecs WHERE Width != 'null' ORDER BY PartType")
 #     # Joe Hammond suggested we use this newer view/statement which is quicker.
-#     cursor.execute("SELECT PartType, CasePack, Sleeve, Length, Width, Height FROM PartTypeStandards")
+# #     cursor.execute("SELECT PartType, CasePack, Sleeve, Length, Width, Height "
+#                    "FROM PartTypeStandards")
 #     if PRINT_COLUMNS:
 #         # Show a list of columns + their data types.
 #         for column in cursor.description:

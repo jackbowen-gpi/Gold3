@@ -16,12 +16,8 @@ class SBO(models.Model):
 
     date_added = models.DateTimeField("Date Added", auto_now_add=True)
     date_observed = models.DateTimeField("Date Observed")
-    observer = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=True, null=True, related_name="observer"
-    )
-    observed = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=True, null=True, related_name="observed"
-    )
+    observer = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name="observer")
+    observed = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name="observed")
 
     task = models.TextField(max_length=500)
     behavior = models.TextField(max_length=500)

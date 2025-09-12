@@ -14,7 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""A simple template system that compiles templates to Python code.
+"""
+A simple template system that compiles templates to Python code.
 
 Basic usage looks like:
 
@@ -89,7 +90,8 @@ from . import escape
 
 
 class Template(object):
-    """A compiled template.
+    """
+    A compiled template.
 
     We compile into Python from the given template_string. You can generate
     the template from variables with generate().
@@ -161,7 +163,8 @@ class Template(object):
 
 
 class Loader(object):
-    """A template loader that loads from a single root directory.
+    """
+    A template loader that loads from a single root directory.
 
     You must use a template loader to use template constructs like
     {% extends %} and {% include %}. Loader caches all templates after

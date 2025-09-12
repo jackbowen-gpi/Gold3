@@ -1,13 +1,12 @@
-"""This file is for common global defines that generally shouldn't change.
+"""
+This file is for common global defines that generally shouldn't change.
 Anything that is subject to change is likely to be in the application's
 settings.py file.
 """
 
 APIURL = "http://www.fedex.com/fsmapi"
 XSIURL = "http://www.w3.org/2001/XMLSchema-instance"
-SUBSCRIBE_NNSLOC = (
-    "FDXSubscriptionRequest.xsd"  # NNSLOC is "xsi:noNamespaceSchemaLocation"
-)
+SUBSCRIBE_NNSLOC = "FDXSubscriptionRequest.xsd"  # NNSLOC is "xsi:noNamespaceSchemaLocation"
 URL_RATE_CHECK = "/GatewayDC"
 
 # Used in the ship_carrier_code field

@@ -1,4 +1,5 @@
-"""Quick helper to verify importing `gchub_db.settings` from the repo.
+"""
+Quick helper to verify importing `gchub_db.settings` from the repo.
 
 Useful during local setup when Python path issues occur.
 """

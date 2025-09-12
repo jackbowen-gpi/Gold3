@@ -9,7 +9,6 @@ def preferences_theme_context(request):
     Add theme and styling context to all templates.
     This allows dynamic CSS control across all preferences pages.
     """
-
     # Get theme from session, cookie, or user preference
     theme = None
     custom_primary = None
@@ -24,9 +23,7 @@ def preferences_theme_context(request):
 
     # Fall back to session or cookie
     if not theme:
-        theme = request.session.get(
-            "preferences_theme", request.COOKIES.get("preferences_theme", "default")
-        )
+        theme = request.session.get("preferences_theme", request.COOKIES.get("preferences_theme", "default"))
 
     # Get animations preference
     animations = True
@@ -61,22 +58,8 @@ def preferences_theme_context(request):
             ],
         },
         "css_variables": {
-            "primary_color": custom_primary
-            or (
-                "#663333"
-                if theme == "default"
-                else "#2c5530"
-                if theme == "dark"
-                else "#4a90e2"
-            ),
-            "accent_color": custom_accent
-            or (
-                "#CCCC66"
-                if theme == "default"
-                else "#5a9c66"
-                if theme == "dark"
-                else "#f0a500"
-            ),
+            "primary_color": custom_primary or ("#663333" if theme == "default" else "#2c5530" if theme == "dark" else "#4a90e2"),
+            "accent_color": custom_accent or ("#CCCC66" if theme == "default" else "#5a9c66" if theme == "dark" else "#f0a500"),
         },
     }
 

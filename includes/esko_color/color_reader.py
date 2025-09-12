@@ -1,4 +1,5 @@
-"""This module contains EskoColor, which is used to abstract access to
+"""
+This module contains EskoColor, which is used to abstract access to
 colors within Kalleidescope color books.
 """
 
@@ -18,12 +19,14 @@ class InvalidColor(Exception):
 
 
 class EskoColor(object):
-    """Abstracts access to inkbook files that are located on the Esko bg_cms_data
+    """
+    Abstracts access to inkbook files that are located on the Esko bg_cms_data
     share. From here, you can get color values and perform some calculations.
     """
 
     def __init__(self, color_name, color_spec_res_path):
-        """color_name: (str) Raw, user-provided color name that was queried for.
+        """
+        color_name: (str) Raw, user-provided color name that was queried for.
         color_spec_res_path: (str) Path to the color's *_ras_spec.res file.
         """
         self.name = color_name

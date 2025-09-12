@@ -213,9 +213,7 @@ def item_print_seps_link(item, link_text="Printable Separations"):
     except fs_api.NoResultsFound:
         # Check if this is development mode with file system access disabled
         if not getattr(settings, "FS_ACCESS_ENABLED", True):
-            alert_message = (
-                "Printable separations are not available in development mode."
-            )
+            alert_message = "Printable separations are not available in development mode."
         else:
             alert_message = "No printable separations are available for this item."
 

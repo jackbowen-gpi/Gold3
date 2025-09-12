@@ -1,3 +1,7 @@
+r"""
+Module includes\EXIF.py
+"""
+
 import collections
 import collections.abc
 

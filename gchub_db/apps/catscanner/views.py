@@ -6,7 +6,8 @@ from gchub_db.apps.workflow.models import Job
 
 
 def item_data(request, job_id, item_num):
-    """Return item data for Catscanner to parse.
+    """
+    Return item data for Catscanner to parse.
 
     URL: /catscanner/item_data/<job_id>/<item_num>/
     """
@@ -62,14 +63,12 @@ def color_data(request, job_id, item_num, color_num):
         else:
             dont_compare = 1
 
-        return HttpResponse(
-            "%d|%f|%f|%f"
-            % (dont_compare, colordef.lab_l, colordef.lab_a, colordef.lab_b)
-        )
+        return HttpResponse("%d|%f|%f|%f" % (dont_compare, colordef.lab_l, colordef.lab_a, colordef.lab_b))
 
 
 def send_measurement(request, job_id, item_num, color_num):
-    """Records a measurement to one of the ItemColor objects associated with an
+    """
+    Records a measurement to one of the ItemColor objects associated with an
     item.
 
     URL: /catscanner/send_measurement/<job_id>/<item_num>/<color_num>/

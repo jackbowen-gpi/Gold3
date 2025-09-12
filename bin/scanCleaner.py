@@ -26,9 +26,7 @@ if mounted:
         if os.path.isfile(filePath):
             # make sure that none of the files are hidden files
             if file[0] != ".":
-                dateModified = datetime.datetime.utcfromtimestamp(
-                    os.path.getmtime(filePath)
-                )
+                dateModified = datetime.datetime.utcfromtimestamp(os.path.getmtime(filePath))
 
                 # comepare today to the dateMod and get the lifetime
                 lifetime = today - dateModified

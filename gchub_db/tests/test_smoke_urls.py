@@ -17,7 +17,8 @@ class SmokeURLTests(SimpleTestCase):
     ]
 
     def test_reverse_named_urls(self):
-        """Use a minimal in-memory URLConf to verify named routes exist.
+        """
+        Use a minimal in-memory URLConf to verify named routes exist.
 
         The project has a repo-root `test_urls.py` that can confuse test
         discovery and cause Django to import the wrong module. Creating a

@@ -12,9 +12,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="colorkeyqueue",
             name="date_processed",
-            field=models.DateTimeField(
-                blank=True, null=True, verbose_name="Date Processed"
-            ),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="Date Processed"),
         ),
         migrations.AlterField(
             model_name="colorkeyqueue",
@@ -24,16 +22,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="colorkeyqueue",
             name="number_of_attempts",
-            field=models.IntegerField(
-                blank=True, default=0, null=True, verbose_name="Attempts"
-            ),
+            field=models.IntegerField(blank=True, default=0, null=True, verbose_name="Attempts"),
         ),
         migrations.AlterField(
             model_name="tifftopdf",
             name="date_processed",
-            field=models.DateTimeField(
-                blank=True, null=True, verbose_name="Date Processed"
-            ),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="Date Processed"),
         ),
         migrations.AlterField(
             model_name="tifftopdf",

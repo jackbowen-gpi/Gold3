@@ -82,9 +82,7 @@ class SendAlertForm(forms.Form):
         min_value=3,
         max_value=30,
         help_text="How long the notification should stay visible (seconds)",
-        widget=forms.NumberInput(
-            attrs={"class": "form-control", "min": "3", "max": "30"}
-        ),
+        widget=forms.NumberInput(attrs={"class": "form-control", "min": "3", "max": "30"}),
     )
 
     test_mode = forms.BooleanField(
@@ -102,22 +100,21 @@ def is_admin_or_above(user):
 @user_passes_test(is_admin_or_above)
 def send_alert_view(request):
     """Admin view for sending alert notifications."""
-
     if not NOTIFICATIONS_AVAILABLE:
         messages.error(request, "Notification system is not available.")
         return redirect("/admin/")
 
     template_messages = {
-        "server_maintenance": "Server Maintenance: The system will be down for maintenance from X to Y. Please save your work.",
-        "urgent_update": "Urgent System Update: Please save your work and refresh your browser within the next 10 minutes.",
-        "production_alert": "Production Alert: High priority jobs need immediate attention. Please check your queue.",
-        "deadline_reminder": "Deadline Reminder: Multiple jobs are due today. Please check your queue and prioritize accordingly.",
-        "system_slowdown": "System Performance: The system may be running slower than usual. We are investigating the issue.",
-        "new_feature": "New Feature: A new feature has been added to the system. Check the workflow section for updates!",
-        "training_session": "Training Session: Join us for training on new system features. Details in your email.",
-        "holiday_schedule": "Holiday Schedule: Please note changed hours for the upcoming holiday. Check the calendar for details.",
-        "backup_reminder": "Backup Reminder: Please ensure all important work is saved. System backup starting soon.",
-        "security_alert": "Security Alert: Please verify your account security settings and update your password if needed.",
+        "server_maintenance": ("Server Maintenance: The system will be down for maintenance from X to Y. " "Please save your work."),
+        "urgent_update": ("Urgent System Update: Please save your work and refresh your browser " "within the next 10 minutes."),
+        "production_alert": ("Production Alert: High priority jobs need immediate attention. " "Please check your queue."),
+        "deadline_reminder": ("Deadline Reminder: Multiple jobs are due today. Please check your queue " "and prioritize accordingly."),
+        "system_slowdown": ("System Performance: The system may be running slower than usual. " "We are investigating the issue."),
+        "new_feature": ("New Feature: A new feature has been added to the system. " "Check the workflow section for updates!"),
+        "training_session": ("Training Session: Join us for training on new system features. " "Details in your email."),
+        "holiday_schedule": ("Holiday Schedule: Please note changed hours for the upcoming holiday. " "Check the calendar for details."),
+        "backup_reminder": ("Backup Reminder: Please ensure all important work is saved. " "System backup starting soon."),
+        "security_alert": ("Security Alert: Please verify your account security settings and " "update your password if needed."),
     }
 
     if request.method == "POST":
@@ -138,9 +135,7 @@ def send_alert_view(request):
                 target_users = User.objects.filter(is_active=True)
                 mode_text = "all active users"
             elif target_groups.exists():
-                target_users = User.objects.filter(
-                    groups__in=target_groups, is_active=True
-                ).distinct()
+                target_users = User.objects.filter(groups__in=target_groups, is_active=True).distinct()
                 group_names = ", ".join([g.name for g in target_groups])
                 mode_text = f"groups: {group_names}"
             else:
@@ -165,11 +160,13 @@ def send_alert_view(request):
 
             for user in target_users:
                 try:
-                    # For now, we'll send to all users on the same machine
-                    # In a real deployment, you'd need to track which machine each user is on
+                    # For now, we'll send to all users on the same machine.
+                    # In a real deployment, you'd need to track which machine
+                    # each user is on.
+                    sender_name = request.user.get_full_name() or request.user.username
                     result = notification_manager.send_notification(
                         title=f"[ADMIN ALERT] {title}",
-                        message=f"{message}\n\n— {request.user.get_full_name() or request.user.username}",
+                        message=f"{message}\n\n— {sender_name}",
                         duration=duration,
                     )
                     if result:
@@ -181,15 +178,11 @@ def send_alert_view(request):
 
             # Show success message
             if success_count > 0:
-                messages.success(
-                    request,
-                    f"Alert sent successfully to {success_count} user(s) in {mode_text}.",
-                )
+                success_msg = f"Alert sent successfully to {success_count} user(s) in " f"{mode_text}."
+                messages.success(request, success_msg)
             if error_count > 0:
-                messages.warning(
-                    request,
-                    f"Failed to send to {error_count} user(s). They may not be on this machine.",
-                )
+                error_msg = f"Failed to send to {error_count} user(s). " "They may not be on this machine."
+                messages.warning(request, error_msg)
 
             return redirect(request.path)
 

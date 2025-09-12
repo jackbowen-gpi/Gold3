@@ -56,9 +56,7 @@ class JobTestMixin:
         statuses = ["Active", "Pending", "Complete", "On Hold", "Cancelled"]
 
         for status in statuses:
-            jobs[status.lower().replace(" ", "_")] = self.create_test_job(
-                name=f"{status} Job", workflow=site, status=status
-            )
+            jobs[status.lower().replace(" ", "_")] = self.create_test_job(name=f"{status} Job", workflow=site, status=status)
 
         return jobs
 
@@ -104,25 +102,15 @@ class JobTestMixin:
     def create_jobs_for_different_sites(self):
         """Create jobs across different site types for testing."""
         sites = {
-            "beverage": self.create_test_site(
-                name="Beverage Site", domain=f"beverage-{uuid.uuid4().hex[:8]}.local"
-            ),
-            "carton": self.create_test_site(
-                name="Carton Site", domain=f"carton-{uuid.uuid4().hex[:8]}.local"
-            ),
-            "food": self.create_test_site(
-                name="Food Site", domain=f"food-{uuid.uuid4().hex[:8]}.local"
-            ),
-            "regular": self.create_test_site(
-                name="Regular Site", domain=f"regular-{uuid.uuid4().hex[:8]}.local"
-            ),
+            "beverage": self.create_test_site(name="Beverage Site", domain=f"beverage-{uuid.uuid4().hex[:8]}.local"),
+            "carton": self.create_test_site(name="Carton Site", domain=f"carton-{uuid.uuid4().hex[:8]}.local"),
+            "food": self.create_test_site(name="Food Site", domain=f"food-{uuid.uuid4().hex[:8]}.local"),
+            "regular": self.create_test_site(name="Regular Site", domain=f"regular-{uuid.uuid4().hex[:8]}.local"),
         }
 
         jobs = {}
         for site_type, site in sites.items():
-            jobs[site_type] = self.create_test_job(
-                name=f"{site_type.title()} Job", workflow=site
-            )
+            jobs[site_type] = self.create_test_job(name=f"{site_type.title()} Job", workflow=site)
 
         return jobs, sites
 
@@ -263,9 +251,7 @@ class JobTestData:
         return {
             "empty_name": {"name": ""},
             "very_long_name": {"name": "X" * 1000},
-            "special_chars_name": {
-                "name": "Job with §pecial ¢haråcters & symbols!@#$%"
-            },
+            "special_chars_name": {"name": "Job with §pecial ¢haråcters & symbols!@#$%"},
             "unicode_name": {"name": "Job with Ünícødé 中文 العربية"},
             "past_due_date": {"due_date": date.today() - timedelta(days=30)},
             "far_future_due_date": {"due_date": date.today() + timedelta(days=3650)},
@@ -287,9 +273,7 @@ def create_sample_jobs(site, count=10):
     jobs = []
     sample_data = JobTestData.get_sample_job_data(count)
 
-    for i, data in enumerate(
-        sample_data if isinstance(sample_data, list) else [sample_data]
-    ):
+    for i, data in enumerate(sample_data if isinstance(sample_data, list) else [sample_data]):
         data["workflow"] = site
         data["name"] = f"{data['name']} {i+1}"  # Make names unique
         jobs.append(Job.objects.create(**data))

@@ -1,3 +1,7 @@
+"""
+Module .scripts\test_lazy_accounts_view.py
+"""
+
 import os
 import sys
 
@@ -29,9 +33,7 @@ except Exception as e:
         candidate = os.path.join(accounts_dir, "views.py")
         print("candidate", candidate, "exists=", os.path.exists(candidate))
         if os.path.exists(candidate):
-            spec2 = importlib.util.spec_from_file_location(
-                module_name + "_file", candidate
-            )
+            spec2 = importlib.util.spec_from_file_location(module_name + "_file", candidate)
             mod2 = importlib.util.module_from_spec(spec2)
             spec2.loader.exec_module(mod2)
             print("mod2 attrs sample:", dir(mod2)[:20])

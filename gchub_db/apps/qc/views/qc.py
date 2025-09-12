@@ -20,7 +20,8 @@ from gchub_db.apps.qc.models import (
 
 
 def create_review_and_redirect(request, qcdoc_id):
-    """Creates a QCResponseDoc and sets its parent to the specified master QC.
+    """
+    Creates a QCResponseDoc and sets its parent to the specified master QC.
     Redirects the browser to the QC editor instance for the created review QC.
     """
     qcdoc = get_object_or_404(QCResponseDoc, id=qcdoc_id)
@@ -29,7 +30,8 @@ def create_review_and_redirect(request, qcdoc_id):
 
 
 def edit_qc(request, qcdoc_id):
-    """This is where the bulk of the QC process takes place. The QC Editor is
+    """
+    This is where the bulk of the QC process takes place. The QC Editor is
     the interface in which artists can review items.
     """
     qcdoc = get_object_or_404(QCResponseDoc, id=qcdoc_id)
@@ -69,7 +71,8 @@ def edit_qc(request, qcdoc_id):
 
 
 def view_qc(request, qcdoc_id):
-    """The QC Viewer shows a QC's responses and lets the artist or another person
+    """
+    The QC Viewer shows a QC's responses and lets the artist or another person
     respond to Whoopses.
     """
     qcdoc = get_object_or_404(QCResponseDoc, id=qcdoc_id)
@@ -121,13 +124,9 @@ def finish_qc(request, qcdoc_id):
                 whoops_found,
             )
         else:
-            growl_text = "%s has reviewed your QC and found no problems." % (
-                request.user
-            )
+            growl_text = "%s has reviewed your QC and found no problems." % (request.user)
 
-        qcdoc.job.growl_at_artist(
-            growl_title, growl_text, pref_field="growl_hear_jdf_processes"
-        )
+        qcdoc.job.growl_at_artist(growl_title, growl_text, pref_field="growl_hear_jdf_processes")
     else:
         joblog_type = joblog_defs.JOBLOG_TYPE_QC_SUBMITTED
         joblog_text = "Initial QC has been submitted."
@@ -212,7 +211,8 @@ def ajax_whoops_get_div(request, qcresponse_id):
 
 
 def create_review_and_redirect2(request, qcdoc_id):
-    """Creates a QCResponseDoc and sets its parent to the specified master QC.
+    """
+    Creates a QCResponseDoc and sets its parent to the specified master QC.
     Redirects the browser to the QC editor instance for the created review QC.
     """
     qcdoc = get_object_or_404(QCResponseDoc, id=qcdoc_id)
@@ -221,7 +221,8 @@ def create_review_and_redirect2(request, qcdoc_id):
 
 
 def edit_qc2(request, qcdoc_id):
-    """This is where the bulk of the QC process takes place. The QC Editor is
+    """
+    This is where the bulk of the QC process takes place. The QC Editor is
     the interface in which artists can review items.
     """
     qcdoc = get_object_or_404(QCResponseDoc, id=qcdoc_id)
@@ -272,12 +273,7 @@ def edit_qc2(request, qcdoc_id):
     # list = all of the QCResponse items.
     list = qcdoc.items.all()
     for item in list:
-        if (
-            (not item.final_file_date())
-            and item.current_proof_date()
-            and item.is_approved()
-            and (not item.current_revision())
-        ):
+        if (not item.final_file_date()) and item.current_proof_date() and item.is_approved() and (not item.current_revision()):
             qc_type = "Final File"
             break
         elif item.current_revision():

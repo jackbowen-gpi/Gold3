@@ -26,7 +26,8 @@ import time
 
 
 class IOLoop(object):
-    """A level-triggered I/O loop.
+    """
+    A level-triggered I/O loop.
 
     We use epoll if it is available, or else we fall back on select(). If
     you are implementing a system that needs to handle 1000s of simultaneous
@@ -100,7 +101,8 @@ class IOLoop(object):
 
     @classmethod
     def instance(cls):
-        """Returns a global IOLoop instance.
+        """
+        Returns a global IOLoop instance.
 
         Most single-threaded applications have a single, global IOLoop.
         Use this method instead of passing around IOLoop instances
@@ -141,7 +143,8 @@ class IOLoop(object):
             logging.debug("Error deleting fd from IOLoop", exc_info=True)
 
     def start(self):
-        """Starts the I/O loop.
+        """
+        Starts the I/O loop.
 
         The loop will run until one of the I/O handlers calls stop(), which
         will make the loop stop after the current event iteration completes.
@@ -214,7 +217,8 @@ class IOLoop(object):
         self._stopped = False
 
     def stop(self):
-        """Stop the loop after the current event loop iteration is complete.
+        """
+        Stop the loop after the current event loop iteration is complete.
         If the event loop is not currently running, the next call to start()
         will return immediately.
 
@@ -285,14 +289,17 @@ class _Timeout(object):
         self.deadline = deadline
         self.callback = callback
 
-    def __cmp__(self, other):
-        return cmp(  # type: ignore
-            (self.deadline, id(self.callback)), (other.deadline, id(other.callback))
-        )
+    def __lt__(self, other):
+        """Order timeouts by (deadline, id(callback)) for bisect.insort usage.
+
+        Python 2 used __cmp__; implement __lt__ for Python 3 compatibility.
+        """
+        return (self.deadline, id(self.callback)) < (other.deadline, id(other.callback))
 
 
 class PeriodicCallback(object):
-    """Schedules the given callback to be called periodically.
+    """
+    Schedules the given callback to be called periodically.
 
     The callback is called every callback_time milliseconds.
     """

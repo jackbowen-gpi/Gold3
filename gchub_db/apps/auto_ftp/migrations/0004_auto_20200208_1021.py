@@ -12,9 +12,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="autoftptiff",
             name="date_processed",
-            field=models.DateTimeField(
-                blank=True, null=True, verbose_name="Date Processed"
-            ),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="Date Processed"),
         ),
         migrations.AlterField(
             model_name="autoftptiff",

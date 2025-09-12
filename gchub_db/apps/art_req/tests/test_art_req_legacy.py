@@ -1,4 +1,5 @@
-"""Legacy small tests moved from apps/art_req/tests.py into the tests package so
+"""
+Legacy small tests moved from apps/art_req/tests.py into the tests package so
 unittest discovery doesn't confuse the module and package named `tests`.
 """
 

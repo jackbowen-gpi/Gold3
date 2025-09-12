@@ -1,4 +1,5 @@
-"""Simple health check for the devserver used by CI.
+"""
+Simple health check for the devserver used by CI.
 
 Usage: run this from the project root with the virtualenv active.
 Exits with non-zero code if any checked endpoint fails or returns non-200.

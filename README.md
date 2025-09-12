@@ -564,6 +564,26 @@ django-prometheus==2.3.1             # Prometheus metrics
 django-structlog==8.1.0              # Structured logging
 ```
 
+#### **Celery Startup & Configuration**
+
+**🎯 Robust Celery Beat Startup**: The `scripts/wait-and-start-celery-beat.sh` script ensures reliable Celery Beat initialization with production-grade features:
+
+- **⏱️ Configurable Wait Timeout**: `WAIT_TIMEOUT` environment variable sets maximum wait time for web readiness marker (`/app/.web_ready`). Defaults to infinite wait for development, configurable for production (e.g., 120s).
+- **🔄 Adjustable Check Interval**: `WAIT_INTERVAL` controls seconds between readiness checks (default 1s).
+- **🐍 Safe PYTHONPATH Handling**: Appends `/app` to existing `PYTHONPATH` instead of overwriting, preserving custom paths.
+- **📡 Signal Forwarding**: Uses `exec` to replace shell with Python process, ensuring proper signal handling (SIGTERM) for graceful container shutdowns.
+- **📝 Enhanced Logging**: Logs wait progress, timeouts, and elapsed time for better debugging.
+
+**Usage in Docker Compose**:
+```yaml
+celery-beat:
+  environment:
+    WAIT_TIMEOUT: "120"  # Optional: timeout after 120 seconds
+    WAIT_INTERVAL: "2"   # Optional: check every 2 seconds
+```
+
+**📖 Documentation**: See `docs/CELERY-STARTUP.md` for detailed startup mechanics and troubleshooting.
+
 ### **🎨 UI/UX Enhancement Ideas**
 
 #### **Modern Frontend Stack**

@@ -1,3 +1,7 @@
+r"""
+Module .scripts\check_accounts_views.py
+"""
+
 import os
 import sys
 
@@ -24,6 +28,4 @@ mod = importlib.import_module("gchub_db.apps.accounts.views")
 print("imported accounts.views as", type(mod))
 print("has index:", hasattr(mod, "index"))
 urls = importlib.import_module("gchub_db.apps.accounts.urls")
-print(
-    "imported accounts.urls, urlpatterns_len =", len(getattr(urls, "urlpatterns", []))
-)
+print("imported accounts.urls, urlpatterns_len =", len(getattr(urls, "urlpatterns", [])))

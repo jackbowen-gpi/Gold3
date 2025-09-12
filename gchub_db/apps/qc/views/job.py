@@ -50,9 +50,7 @@ def ajax_create_qc(request, job_id):
             pass
 
     if not items:
-        return HttpResponse(
-            JSMessage("Select at least one item to review.", is_error=True)
-        )
+        return HttpResponse(JSMessage("Select at least one item to review.", is_error=True))
 
     qcr = QCResponseDoc.objects.start_qc_for_items(items, request.user)
 
@@ -79,9 +77,7 @@ def ajax_create_qc2(request, job_id):
             pass
 
     if not items:
-        return HttpResponse(
-            JSMessage("Select at least one item to review.", is_error=True)
-        )
+        return HttpResponse(JSMessage("Select at least one item to review.", is_error=True))
 
     qcr = QCResponseDoc.objects.start_qc_for_items(items, request.user)
 

@@ -19,7 +19,8 @@ class GenericElement(object):
 
 
 class MultiLineTextElement(object):
-    """This class will correctly set the element's 'width' attribute by looking
+    """
+    This class will correctly set the element's 'width' attribute by looking
     at the longest line of text.
     """
 
@@ -66,7 +67,8 @@ class TextElement(object):
     def __init__(
         self, bottom_left_x, bottom_left_y, label_text, font="Helvetica-Bold", size=12
     ):
-        """bottom_left_x: (float) X coordinate for object's bottom left point.
+        """
+        bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         text: (str) Text to be displayed on the element.
         font: (str) A valid registered font.
@@ -87,7 +89,8 @@ class TextElement(object):
 
 
 class SVGGraphicElement(object):
-    """This class represents any single imported SVG (Scalable Vector Graphic)
+    """
+    This class represents any single imported SVG (Scalable Vector Graphic)
     element.
     """
 
@@ -99,7 +102,8 @@ class SVGGraphicElement(object):
         available_area_x,
         available_area_y,
     ):
-        """bottom_left_x: (float) X coordinate for object's bottom left point.
+        """
+        bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         file: (str) File path to import.
         available_area_x: (int) Horiz. area available for graphic placement.

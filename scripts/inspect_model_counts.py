@@ -1,4 +1,5 @@
-"""Diagnostic helper: attempts to count rows for every registered
+"""
+Diagnostic helper: attempts to count rows for every registered
 model and prints full tracebacks for any exceptions. Run with
 the dev Postgres env vars set when using Postgres.
 """

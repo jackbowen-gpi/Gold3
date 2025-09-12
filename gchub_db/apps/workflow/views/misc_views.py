@@ -76,9 +76,7 @@ def code_manager_edit(request, code_id):
             "code": code,
         }
 
-        return render(
-            request, "workflow/misc/beverage/code_manager_edit.html", context=pagevars
-        )
+        return render(request, "workflow/misc/beverage/code_manager_edit.html", context=pagevars)
 
 
 class CodeEditForm(ModelForm):
@@ -124,9 +122,7 @@ def add_centercode(request, code="center"):
             return HttpResponseRedirect(reverse("add_code_complete"))
         else:
             for error in form.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         if code == "center":
             form = CenterCodeForm()
@@ -136,9 +132,7 @@ def add_centercode(request, code="center"):
             "page_title": "Create New Center/Brand Code",
             "form": form,
         }
-        return render(
-            request, "workflow/misc/beverage/add_centercode.html", context=pagevars
-        )
+        return render(request, "workflow/misc/beverage/add_centercode.html", context=pagevars)
 
 
 def add_endcode(request):
@@ -150,17 +144,13 @@ def add_endcode(request):
             return HttpResponseRedirect(reverse("add_code_complete"))
         else:
             for error in form.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         pagevars = {
             "page_title": "Create New End (Liquid) Code",
             "form": EndCodeForm(),
         }
-        return render(
-            request, "workflow/misc/beverage/add_endcode.html", context=pagevars
-        )
+        return render(request, "workflow/misc/beverage/add_endcode.html", context=pagevars)
 
 
 def gen_doc_upload(request):
@@ -189,9 +179,7 @@ def gen_doc_upload(request):
             "fileform": fileform,
         }
 
-        return render(
-            request, "workflow/misc/popups/gen_doc_upload.html", context=pagevars
-        )
+        return render(request, "workflow/misc/popups/gen_doc_upload.html", context=pagevars)
 
 
 def data_trends_main(request):
@@ -214,15 +202,9 @@ def data_trends_volume(request):
     REL_BILLING_SCALE_FACTOR = 550
 
     # Calculate overall trends.
-    fsb_jobs = Job.objects.filter(workflow__name="Foodservice").exclude(
-        status__in=EXCEPTION_STATUSES
-    )
-    fsb_items = Item.objects.filter(job__workflow__name="Foodservice").exclude(
-        job__status__in=EXCEPTION_STATUSES
-    )
-    fsb_colors = ItemColor.objects.filter(
-        item__job__workflow__name="Foodservice"
-    ).exclude(item__job__status__in=EXCEPTION_STATUSES)
+    fsb_jobs = Job.objects.filter(workflow__name="Foodservice").exclude(status__in=EXCEPTION_STATUSES)
+    fsb_items = Item.objects.filter(job__workflow__name="Foodservice").exclude(job__status__in=EXCEPTION_STATUSES)
+    fsb_colors = ItemColor.objects.filter(item__job__workflow__name="Foodservice").exclude(item__job__status__in=EXCEPTION_STATUSES)
 
     fsb_items_per_job = float(fsb_items.count()) / float(fsb_jobs.count())
     fsb_colors_per_item = float(fsb_colors.count()) / float(fsb_items.count())
@@ -240,9 +222,7 @@ def data_trends_volume(request):
         jobs = fsb_jobs.filter(creation_date__year=year)
         items = fsb_items.filter(job__creation_date__year=year)
         colors = fsb_colors.filter(item__job__creation_date__year=year)
-        charges = Charge.objects.filter(invoice_date__year=year).aggregate(
-            total=Sum("amount")
-        )["total"]
+        charges = Charge.objects.filter(invoice_date__year=year).aggregate(total=Sum("amount"))["total"]
 
         num_items = items.count()
         num_jobs = jobs.count()
@@ -267,9 +247,7 @@ def data_trends_volume(request):
         "billing_scale_factor": REL_BILLING_SCALE_FACTOR,
     }
 
-    return render(
-        request, "workflow/misc/trends/data_trends_volume.html", context=pagevars
-    )
+    return render(request, "workflow/misc/trends/data_trends_volume.html", context=pagevars)
 
 
 @cache_page(60 * 10080)
@@ -358,9 +336,7 @@ def data_trends_cuptype(request):
         "winter_cold": winter_cold,
     }
 
-    return render(
-        request, "workflow/misc/trends/data_trends_cuptype.html", context=pagevars
-    )
+    return render(request, "workflow/misc/trends/data_trends_cuptype.html", context=pagevars)
 
 
 @cache_page(60 * 10080)
@@ -413,6 +389,4 @@ def data_trends_quality(request):
         "fsb_by_year": fsb_by_year,
     }
 
-    return render(
-        request, "workflow/misc/trends/data_trends_quality.html", context=pagevars
-    )
+    return render(request, "workflow/misc/trends/data_trends_quality.html", context=pagevars)

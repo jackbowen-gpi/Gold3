@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Lightweight shim for the optional `maintenance_mode` package.
+"""
+Lightweight shim for the optional `maintenance_mode` package.
 
 Some deployments don't install the 3rd-party `maintenance_mode` package.
 Guard the import so that importing this module doesn't raise during project

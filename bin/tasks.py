@@ -1,3 +1,7 @@
+"""
+Module bin\tasks.py
+"""
+
 from celery import shared_task
 
 

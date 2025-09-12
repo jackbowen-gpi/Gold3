@@ -46,22 +46,16 @@ if DEBUG:
 def ColorKeyErrorMonitor(item):
     """Notify on recent Color Key related errors for the provided item."""
     an_hour_ago = timezone.now() - timedelta(hours=1)
-    recent_errors = JobLog.objects.filter(
-        job=item.job_id, log_text__icontains="Keys", event_time__gte=an_hour_ago
-    )
+    recent_errors = JobLog.objects.filter(job=item.job_id, log_text__icontains="Keys", event_time__gte=an_hour_ago)
     if recent_errors:
         mail_subject = "Shelbyville Color Keys Failure: %s" % item.job
         mail_send_to = []
-        group_members = User.objects.filter(
-            groups__name="EmailGCHubColorManagement", is_active=True
-        )
+        group_members = User.objects.filter(groups__name="EmailGCHubColorManagement", is_active=True)
         for user in group_members:
             mail_send_to.append(user.email)
         mail_body = loader.get_template("emails/ckfail.txt")
         mail_context = {"item": item}
-        general_funcs.send_info_mail(
-            mail_subject, mail_body.render(mail_context), mail_send_to
-        )
+        general_funcs.send_info_mail(mail_subject, mail_body.render(mail_context), mail_send_to)
 
 
 # List of JDF files in the Processed directory waiting for review.
@@ -77,8 +71,7 @@ def move_to_error_folder(filepath, error_msg, item):
 
         # Notify the artist via Growl pop-up.
         item.job.growl_at_artist(
-            "JDF Error: JDF error on %s-%s %s"
-            % (item.job.id, item.num_in_job, item.job.name),
+            "JDF Error: JDF error on %s-%s %s" % (item.job.id, item.num_in_job, item.job.name),
             error_msg,
             pref_field="growl_hear_jdf_processes",
         )
@@ -134,9 +127,7 @@ for xmfile in jdf_list:
                     print("@ END STATUS:", task.status)
                     print("@ COMMENTS:", task_debug_output)
                     # Create a JobLog entry to let the user know something bad happened.
-                    log_text = "JDF task resulted in an error:<br />%s" % (
-                        task_debug_output
-                    )
+                    log_text = "JDF task resulted in an error:<br />%s" % (task_debug_output)
                     move_to_error_folder(xmfile_fullpath, log_text, item)
                     # Send email if related to Color Keys
                     ColorKeyErrorMonitor(item)

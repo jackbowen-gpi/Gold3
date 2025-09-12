@@ -27,12 +27,11 @@ class ContactInfoForm(forms.ModelForm):
     # Username is display-only, not included in form fields
 
     def __init__(self, request, *args, **kwargs):
-        """This form takes an additional request argument in order to populate the
+        """
+        This form takes an additional request argument in order to populate the
         fields from both User and UserProfile models.
         """
-        super(ContactInfoForm, self).__init__(
-            instance=request.user.profile, *args, **kwargs
-        )
+        super(ContactInfoForm, self).__init__(instance=request.user.profile, *args, **kwargs)
         # Populate the User fields
         self.fields["first_name"].initial = request.user.first_name
         self.fields["last_name"].initial = request.user.last_name

@@ -1,4 +1,5 @@
-"""Fabric deployment file.
+"""
+Fabric deployment file.
 
 To update all server nodes, type:
 
@@ -20,9 +21,7 @@ def update_apache(user, password):
         user="gchub",
         connect_kwargs={"password": "1987tigersdontsurf"},
     )
-    conn.run(
-        "svn update --password %s --username %s /home/gchub/gchub_db" % (password, user)
-    )
+    conn.run("svn update --password %s --username %s /home/gchub/gchub_db" % (password, user))
     conn.run("touch /home/gchub/gchub_db/gchub_db/apache/wsgi_conf.py")
 
 
@@ -33,9 +32,7 @@ def update_db(user, password):
         user="gchub",
         connect_kwargs={"password": "1987tigersdontsurf"},
     )
-    conn.run(
-        "svn update --password %s --username %s /home/gchub/gchub_db" % (password, user)
-    )
+    conn.run("svn update --password %s --username %s /home/gchub/gchub_db" % (password, user))
     conn.run("touch /home/gchub/gchub_db/gchub_db/apache/wsgi_conf.py")
 
 
@@ -46,9 +43,7 @@ def update_fedex(user, password):
         user="admin",
         connect_kwargs={"password": "1987tigersdontsurf"},
     )
-    conn.run(
-        "svn update --password %s --username %s /home/admin/gchub_db" % (password, user)
-    )
+    conn.run("svn update --password %s --username %s /home/admin/gchub_db" % (password, user))
     conn.run("touch /home/admin/gchub_db/gchub_db/apache/wsgi_conf.py")
 
 

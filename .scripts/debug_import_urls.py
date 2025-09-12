@@ -1,3 +1,7 @@
+r"""
+Module .scripts\debug_import_urls.py
+"""
+
 import os
 import sys
 import traceback

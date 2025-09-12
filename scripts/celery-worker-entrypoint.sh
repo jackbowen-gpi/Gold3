@@ -20,4 +20,4 @@ if [ $i -ge $MAX_TRIES ]; then
   echo "Timed out waiting for web readiness marker; starting worker anyway."
 fi
 
-exec celery -A celery_app worker --loglevel=info
+exec celery -A src.celery_app worker --loglevel=info

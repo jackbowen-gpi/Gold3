@@ -1,4 +1,5 @@
-"""This module contains the functions that are called in response to specific
+"""
+This module contains the functions that are called in response to specific
 URLs mentioned in urls.py in the project's root directory. It pulls the data
 storage models from the models file in the rendersys directory (this one).
 """
@@ -29,9 +30,7 @@ class CatalogSearchForm(forms.Form, JSONErrorForm):
     size = forms.CharField(required=False)
     mfg_name = forms.CharField(required=False)
 
-    category = forms.ModelChoiceField(
-        queryset=ProductSubCategory.objects.all(), required=False
-    )
+    category = forms.ModelChoiceField(queryset=ProductSubCategory.objects.all(), required=False)
 
     active = forms.BooleanField(required=False, initial=False)
 
@@ -100,9 +99,7 @@ def catalog_search_results(request, form):
     message = JSMessage("Success.")
     results = []
     for result in qset[start_index:end_index]:
-        product_subcats = list(
-            result.productsubcategory.values_list("sub_category", flat=True)
-        )
+        product_subcats = list(result.productsubcategory.values_list("sub_category", flat=True))
 
         size_url = "<a href='javascript:create_item_editor(\"%s\")'>%s</a>" % (
             reverse("item_catalog_itemcat_popup_edit_itemcatalog", args=[result.id]),
@@ -145,7 +142,8 @@ class ItemCatalogForm(forms.ModelForm, JSONErrorForm):
 
 
 def itemcat_popup(request, itemcat_id=None):
-    """Renders the ItemCatalog editing popup. The main tab on the page is
+    """
+    Renders the ItemCatalog editing popup. The main tab on the page is
     the form for adds/edits, this is handled by this view. Spec editing/adding
     is handled elsewhere.
     """
@@ -193,7 +191,8 @@ def get_pdf_template(request, size_id):
 
 
 def list_templates(request):
-    """List off all the available templates for download.
+    """
+    List off all the available templates for download.
     Eventually, this will be based on active item catalog records,
     sorted by type, with linked PDF templates.
     """
@@ -201,17 +200,11 @@ def list_templates(request):
 
     prod_categories = []
     prod_main_categories = []
-    items_without_category = ItemCatalog.objects.filter(
-        active=True, workflow__name="Foodservice", productsubcategory=None
-    )
+    items_without_category = ItemCatalog.objects.filter(active=True, workflow__name="Foodservice", productsubcategory=None)
 
     # for type in workflow_app_defs.PRODUCT_CATEGORIES:
-    for type in ProductSubCategory.objects.all().order_by(
-        "main_category", "sub_category"
-    ):
-        all_active_items = type.itemcatalog_set.filter(
-            active=True, workflow__name="Foodservice"
-        )
+    for type in ProductSubCategory.objects.all().order_by("main_category", "sub_category"):
+        all_active_items = type.itemcatalog_set.filter(active=True, workflow__name="Foodservice")
         # If there are items in the category, use it.
         if all_active_items:
             prod_categories.append(type)

@@ -1,4 +1,5 @@
-"""Workflow app package shim: re-export submodules that legacy code/tests import
+"""
+Workflow app package shim: re-export submodules that legacy code/tests import
 directly from the package (for example: `from gchub_db.apps.workflow import views`).
 """
 

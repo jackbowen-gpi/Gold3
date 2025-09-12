@@ -5,7 +5,8 @@ from reportlab.lib.textsplit import getCharWidths
 
 
 def check_text_width(type_size, font, text):
-    """Return the total width of a given type size in inches.
+    """
+    Return the total width of a given type size in inches.
 
     type_size: (int) Type size, in points.
     font: (str) Font name.

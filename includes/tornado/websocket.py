@@ -14,6 +14,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""
+Module includes\tornado\\websocket.py
+"""
+
 import functools
 import logging
 
@@ -22,7 +26,8 @@ import tornado.web
 
 
 class WebSocketHandler(tornado.web.RequestHandler):
-    """A request handler for HTML 5 Web Sockets.
+    """
+    A request handler for HTML 5 Web Sockets.
 
     See http://www.w3.org/TR/2009/WD-websockets-20091222/ for details on the
     JavaScript interface. We implement the protocol as specified at
@@ -105,7 +110,8 @@ class WebSocketHandler(tornado.web.RequestHandler):
         self.stream.read_bytes(1, functools.partial(self._on_frame_type, callback))
 
     def close(self):
-        """Closes this Web Socket.
+        """
+        Closes this Web Socket.
 
         The browser will receive the onclose event for the open web socket
         when this method is called.
@@ -113,7 +119,8 @@ class WebSocketHandler(tornado.web.RequestHandler):
         self.stream.close()
 
     def async_callback(self, callback, *args, **kwargs):
-        """Wrap callbacks with this if they are used on asynchronous requests.
+        """
+        Wrap callbacks with this if they are used on asynchronous requests.
 
         Catches exceptions properly and closes this Web Socket if an exception
         is uncaught.

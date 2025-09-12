@@ -1,4 +1,5 @@
-"""Shim module: re-export `gchub_db.includes.windows_notifications` implementation.
+"""
+Shim module: re-export `gchub_db.includes.windows_notifications` implementation.
 
 Some older imports use `includes.windows_notifications` (top-level). The
 real implementation lives in `gchub_db.includes.windows_notifications`.

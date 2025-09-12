@@ -40,9 +40,7 @@ for file in next(os.walk(xml_file_path))[2]:
 
         # Check the files modification date. The dates stored within the XML are too inconsistent.
         try:
-            print_date_string = time.ctime(
-                os.path.getmtime(os.path.join(xml_file_path, file))
-            )
+            print_date_string = time.ctime(os.path.getmtime(os.path.join(xml_file_path, file)))
             print_date = datetime.strptime(print_date_string, "%a %b %d %H:%M:%S %Y")
             # Skip XML older than a month.
             if month_ago > print_date:
@@ -98,18 +96,13 @@ for file in next(os.walk(xml_file_path))[2]:
 
         for workflow in workflows:
             try:
-                proofer = workflow.getElementsByTagName("Description")[
-                    0
-                ].firstChild.data
+                proofer = workflow.getElementsByTagName("Description")[0].firstChild.data
             except Exception:
                 pass
 
         # Print all the data we've gathered.
         if show_your_work:
-            print(
-                "   %s-%s = %s copie(s) (%s) %s"
-                % (jobnum, num_in_job, copycount, print_date, proofer)
-            )
+            print("   %s-%s = %s copie(s) (%s) %s" % (jobnum, num_in_job, copycount, print_date, proofer))
 
         # Look up the item in GOLD.
         try:

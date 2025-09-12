@@ -64,6 +64,11 @@ server_stdout.log
 server_stderr.log
 runserver*.log
 
+# Pre-commit output files
+precommit_*.txt
+pytest_*.txt
+test_results.txt
+
 # Local scripts / debug output
 *.out
 *.dump

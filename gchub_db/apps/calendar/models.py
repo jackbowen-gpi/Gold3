@@ -102,10 +102,7 @@ class Event(models.Model):
 
         # Add an icon to highlight Office Meetings.
         if self.type == "OM":
-            icon = (
-                '<img src="%s" style="vertical-align: text-bottom" />'
-                % self.event_icon()
-            )
+            icon = '<img src="%s" style="vertical-align: text-bottom" />' % self.event_icon()
         else:
             icon = ""
 
@@ -117,7 +114,8 @@ class Event(models.Model):
         )
 
     def overload(self):
-        """Return True if the event is a vacation and there are already 3 vacation
+        """
+        Return True if the event is a vacation and there are already 3 vacation
         days (or half vacation days) scheduled on that date.
         """
         vac_types = ["VA", "HV"]
@@ -128,7 +126,8 @@ class Event(models.Model):
             return False
 
     def five_consecutive(self, userid, event_length):
-        """This function is called when a new event is added that crawls to the right
+        """
+        This function is called when a new event is added that crawls to the right
         and the left of a new event and counts the consecutive days in either direction
         makeing sure that more than 5 consecutive days are not requested without a manager
         """
@@ -199,7 +198,8 @@ class Event(models.Model):
             return False
 
     def ten_in_month(self, userid, event_length):
-        """This function gets called when a new event is added and counts all events by that
+        """
+        This function gets called when a new event is added and counts all events by that
         user in the same month as the requested event  so make sure they arnt requesting
         more than 10 without a manager
         """

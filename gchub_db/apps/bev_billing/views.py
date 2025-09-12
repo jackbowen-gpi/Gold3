@@ -25,9 +25,7 @@ class BevInvoiceForm(ModelForm, JSONErrorForm):
     """Form to update invoice information -- used primarily by accounting."""
 
     qad_entered = forms.BooleanField(required=False, label="QAD Entry?")
-    invoice_number = forms.CharField(
-        required=False, max_length=12, widget=forms.TextInput(attrs={"size": "12"})
-    )
+    invoice_number = forms.CharField(required=False, max_length=12, widget=forms.TextInput(attrs={"size": "12"}))
 
     class Meta:
         model = BevInvoice
@@ -145,9 +143,7 @@ def send_invoice_email(invoice_id):
     if not invoice.job.temp_printlocation.plant.name == "Plant City":
         # Plant city wants to review their invoices first so we don't send their
         # invoices directly to APMail@everpack.com.
-        group_members = User.objects.filter(
-            groups__name="EmailEverpackAPMail", is_active=True
-        )
+        group_members = User.objects.filter(groups__name="EmailEverpackAPMail", is_active=True)
         for user in group_members:
             mail_list.append(user.email)
     # Include all users that should be copied on email.

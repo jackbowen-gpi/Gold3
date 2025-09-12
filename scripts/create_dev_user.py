@@ -1,4 +1,5 @@
-"""Create or update a development superuser for local development.
+"""
+Create or update a development superuser for local development.
 
 This script is intended to be run from the repository root inside the
 project virtualenv. It creates or updates a `dev` user with administrative
@@ -25,7 +26,8 @@ from django.contrib.auth import get_user_model
 
 
 def main():
-    """Create or update the local development superuser `dev`.
+    """
+    Create or update the local development superuser `dev`.
 
     Idempotent: if the user exists, update password and privileges.
     """
@@ -46,9 +48,7 @@ def main():
             user.save()
             print(f"Updated existing user '{username}' and set admin privileges.")
         else:
-            user = user_model.objects.create_superuser(
-                username=username, email=email, password=password
-            )
+            user = user_model.objects.create_superuser(username=username, email=email, password=password)
             user.first_name = "dev"
             user.last_name = "admin"
             user.save()

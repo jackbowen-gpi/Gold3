@@ -20,9 +20,7 @@ fourteen_digit_num = 12345678901234
 text_line_1 = "SMR-12 Example Case"
 text_line_2 = "12 ounce hot cup"
 
-box1 = FSBLabel(
-    "label_example.pdf", nine_digit_num, fourteen_digit_num, text_line_1, text_line_2
-)
+box1 = FSBLabel("label_example.pdf", nine_digit_num, fourteen_digit_num, text_line_1, text_line_2)
 
 box1.save_to_pdf()
 

@@ -28,9 +28,7 @@ class Migration(migrations.Migration):
                 ("replaces_prev_design", models.BooleanField(default=False)),
                 (
                     "prev_9_digit",
-                    models.CharField(
-                        blank=True, max_length=255, verbose_name=b"Previous 9-Digit #"
-                    ),
+                    models.CharField(blank=True, max_length=255, verbose_name=b"Previous 9-Digit #"),
                 ),
                 (
                     "forecast",
@@ -140,21 +138,15 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "ship_to_company",
-                    models.CharField(
-                        blank=True, max_length=255, verbose_name=b"Company"
-                    ),
+                    models.CharField(blank=True, max_length=255, verbose_name=b"Company"),
                 ),
                 (
                     "ship_to_addy_1",
-                    models.CharField(
-                        blank=True, max_length=255, verbose_name=b"Address 1"
-                    ),
+                    models.CharField(blank=True, max_length=255, verbose_name=b"Address 1"),
                 ),
                 (
                     "ship_to_addy_2",
-                    models.CharField(
-                        blank=True, max_length=255, verbose_name=b"Address 2"
-                    ),
+                    models.CharField(blank=True, max_length=255, verbose_name=b"Address 2"),
                 ),
                 (
                     "ship_to_city",
@@ -170,9 +162,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "ship_to_country",
-                    models.CharField(
-                        blank=True, max_length=255, verbose_name=b"Country"
-                    ),
+                    models.CharField(blank=True, max_length=255, verbose_name=b"Country"),
                 ),
                 (
                     "ship_to_email",
@@ -220,9 +210,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "last_updated",
-                    models.DateTimeField(
-                        blank=True, null=True, verbose_name=b"last_updated"
-                    ),
+                    models.DateTimeField(blank=True, null=True, verbose_name=b"last_updated"),
                 ),
                 ("partial_name", models.CharField(max_length=255)),
             ],
@@ -242,15 +230,11 @@ class Migration(migrations.Migration):
                 ("annual_usage", models.IntegerField(verbose_name=b"Annual Usage")),
                 (
                     "order_quantity",
-                    models.IntegerField(
-                        blank=True, null=True, verbose_name=b"Estimated Order Quantity"
-                    ),
+                    models.IntegerField(blank=True, null=True, verbose_name=b"Estimated Order Quantity"),
                 ),
                 (
                     "customer_number",
-                    models.CharField(
-                        blank=True, max_length=255, verbose_name=b"Customer Number"
-                    ),
+                    models.CharField(blank=True, max_length=255, verbose_name=b"Customer Number"),
                 ),
                 (
                     "wrap_proof",
@@ -353,54 +337,38 @@ class Migration(migrations.Migration):
                 ("corr_only", models.BooleanField(default=False)),
                 (
                     "label_color",
-                    models.CharField(
-                        blank=True, max_length=255, verbose_name=b"Label Color"
-                    ),
+                    models.CharField(blank=True, max_length=255, verbose_name=b"Label Color"),
                 ),
                 (
                     "label_copy_1",
-                    models.CharField(
-                        blank=True, max_length=22, verbose_name=b"Label Copy 1"
-                    ),
+                    models.CharField(blank=True, max_length=22, verbose_name=b"Label Copy 1"),
                 ),
                 (
                     "label_copy_2",
-                    models.CharField(
-                        blank=True, max_length=22, verbose_name=b"Label Copy 2"
-                    ),
+                    models.CharField(blank=True, max_length=22, verbose_name=b"Label Copy 2"),
                 ),
                 (
                     "label_copy_3",
-                    models.CharField(
-                        blank=True, max_length=22, verbose_name=b"Label Copy 3"
-                    ),
+                    models.CharField(blank=True, max_length=22, verbose_name=b"Label Copy 3"),
                 ),
                 ("corr_plant1", models.CharField(blank=True, max_length=255)),
                 ("corr_plant2", models.CharField(blank=True, max_length=255)),
                 ("corr_plant3", models.CharField(blank=True, max_length=255)),
                 (
                     "sleeve_count",
-                    models.IntegerField(
-                        blank=True, null=True, verbose_name=b"Sleeve Count"
-                    ),
+                    models.IntegerField(blank=True, null=True, verbose_name=b"Sleeve Count"),
                 ),
                 (
                     "print_color",
-                    models.CharField(
-                        blank=True, max_length=255, verbose_name=b"Print Color"
-                    ),
+                    models.CharField(blank=True, max_length=255, verbose_name=b"Print Color"),
                 ),
                 (
                     "case_color",
-                    models.CharField(
-                        blank=True, max_length=255, verbose_name=b"Case Color"
-                    ),
+                    models.CharField(blank=True, max_length=255, verbose_name=b"Case Color"),
                 ),
                 (
                     "artreq",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="art_req.ArtReq"
-                    ),
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="art_req.ArtReq"),
                 ),
             ],
         ),

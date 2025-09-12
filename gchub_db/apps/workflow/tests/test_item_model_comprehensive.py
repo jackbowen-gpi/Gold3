@@ -32,9 +32,7 @@ class ItemModelComprehensiveTests(ItemTestMixin, TestCase):
 
     def test_item_creation_with_dimensions(self):
         """Test item creation with physical dimensions."""
-        item = self.create_test_item(
-            length=Decimal("12.5"), width=Decimal("9.0"), height=Decimal("3.25"), ect=32
-        )
+        item = self.create_test_item(length=Decimal("12.5"), width=Decimal("9.0"), height=Decimal("3.25"), ect=32)
 
         self.assertEqual(item.length, Decimal("12.5"))
         self.assertEqual(item.width, Decimal("9.0"))
@@ -192,9 +190,7 @@ class ItemModelComprehensiveTests(ItemTestMixin, TestCase):
 
     def test_item_color_requirements(self):
         """Test color-related fields."""
-        item = self.create_test_item(
-            num_colors_req=6, upc_ink_color="Black", label_color="Red, Blue, Yellow"
-        )
+        item = self.create_test_item(num_colors_req=6, upc_ink_color="Black", label_color="Red, Blue, Yellow")
 
         self.assertEqual(item.num_colors_req, 6)
         self.assertEqual(item.upc_ink_color, "Black")
@@ -256,9 +252,7 @@ class ItemModelEdgeCaseTests(ItemTestMixin, TestCase):
 
     def test_item_with_null_optional_fields(self):
         """Test item creation with null optional fields."""
-        item = Item.objects.create(
-            workflow=self.test_site, job=self.test_job, size=self.test_item_catalog
-        )
+        item = Item.objects.create(workflow=self.test_site, job=self.test_job, size=self.test_item_catalog)
 
         # Check that optional fields can be null
         self.assertIsNone(item.num_in_job)
@@ -394,9 +388,7 @@ class ItemModelPerformanceTests(ItemTestMixin, TestCase):
         self.assertEqual(job_items.count(), 20)
 
         # Test complex filtering
-        complex_filter = Item.objects.filter(
-            job=self.test_job, item_status="Pending", is_deleted=False
-        )
+        complex_filter = Item.objects.filter(job=self.test_job, item_status="Pending", is_deleted=False)
         self.assertEqual(complex_filter.count(), 10)
 
     def test_item_queryset_efficiency(self):
@@ -406,9 +398,7 @@ class ItemModelPerformanceTests(ItemTestMixin, TestCase):
             self.create_test_item(po_number=f"PO{i:04d}")
 
         # Test select_related efficiency
-        items_with_relations = Item.objects.select_related(
-            "job", "workflow", "size"
-        ).filter(job=self.test_job)
+        items_with_relations = Item.objects.select_related("job", "workflow", "size").filter(job=self.test_job)
 
         # This should not trigger additional queries
         for item in items_with_relations:

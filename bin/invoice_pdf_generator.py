@@ -24,9 +24,7 @@ workflow = "Beverage"
 # month_name = end_date.strftime('%B')
 
 # Get invoiced charges, plates included.
-invoiced_charges = billing_funcs.get_invoiced_data(
-    year_num, month_num, workflow, plates=True
-)["charges"]
+invoiced_charges = billing_funcs.get_invoiced_data(year_num, month_num, workflow, plates=True)["charges"]
 
 # Build list of all unique job numbers in queryset.
 jobs = []
@@ -58,9 +56,7 @@ for job_id in job_set:
     c.setFont("Helvetica", 9)
     c.drawString(0.85 * inch, 10.5 * inch, "%s" % job.po_number)
     c.drawString(0.85 * inch, 10.35 * inch, "%s" % date.today())
-    c.drawInlineImage(
-        "../media/img/gch_logo.jpg", 2.5 * inch, 9.75 * inch, width=None, height=None
-    )
+    c.drawInlineImage("../media/img/gch_logo.jpg", 2.5 * inch, 9.75 * inch, width=None, height=None)
     c.setFont("Helvetica-Bold", 9)
     c.rect(0.45 * inch, 9 * inch, 7.6 * inch, 0.65 * inch, stroke=1, fill=0)
     c.drawString(0.5 * inch, 9.5 * inch, "Bill To:")
@@ -109,15 +105,10 @@ for job_id in job_set:
             c.drawString(
                 2.8 * inch,
                 vert_start * inch,
-                "%s" % charge.item.bev_nomenclature()
-                + " ("
-                + charge.item.description
-                + ")",
+                "%s" % charge.item.bev_nomenclature() + " (" + charge.item.description + ")",
             )
             c.setFont("Helvetica", 9)
-            c.drawRightString(
-                7.95 * inch, vert_start * inch, "$%.2f" % float(charge.amount)
-            )
+            c.drawRightString(7.95 * inch, vert_start * inch, "$%.2f" % float(charge.amount))
             vert_start -= 0.16
             item += 1
             total += charge.amount
@@ -134,8 +125,7 @@ for job_id in job_set:
     c.drawCentredString(
         4.25 * inch,
         0.25 * inch,
-        "P: 864.633.6000  F: 864.653.5168    155 Old Greenville Hwy, Suite 103, "
-        "Clemson, SC, 29631",
+        "P: 864.633.6000  F: 864.653.5168    155 Old Greenville Hwy, Suite 103, " "Clemson, SC, 29631",
     )
 
     # Close and save the PDF

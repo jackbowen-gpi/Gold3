@@ -75,14 +75,10 @@ class JobModelTests(TestCase):
         # Temporarily override Job.all_items_complete to use deterministic fakes
         orig_method = Job.all_items_complete
         try:
-            Job.all_items_complete = lambda self: all(
-                bool(x.final_file_date()) for x in [FakeItem(False), FakeItem(True)]
-            )
+            Job.all_items_complete = lambda self: all(bool(x.final_file_date()) for x in [FakeItem(False), FakeItem(True)])
             self.assertFalse(job.all_items_complete())
 
-            Job.all_items_complete = lambda self: all(
-                bool(x.final_file_date()) for x in [FakeItem(True), FakeItem(True)]
-            )
+            Job.all_items_complete = lambda self: all(bool(x.final_file_date()) for x in [FakeItem(True), FakeItem(True)])
             self.assertTrue(job.all_items_complete())
         finally:
             Job.all_items_complete = orig_method
@@ -187,9 +183,7 @@ class TestJobModel(TestCase):
 
         def test_str_beverage_and_other(self):
             site_bev = create_site(domain=f"bev-{uuid.uuid4()}.local", name="Beverage")
-            j = Job.objects.create(
-                name="BeverageJob", workflow=site_bev, brand_name="Acme"
-            )
+            j = Job.objects.create(name="BeverageJob", workflow=site_bev, brand_name="Acme")
             self.assertIn("Acme", str(j))
 
             site_other = create_site(domain=f"oth-{uuid.uuid4()}.local", name="Other")
@@ -227,9 +221,7 @@ class TestJobModel(TestCase):
             self.assertIn("kwjob", job.generated_keywords)
 
         def test_calculate_real_due_date_behaviour(self):
-            site_food = create_site(
-                domain=f"food-{uuid.uuid4()}.local", name="Foodservice"
-            )
+            site_food = create_site(domain=f"food-{uuid.uuid4()}.local", name="Foodservice")
             j = Job.objects.create(name="DueTest", workflow=site_food)
             fri = date(2025, 8, 29)
             j.due_date = fri
@@ -244,15 +236,11 @@ class TestJobModel(TestCase):
             self.assertEqual(j2.real_due_date, sat + timedelta(days=-1))
 
         def test_get_icon_url_variants(self):
-            site_food = create_site(
-                domain=f"icon-food-{uuid.uuid4()}.local", name="Foodservice"
-            )
+            site_food = create_site(domain=f"icon-food-{uuid.uuid4()}.local", name="Foodservice")
             job_food = Job.objects.create(name="IconJob", workflow=site_food)
             self.assertIn("bullet_red.png", job_food.get_icon_url())
 
-            site_bev = create_site(
-                domain=f"icon-bev-{uuid.uuid4()}.local", name="Beverage"
-            )
+            site_bev = create_site(domain=f"icon-bev-{uuid.uuid4()}.local", name="Beverage")
             job_bev = Job.objects.create(name="IconJob2", workflow=site_bev)
             self.assertIn("bullet_green.png", job_bev.get_icon_url())
 
@@ -261,12 +249,8 @@ class TestJobModel(TestCase):
                     self.user = create_user(username="tester", password="p")
 
                 def test_str_and_brand(self):
-                    site = create_site(
-                        domain=f"bev-{uuid.uuid4()}.local", name="Beverage"
-                    )
-                    job = Job.objects.create(
-                        name="BeverageJob", workflow=site, brand_name="Acme"
-                    )
+                    site = create_site(domain=f"bev-{uuid.uuid4()}.local", name="Beverage")
+                    job = Job.objects.create(name="BeverageJob", workflow=site, brand_name="Acme")
                     self.assertIn("Acme", str(job))
 
                 def test_delete_marks_is_deleted_and_calls_delete_folder(self):
@@ -299,18 +283,14 @@ class TestJobModel(TestCase):
                     self.assertIn("kwjob", job.generated_keywords)
 
                 def test_calculate_real_due_date_behaviour(self):
-                    site_food = create_site(
-                        domain=f"food-{uuid.uuid4()}.local", name="Foodservice"
-                    )
+                    site_food = create_site(domain=f"food-{uuid.uuid4()}.local", name="Foodservice")
                     j = Job.objects.create(name="DueTest", workflow=site_food)
                     fri = date(2025, 8, 29)
                     j.due_date = fri
                     j.calculate_real_due_date()
                     self.assertNotEqual(j.real_due_date, fri)
 
-                    site_other = create_site(
-                        domain=f"oth2-{uuid.uuid4()}.local", name="Other"
-                    )
+                    site_other = create_site(domain=f"oth2-{uuid.uuid4()}.local", name="Other")
                     j2 = Job.objects.create(name="DueTest2", workflow=site_other)
                     sat = date(2025, 8, 30)
                     j2.due_date = sat
@@ -318,18 +298,12 @@ class TestJobModel(TestCase):
                     self.assertEqual(j2.real_due_date, sat + timedelta(days=-1))
 
                 def test_get_icon_url_variants(self):
-                    site_carton = create_site(
-                        domain=f"icon-cart-{uuid.uuid4()}.local", name="Carton"
-                    )
-                    job_carton = Job.objects.create(
-                        name="IconJob", workflow=site_carton
-                    )
+                    site_carton = create_site(domain=f"icon-cart-{uuid.uuid4()}.local", name="Carton")
+                    job_carton = Job.objects.create(name="IconJob", workflow=site_carton)
                     self.assertIn("bullet_purple.png", job_carton.get_icon_url())
 
                 def test_items_in_job_and_all_items_complete(self):
-                    site = create_site(
-                        domain=f"items-{uuid.uuid4()}.local", name="Other"
-                    )
+                    site = create_site(domain=f"items-{uuid.uuid4()}.local", name="Other")
                     job = Job.objects.create(name="ItemJob", workflow=site)
 
                     # monkeypatch get_item_qset to return fake items for this instance
@@ -346,9 +320,7 @@ class TestJobModel(TestCase):
                     self.assertTrue(job.all_items_complete())
 
                 def test_todo_list_html_and_last_modified(self):
-                    site = create_site(
-                        domain=f"todo-{uuid.uuid4()}.local", name="Other"
-                    )
+                    site = create_site(domain=f"todo-{uuid.uuid4()}.local", name="Other")
                     job = Job.objects.create(name="TodoJob", workflow=site)
                     html = job.todo_list_html()
                     self.assertIn(str(job.id), html)

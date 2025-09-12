@@ -1,5 +1,6 @@
 #!/usr/bin/python
-"""Generate billing efficiency and volume trend Excel reports.
+"""
+Generate billing efficiency and volume trend Excel reports.
 
 Reports include yearly, monthly, and breakdowns by artist, salesperson,
 quality, and plant for Foodservice workflow data.
@@ -104,11 +105,7 @@ revised = (
     .query
 )
 
-revision_charges = (
-    Charge.objects.filter(description__category__name="Revision")
-    .values("item__id")
-    .query
-)
+revision_charges = Charge.objects.filter(description__category__name="Revision").values("item__id").query
 
 # Some master data that needs to be established early.
 # Heavy filtering here to obtain the most accurate customer-related data.
@@ -179,9 +176,7 @@ def _calculate_billing_data(item_set):
     if charges:
         total_charges = round(charges.aggregate(total=Sum("amount"))["total"], 2)
         billed_charges = charges.filter(invoice_date__isnull=False)
-        total_billed_charges = round(
-            billed_charges.aggregate(total=Sum("amount"))["total"], 2
-        )
+        total_billed_charges = round(billed_charges.aggregate(total=Sum("amount"))["total"], 2)
         unbilled_charges = round((total_charges - total_billed_charges), 2)
         unbilled_percentage = round((float(unbilled_charges / total_charges)) * 100, 2)
     else:
@@ -211,7 +206,8 @@ def _do_list_applicable_jobs():
 
 
 def _do_yearly_breakdown():
-    """Iterate through the given years and fill in the information on docSheet1.
+    """
+    Iterate through the given years and fill in the information on docSheet1.
 
     TODO: Predictive billing for items that would be finaled out (Post-Production
     and Color Keys/Extra Proof).
@@ -255,9 +251,7 @@ def _do_yearly_breakdown():
         docSheet1.cell(row=i + 1, column=4).value = filed_out_item_count
 
         # Calculate the hit ratio (ratio between all items and those filed out.)
-        hit_ratio = round(
-            (float(filed_out_item_count) / float(all_item_count)) * 100, 2
-        )
+        hit_ratio = round((float(filed_out_item_count) / float(all_item_count)) * 100, 2)
         # print "Hit Ratio:", hit_ratio
         docSheet1.cell(row=i + 1, column=5).value = hit_ratio
 
@@ -265,9 +259,7 @@ def _do_yearly_breakdown():
         all_charges = Charge.objects.filter(item__in=all_items)
         total_charges = round(all_charges.aggregate(total=Sum("amount"))["total"], 2)
         all_billed_charges = all_charges.filter(invoice_date__isnull=False)
-        total_billed_charges = round(
-            all_billed_charges.aggregate(total=Sum("amount"))["total"], 2
-        )
+        total_billed_charges = round(all_billed_charges.aggregate(total=Sum("amount"))["total"], 2)
 
         # All charges applied to items in the given year.
         # print "Charges applied: $", total_charges
@@ -291,7 +283,8 @@ def _do_yearly_breakdown():
 
 
 def _do_monthly_breakdown():
-    """Do breakdown of hit ratios on a month-to-month basis.
+    """
+    Do breakdown of hit ratios on a month-to-month basis.
 
     NOTE: This one takes a while to run. Look to speed up, or disable if needing
     a quicker report.
@@ -327,9 +320,7 @@ def _do_monthly_breakdown():
         month_filed_items_count = month_filed_items.count()
         docSheet2.cell(row=i + 1, column=4).value = month_filed_items_count
         # Calc hit ratio for month.
-        month_hit_ratio = round(
-            (float(month_filed_items_count) / float(month_items_count)) * 100, 2
-        )
+        month_hit_ratio = round((float(month_filed_items_count) / float(month_items_count)) * 100, 2)
         docSheet2.cell(row=i + 1, column=5).value = month_hit_ratio
 
         i += 1
@@ -364,9 +355,7 @@ def _do_artist_breakdown():
         docSheet3.write(i, 2, artist_filed_items_count)
         # Calc hit ratio.
         if artist_item_count > 0:
-            artist_hit_ratio = round(
-                (float(artist_filed_items_count) / float(artist_item_count)) * 100, 2
-            )
+            artist_hit_ratio = round((float(artist_filed_items_count) / float(artist_item_count)) * 100, 2)
         else:
             artist_hit_ratio = 0
         docSheet3.write(i, 3, artist_hit_ratio)
@@ -403,15 +392,12 @@ def _do_salesperson_breakdown():
         salesperson_item_count = salesperson_items.count()
         docSheet4.write(i, 1, salesperson_item_count)
         # Filter salesperson by filed out.
-        salesperson_filed_items_count = salesperson_items.filter(
-            id__in=file_outs
-        ).count()
+        salesperson_filed_items_count = salesperson_items.filter(id__in=file_outs).count()
         docSheet4.write(i, 2, salesperson_filed_items_count)
         # Calc hit ratio.
         if salesperson_item_count > 0:
             salesperson_hit_ratio = round(
-                (float(salesperson_filed_items_count) / float(salesperson_item_count))
-                * 100,
+                (float(salesperson_filed_items_count) / float(salesperson_item_count)) * 100,
                 2,
             )
         else:
@@ -428,7 +414,8 @@ def _do_salesperson_breakdown():
 
 
 def do_progress_breakdown():
-    """Look at progress of all items, determine hit ratio for each stage.
+    """
+    Look at progress of all items, determine hit ratio for each stage.
 
     Proofed, Approved, Revisions, etc...
     """
@@ -453,9 +440,7 @@ def do_progress_breakdown():
     all_filed_item_count = all_filedout_items.count()
     docSheet5.write(1, 2, all_filed_item_count)
     # Calc hit ratio
-    total_hit_ratio = round(
-        (float(all_filed_item_count) / float(all_item_count)) * 100, 2
-    )
+    total_hit_ratio = round((float(all_filed_item_count) / float(all_item_count)) * 100, 2)
     docSheet5.write(1, 3, total_hit_ratio)
     billing = _calculate_billing_data(master_item_list)
     docSheet5.write(1, 4, billing["total_charges"])
@@ -476,9 +461,7 @@ def do_progress_breakdown():
     print("Proofed and filed out items:", proofed_filed_items_count)
     docSheet5.write(2, 2, proofed_filed_items_count)
     # Calc hit ratio
-    total_hit_ratio = round(
-        (float(proofed_filed_items_count) / float(proofed_item_count)) * 100, 2
-    )
+    total_hit_ratio = round((float(proofed_filed_items_count) / float(proofed_item_count)) * 100, 2)
     docSheet5.write(2, 3, total_hit_ratio)
     billing = _calculate_billing_data(proofed_items)
     docSheet5.write(2, 4, billing["total_charges"])
@@ -499,9 +482,7 @@ def do_progress_breakdown():
     revised_filed_item_count = revised_filed_items.count()
     docSheet5.write(3, 2, revised_filed_item_count)
     # Calc hit ratio
-    revised_hit_ratio = round(
-        (float(revised_filed_item_count) / float(revised_item_count)) * 100, 2
-    )
+    revised_hit_ratio = round((float(revised_filed_item_count) / float(revised_item_count)) * 100, 2)
     docSheet5.write(3, 3, revised_hit_ratio)
     billing = _calculate_billing_data(revised_items)
     docSheet5.write(3, 4, billing["total_charges"])
@@ -520,9 +501,7 @@ def do_progress_breakdown():
     approved_filed_item_count = approved_filed_items.count()
     docSheet5.write(4, 2, approved_filed_item_count)
     # Calc hit ratio
-    total_hit_ratio = round(
-        (float(approved_filed_item_count) / float(approved_item_count)) * 100, 2
-    )
+    total_hit_ratio = round((float(approved_filed_item_count) / float(approved_item_count)) * 100, 2)
     docSheet5.write(4, 3, total_hit_ratio)
     billing = _calculate_billing_data(approved_items)
     docSheet5.write(4, 4, billing["total_charges"])
@@ -550,16 +529,12 @@ def _do_general_stats():
     docSheet6.cell(row=4, column=1).value = "Canceled Items"
     canceled_items_count = all_unfiledout_items.filter(job__status="Cancelled").count()
     docSheet6.cell(row=4, column=2).value = canceled_items_count
-    docSheet6.cell(row=4, column=3).value = round(
-        (float(canceled_items_count) / float(all_unfiledout_items_count)) * 100, 2
-    )
+    docSheet6.cell(row=4, column=3).value = round((float(canceled_items_count) / float(all_unfiledout_items_count)) * 100, 2)
     # Hold Items
     docSheet6.cell(row=5, column=1).value = "Hold Items"
     hold_items_count = all_unfiledout_items.filter(job__status="Hold").count()
     docSheet6.cell(row=5, column=2).value = hold_items_count
-    docSheet6.cell(row=5, column=3).value = round(
-        (float(hold_items_count) / float(all_unfiledout_items_count)) * 100, 2
-    )
+    docSheet6.cell(row=5, column=3).value = round((float(hold_items_count) / float(all_unfiledout_items_count)) * 100, 2)
     # Before and after proof reminder email.
     docSheet6.cell(row=6, column=1).value = "Pre-Reminder Email"
     pre_email_items = master_item_list.filter(creation_date__lte=date(2009, 7, 1))
@@ -567,9 +542,7 @@ def _do_general_stats():
     pre_email_items_filedout = pre_email_items.filter(id__in=all_filedout_items)
     pre_email_items_filedout_count = pre_email_items_filedout.count()
     docSheet6.cell(row=6, column=2).value = pre_email_items_count
-    docSheet6.cell(row=6, column=3).value = round(
-        (float(pre_email_items_filedout_count) / float(pre_email_items_count)) * 100, 2
-    )
+    docSheet6.cell(row=6, column=3).value = round((float(pre_email_items_filedout_count) / float(pre_email_items_count)) * 100, 2)
     # Before and after proof reminder email.
     docSheet6.cell(row=7, column=1).value = "Post-Reminder Email"
     post_email_items = master_item_list.filter(creation_date__gte=date(2009, 7, 1))
@@ -584,7 +557,8 @@ def _do_general_stats():
 
 
 def _do_quality_breakdown():
-    """Determine hit ratios based on item quality.
+    """
+    Determine hit ratios based on item quality.
 
     TODO: and number of colors?
     """
@@ -607,9 +581,7 @@ def _do_quality_breakdown():
         for qual in quality_set:
             docSheet7.write(i, 7, qual)
             # Total of given quality.
-            quality_items = master_item_list.filter(
-                quality=qual, creation_date__year=year
-            )
+            quality_items = master_item_list.filter(quality=qual, creation_date__year=year)
             quality_items_count = quality_items.count()
             docSheet7.write(i, 1, quality_items_count)
             # Num. filed out
@@ -618,8 +590,7 @@ def _do_quality_breakdown():
             docSheet7.write(i, 2, quality_items_filedout_count)
             # Calc. hit ratio.
             quality_ratio = round(
-                (float(quality_items_filedout_count) / float(quality_items_count))
-                * 100,
+                (float(quality_items_filedout_count) / float(quality_items_count)) * 100,
                 2,
             )
             docSheet7.write(i, 3, quality_ratio)
@@ -663,9 +634,7 @@ def _do_plant_breakdown():
         for quality in quality_set:
             docSheet8.write(i, 7, quality)
             # Total of given plant.
-            plant_items = master_item_list.filter(
-                printlocation__plant__name=plant, quality=quality
-            )
+            plant_items = master_item_list.filter(printlocation__plant__name=plant, quality=quality)
             plant_items_count = plant_items.count()
             docSheet8.write(i, 1, plant_items_count)
             # Num. filed out
@@ -673,9 +642,7 @@ def _do_plant_breakdown():
             plant_items_filedout_count = plant_items_filedout.count()
             docSheet8.write(i, 2, plant_items_filedout_count)
             # Calc. hit ratio.
-            plant_ratio = round(
-                (float(plant_items_filedout_count) / float(plant_items_count)) * 100, 2
-            )
+            plant_ratio = round((float(plant_items_filedout_count) / float(plant_items_count)) * 100, 2)
             docSheet8.write(i, 3, plant_ratio)
             billing = _calculate_billing_data(plant_items)
             docSheet8.write(i, 4, billing["total_charges"])
@@ -712,9 +679,7 @@ def _do_itemtype_breakdown():
         docSheet9.write(i, 2, type_items_filedout_count)
         # Calc. hit ratio.
         if type_items_count > 0:
-            type_ratio = round(
-                (float(type_items_filedout_count) / float(type_items_count)) * 100, 2
-            )
+            type_ratio = round((float(type_items_filedout_count) / float(type_items_count)) * 100, 2)
         else:
             type_ratio = 0
         docSheet9.write(i, 3, type_ratio)
@@ -739,14 +704,10 @@ def _do_monthly_itemtype():
     for month in month_set:
         print("Month", month)
         docSheet10.write(i, 0, str(month))
-        month_items = master_item_list.filter(
-            job__creation_date__month=month, size__item_type="HC"
-        )
+        month_items = master_item_list.filter(job__creation_date__month=month, size__item_type="HC")
         month_items_count = month_items.count()
         docSheet10.write(i, 1, month_items_count)
-        month_items = master_item_list.filter(
-            job__creation_date__month=month, size__item_type="CC"
-        )
+        month_items = master_item_list.filter(job__creation_date__month=month, size__item_type="CC")
         month_items_count = month_items.count()
         docSheet10.write(i, 2, month_items_count)
 
@@ -761,11 +722,7 @@ def _do_case_estimates():
     case_total = 0
     # Garbage_items are items with case counts of < 10
     garbage_items = 0
-    case_set = (
-        all_unfiledout_items.filter(id__in=approved)
-        .exclude(annual_use=None)
-        .order_by("-annual_use")
-    )
+    case_set = all_unfiledout_items.filter(id__in=approved).exclude(annual_use=None).order_by("-annual_use")
 
     for item in case_set:
         if item.annual_use < 10:
@@ -835,9 +792,7 @@ def _do_approval_time_chances():
     # 60+
     set7 = []
     for item in approved_items:
-        elapsed_approval = (
-            item.approval_date().date() - item.creation_date.date()
-        ).days
+        elapsed_approval = (item.approval_date().date() - item.creation_date.date()).days
         if elapsed_approval <= 10:
             set1.append(item)
         elif 11 <= elapsed_approval <= 20:
@@ -941,9 +896,7 @@ def _do_approved_not_filed_detail():
 
     print("Num. jobs cancelled:", jobs_cancelled)
 
-    print(
-        "Number of jobs with approved items, no filed out items:", len(jobs_incomplete)
-    )
+    print("Number of jobs with approved items, no filed out items:", len(jobs_incomplete))
 
 
 # Execute each breakdown.

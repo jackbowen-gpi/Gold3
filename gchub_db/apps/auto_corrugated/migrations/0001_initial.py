@@ -105,9 +105,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "creation_date",
-                    models.DateTimeField(
-                        auto_now_add=True, verbose_name=b"Date Info Entered"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name=b"Date Info Entered"),
                 ),
                 ("six_digit_num", models.IntegerField()),
                 ("replaced_6digit", models.IntegerField(null=True)),
@@ -127,16 +125,12 @@ class Migration(migrations.Migration):
                 ("sfi_stamp_box", models.BooleanField(default=True)),
                 (
                     "sfi_stamp_cup",
-                    models.BooleanField(
-                        default=False, verbose_name=b"SFI Content Stamp"
-                    ),
+                    models.BooleanField(default=False, verbose_name=b"SFI Content Stamp"),
                 ),
                 ("blank_label", models.BooleanField(default=False)),
                 (
                     "box_format",
-                    models.IntegerField(
-                        choices=[(0, b"Left"), (1, b"Right")], default=0
-                    ),
+                    models.IntegerField(choices=[(0, b"Left"), (1, b"Right")], default=0),
                 ),
                 (
                     "pdf_output",
@@ -180,9 +174,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "creation_date",
-                    models.DateTimeField(
-                        auto_now_add=True, verbose_name=b"Date Info Entered"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name=b"Date Info Entered"),
                 ),
                 ("nine_digit_num", models.IntegerField()),
                 (

@@ -1,4 +1,5 @@
-r"""Cleanup legacy development user accounts and ensure a single canonical dev user.
+r"""
+Cleanup legacy development user accounts and ensure a single canonical dev user.
 
 Usage: run from repo root with the project's venv python:
 
@@ -42,9 +43,7 @@ print("Found users:", [u.username for u in found])
 # Ensure canonical exists
 canonical = User.objects.filter(username=CANONICAL_USERNAME).first()
 if not canonical:
-    canonical = User.objects.create_superuser(
-        CANONICAL_USERNAME, CANONICAL_EMAIL, CANONICAL_PASSWORD
-    )
+    canonical = User.objects.create_superuser(CANONICAL_USERNAME, CANONICAL_EMAIL, CANONICAL_PASSWORD)
     canonical.first_name = "dev"
     canonical.last_name = "admin"
     canonical.save()

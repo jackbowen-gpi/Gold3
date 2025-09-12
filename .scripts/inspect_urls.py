@@ -1,3 +1,7 @@
+r"""
+Module .scripts\inspect_urls.py
+"""
+
 import os
 import importlib
 import traceback

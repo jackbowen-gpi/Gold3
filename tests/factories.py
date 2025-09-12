@@ -4,7 +4,8 @@ from django.contrib.sites.models import Site
 
 
 def create_user(username="testuser", password="password", is_staff=False, **kwargs):
-    """Create and return a Django user for tests.
+    """
+    Create and return a Django user for tests.
 
     Keeps things minimal so legacy tests can import `tests.factories.create_user`.
     """

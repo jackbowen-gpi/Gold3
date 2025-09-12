@@ -30,9 +30,7 @@ def growl_code_change(change):
     for workflow in change.workflows_affected.all():
         try:
             # Find the permission that coincides with this workflow.
-            permission = Permission.objects.get(
-                codename="%s_access" % workflow.name.lower()
-            )
+            permission = Permission.objects.get(codename="%s_access" % workflow.name.lower())
             # Combine querysets to build the list of groups to look for.
             groups = permission.group_set.all()
             users = users | User.objects.filter(groups__in=groups)

@@ -1,4 +1,5 @@
-"""Run pytest with a controlled import environment.
+"""
+Run pytest with a controlled import environment.
 
 This script inserts the repository parent on sys.path and sets the
 DJANGO_SETTINGS_MODULE to the repo-root `settings` shim before importing

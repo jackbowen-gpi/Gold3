@@ -14,7 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""The Tornado web framework.
+"""
+The Tornado web framework.
 
 The Tornado web framework looks a bit like web.py (http://webpy.org/) or
 Google's webapp (http://code.google.com/appengine/docs/python/tools/webapp/),
@@ -72,7 +73,8 @@ from . import escape, locale, template
 
 
 def _utcnow_naive():
-    """Return a naive UTC datetime, preferring Django's timezone when present.
+    """
+    Return a naive UTC datetime, preferring Django's timezone when present.
 
     We try to use django.utils.timezone.now() and convert to UTC then drop
     tzinfo to produce a naive UTC datetime (keeps previous behavior). If
@@ -92,7 +94,8 @@ def _utcnow_naive():
 
 
 class RequestHandler(object):
-    """Subclass this class and define get() or post() to make a handler.
+    """
+    Subclass this class and define get() or post() to make a handler.
 
     If you want to support more methods than the standard GET/HEAD/POST, you
     should override the class variable SUPPORTED_METHODS in your
@@ -137,7 +140,8 @@ class RequestHandler(object):
         raise HTTPError(405)
 
     def prepare(self):
-        """Called before the actual handler method.
+        """
+        Called before the actual handler method.
 
         Useful to override in a handler if you want a common bottleneck for
         all of your requests.
@@ -145,7 +149,8 @@ class RequestHandler(object):
         pass
 
     def on_connection_close(self):
-        """Called in async handlers if the client closed the connection.
+        """
+        Called in async handlers if the client closed the connection.
 
         You may override this to clean up resources associated with
         long-lived connections.
@@ -176,7 +181,8 @@ class RequestHandler(object):
         self._status_code = status_code
 
     def set_header(self, name, value):
-        """Sets the given response header name and value.
+        """
+        Sets the given response header name and value.
 
         If a datetime is given, we automatically format it according to the
         HTTP specification. If the value is not a string, we convert it to
@@ -200,7 +206,8 @@ class RequestHandler(object):
     _ARG_DEFAULT = []
 
     def get_argument(self, name, default=_ARG_DEFAULT, strip=True):
-        """Returns the value of the argument with the given name.
+        """
+        Returns the value of the argument with the given name.
 
         If default is not provided, the argument is considered to be
         required, and we throw an HTTP 404 exception if it is missing.
@@ -296,7 +303,8 @@ class RequestHandler(object):
             self.clear_cookie(name)
 
     def set_secure_cookie(self, name, value, expires_days=30, **kwargs):
-        """Signs and timestamps a cookie so it cannot be forged.
+        """
+        Signs and timestamps a cookie so it cannot be forged.
 
         You must specify the 'cookie_secret' setting in your Application
         to use this method. It should be a long, random sequence of bytes
@@ -352,7 +360,8 @@ class RequestHandler(object):
         self.finish()
 
     def write(self, chunk):
-        """Writes the given chunk to the output buffer.
+        """
+        Writes the given chunk to the output buffer.
 
         To write the output to the network, use the flush() method below.
 
@@ -446,7 +455,8 @@ class RequestHandler(object):
         self.finish(html)
 
     def render_string(self, template_name, **kwargs):
-        """Generate the given template with the given arguments.
+        """
+        Generate the given template with the given arguments.
 
         We return the generated string. To generate and write a template
         as a response, use render() above.
@@ -537,7 +547,8 @@ class RequestHandler(object):
         self._finished = True
 
     def send_error(self, status_code=500, **kwargs):
-        """Sends the given HTTP error code to the browser.
+        """
+        Sends the given HTTP error code to the browser.
 
         We also send the error HTML for the given error code as returned by
         get_error_html. Override that method if you want custom error pages
@@ -554,7 +565,8 @@ class RequestHandler(object):
         self.finish(message)
 
     def get_error_html(self, status_code, **kwargs):
-        """Override to implement custom error pages.
+        """
+        Override to implement custom error pages.
 
         If this error was caused by an uncaught exception, the
         exception object can be found in kwargs e.g. kwargs['exception']
@@ -570,7 +582,8 @@ class RequestHandler(object):
 
     @property
     def locale(self):
-        """The local for the current session.
+        """
+        The local for the current session.
 
         Determined by either get_user_locale, which you can override to
         set the locale based on, e.g., a user preference stored in a
@@ -585,14 +598,16 @@ class RequestHandler(object):
         return self._locale
 
     def get_user_locale(self):
-        """Override to determine the locale from the authenticated user.
+        """
+        Override to determine the locale from the authenticated user.
 
         If None is returned, we use the Accept-Language header.
         """
         return None
 
     def get_browser_locale(self, default="en_US"):
-        """Determines the user's locale from Accept-Language header.
+        """
+        Determines the user's locale from Accept-Language header.
 
         See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4
         """
@@ -617,7 +632,8 @@ class RequestHandler(object):
 
     @property
     def current_user(self):
-        """The authenticated user for this request.
+        """
+        The authenticated user for this request.
 
         Determined by either get_current_user, which you can override to
         set the user based on, e.g., a cookie. If that method is not
@@ -635,7 +651,8 @@ class RequestHandler(object):
         return None
 
     def get_login_url(self):
-        """Override to customize the login URL based on the request.
+        """
+        Override to customize the login URL based on the request.
 
         By default, we use the 'login_url' application setting.
         """
@@ -644,7 +661,8 @@ class RequestHandler(object):
 
     @property
     def xsrf_token(self):
-        """The XSRF-prevention token for the current user/session.
+        """
+        The XSRF-prevention token for the current user/session.
 
         To prevent cross-site request forgery, we set an '_xsrf' cookie
         and include the same '_xsrf' value as an argument with all POST
@@ -663,7 +681,8 @@ class RequestHandler(object):
         return self._xsrf_token
 
     def check_xsrf_cookie(self):
-        """Verifies that the '_xsrf' cookie matches the '_xsrf' argument.
+        """
+        Verifies that the '_xsrf' cookie matches the '_xsrf' argument.
 
         To prevent cross-site request forgery, we set an '_xsrf' cookie
         and include the same '_xsrf' value as an argument with all POST
@@ -681,7 +700,8 @@ class RequestHandler(object):
             raise HTTPError(403, "XSRF cookie does not match POST argument")
 
     def xsrf_form_html(self):
-        """An HTML <input/> element to be included with all POST forms.
+        """
+        An HTML <input/> element to be included with all POST forms.
 
         It defines the _xsrf input value, which we check on all POST
         requests to prevent cross-site request forgery. If you have set
@@ -697,7 +717,8 @@ class RequestHandler(object):
         )
 
     def static_url(self, path):
-        """Returns a static URL for the given relative static file path.
+        """
+        Returns a static URL for the given relative static file path.
 
         This method requires you set the 'static_path' setting in your
         application (which specifies the root directory of your static
@@ -736,7 +757,8 @@ class RequestHandler(object):
             return base + "/static/" + path
 
     def async_callback(self, callback, *args, **kwargs):
-        """Wrap callbacks with this if they are used on asynchronous requests.
+        """
+        Wrap callbacks with this if they are used on asynchronous requests.
 
         Catches exceptions and properly finishes the request.
         """
@@ -859,7 +881,8 @@ class RequestHandler(object):
 
 
 def asynchronous(method):
-    """Wrap request handler methods with this if they are asynchronous.
+    """
+    Wrap request handler methods with this if they are asynchronous.
 
     If this decorator is given, the response is not finished when the
     method returns. It is up to the request handler to call self.finish()
@@ -889,7 +912,8 @@ def asynchronous(method):
 
 
 def removeslash(method):
-    """Use this decorator to remove trailing slashes from the request path.
+    """
+    Use this decorator to remove trailing slashes from the request path.
 
     For example, a request to '/foo/' would redirect to '/foo' with this
     decorator. Your request handler mapping should use a regular expression
@@ -912,7 +936,8 @@ def removeslash(method):
 
 
 def addslash(method):
-    """Use this decorator to add a missing trailing slash to the request path.
+    """
+    Use this decorator to add a missing trailing slash to the request path.
 
     For example, a request to '/foo' would redirect to '/foo/' with this
     decorator. Your request handler mapping should use a regular expression
@@ -935,7 +960,8 @@ def addslash(method):
 
 
 class Application(object):
-    r"""A collection of request handlers that make up a web application.
+    r"""
+    A collection of request handlers that make up a web application.
 
     Instances of this class are callable and can be passed directly to
     HTTPServer to serve the application:
@@ -1106,7 +1132,8 @@ class Application(object):
         return handler
 
     def reverse_url(self, name, *args):
-        """Returns a URL path for handler named `name`
+        """
+        Returns a URL path for handler named `name`
 
         The handler must be added to the application as a named URLSpec
         """
@@ -1146,7 +1173,8 @@ class ErrorHandler(RequestHandler):
 
 
 class RedirectHandler(RequestHandler):
-    """Redirects the client to the given URL for all GET requests.
+    """
+    Redirects the client to the given URL for all GET requests.
 
     You should provide the keyword argument "url" to the handler, e.g.:
 
@@ -1165,7 +1193,8 @@ class RedirectHandler(RequestHandler):
 
 
 class StaticFileHandler(RequestHandler):
-    """A simple handler that can serve static content from a directory.
+    """
+    A simple handler that can serve static content from a directory.
 
     To map a path to this handler for a static data directory /var/www,
     you would add a line to your application like:
@@ -1237,7 +1266,8 @@ class StaticFileHandler(RequestHandler):
 
 
 class FallbackHandler(RequestHandler):
-    """A RequestHandler that wraps another HTTP server callback.
+    """
+    A RequestHandler that wraps another HTTP server callback.
 
     The fallback is a callable object that accepts an HTTPRequest,
     such as an Application or tornado.wsgi.WSGIContainer.  This is most
@@ -1261,7 +1291,8 @@ class FallbackHandler(RequestHandler):
 
 
 class OutputTransform(object):
-    """A transform modifies the result of an HTTP request (e.g., GZip encoding)
+    """
+    A transform modifies the result of an HTTP request (e.g., GZip encoding)
 
     A new transform instance is created for every request. See the
     ChunkedTransferEncoding example below if you want to implement a
@@ -1279,7 +1310,8 @@ class OutputTransform(object):
 
 
 class GZipContentEncoding(OutputTransform):
-    """Applies the gzip content encoding to the response.
+    """
+    Applies the gzip content encoding to the response.
 
     See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.11
     """
@@ -1339,7 +1371,8 @@ class GZipContentEncoding(OutputTransform):
 
 
 class ChunkedTransferEncoding(OutputTransform):
-    """Applies the chunked transfer encoding to the response.
+    """
+    Applies the chunked transfer encoding to the response.
 
     See http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1
     """
@@ -1387,7 +1420,8 @@ def authenticated(method):
 
 
 class UIModule(object):
-    """A UI re-usable, modular unit on a page.
+    """
+    A UI re-usable, modular unit on a page.
 
     UI modules often execute additional queries, and they can include
     additional CSS and JavaScript that will be included in the output
@@ -1432,7 +1466,8 @@ class URLSpec(object):
     """Specifies mappings between URLs and handlers."""
 
     def __init__(self, pattern, handler_class, kwargs={}, name=None):
-        """Creates a URLSpec.
+        """
+        Creates a URLSpec.
 
         Parameters
         ----------
@@ -1455,7 +1490,8 @@ class URLSpec(object):
         self._path, self._group_count = self._find_groups()
 
     def _find_groups(self):
-        """Returns a tuple (reverse string, group count) for a url.
+        """
+        Returns a tuple (reverse string, group count) for a url.
 
         For example: Given the url pattern /([0-9]{4})/([a-z-]+)/, this method
         would return ('/%s/%s/', 2).

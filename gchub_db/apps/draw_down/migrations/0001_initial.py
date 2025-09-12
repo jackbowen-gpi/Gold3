@@ -32,15 +32,11 @@ class Migration(migrations.Migration):
                 ("comments", models.TextField(blank=True, max_length=500)),
                 (
                     "date_needed",
-                    models.DateField(
-                        blank=True, null=True, verbose_name=b"Date Needed"
-                    ),
+                    models.DateField(blank=True, null=True, verbose_name=b"Date Needed"),
                 ),
                 (
                     "creation_date",
-                    models.DateField(
-                        blank=True, null=True, verbose_name=b"Date Created"
-                    ),
+                    models.DateField(blank=True, null=True, verbose_name=b"Date Created"),
                 ),
                 ("request_complete", models.BooleanField(default=False)),
             ],

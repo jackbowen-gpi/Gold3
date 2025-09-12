@@ -37,12 +37,11 @@ class JMFMessage(object):
         self.doc_root = self.doc.createElement("JMF")
         self.doc_root.setAttribute("SenderID", "QMon")
         self.doc_root.setAttribute("Version", "1.2")
-        self.doc_root.setAttribute(
-            "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance"
-        )
+        self.doc_root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
 
     def execute(self):
-        """Processes the request by sending it to the FedEx server. Stores
+        """
+        Processes the request by sending it to the FedEx server. Stores
         a minidom.Document object containing the result of the query in
         the object's responsexml property.
         """
@@ -148,7 +147,8 @@ class JMFUnsubscribe(JMFMessage):
 
 
 class JMFSubmitQueueEntry(JMFMessage):
-    """Send a JMF SubmitQueueEntry request to Backstage. This is done to order
+    """
+    Send a JMF SubmitQueueEntry request to Backstage. This is done to order
     Backstage to visit a URL to grab a JDF that is to be executed.
     """
 
@@ -195,9 +195,7 @@ if __name__ == "__main__":
         t2.execute()
 
     if ex_queue:
-        t = JMFSubmitQueueEntry(
-            reverse("jdf-gen-item", args=[49297, 1, "fsb_proof"]), debug=True
-        )
+        t = JMFSubmitQueueEntry(reverse("jdf-gen-item", args=[49297, 1, "fsb_proof"]), debug=True)
         # t = JMFKnownDevices()
         # t = JMFKnownMessages()
         t.execute()

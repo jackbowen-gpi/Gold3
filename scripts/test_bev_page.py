@@ -1,11 +1,13 @@
-"""Quick functional check that a beverage job page renders for the dev test user.
+"""
+Quick functional check that a beverage job page renders for the dev test user.
 
 Run to perform a simple Django test client request and print basic results.
 """
 
 
 def run():
-    """Execute a small Django test client request and print basic results.
+    """
+    Execute a small Django test client request and print basic results.
 
     Useful as a quick smoke test during local development.
     """

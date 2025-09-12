@@ -16,9 +16,7 @@ class BeverageViewTests(TestCase):
         self.client.login(username="testuser", password="password")
 
     def test_new_beverage_get(self):
-        resp = self.client.get(
-            "/workflow/job/new/beverage/", HTTP_HOST="127.0.0.1:8002"
-        )
+        resp = self.client.get("/workflow/job/new/beverage/", HTTP_HOST="127.0.0.1:8002")
         self.assertIn(resp.status_code, (200, 302))
         if resp.status_code == 200:
             self.assertIn("<form", resp.content.decode("utf-8"))

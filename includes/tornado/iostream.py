@@ -24,7 +24,8 @@ from . import ioloop
 
 
 class IOStream(object):
-    """A utility class to write to and read from a non-blocking socket.
+    """
+    A utility class to write to and read from a non-blocking socket.
 
     We support three methods: write(), read_until(), and read_bytes().
     All of the methods take callbacks (since writing and reading are
@@ -103,7 +104,8 @@ class IOStream(object):
         self._add_io_state(self.io_loop.READ)
 
     def write(self, data, callback=None):
-        """Write the given data to this stream.
+        """
+        Write the given data to this stream.
 
         If callback is given, we call it when all of the buffered write
         data has been successfully written to the stream. If there was

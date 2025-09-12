@@ -17,7 +17,8 @@ def echo_input(request):
 
 
 def run_jdf_jobitem(request, job_id, item_num, genxml_func):
-    """Executes a JDF task via hotolder. genxml_func must match a do_jdf_* function
+    """
+    Executes a JDF task via hotolder. genxml_func must match a do_jdf_* function
     in workflow/models.py for this to work. See the comments for
     generate_jdf_jobitem() in this module for more details.
     """
@@ -36,7 +37,8 @@ def run_jdf_jobitem(request, job_id, item_num, genxml_func):
 
 
 def run_jmf_jobitem(request, job_id, item_num, genxml_func):
-    """Executes a JDF task via JMF. genxml_func must match a genxml_jdf_* function
+    """
+    Executes a JDF task via JMF. genxml_func must match a genxml_jdf_* function
     in workflow/models.py for this to work. See the comments for
     generate_jdf_jobitem() in this module for more details.
     """
@@ -47,7 +49,8 @@ def run_jmf_jobitem(request, job_id, item_num, genxml_func):
 
 
 def generate_jdf_jobitem(request, job_id, item_num, genxml_func):
-    """Generates a JDF for the specified item, where genxml_func matches up to one
+    """
+    Generates a JDF for the specified item, where genxml_func matches up to one
     of the genxml_jdf_* functions in workflow/models.py. For example, if you
     want to get the return value of genxml_jdf_fsb_proof, the url would
     look something like: http://somehost/xml/jdf/49297/1/fsb_proof
@@ -60,6 +63,4 @@ def generate_jdf_jobitem(request, job_id, item_num, genxml_func):
     # Get the genxml_jdf_* function that matches genxml_func as a reference.
     genxml = getattr(item, "genxml_jdf_" + genxml_func)
     # Run the function and pipe it out to the client as a JDF file.
-    return HttpResponse(
-        genxml().get_xml_doc_string(pretty=False), content_type="vnd.cip4-jdf+xml"
-    )
+    return HttpResponse(genxml().get_xml_doc_string(pretty=False), content_type="vnd.cip4-jdf+xml")

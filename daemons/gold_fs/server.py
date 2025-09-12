@@ -6,9 +6,7 @@ import sys
 
 sys.path.insert(
     0,
-    os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    ),
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
 )
 os.environ["DJANGO_SETTINGS_MODULE"] = "gchub_db.settings"
 
@@ -19,7 +17,8 @@ from . import handlers
 
 
 class EchoUDP(DatagramProtocol):
-    """UDP server protocol that routes filesystem commands to handlers.
+    """
+    UDP server protocol that routes filesystem commands to handlers.
 
     Each datagram is split into a command and args; handlers are looked up on
     the `handlers` module using a `cmd_<name>` naming convention.
@@ -46,7 +45,8 @@ class EchoUDP(DatagramProtocol):
 
 
 def main():
-    """Start the GOLD FS UDP server and begin the reactor loop.
+    """
+    Start the GOLD FS UDP server and begin the reactor loop.
 
     This function is intentionally small so it can be run as a script to
     start the daemon from the command line.

@@ -1,4 +1,5 @@
-"""Dev-only middleware to ensure a development admin user exists and is
+"""
+Dev-only middleware to ensure a development admin user exists and is
 automatically logged in for local development (DEBUG=True).
 
 This middleware is intentionally defensive: it only runs when DEBUG is True

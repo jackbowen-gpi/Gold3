@@ -50,12 +50,8 @@ for i in range(len(color_list)):
         docSheet1.cell(row=i + 2, column=4).value = color.get_lab_color_obj().lab_b
         # Look up color standard and run comparison.
         try:
-            db_color = ColorDefinition.objects.get(
-                name=color_list[i], coating=book_type
-            )
-            db_color_lab = LabColor(
-                lab_l=db_color.lab_l, lab_a=db_color.lab_a, lab_b=db_color.lab_b
-            )
+            db_color = ColorDefinition.objects.get(name=color_list[i], coating=book_type)
+            db_color_lab = LabColor(lab_l=db_color.lab_l, lab_a=db_color.lab_a, lab_b=db_color.lab_b)
             # Calculate dE between color from Esko library and database library.
             de2000 = color.get_lab_color_obj().delta_e(db_color_lab)
             docSheet1.cell(row=i + 2, column=5).value = de2000

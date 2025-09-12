@@ -1,4 +1,8 @@
 # Celery configuration
+"""
+Module settings.py
+"""
+
 import os
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")

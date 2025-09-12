@@ -42,7 +42,8 @@ class AutoFTPTiff(models.Model):
             return returnStr[1:]
 
     def get_settings_dict(self):
-        """Gets the correct FTP account data dict from settings.py based
+        """
+        Gets the correct FTP account data dict from settings.py based
         on the destination.
         """
         ftp_dict_key = self.get_destination_display().upper()
@@ -71,7 +72,8 @@ class AutoFTPTiff(models.Model):
         return "%s/%s_%s" % (remote_dir, self.job.id, stripped_name)
 
     def mark_as_processed(self):
-        """The items have been uploaded or the attempt has been made. Removes
+        """
+        The items have been uploaded or the attempt has been made. Removes
         the upload from the queue.
         """
         self.date_processed = timezone.now()

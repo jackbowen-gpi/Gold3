@@ -1,3 +1,7 @@
+r"""
+Module templatetags\legacy_tags.py
+"""
+
 from django import template
 
 register = template.Library()

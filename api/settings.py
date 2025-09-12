@@ -1,4 +1,5 @@
-"""Minimal settings shim for `api.settings` used by some legacy modules.
+"""
+Minimal settings shim for `api.settings` used by some legacy modules.
 
 This file is intentionally minimal. Add values as needed when the import
 fails for a specific variable.
@@ -11,7 +12,8 @@ DATABASES = {}
 
 
 def get(name, default=None):
-    """Return a settings value by name with an optional default.
+    """
+    Return a settings value by name with an optional default.
 
     This helper mirrors a tiny subset of Django's settings access patterns
     used by legacy modules that import `api.settings`.

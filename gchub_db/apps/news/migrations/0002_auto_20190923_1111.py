@@ -14,16 +14,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="codechange",
             name="change",
-            field=models.TextField(
-                help_text="A description of the change, in terms that the end users can understand."
-            ),
+            field=models.TextField(help_text="A description of the change, in terms that the end users can understand."),
         ),
         migrations.AlterField(
             model_name="codechange",
             name="change_type",
-            field=models.IntegerField(
-                choices=[(0, "Feature Enhancement"), (1, "New Feature"), (1, "Bug Fix")]
-            ),
+            field=models.IntegerField(choices=[(0, "Feature Enhancement"), (1, "New Feature"), (1, "Bug Fix")]),
         ),
         migrations.AlterField(
             model_name="codechange",
@@ -64,8 +60,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="codechange",
             name="workflows_affected",
-            field=models.ManyToManyField(
-                help_text="Which workflows are affected by the change.", to="sites.Site"
-            ),
+            field=models.ManyToManyField(help_text="Which workflows are affected by the change.", to="sites.Site"),
         ),
     ]

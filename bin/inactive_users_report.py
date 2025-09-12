@@ -35,9 +35,7 @@ We want the less than search here because we want people whose last login is old
 give us those within that X -> now time window.
 """
 never_login = User.objects.filter(last_login=never, is_active=True).order_by("username")
-ninety_days_login = User.objects.filter(
-    last_login__lt=ninety_days, is_active=True
-).order_by("username")
+ninety_days_login = User.objects.filter(last_login__lt=ninety_days, is_active=True).order_by("username")
 
 """
 Logging
@@ -75,9 +73,7 @@ for criteria in tuple:
             docSheet1.cell(row=i + 2, column=1).value = search_results[i].username
             docSheet1.cell(row=i + 2, column=2).value = search_results[i].email
             if search_results[i].last_login:
-                docSheet1.cell(row=i + 2, column=3).value = search_results[
-                    i
-                ].last_login.strftime("%m/%d/%Y")
+                docSheet1.cell(row=i + 2, column=3).value = search_results[i].last_login.strftime("%m/%d/%Y")
             else:
                 docSheet1.cell(row=i + 2, column=3).value = "Never"
 

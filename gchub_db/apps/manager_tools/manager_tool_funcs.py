@@ -1,4 +1,5 @@
-"""Manager Tool Functions. These are functions that need to be accessed outside of
+"""
+Manager Tool Functions. These are functions that need to be accessed outside of
 maager tools. We split them out to minimize circular dependencies.
 """
 
@@ -8,7 +9,8 @@ from gchub_db.apps.workflow.models import Item, JobComplexity
 
 
 def get_job_average_hours(supplied_category, supplied_type, supplied_artist=False):
-    """Calculates the average amount of time artists put into a given type of job
+    """
+    Calculates the average amount of time artists put into a given type of job
     based on time sheet data. Averages are calculated for every available
     complexity for a given category and type. Results can be limited to a single
     artist if one is supplied.
@@ -35,9 +37,7 @@ def get_job_average_hours(supplied_category, supplied_type, supplied_artist=Fals
         current_complexity = current_complexity[0]
 
         # Get the job complexity objects.
-        job_complexities = JobComplexity.objects.filter(
-            category=supplied_category, complexity=current_complexity
-        )
+        job_complexities = JobComplexity.objects.filter(category=supplied_category, complexity=current_complexity)
 
         # Filter by type next
         job_list = []
@@ -75,7 +75,8 @@ def get_job_average_hours(supplied_category, supplied_type, supplied_artist=Fals
 
 
 def get_item_average_hours(supplied_category, supplied_type, supplied_artist=False):
-    """Just like get_job_average_hours but it takes the number of items into
+    """
+    Just like get_job_average_hours but it takes the number of items into
     account. If you're using this to more accurately figure out how long a job
     will take remember multiply the results by the number of items in the job.
 
@@ -95,9 +96,7 @@ def get_item_average_hours(supplied_category, supplied_type, supplied_artist=Fal
         current_complexity = current_complexity[0]
 
         # Get the job complexity objects.
-        job_complexities = JobComplexity.objects.filter(
-            category=supplied_category, complexity=current_complexity
-        )
+        job_complexities = JobComplexity.objects.filter(category=supplied_category, complexity=current_complexity)
 
         # Filter by type next
         job_list = []

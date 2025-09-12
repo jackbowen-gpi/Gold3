@@ -58,12 +58,8 @@ class SpecSearchForm(forms.Form):
     """Search for Item Specification records."""
 
     size = forms.CharField(required=False)
-    plant = forms.ModelChoiceField(
-        queryset=Plant.objects.all().order_by("name"), required=False
-    )
-    press = forms.ModelChoiceField(
-        queryset=Press.objects.all().order_by("name"), required=False
-    )
+    plant = forms.ModelChoiceField(queryset=Plant.objects.all().order_by("name"), required=False)
+    press = forms.ModelChoiceField(queryset=Press.objects.all().order_by("name"), required=False)
     sort_by = forms.ChoiceField(choices=[("size", "Size")], required=False)
     sort_order = forms.ChoiceField(
         choices=[("desc", "Descending"), ("asc", "Ascending")],
@@ -81,23 +77,17 @@ class ItemCatalogForm(ModelForm):
             queryset=ItemCatalog.objects.filter(active=True).order_by("size"),
             required=False,
         )
-        self.fields[
-            "acts_like"
-        ].help_text = "(JDF Stepping Only -- Item will use S&R of selected item.)"
+        self.fields["acts_like"].help_text = "(JDF Stepping Only -- Item will use S&R of selected item.)"
         self.fields["product_substrate"].label = "Proofing"
-        self.fields[
-            "product_substrate"
-        ].help_text = "(Determines substrate for proofing purposes.)"
-        self.fields[
-            "mfg_name"
-        ].help_text = "(QAD code, 8 characters. Example: SMR-0160)"
+        self.fields["product_substrate"].help_text = "(Determines substrate for proofing purposes.)"
+        self.fields["mfg_name"].help_text = "(QAD code, 8 characters. Example: SMR-0160)"
         self.fields["bev_size_code"].label = "Bev Size Code"
-        self.fields[
-            "bev_size_code"
-        ].help_text = "(Evergreen only. Example: Q=Quart, A=4oz Eco)"
+        self.fields["bev_size_code"].help_text = "(Evergreen only. Example: Q=Quart, A=4oz Eco)"
         self.fields[
             "productsubcategory"
-        ].help_text = '(For sorting purposes in PDF Tempalte download page.) Hold down "Control", or "Command" on a Mac, to select more than one.'
+        ].help_text = (
+            '(For sorting purposes in PDF Tempalte download page.) Hold down "Control", or "Command" on a Mac, to select more than one.'
+        )
 
     class Meta:
         model = ItemCatalog
@@ -111,18 +101,12 @@ class ItemSpecsForm(ModelForm):
         super(ItemSpecsForm, self).__init__(*args, **kwargs)
         # qset = PrintLocation.objects.filter(plant__workflow=self.fields["size.workflow"])
         # self.fields["printlocation"] = forms.ModelChoiceField(queryset=qset, required=False)
-        self.fields["size"] = forms.ModelChoiceField(
-            queryset=ItemCatalog.objects.filter(active=True).order_by("size")
-        )
-        self.fields["printlocation"] = forms.ModelChoiceField(
-            queryset=PrintLocation.objects.filter(active=True).order_by("plant__name")
-        )
+        self.fields["size"] = forms.ModelChoiceField(queryset=ItemCatalog.objects.filter(active=True).order_by("size"))
+        self.fields["printlocation"] = forms.ModelChoiceField(queryset=PrintLocation.objects.filter(active=True).order_by("plant__name"))
         #        self.fields["num_colors"].label = 'Max. Num. Colors'
         self.fields["horizontal"].help_text = "(Rectangle dimensions to build art to.)"
         self.fields["vertical"].help_text = "(Rectangle dimensions to build art to.)"
-        self.fields[
-            "total_print_area"
-        ].help_text = "(A.K.A inch squared from pack edge.)"
+        self.fields["total_print_area"].help_text = "(A.K.A inch squared from pack edge.)"
 
     #        self.fields["step_across"].help_text = '(Num. columns across the web.)'
     #        self.fields["step_around"].help_text = '(Num. rows around the plate cylinder.)'
@@ -139,9 +123,7 @@ class StepSpecsForm(ModelForm):
 
     def __init__(self, request, *args, **kwargs):
         super(StepSpecsForm, self).__init__(*args, **kwargs)
-        self.fields["itemspec"] = forms.ModelChoiceField(
-            queryset=ItemSpec.objects.filter(active=True).order_by("size")
-        )
+        self.fields["itemspec"] = forms.ModelChoiceField(queryset=ItemSpec.objects.filter(active=True).order_by("size"))
         self.fields["special_mfg"].label = "Special Mfg"
         self.fields["eng_num"].label = "Engineering Num"
         self.fields["num_colors"].label = "Max Num Colors"
@@ -164,15 +146,9 @@ class StepSearchForm(forms.Form):
     """Search for Step and Repeat records."""
 
     size = forms.CharField(required=False)
-    plant = forms.ModelChoiceField(
-        queryset=Plant.objects.all().order_by("name"), required=False
-    )
-    press = forms.ModelChoiceField(
-        queryset=Press.objects.all().order_by("name"), required=False
-    )
-    special_mfg = forms.ModelChoiceField(
-        queryset=SpecialMfgConfiguration.objects.all().order_by("name"), required=False
-    )
+    plant = forms.ModelChoiceField(queryset=Plant.objects.all().order_by("name"), required=False)
+    press = forms.ModelChoiceField(queryset=Press.objects.all().order_by("name"), required=False)
+    special_mfg = forms.ModelChoiceField(queryset=SpecialMfgConfiguration.objects.all().order_by("name"), required=False)
     eng_num = forms.CharField(required=False)
     sort_by = forms.ChoiceField(choices=[("size", "Size")], required=False)
     sort_order = forms.ChoiceField(
@@ -194,9 +170,7 @@ def itemcatalog_home(request):
         "item_spec_count": item_spec_count,
         "item_photo": item_photo,
     }
-    return render(
-        request, "workflow/itemcatalog/itemcatalog_home.html", context=pagevars
-    )
+    return render(request, "workflow/itemcatalog/itemcatalog_home.html", context=pagevars)
 
 
 def sendAddEditProductEmail(type, user, id):
@@ -207,9 +181,7 @@ def sendAddEditProductEmail(type, user, id):
 
     # Continue composing the email.
     mail_send_to = []
-    group_members = User.objects.filter(
-        groups__name="EmailGCHubProductChanges", is_active=True
-    )
+    group_members = User.objects.filter(groups__name="EmailGCHubProductChanges", is_active=True)
     for manager in group_members:
         mail_send_to.append(manager.email)
     mail_from = "Gold - Clemson Support <%s>" % settings.EMAIL_SUPPORT
@@ -225,9 +197,7 @@ def sendAddEditProductEmail(type, user, id):
         "product_name": product_name,
     }
     # send the email
-    msg = EmailMultiAlternatives(
-        mail_subject, mail_body.render(mail_context), mail_from, mail_send_to
-    )
+    msg = EmailMultiAlternatives(mail_subject, mail_body.render(mail_context), mail_from, mail_send_to)
     msg.content_subtype = "html"
     msg.send()
 
@@ -259,9 +229,7 @@ def new_itemcatalog(request):
             "add_form": add_form,
         }
 
-        return render(
-            request, "workflow/itemcatalog/add_itemcatalog.html", context=pagevars
-        )
+        return render(request, "workflow/itemcatalog/add_itemcatalog.html", context=pagevars)
 
 
 def edit_itemcatalog(request, item_id):
@@ -290,9 +258,7 @@ def edit_itemcatalog(request, item_id):
             "add_form": add_form,
             "item": item,
         }
-        return render(
-            request, "workflow/itemcatalog/edit_itemcatalog.html", context=pagevars
-        )
+        return render(request, "workflow/itemcatalog/edit_itemcatalog.html", context=pagevars)
 
 
 class BrowseItemCatalog(ListView):
@@ -319,9 +285,7 @@ def catalog_search(request):
     }
     # This is the search page to be re-displayed if there's a problem or no
     # POST data.
-    search_page = render(
-        request, "workflow/itemcatalog/search_form.html", context=pagevars
-    )
+    search_page = render(request, "workflow/itemcatalog/search_form.html", context=pagevars)
 
     if request.GET:
         form = CatalogSearchForm(request.GET)
@@ -391,9 +355,7 @@ def spec_search(request):
     }
     # This is the search page to be re-displayed if there's a problem or no
     # POST data.
-    search_page = render(
-        request, "workflow/itemcatalog/search_form.html", context=pagevars
-    )
+    search_page = render(request, "workflow/itemcatalog/search_form.html", context=pagevars)
 
     if request.GET:
         form = SpecSearchForm(request.GET)
@@ -454,9 +416,7 @@ def step_search(request):
     }
     # This is the search page to be re-displayed if there's a problem or no
     # POST data.
-    search_page = render(
-        request, "workflow/itemcatalog/search_form.html", context=pagevars
-    )
+    search_page = render(request, "workflow/itemcatalog/search_form.html", context=pagevars)
 
     if request.GET:
         form = StepSearchForm(request.GET)
@@ -566,9 +526,7 @@ def new_itemspecs(request, set_size=None, set_printlocation=None):
             "page_title": "Add Specification for Product",
             "add_form": add_form,
         }
-        return render(
-            request, "workflow/itemcatalog/add_itemspecs.html", context=pagevars
-        )
+        return render(request, "workflow/itemcatalog/add_itemspecs.html", context=pagevars)
 
 
 def new_stepspecs(request):
@@ -594,9 +552,7 @@ def new_stepspecs(request):
             "page_title": "Add Specification for Step & Repeat",
             "add_form": add_form,
         }
-        return render(
-            request, "workflow/itemcatalog/add_stepspecs.html", context=pagevars
-        )
+        return render(request, "workflow/itemcatalog/add_stepspecs.html", context=pagevars)
 
 
 def edit_stepspecs(request, stepspec_id):
@@ -628,9 +584,7 @@ def edit_stepspecs(request, stepspec_id):
             "stepspec": stepspec,
         }
 
-        return render(
-            request, "workflow/itemcatalog/edit_stepspecs.html", context=pagevars
-        )
+        return render(request, "workflow/itemcatalog/edit_stepspecs.html", context=pagevars)
 
 
 def edit_itemspecs(request, spec_id):
@@ -657,9 +611,7 @@ def edit_itemspecs(request, spec_id):
             "add_form": add_form,
             "spec": spec,
         }
-        return render(
-            request, "workflow/itemcatalog/edit_itemspecs.html", context=pagevars
-        )
+        return render(request, "workflow/itemcatalog/edit_itemspecs.html", context=pagevars)
 
 
 def new_itemspecs_dupe(request, spec_id):
@@ -688,9 +640,7 @@ def new_itemspecs_dupe(request, spec_id):
             "spec": spec,
             "duplicate": True,
         }
-        return render(
-            request, "workflow/itemcatalog/edit_itemspecs.html", context=pagevars
-        )
+        return render(request, "workflow/itemcatalog/edit_itemspecs.html", context=pagevars)
 
 
 def new_stepspecs_dupe(request, stepspec_id):
@@ -722,6 +672,4 @@ def new_stepspecs_dupe(request, stepspec_id):
             "stepspec": stepspec,
             "duplicate": True,
         }
-        return render(
-            request, "workflow/itemcatalog/edit_stepspecs.html", context=pagevars
-        )
+        return render(request, "workflow/itemcatalog/edit_stepspecs.html", context=pagevars)

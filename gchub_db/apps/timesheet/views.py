@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+Module gchub_db\apps\timesheet\views.py
+"""
+
 from __future__ import unicode_literals
 
 import math
@@ -68,9 +72,7 @@ class TimeSheetForm(ModelForm):
         super(TimeSheetForm, self).__init__(*args, **kwargs)
         # Limit the choice of artists to Clemson artists.
         permission = Permission.objects.get(codename="in_artist_pulldown")
-        artists = User.objects.filter(
-            is_active=True, groups__in=permission.group_set.all()
-        ).order_by("username")
+        artists = User.objects.filter(is_active=True, groups__in=permission.group_set.all()).order_by("username")
         self.fields["artist"].queryset = artists
         # Make the date default to today (UTC-naive via helper).
         today = general_funcs._utcnow_naive().date()
@@ -80,9 +82,7 @@ class TimeSheetForm(ModelForm):
         self.fields["hour"].label = "Hours"
         self.fields["min"].label = "Minutes"
         self.fields["comments"].help_text = "(Limit 500 characters.)"
-        self.fields["category"].queryset = self.fields["category"].queryset.order_by(
-            "order"
-        )
+        self.fields["category"].queryset = self.fields["category"].queryset.order_by("order")
 
     def clean(self):
         """Make the comments field required if the user selects the misc category."""
@@ -119,7 +119,8 @@ class TimeSheetForm(ModelForm):
 
 
 class TimeSheetReportForm(forms.Form):
-    """Form used when users want to view time sheet entries from a specific date
+    """
+    Form used when users want to view time sheet entries from a specific date
     range.
     """
 
@@ -129,7 +130,8 @@ class TimeSheetReportForm(forms.Form):
 
 @login_required
 def home(request, user_id=None):
-    """Main page for timesheets. If a user ID is provided then a manager is
+    """
+    Main page for timesheets. If a user ID is provided then a manager is
     reviewing and employee's timesheet entries and we show some different
     elements.
 
@@ -190,9 +192,7 @@ def home(request, user_id=None):
         todays_date = start_date - timedelta(days=days_back)
         todays_data.append(todays_date)
         # Get the user's timesheets for this date.
-        timesheets = TimeSheet.objects.filter(artist=user, date=todays_date).order_by(
-            "id"
-        )
+        timesheets = TimeSheet.objects.filter(artist=user, date=todays_date).order_by("id")
         todays_data.append(timesheets)
         # Total up the hours
         total = 0
@@ -249,9 +249,7 @@ def add(request, timesheet_id=None):
             if request.POST.get("jobnum"):
                 form.job = Job.objects.get(id=request.POST.get("jobnum"))
             # Total up the hours and minutes.
-            form.hours = float(request.POST.get("hour")) + float(
-                request.POST.get("min")
-            )
+            form.hours = float(request.POST.get("hour")) + float(request.POST.get("min"))
             form.save()
             if "SubmitAdditional" in request.POST:
                 return HttpResponseRedirect(reverse("timesheet_add"))

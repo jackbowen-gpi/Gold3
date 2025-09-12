@@ -41,9 +41,7 @@ class Migration(migrations.Migration):
                 ("December", models.IntegerField()),
                 (
                     "workflow",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="sites.Site"
-                    ),
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="sites.Site"),
                 ),
             ],
             options={
@@ -76,9 +74,7 @@ class Migration(migrations.Migration):
                 ("December", models.IntegerField(blank=True, null=True)),
                 (
                     "budget",
-                    models.OneToOneField(
-                        on_delete=django.db.models.deletion.CASCADE, to="budget.Budget"
-                    ),
+                    models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to="budget.Budget"),
                 ),
             ],
             options={

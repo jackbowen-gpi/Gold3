@@ -1,3 +1,7 @@
+r"""
+Module .scripts\check_try_includes.py
+"""
+
 import os
 import sys
 import re

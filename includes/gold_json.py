@@ -1,4 +1,5 @@
-"""This file contains everything needed to send and receive JSON requests. This
+"""
+This file contains everything needed to send and receive JSON requests. This
 used to be called json.py but that caused a conflict with psycopg2 so we just
 renamed it to gold_json.py.
 """
@@ -7,7 +8,8 @@ import json
 
 
 class JSMessage(object):
-    """The JSMessages class is used to pass JSON messages to client JavaScripts.
+    """
+    The JSMessages class is used to pass JSON messages to client JavaScripts.
     Use this as a vessel for JSON stuff instead of directly sending JSON
     text.
     """
@@ -27,7 +29,8 @@ class JSMessage(object):
             self.contents = contents
 
     def __str__(self):
-        """The to-string method is called when sending JSMessage objects. This
+        """
+        The to-string method is called when sending JSMessage objects. This
         is what the client will see.
         """
         # Encode the dictionary and return it for sending.

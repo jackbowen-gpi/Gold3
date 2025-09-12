@@ -17,9 +17,7 @@ workBookDocument = openpyxl.Workbook()
 year = 2010
 
 jobs_active = (
-    Job.objects.filter(
-        due_date__year=year, workflow__name__in=("Beverage", "Foodservice")
-    )
+    Job.objects.filter(due_date__year=year, workflow__name__in=("Beverage", "Foodservice"))
     .exclude(status__in=("Hold", "Cancelled", "Hold for Art"))
     .exclude(prepress_supplier__in=("PHT", "SGS", "SHK"))
 )
@@ -39,16 +37,10 @@ jobs_on_cancelled = Job.objects.filter(
 )
 print("Total Jobs Cancelled %d" % jobs_on_cancelled.count())
 
-items = (
-    Item.objects.filter(job__in=jobs_active)
-    .exclude(overdue_exempt=True)
-    .order_by("job__artist__username", "job__id")
-)
+items = Item.objects.filter(job__in=jobs_active).exclude(overdue_exempt=True).order_by("job__artist__username", "job__id")
 print("Total Items %d" % items.count())
 
-items_exempted = Item.objects.filter(job__in=jobs_active, overdue_exempt=True).order_by(
-    "job__artist__username", "job__id"
-)
+items_exempted = Item.objects.filter(job__in=jobs_active, overdue_exempt=True).order_by("job__artist__username", "job__id")
 
 # Set up blank lists.
 on_time = []
@@ -126,9 +118,7 @@ for i in range(len(overdue)):
     docSheet2.cell(row=i + 2, column=4).value = str(overdue[i].job.name)
     docSheet2.cell(row=i + 2, column=5).value = str(overdue[i].size)
     docSheet2.cell(row=i + 2, column=6).value = str(overdue[i].num_in_job)
-    docSheet2.cell(row=i + 2, column=7).value = str(
-        overdue[i].first_proof_date().date()
-    )
+    docSheet2.cell(row=i + 2, column=7).value = str(overdue[i].first_proof_date().date())
     docSheet2.cell(row=i + 2, column=8).value = str(overdue[i].job.due_date)
 
 # Create 3rd sheet to display all items exempted.
@@ -149,13 +139,9 @@ docSheet1.panes_frozen = docSheet1["B2"]
 for i in range(len(items_exempted)):
     # Increment rows, write data.
     # docSheet1.write(row, column, value)creation_date
-    docSheet3.cell(row=i + 2, column=1).value = str(
-        items_exempted[i].creation_date.date()
-    )
+    docSheet3.cell(row=i + 2, column=1).value = str(items_exempted[i].creation_date.date())
     try:
-        docSheet3.cell(row=i + 2, column=2).value = str(
-            items_exempted[i].job.artist.username
-        )
+        docSheet3.cell(row=i + 2, column=2).value = str(items_exempted[i].job.artist.username)
     except Exception:
         docSheet3.cell(row=i + 2, column=2).value = "No Artist"
     docSheet3.cell(row=i + 2, column=3).value = str(items_exempted[i].job.id)
@@ -163,9 +149,7 @@ for i in range(len(items_exempted)):
     docSheet3.cell(row=i + 2, column=5).value = str(items_exempted[i].size)
     docSheet3.cell(row=i + 2, column=6).value = str(items_exempted[i].num_in_job)
     if items_exempted[i].first_proof_date():
-        docSheet3.cell(row=i + 2, column=7).value = str(
-            items_exempted[i].first_proof_date().date()
-        )
+        docSheet3.cell(row=i + 2, column=7).value = str(items_exempted[i].first_proof_date().date())
     docSheet3.cell(row=i + 2, column=8).value = str(items_exempted[i].job.due_date)
 
 # Create 3rd sheet to display all items exempted.
@@ -189,9 +173,7 @@ for i in range(len(never_sent)):
     # docSheet1.write(row, column, value)creation_date
     docSheet4.cell(row=i + 2, column=1).value = str(never_sent[i].creation_date.date())
     try:
-        docSheet4.cell(row=i + 2, column=2).value = str(
-            never_sent[i].job.artist.username
-        )
+        docSheet4.cell(row=i + 2, column=2).value = str(never_sent[i].job.artist.username)
     except Exception:
         docSheet4.cell(row=i + 2, column=2).value = "No Artist"
     docSheet4.cell(row=i + 2, column=3).value = str(never_sent[i].job.id)
@@ -199,16 +181,12 @@ for i in range(len(never_sent)):
     docSheet4.cell(row=i + 2, column=5).value = str(never_sent[i])
     docSheet4.cell(row=i + 2, column=6).value = str(never_sent[i].num_in_job)
     if never_sent[i].first_proof_date():
-        docSheet4.cell(row=i + 2, column=7).value = str(
-            never_sent[i].first_proof_date().date()
-        )
+        docSheet4.cell(row=i + 2, column=7).value = str(never_sent[i].first_proof_date().date())
     docSheet4.cell(row=i + 2, column=8).value = str(never_sent[i].job.due_date)
     docSheet4.cell(row=i + 2, column=9).value = str(never_sent[i].job.status)
 
 
-fsb_items = Item.objects.filter(
-    job__workflow__name="Foodservice", job__creation_date__year=year
-)
+fsb_items = Item.objects.filter(job__workflow__name="Foodservice", job__creation_date__year=year)
 
 
 # Save XLS document

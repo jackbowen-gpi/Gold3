@@ -30,9 +30,7 @@ class ItemJDF(object):
         self.doc_root.setAttribute("Type", "ProcessGroup")
         self.doc_root.setAttribute("Version", "1.2")
         self.doc_root.setAttribute("xmlns", "http://www.CIP4.org/JDFSchema_1_2")
-        self.doc_root.setAttribute(
-            "xmlns:eg", "http://www.esko-graphics.com/EGschema1_0"
-        )
+        self.doc_root.setAttribute("xmlns:eg", "http://www.esko-graphics.com/EGschema1_0")
         self.doc.appendChild(self.doc_root)
 
         for key in file_list.keys():
@@ -90,7 +88,8 @@ class ItemJDF(object):
         task_hold="false",
         smartmark_set=None,
     ):
-        """Adds a generic, configurable task node to the document.
+        """
+        Adds a generic, configurable task node to the document.
 
         descriptive_name: (str) Description of the document's purpose.
         node_id: (str) JDF task tag's ID.
@@ -170,7 +169,8 @@ class ItemJDF(object):
             return self.doc.toxml()
 
     def check_jdf_exists(self, file_name, jdf_queue_path):
-        """Checks to see if a jdf file exists for that job already and throws a growl error
+        """
+        Checks to see if a jdf file exists for that job already and throws a growl error
         so that two jobs dont get processed by automation engine at the same time.
         """
         try:
@@ -224,10 +224,12 @@ class ItemJDF(object):
             )
 
         if self.check_jdf_exists(file_name, jdf_queue_path):
-            error_msg = "Too many JDF tasks launched back-to-back on this item. Only the first task will run. You can launch another JDF task in 1 minute."
+            error_msg = (
+                "Too many JDF tasks launched back-to-back on this item. "
+                "Only the first task will run. You can launch another JDF task in 1 minute."
+            )
             self.item.job.growl_at_artist(
-                "JDF error on %s-%s %s"
-                % (self.item.job.id, self.item.num_in_job, self.item.job.name),
+                "JDF error on %s-%s %s" % (self.item.job.id, self.item.num_in_job, self.item.job.name),
                 error_msg,
                 pref_field="growl_hear_jdf_processes",
             )

@@ -1,3 +1,7 @@
+r"""
+Module src\inspect_imports.py
+"""
+
 import importlib
 import os
 import sys

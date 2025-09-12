@@ -1,3 +1,7 @@
+"""
+Module .scripts\test_dev_auto_login.py
+"""
+
 import os
 import sys
 import traceback

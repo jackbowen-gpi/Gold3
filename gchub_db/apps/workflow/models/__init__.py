@@ -43,6 +43,9 @@ from .general import (
     Trap,
 )
 
+# Note: Some environments may not use django.contrib.sites; import where needed locally.
+from django.contrib.sites.models import Site
+
 # Explicit imports from item.py
 from .item import Item
 from .general import ItemReview
@@ -110,6 +113,7 @@ __all__ = [
     "SalesServiceRep",
     "PlateOrder",
     "PlateOrderItem",
+    "Site",
     # Models from item.py
     "Item",
     "ItemReview",

@@ -13,7 +13,8 @@ from gchub_db.apps.workflow.models import ItemCatalog
 
 
 def main():
-    """Main entry point for transferring items/specs between catalogs.
+    """
+    Main entry point for transferring items/specs between catalogs.
 
     Expects two positional arguments: oldid and newid.
     """

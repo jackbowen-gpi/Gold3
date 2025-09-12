@@ -14,9 +14,7 @@ from django.shortcuts import render
 
 
 def recent_slow_requests(request):
-    base_dir = getattr(settings, "BASE_DIR", None) or getattr(
-        settings, "PROJECT_ROOT", None
-    )
+    base_dir = getattr(settings, "BASE_DIR", None) or getattr(settings, "PROJECT_ROOT", None)
     if not base_dir:
         base_dir = os.getcwd()
     log_path = os.path.join(base_dir, "var", "slow_requests.log")
@@ -154,11 +152,7 @@ def recent_slow_requests(request):
             e["timestamp_str"] = str(e.get("timestamp") or e.get("time") or "")
 
     # Prepare a base query string (preserve filters/sort but not page) for pagination links
-    qs_items = [
-        (k, v)
-        for k, v in request.GET.items()
-        if k.lower() != "page" and v is not None and v != ""
-    ]
+    qs_items = [(k, v) for k, v in request.GET.items() if k.lower() != "page" and v is not None and v != ""]
     base_qs = urlencode(qs_items)
 
     if (request.GET.get("format") or "").lower() == "csv":
@@ -166,9 +160,7 @@ def recent_slow_requests(request):
         resp = HttpResponse(content_type="text/csv")
         resp["Content-Disposition"] = "attachment; filename=slow_requests.csv"
         writer = csv.writer(resp)
-        writer.writerow(
-            ["timestamp", "path", "duration_ms", "db_queries", "sql_snippets"]
-        )
+        writer.writerow(["timestamp", "path", "duration_ms", "db_queries", "sql_snippets"])
         for e in page_items:
             # prefer the pre-formatted string if available
             ts = e.get("timestamp_str") or e.get("timestamp") or e.get("time") or ""

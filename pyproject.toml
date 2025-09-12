@@ -1,0 +1,116 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gchub_db"
+version = "0.0.0"
+description = "Legacy gchub_db project shim for editable installs"
+authors = [ { name = "dev", email = "dev@example.com" } ]
+
+[tool.setuptools]
+packages = ["gchub_db"]
+[tool.black]
+line-length = 140
+target-version = ['py311']
+
+[tool.isort]
+profile = 'black'
+[tool.poetry]
+name = "gold"
+version = "0.1.0"
+description = "Gold (gchub_db) Django project dependency manifest for Poetry"
+authors = ["dev@example.local"]
+packages = [
+  { include = "gchub_db" }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.14"
+Django = "4.2.23"
+
+# Note: This pyproject is intentionally minimal. Use the instructions in
+# README_POETRY.md to migrate the current `requirements.txt` into Poetry's
+# dependency table and to install the environment locally.
+
+[tool.poetry.dev-dependencies]
+black = "^24.3"
+pytest = "^7.4"
+
+
+# Configure ruff (move deprecated top-level selection/ignore into the `lint` section)
+[tool.ruff]
+line-length = 140
+exclude = [
+    "includes/**",  # Third-party libraries
+    "gchub_db/includes/**",  # Third-party libraries in app directory
+    "venv/**",  # Virtual environment
+    ".venv/**",  # Virtual environment
+    "__pycache__/**",  # Python cache
+    "*.pyc",  # Compiled Python files
+    ".git/**",  # Git directory
+    "node_modules/**",  # Node.js dependencies
+    "build/**",  # Build directory
+    "dist/**",  # Distribution directory
+    ".pytest_cache/**",  # Pytest cache
+    ".tox/**",  # Tox environments
+    ".coverage",  # Coverage reports
+    "htmlcov/**",  # Coverage HTML reports
+]
+
+[tool.ruff.lint]
+select = ["E", "F"]
+# Only run serious error checks: E (pycodestyle errors) and F (pyflakes).
+# Keep per-file-ignores below to avoid noisy legacy/generated files.
+
+[tool.ruff.lint.per-file-ignores]
+# Allow legacy scripts to skip docstring rules and some import placement checks
+"scripts/*" = ["D100", "D101", "D102", "D103", "D107", "E402", "E501"]
+"gchub_db/src/**" = ["D100", "D101", "D102", "D103"]
+
+# Broader legacy ignores to reduce noise from many historical modules.
+"gchub_db/**" = [
+  "D100", "D101", "D102", "D103", "D104", "D205", "D212", "D404",
+  "E402", "C901"
+]
+"gchub_db/includes/**" = ["D100", "D101", "D102", "D103", "E402"]
+"gchub_db/middleware/**" = ["D100", "D101", "D102", "D103", "D104", "C901", "E402"]
+"gchub_db/templatetags/**" = ["D100", "D101", "D102", "D103"]
+"gchub_db/settings*.py" = ["D100", "D101", "D102", "D103", "F403"]
+
+# Suppress wildcard-import/star-import warnings and other legacy-only complaints for historical modules
+"gchub_db/middleware/maintenance_mode/**" = ["D100", "D101", "D102", "D103", "F403", "F405", "F821"]
+"gchub_db/**/urls.py" = ["F403", "F405"]
+"gchub_db/**/tests/**" = ["D100", "D101", "D102", "D103"]
+
+# Additional targeted ignores for files still flagged after auto-fixes
+"gchub_db/includes/widgets.py" = ["D100", "D101", "D102", "D103", "D205", "N801"]
+"gchub_db/local_settings.py" = ["E501", "D100"]
+"gchub_db/manage.py" = ["D100"]
+"gchub_db/middleware/__init__.py" = ["D104"]
+"gchub_db/tmp_*.py" = ["D100", "E402"]
+"gchub_db/scripts/*" = ["D100", "D101", "D102", "D103", "E402"]
+
+# Test files - exclude from strict linting
+"**/test*.py" = ["D100", "D101", "D102", "D103", "E402"]
+"**/tests/**" = ["D100", "D101", "D102", "D103", "E402"]
+"test_minimal.py" = ["D100", "D101", "D102", "D103", "E402"]
+"urls.py" = ["E402"]  # URL configuration files often need late imports
+
+# Root-level equivalents (repo layout uses root-level `includes/`, `middleware/`, etc.)
+"includes/**" = ["D100", "D101", "D102", "D103", "D205", "E402", "N801"]
+"local_settings.py" = ["E501", "D100"]
+"manage.py" = ["D100"]
+"middleware/**" = ["D100", "D101", "D102", "D103", "D104", "C901", "E402"]
+"templatetags/**" = ["D100", "D101", "D102", "D103"]
+"urls_dummy.py" = ["E501"]
+"tmp_*.py" = ["D100", "E402"]
+
+# Legacy top-level bin scripts intentionally import/setup Django at module-level.
+# Suppress E402 (module level import not at top of file) for these.
+"bin/**" = ["E402", "E501"]
+
+# Reduce noise: ignore long lines and docstring rules in migrations and generated files
+"**/migrations/**" = ["E501", "D100", "D101", "D102", "D103", "D205"]
+".scripts/**" = ["E402", "E501"]
+"daemons/**" = ["E402", "E501"]

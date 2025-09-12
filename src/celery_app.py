@@ -1,11 +1,26 @@
+r"""
+Module src\celery_app.py
+"""
+
 import os
 import logging
+
+# Ensure a default settings module is available; actual django.setup()
+# is performed by the container startup wrappers so importing this module
+# doesn't trigger Django app population during package import.
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
+
 from celery import Celery  # type: ignore[import-not-found]
 
-# Explicitly import tasks from bin package since it's not a Django app
-import bin.tasks  # noqa: F401
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
+# Explicitly import tasks from bin package since it's not a Django app.
+# Do this after Django is set up in the container entrypoint to avoid
+# import-time side-effects.
+try:
+    import bin.tasks  # noqa: F401
+except Exception:
+    # Import may fail during static analysis or before Django is configured;
+    # defer failures to runtime when startup wrappers call django.setup().
+    pass
 
 app = Celery("Gold3")
 # Load configuration from Django settings (CELERY_ prefixed settings)

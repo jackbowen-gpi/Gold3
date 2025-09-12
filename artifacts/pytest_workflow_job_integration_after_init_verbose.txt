@@ -1,0 +1,71 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- C:\Dev\Gold3\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.6, settings: gchub_db.test_settings (from ini)
+rootdir: C:\Dev\Gold3
+configfile: pytest.ini
+plugins: anyio-4.10.0, Faker-37.6.0, django-4.11.1
+collecting ... collected 19 items
+
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_bulk_operations_integrity PASSED [  5%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_completion_status_integration FAILED [ 10%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_creation_date_ordering_integration PASSED [ 15%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_creation_with_joblog_integration PASSED [ 21%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_date_calculations_integration FAILED [ 26%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_deletion_cascade_behavior FAILED [ 31%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_icon_url_integration FAILED [ 36%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_keyword_generation_integration FAILED [ 42%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_search_and_filtering_integration PASSED [ 47%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_status_calculations_integration PASSED [ 52%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_status_workflow_integration PASSED [ 57%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_user_relationship_tracking PASSED [ 63%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_workflow_site_relationship_integrity PASSED [ 68%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelConcurrencyTests::test_concurrent_job_updates PASSED [ 73%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelConcurrencyTests::test_job_creation_uniqueness PASSED [ 78%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelConcurrencyTests::test_job_deletion_concurrent_access FAILED [ 84%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelTransactionTests::test_job_bulk_operation_transaction PASSED [ 89%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelTransactionTests::test_job_creation_rollback_scenario PASSED [ 94%]
+gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelTransactionTests::test_job_creation_transaction_integrity PASSED [100%]
+
+================================== FAILURES ===================================
+_______ JobModelIntegrationTests.test_job_completion_status_integration _______
+gchub_db\apps\workflow\tests\test_job_model_integration.py:303: in test_job_completion_status_integration
+    self.assertFalse(job.all_items_complete())
+E   AssertionError: True is not false
+_______ JobModelIntegrationTests.test_job_date_calculations_integration _______
+gchub_db\apps\workflow\tests\test_job_model_integration.py:210: in test_job_date_calculations_integration
+    self.assertEqual(food_job.real_due_date, expected_date)
+E   AssertionError: datetime.date(2025, 8, 29) != datetime.date(2025, 8, 28)
+_________ JobModelIntegrationTests.test_job_deletion_cascade_behavior _________
+gchub_db\apps\workflow\tests\test_job_model_integration.py:155: in test_job_deletion_cascade_behavior
+    self.assertTrue(Job.objects.filter(id=job_id).exists())
+E   AssertionError: False is not true
+___________ JobModelIntegrationTests.test_job_icon_url_integration ____________
+gchub_db\apps\workflow\tests\test_job_model_integration.py:293: in test_job_icon_url_integration
+    self.assertIn(expected_icon, icon_url)
+E   AssertionError: 'bullet_green.png' not found in '/media/img/icons/page_black.png'
+______ JobModelIntegrationTests.test_job_keyword_generation_integration _______
+gchub_db\apps\workflow\tests\test_job_model_integration.py:277: in test_job_keyword_generation_integration
+    self.assertIn(term, keywords_lower)
+E   AssertionError: 'techcorp' not found in 'website redesign project 1'
+________ JobModelConcurrencyTests.test_job_deletion_concurrent_access _________
+gchub_db\apps\workflow\tests\test_job_model_integration.py:439: in test_job_deletion_concurrent_access
+    final_job = Job.objects.get(id=job_id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:633: in get
+    raise self.model.DoesNotExist(
+E   gchub_db.apps.workflow.models.job.Job.DoesNotExist: Job matching query does not exist.
+---------------------------- Captured stdout call -----------------------------
+! Error removing symlink.
+! Error removing symlink.
+=========================== short test summary info ===========================
+FAILED gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_completion_status_integration - AssertionError: True is not false
+FAILED gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_date_calculations_integration - AssertionError: datetime.date(2025, 8, 29) != datetime.date(2025, 8, 28)
+FAILED gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_deletion_cascade_behavior - AssertionError: False is not true
+FAILED gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_icon_url_integration - AssertionError: 'bullet_green.png' not found in '/media/img/icons/page_black.png'
+FAILED gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelIntegrationTests::test_job_keyword_generation_integration - AssertionError: 'techcorp' not found in 'website redesign project 1'
+FAILED gchub_db/apps/workflow/tests/test_job_model_integration.py::JobModelConcurrencyTests::test_job_deletion_concurrent_access - gchub_db.apps.workflow.models.job.Job.DoesNotExist: Job matching query does not exist.
+======================== 6 failed, 13 passed in 17.86s ========================

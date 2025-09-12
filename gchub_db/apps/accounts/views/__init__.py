@@ -1,4 +1,5 @@
-"""Lazy shim to forward attribute access to the sibling ``views.py`` file.
+"""
+Lazy shim to forward attribute access to the sibling ``views.py`` file.
 
 We intentionally avoid importing the sibling module at package import time
 because that file imports Django models and will trigger settings access.
@@ -19,7 +20,8 @@ def _sibling_path():
 
 
 def _load_real_module():
-    """Load the sibling views.py as a separate module and cache it.
+    """
+    Load the sibling views.py as a separate module and cache it.
 
     This is executed lazily when an attribute on this package is requested.
     Errors are propagated so callers (e.g. Django request handling) see the
@@ -33,9 +35,7 @@ def _load_real_module():
     if not os.path.exists(path):
         raise ImportError("sibling views.py not found")
 
-    spec = importlib.util.spec_from_file_location(
-        "gchub_db.apps.accounts._views_py", path
-    )
+    spec = importlib.util.spec_from_file_location("gchub_db.apps.accounts._views_py", path)
     mod = importlib.util.module_from_spec(spec)
     # Execute the module in its own namespace.
     spec.loader.exec_module(mod)

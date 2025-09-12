@@ -1,4 +1,5 @@
-"""This middleware stores certain information for use outside areas in the
+"""
+This middleware stores certain information for use outside areas in the
 codebase that can't typically reach said information.
 
 For example, if a model has a last_modified_by field related to the User model,
@@ -16,7 +17,8 @@ def get_current_user():
 
 
 class ThreadLocals(object):
-    """Middleware that gets various objects from the
+    """
+    Middleware that gets various objects from the
     request object and saves them in thread local storage.
 
     Also stores some useful information on the UserProfile object.

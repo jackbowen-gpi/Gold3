@@ -43,9 +43,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="additionalinfo",
             name="prev_9_digit",
-            field=models.CharField(
-                blank=True, max_length=255, verbose_name="Previous 9-Digit #"
-            ),
+            field=models.CharField(blank=True, max_length=255, verbose_name="Previous 9-Digit #"),
         ),
         migrations.AlterField(
             model_name="artreq",
@@ -77,16 +75,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="extraproof",
             name="ship_to_addy_1",
-            field=models.CharField(
-                blank=True, max_length=255, verbose_name="Address 1"
-            ),
+            field=models.CharField(blank=True, max_length=255, verbose_name="Address 1"),
         ),
         migrations.AlterField(
             model_name="extraproof",
             name="ship_to_addy_2",
-            field=models.CharField(
-                blank=True, max_length=255, verbose_name="Address 2"
-            ),
+            field=models.CharField(blank=True, max_length=255, verbose_name="Address 2"),
         ),
         migrations.AlterField(
             model_name="extraproof",
@@ -136,9 +130,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="partialartreq",
             name="last_updated",
-            field=models.DateTimeField(
-                blank=True, null=True, verbose_name="last_updated"
-            ),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="last_updated"),
         ),
         migrations.AlterField(
             model_name="product",
@@ -148,9 +140,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="product",
             name="case_color",
-            field=models.CharField(
-                blank=True, max_length=255, verbose_name="Case Color"
-            ),
+            field=models.CharField(blank=True, max_length=255, verbose_name="Case Color"),
         ),
         migrations.AlterField(
             model_name="product",
@@ -182,9 +172,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="product",
             name="customer_number",
-            field=models.CharField(
-                blank=True, max_length=255, verbose_name="Customer Number"
-            ),
+            field=models.CharField(blank=True, max_length=255, verbose_name="Customer Number"),
         ),
         migrations.AlterField(
             model_name="product",
@@ -194,30 +182,22 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="product",
             name="label_color",
-            field=models.CharField(
-                blank=True, max_length=255, verbose_name="Label Color"
-            ),
+            field=models.CharField(blank=True, max_length=255, verbose_name="Label Color"),
         ),
         migrations.AlterField(
             model_name="product",
             name="label_copy_1",
-            field=models.CharField(
-                blank=True, max_length=22, verbose_name="Label Copy 1"
-            ),
+            field=models.CharField(blank=True, max_length=22, verbose_name="Label Copy 1"),
         ),
         migrations.AlterField(
             model_name="product",
             name="label_copy_2",
-            field=models.CharField(
-                blank=True, max_length=22, verbose_name="Label Copy 2"
-            ),
+            field=models.CharField(blank=True, max_length=22, verbose_name="Label Copy 2"),
         ),
         migrations.AlterField(
             model_name="product",
             name="label_copy_3",
-            field=models.CharField(
-                blank=True, max_length=22, verbose_name="Label Copy 3"
-            ),
+            field=models.CharField(blank=True, max_length=22, verbose_name="Label Copy 3"),
         ),
         migrations.AlterField(
             model_name="product",
@@ -232,16 +212,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="product",
             name="order_quantity",
-            field=models.IntegerField(
-                blank=True, null=True, verbose_name="Estimated Order Quantity"
-            ),
+            field=models.IntegerField(blank=True, null=True, verbose_name="Estimated Order Quantity"),
         ),
         migrations.AlterField(
             model_name="product",
             name="print_color",
-            field=models.CharField(
-                blank=True, max_length=255, verbose_name="Print Color"
-            ),
+            field=models.CharField(blank=True, max_length=255, verbose_name="Print Color"),
         ),
         migrations.AlterField(
             model_name="product",
@@ -316,9 +292,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="product",
             name="sleeve_count",
-            field=models.IntegerField(
-                blank=True, null=True, verbose_name="Sleeve Count"
-            ),
+            field=models.IntegerField(blank=True, null=True, verbose_name="Sleeve Count"),
         ),
         migrations.AlterField(
             model_name="product",

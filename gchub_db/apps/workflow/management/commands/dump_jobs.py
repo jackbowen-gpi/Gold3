@@ -25,9 +25,7 @@ class Command(BaseCommand):
                 "status": j.status,
                 "workflow": (j.workflow.name if j.workflow else None),
                 "artist": (j.artist.username if getattr(j, "artist", None) else None),
-                "salesperson": (
-                    j.salesperson.username if getattr(j, "salesperson", None) else None
-                ),
+                "salesperson": (j.salesperson.username if getattr(j, "salesperson", None) else None),
                 "items_in_job": getattr(j, "items_in_job", None),
             }
             self.stdout.write(json.dumps(d, default=str))

@@ -28,7 +28,8 @@ from gchub_db.includes import fs_api
 
 
 def joblog_error(job_or_item, message, kill_script=False):
-    """Joblogs a job or item-related error message.
+    """
+    Joblogs a job or item-related error message.
 
     kill_script: (int) 1 to kill with generic UNIX error code,
     2 for command line error code.
@@ -41,9 +42,7 @@ def joblog_error(job_or_item, message, kill_script=False):
 
 def perform_mock_upload(item, upload):
     """Mock upload function for development - just logs that upload would have happened."""
-    print(
-        f"MOCK: Would upload item {item.num_in_job} ({item.bev_nomenclature()}) to FTP"
-    )
+    print(f"MOCK: Would upload item {item.num_in_job} ({item.bev_nomenclature()}) to FTP")
 
     # Create the joblog entry to simulate successful upload
     item.do_create_joblog_entry(
@@ -59,14 +58,7 @@ def perform_upload(item, sftp, upload):
 
     try:
         # Set up the zip file name using beverage nomenclature.
-        send_name = (
-            str(item.job.id)
-            + "-"
-            + str(item.num_in_job)
-            + "-"
-            + str(item.bev_nomenclature())
-            + ".zip"
-        )
+        send_name = str(item.job.id) + "-" + str(item.num_in_job) + "-" + str(item.bev_nomenclature()) + ".zip"
 
         # Create and upload the zip file.
         zip_contents = fs_api.get_ftp_plate_files(item.job.id, item.num_in_job)

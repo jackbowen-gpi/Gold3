@@ -1,4 +1,8 @@
 # pytest configuration specific for VS Code Test Explorer
+"""
+Module conftest_vscode.py
+"""
+
 import os
 import django
 

@@ -1,4 +1,5 @@
-"""This module handles the creation of FedexConfig objects for consumption
+"""
+This module handles the creation of FedexConfig objects for consumption
 elsewhere in the app. It is merely a shortcut.
 """
 
@@ -25,7 +26,8 @@ except Exception:
 
 
 def create_fedex_config(test_server=False):
-    """Returns a FedexConfig object for usage in a FedexRequest.
+    """
+    Returns a FedexConfig object for usage in a FedexRequest.
 
     test_server: (bool) If True, return a FedexConfig object that points
                         to the Fedex test server.

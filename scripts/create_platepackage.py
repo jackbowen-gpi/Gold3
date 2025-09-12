@@ -25,9 +25,7 @@ if pm_created:
 else:
     print(f"Platemaker exists: {platemaker} (id={platemaker.id})")
 
-pp, pp_created = PlatePackage.objects.get_or_create(
-    platemaker=platemaker, platetype=platetype, defaults={"active": True}
-)
+pp, pp_created = PlatePackage.objects.get_or_create(platemaker=platemaker, platetype=platetype, defaults={"active": True})
 if pp_created:
     print(f"Created PlatePackage: {pp} (id={pp.id})")
 else:

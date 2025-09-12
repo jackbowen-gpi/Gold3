@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-"""Notification daemon for desktop notifications (cross-platform).
+"""
+Notification daemon for desktop notifications (cross-platform).
 
 Run this alongside the Django devserver. The daemon exposes a small HTTP
 endpoint (/notify) that accepts POST JSON payloads {title,message,duration,icon}
@@ -26,21 +27,31 @@ try:
     PLYER_AVAILABLE = True
 except Exception:
     PLYER_AVAILABLE = False
-    logging.warning(
-        "plyer not available in daemon; notifications will print to console"
-    )
+    logging.warning("plyer not available in daemon; notifications will print to console")
 
 
 NOTIFY_QUEUE: "queue.Queue[Dict[str, Any]]" = queue.Queue()
 
 
 class NotifyHandler(BaseHTTPRequestHandler):
+    """
+    HTTP request handler for notification daemon.
+
+    Handles POST requests to /notify to enqueue notifications and GET requests
+    to /health for health checks.
+    """
+
     def _set_json_response(self, code=200):
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.end_headers()
 
-    def do_GET(self):
+    def do_get(self):
+        """
+        Handle GET requests for health check endpoint.
+
+        Responds with status 'ok' for '/health', otherwise returns 404.
+        """
         if self.path == "/health":
             self._set_json_response(200)
             self.wfile.write(b'{"status":"ok"}')
@@ -57,14 +68,10 @@ class NotifyHandler(BaseHTTPRequestHandler):
             payload = json.loads(body)
             # Accept either direct fields or nested 'notification'
             title = payload.get("title") or payload.get("notification", {}).get("title")
-            message = payload.get("message") or payload.get("notification", {}).get(
-                "message"
-            )
+            message = payload.get("message") or payload.get("notification", {}).get("message")
             duration = int(payload.get("duration", 10))
             icon = payload.get("icon")
-            NOTIFY_QUEUE.put(
-                {"title": title, "message": message, "duration": duration, "icon": icon}
-            )
+            NOTIFY_QUEUE.put({"title": title, "message": message, "duration": duration, "icon": icon})
             self._set_json_response(200)
             self.wfile.write(b'{"status":"queued"}')
         except Exception as exc:
@@ -87,9 +94,7 @@ def main():
     parser.add_argument("--port", type=int, default=5341)
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s"
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 
     server = run_server(args.host, args.port)
 
@@ -115,9 +120,7 @@ def main():
                         app_name="Gold3 Notification Daemon",
                     )
                 else:
-                    logging.info(
-                        "NOTIFICATION (daemon fallback): %s - %s", title, message
-                    )
+                    logging.info("NOTIFICATION (daemon fallback): %s - %s", title, message)
             except Exception:
                 logging.exception("Error while showing notification")
             finally:

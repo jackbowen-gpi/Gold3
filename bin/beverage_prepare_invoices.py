@@ -43,9 +43,7 @@ def create_invoice(job, charge_set, inactive, past=False):
             if mail_send_to:
                 mail_body = loader.get_template("emails/bev_inactivity_invoicing.txt")
                 mail_context = {"job": job}
-                general_funcs.send_info_mail(
-                    mail_subject, mail_body.render(mail_context), mail_send_to
-                )
+                general_funcs.send_info_mail(mail_subject, mail_body.render(mail_context), mail_send_to)
         except Exception:
             # Email failed, sad. Probably a bad or nonexistent address.
             pass
@@ -207,9 +205,7 @@ print("NOT READY", len(jobs_not_ready), jobs_not_ready)
 print("INACTIVE", len(inactive_job_list), inactive_job_list)
 
 # Now gather all charges attached to invoiceable jobs for processing.
-billable_charges = Charge.objects.filter(
-    item__job__in=invoiceable_jobs, bev_invoice__isnull=True, item__is_deleted=False
-)
+billable_charges = Charge.objects.filter(item__job__in=invoiceable_jobs, bev_invoice__isnull=True, item__is_deleted=False)
 
 # Fire off the command to create an invoice for the job and it's billable charges.
 for job in invoiceable_jobs:

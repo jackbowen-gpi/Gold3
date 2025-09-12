@@ -33,16 +33,12 @@ def error_tracking_home(request, year=False):
     errors_reported = yearly_errors.count()
 
     # Count errors per workflow.
-    fsb_errors_reported = yearly_errors.filter(
-        job__workflow__name="Foodservice"
-    ).count()
+    fsb_errors_reported = yearly_errors.filter(job__workflow__name="Foodservice").count()
     bev_errors_reported = yearly_errors.filter(job__workflow__name="Beverage").count()
     con_errors_reported = yearly_errors.filter(job__workflow__name="Container").count()
 
     # Get total number of file outs so we can check the percentage of error.
-    file_outs = JobLog.objects.filter(
-        type=joblog_defs.JOBLOG_TYPE_ITEM_FILED_OUT, event_time__year=year
-    )
+    file_outs = JobLog.objects.filter(type=joblog_defs.JOBLOG_TYPE_ITEM_FILED_OUT, event_time__year=year)
 
     num_file_outs = file_outs.count()
     fsb_file_outs = file_outs.filter(job__workflow__name="Foodservice").count()

@@ -1,4 +1,5 @@
-"""Stable US state choices for art_req.Product.ship_to_state.
+"""
+Stable US state choices for art_req.Product.ship_to_state.
 
 This file contains a literal tuple of (code, name) pairs so Django's
 migration autodetector serializes the choices consistently.

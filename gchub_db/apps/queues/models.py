@@ -1,4 +1,5 @@
-"""These models serve as queues for various systems and scritps that run in the
+"""
+These models serve as queues for various systems and scritps that run in the
 background. These models are those that don't fit cleanly under their own apps.
 For example, there is no Hughes Uploading app, and there is not enough
 functionality needed to necessitate such an app.
@@ -18,15 +19,14 @@ class ColorKeyQueue(models.Model):
     item = models.ForeignKey("workflow.Item", on_delete=models.CASCADE, editable=False)
     date_queued = models.DateTimeField("Date Queued", auto_now_add=True)
     date_processed = models.DateTimeField("Date Processed", blank=True, null=True)
-    number_of_attempts = models.IntegerField(
-        "Attempts", default=0, blank=True, null=True
-    )
+    number_of_attempts = models.IntegerField("Attempts", default=0, blank=True, null=True)
 
     class Meta:
         ordering = ["-date_queued"]
 
     def mark_as_processed(self):
-        """The item has either started processing or has been processed. In either
+        """
+        The item has either started processing or has been processed. In either
         case, this prevents the queue watcher from picking the item up again
         and double-processing it.
         """
@@ -50,7 +50,8 @@ class TiffToPDF(models.Model):
         ordering = ["-date_queued"]
 
     def mark_as_processed(self):
-        """The item has either started processing or has been processed. In either
+        """
+        The item has either started processing or has been processed. In either
         case, this prevents the queue watcher from picking the item up again
         and double-processing it.
         """

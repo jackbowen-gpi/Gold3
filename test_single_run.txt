@@ -1,0 +1,11 @@
+.............F.....                                                      [100%]
+================================== FAILURES ===================================
+________________ TestURLSecurity.test_authenticated_url_access ________________
+tests\smoke\test_urls.py:292: in test_authenticated_url_access
+    self.assertIn(response.status_code, [200, 302])
+E   AssertionError: 405 not found in [200, 302]
+---------------------------- Captured stderr call -----------------------------
+WARNING django.request: Method Not Allowed (GET): /accounts/logout/
+=========================== short test summary info ===========================
+FAILED tests/smoke/test_urls.py::TestURLSecurity::test_authenticated_url_access
+1 failed, 18 passed in 19.51s

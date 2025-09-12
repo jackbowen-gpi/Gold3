@@ -17,7 +17,7 @@ DEFAULT_COUNT = int(os.environ.get("POPULATE_DEFAULT_COUNT", "5"))
 
 
 class Command(BaseCommand):
-    help = "Populate the dev database with minimal sample rows for all models (dry-run by default)."
+    help = "Populate the dev DB with minimal sample rows " "(dry-run by default)."
 
     def add_arguments(self, parser):
         """CLI arguments for the command."""
@@ -25,7 +25,7 @@ class Command(BaseCommand):
             "--count",
             type=int,
             default=DEFAULT_COUNT,
-            help=f"How many rows to create per model (default {DEFAULT_COUNT}; override with POPULATE_DEFAULT_COUNT env or --count)",
+            help=(f"How many rows to create per model (default {DEFAULT_COUNT}). " "Override with POPULATE_DEFAULT_COUNT env or --count."),
         )
         parser.add_argument(
             "--commit",
@@ -45,12 +45,12 @@ class Command(BaseCommand):
         parser.add_argument(
             "--apps",
             type=str,
-            help="Comma-separated app labels to limit population to (eg: workflow,auth)",
+            help=("Comma-separated app labels to limit population to, " "e.g. workflow,auth"),
         )
         parser.add_argument(
             "--models",
             type=str,
-            help="Comma-separated model labels to limit population to (eg: workflow.Item,auth.User)",
+            help=("Comma-separated model labels to limit population to, " "e.g. workflow.Item,auth.User"),
         )
 
     def handle(self, *args, **options):
@@ -62,9 +62,7 @@ class Command(BaseCommand):
         apps_filter = options.get("apps")
         models_filter = options.get("models")
 
-        self.stdout.write(
-            "Starting dev DB population (dry-run = %s)" % (do_commit and "NO" or "YES")
-        )
+        self.stdout.write("Starting dev DB population (dry-run = %s)" % (do_commit and "NO" or "YES"))
 
         # collect models and apply optional filters
         all_models = list(apps.get_models())
@@ -81,7 +79,8 @@ class Command(BaseCommand):
 
         created_summary = []
 
-        # curated mode: create a small coherent set first, then continue generic population
+        # curated mode: create a small coherent set first, then continue
+        # generic population
         if curated:
             self.stdout.write("Running curated/core seeder first...")
             try:
@@ -89,11 +88,10 @@ class Command(BaseCommand):
             except Exception as exc:
                 self.stderr.write(f"Curated seeder failed: {exc}")
             else:
-                # after curated seeding, prefer to only populate empty models to avoid duplicate/unique errors
+                # after curated seeding, prefer to only populate empty models to
+                # avoid duplicate/unique errors
                 only_empty = True
-                self.stdout.write(
-                    "Curated seeder finished: will only populate empty models in generic pass."
-                )
+                self.stdout.write("Curated seeder finished: will only populate empty models " "in generic pass.")
 
         for model in all_models:
             # skip unmanaged or proxy models
@@ -106,15 +104,11 @@ class Command(BaseCommand):
                 "ContentType",
                 "Permission",
             ):
-                self.stdout.write(
-                    f"Skipping internal model {opts.app_label}.{opts.object_name}"
-                )
+                self.stdout.write(f"Skipping internal model {opts.app_label}.{opts.object_name}")
                 continue
             # skip admin_log models in the generic pass; AdminLog is special-cased
             if opts.object_name == "AdminLog" or opts.app_label == "admin_log":
-                self.stdout.write(
-                    f"Skipping admin app model {opts.app_label}.{opts.object_name} (handled separately)"
-                )
+                self.stdout.write(f"Skipping admin app model {opts.app_label}.{opts.object_name} " "(handled separately)")
                 continue
 
             try:
@@ -124,19 +118,15 @@ class Command(BaseCommand):
                 # lightweight raw-check to see if the underlying table exists and
                 # has any rows (helps when migrations/tables are partially present).
                 try:
-                    table = (
-                        getattr(model._meta, "db_table", None)
-                        or model._meta.label_lower
-                    )
+                    table = getattr(model._meta, "db_table", None) or model._meta.label_lower
                     with connection.cursor() as cur:
                         cur.execute(f"SELECT 1 FROM {table} LIMIT 1")
                         row = cur.fetchone()
                     existing = 1 if row else 0
                 except Exception as e2:
                     # still failing: surface the original error and skip model
-                    self.stderr.write(
-                        f"Skipping model (count failed): {model.__module__}.{model.__name__} -- {e}; fallback check failed: {e2}"
-                    )
+                    self.stderr.write(f"Skipping model (count failed): {model.__module__}." f"{model.__name__} -- {e}")
+                    self.stderr.write(f"Fallback check failed: {e2}")
                     continue
 
             if only_empty and existing > 0:
@@ -158,23 +148,18 @@ class Command(BaseCommand):
                         m2m_fields.append(field)
                         continue
                     # skip auto PKs
-                    if getattr(field, "auto_created", False) and getattr(
-                        field, "primary_key", False
-                    ):
+                    if getattr(field, "auto_created", False) and getattr(field, "primary_key", False):
                         continue
 
                     fname = field.name
-                    if getattr(field, "primary_key", False) and getattr(
-                        field, "auto_created", False
-                    ):
+                    if getattr(field, "primary_key", False) and getattr(field, "auto_created", False):
                         continue
 
                     # do not unconditionally skip non-editable fields: if the field is a
                     # relationship (ForeignKey/OneToOne) we still want to attempt to
                     # populate it even when editable=False (admin-only flag).
                     if getattr(field, "editable", True) is False and not (
-                        getattr(field, "many_to_one", False)
-                        or getattr(field, "one_to_one", False)
+                        getattr(field, "many_to_one", False) or getattr(field, "one_to_one", False)
                     ):
                         continue
 
@@ -189,7 +174,8 @@ class Command(BaseCommand):
                             # create one for the related model (recursively shallow)
                             rel_instance = self._create_minimal_instance(rel_model)
                             if rel_instance is None:
-                                # if the FK is nullable, we can set None, otherwise we must skip creating this model
+                                # if the FK is nullable, we can set None; otherwise
+                                # we must skip creating this model
                                 if getattr(field, "null", False):
                                     kwargs[fname] = None
                                     continue
@@ -200,22 +186,14 @@ class Command(BaseCommand):
                         continue
 
                     # basic field types
-                    internal_type = getattr(
-                        field, "get_internal_type", lambda: ""
-                    ).__call__()
+                    internal_type = getattr(field, "get_internal_type", lambda: "").__call__()
                     if internal_type in ("CharField", "TextField"):
                         # generate plausibly-typed strings based on the field name
-                        val = self._make_string_for_field(
-                            model.__name__, fname, i, field
-                        )
+                        val = self._make_string_for_field(model.__name__, fname, i, field)
                         # keep unique fields unique
                         if getattr(field, "unique", False):
                             val = f"{val}_{uuid.uuid4().hex[:6]}"
-                        kwargs[fname] = (
-                            val[: (field.max_length or 60)]
-                            if getattr(field, "max_length", None)
-                            else val
-                        )
+                        kwargs[fname] = val[: (field.max_length or 60)] if getattr(field, "max_length", None) else val
                     elif internal_type in (
                         "IntegerField",
                         "PositiveIntegerField",
@@ -231,35 +209,24 @@ class Command(BaseCommand):
                         # random but stable-ish
                         kwargs[fname] = random.choice((True, False))
                     elif internal_type in ("DateField",):
-                        kwargs[fname] = timezone.now().date() + datetime.timedelta(
-                            days=random.randint(-30, 30)
-                        )
+                        kwargs[fname] = timezone.now().date() + datetime.timedelta(days=random.randint(-30, 30))
                     elif internal_type in ("DateTimeField",):
-                        kwargs[fname] = timezone.now() + datetime.timedelta(
-                            hours=random.randint(-200, 200)
-                        )
+                        kwargs[fname] = timezone.now() + datetime.timedelta(hours=random.randint(-200, 200))
                     elif internal_type in ("DecimalField", "FloatField"):
                         # generate a small decimal value
-                        kwargs[fname] = Decimal(
-                            str(round(random.uniform(0.5, 100.0), 2))
-                        )
+                        kwargs[fname] = Decimal(str(round(random.uniform(0.5, 100.0), 2)))
                     elif internal_type in ("UUIDField",):
                         kwargs[fname] = uuid.uuid4()
                     elif internal_type in ("JSONField",):
                         kwargs[fname] = {}
                     else:
-                        # fallback for unknown field types: try default or None or simple string
-                        # only honor explicit defaults that are real values (not the NOT_PROVIDED sentinel)
-                        if (
-                            getattr(field, "default", None) is not None
-                            and getattr(field, "default") is not NOT_PROVIDED
-                        ):
+                        # fallback for unknown field types: try default or None
+                        # or a simple string
+                        # only honor explicit defaults that are real values
+                        # (not the NOT_PROVIDED sentinel)
+                        if getattr(field, "default", None) is not None and getattr(field, "default") is not NOT_PROVIDED:
                             try:
-                                kwargs[fname] = (
-                                    field.default()
-                                    if callable(field.default)
-                                    else field.default
-                                )
+                                kwargs[fname] = field.default() if callable(field.default) else field.default
                                 continue
                             except Exception:
                                 pass
@@ -270,9 +237,7 @@ class Command(BaseCommand):
 
                 # skip creating this model if a required FK was not resolvable
                 if missing_required_fk:
-                    self.stderr.write(
-                        f"Skipping {opts.object_name} creation: required FK not available"
-                    )
+                    self.stderr.write(f"Skipping {opts.object_name} creation: required FK " f"not available")
                     continue
 
                 # create instance (dry-run unless commit)
@@ -285,45 +250,41 @@ class Command(BaseCommand):
                         "ColorKeyQueue",
                         "TiffToPDF",
                     ):
-                        ItemModel = (
-                            apps.get_model("workflow", "Item")
-                            if apps.is_installed("workflow")
-                            else None
-                        )
+                        item_model = apps.get_model("workflow", "Item") if apps.is_installed("workflow") else None
                         has_item = False
-                        if ItemModel:
+                        if item_model:
                             try:
-                                it = ItemModel.objects.first()
+                                it = item_model.objects.first()
                                 if it and getattr(it, "pk", None):
                                     has_item = True
                                 else:
                                     # try to create a minimal persisted item
-                                    it = self._create_minimal_instance(ItemModel)
+                                    it = self._create_minimal_instance(item_model)
                                     if it and getattr(it, "pk", None):
                                         has_item = True
                             except Exception:
                                 has_item = False
-                        if not has_item:
-                            self.stderr.write(
-                                f"Skipping {model.__name__} creation: no persisted Item available (generic pass)"
-                            )
-                            continue
-                        else:
-                            # TEMP DIAGNOSTIC: log the item that will be used for generic queue creation
-                            try:
-                                itrepr = repr(it)
-                            except Exception:
-                                itrepr = "<repr-failed>"
-                            self.stderr.write(
-                                f"[DIAG][generic-queue] will use item={itrepr} pk={getattr(it,'pk',None)}"
-                            )
+                    if not has_item:
+                        self.stderr.write(f"Skipping {model.__name__} creation: no persisted " "Item available (generic pass)")
+                        continue
+                    else:
+                        # TEMP DIAGNOSTIC: log the item that will be used for
+                        # generic queue creation
+                        try:
+                            itrepr = repr(it)
+                        except Exception:
+                            itrepr = "<repr-failed>"
+                        # split to avoid overly long source line
+                        self.stderr.write(f"[DIAG][generic-queue] will use item={itrepr}")
+                        self.stderr.write(f"pk={getattr(it,'pk',None)}")
                 except Exception:
                     pass
 
                 if do_commit:
                     try:
                         with transaction.atomic():
-                            # If there are unique fields, prefer get_or_create to avoid IntegrityError
+                            # If there are unique fields, prefer get_or_create
+                            # to avoid IntegrityError
                             unique_lookup = {}
                             try:
                                 for f in opts.fields:
@@ -334,13 +295,11 @@ class Command(BaseCommand):
 
                             if unique_lookup:
                                 try:
-                                    # strip NOT_PROVIDED sentinel values from defaults to avoid attribute errors
-                                    safe_defaults = {
-                                        k: v
-                                        for k, v in kwargs.items()
-                                        if v is not NOT_PROVIDED
-                                    }
-                                    # ensure any model instances in safe_defaults are persisted
+                                    # strip NOT_PROVIDED sentinel values from
+                                    # defaults to avoid attribute errors
+                                    safe_defaults = {k: v for k, v in kwargs.items() if v is not NOT_PROVIDED}
+                                    # ensure any model instances in
+                                    # safe_defaults are persisted
                                     for k, v in list(safe_defaults.items()):
                                         try:
                                             from django.db.models import Model
@@ -350,42 +309,36 @@ class Command(BaseCommand):
                                                     try:
                                                         v.save()
                                                     except Exception:
-                                                        # try to get/create a minimal persisted instance as a fallback
+                                                        # try to get/create a persisted
+                                                        # fallback instance
                                                         try:
-                                                            fallback = self._create_minimal_instance(
-                                                                type(v)
-                                                            )
-                                                            if fallback and getattr(
-                                                                fallback, "pk", None
-                                                            ):
-                                                                safe_defaults[k] = (
-                                                                    fallback
-                                                                )
+                                                            fallback = self._create_minimal_instance(type(v))
+                                                            if fallback and getattr(fallback, "pk", None):
+                                                                safe_defaults[k] = fallback
                                                             else:
                                                                 del safe_defaults[k]
                                                         except Exception:
-                                                            # can't persist related instance; drop the key so we don't pass an unsaved instance
+                                                            # can't persist
+                                                            # drop key
+                                                            # avoid unsaved
+                                                            # instance
                                                             del safe_defaults[k]
-                                                        # if the field is required, we'll fall back later
+                                                    # if the field is required, we'll
+                                                    # fall back later
                                         except Exception:
                                             continue
-                                    obj, was_created = model.objects.get_or_create(
-                                        **unique_lookup, defaults=safe_defaults
-                                    )
-                                    self.stdout.write(
-                                        f"Used get_or_create for {model.__name__} lookup={unique_lookup}"
-                                    )
+                                    obj, was_created = model.objects.get_or_create(**unique_lookup, defaults=safe_defaults)
+                                    self.stdout.write((f"Used get_or_create for {model.__name__} " f"lookup={unique_lookup}"))
                                     inst = obj
                                     if was_created:
-                                        # ensure m2m relations are set for newly created object
+                                        # ensure m2m relations are set for
+                                        # newly created object
                                         for m2m in m2m_fields:
                                             try:
                                                 rel_model = m2m.related_model
                                                 rel = rel_model.objects.first()
                                                 if not rel:
-                                                    rel = self._create_minimal_instance(
-                                                        rel_model
-                                                    )
+                                                    rel = self._create_minimal_instance(rel_model)
                                                 if rel:
                                                     getattr(inst, m2m.name).add(rel)
                                             except Exception:
@@ -396,22 +349,17 @@ class Command(BaseCommand):
                                         pass
                                 except Exception:
                                     # fallback to normal save path below
-                                    # sanitize kwargs: remove NOT_PROVIDED sentinel values
-                                    safe_kwargs = {
-                                        k: v
-                                        for k, v in kwargs.items()
-                                        if v is not NOT_PROVIDED
-                                    }
-                                    # ensure FK instances are persisted or else skip creating this model
+                                    # sanitize kwargs: remove NOT_PROVIDED
+                                    # sentinel values
+                                    safe_kwargs = {k: v for k, v in kwargs.items() if v is not NOT_PROVIDED}
+                                    # ensure FK instances are persisted or
+                                    # else skip creating this model
                                     skip_due_to_unsaved_fk = False
                                     for k, v in list(safe_kwargs.items()):
                                         try:
                                             from django.db.models import Model
 
-                                            if (
-                                                isinstance(v, Model)
-                                                and getattr(v, "pk", None) is None
-                                            ):
+                                            if isinstance(v, Model) and getattr(v, "pk", None) is None:
                                                 try:
                                                     v.save()
                                                 except Exception:
@@ -420,9 +368,7 @@ class Command(BaseCommand):
                                         except Exception:
                                             continue
                                     if skip_due_to_unsaved_fk:
-                                        self.stderr.write(
-                                            f"Skipping {model.__name__} creation: related FK could not be persisted"
-                                        )
+                                        self.stderr.write(f"Skipping {model.__name__} creation: " "related FK could not be persisted")
                                         continue
                                     inst = model(**safe_kwargs)
                                     try:
@@ -434,45 +380,35 @@ class Command(BaseCommand):
                                             rel_model = m2m.related_model
                                             rel = rel_model.objects.first()
                                             if not rel:
-                                                rel = self._create_minimal_instance(
-                                                    rel_model
-                                                )
+                                                rel = self._create_minimal_instance(rel_model)
                                             if rel:
                                                 getattr(inst, m2m.name).add(rel)
                                         except Exception:
                                             continue
                                     created += 1
                             else:
-                                # avoid QuerySet.create() because it may call save(force_insert=True)
-                                # on models that override save() without **kwargs; sanitize and instantiate and save()
-                                safe_kwargs = {
-                                    k: v
-                                    for k, v in kwargs.items()
-                                    if v is not NOT_PROVIDED
-                                }
-                                # ensure FK instances are persisted or try to replace with persisted minimal instances
+                                # avoid QuerySet.create() because it may call
+                                # save(force_insert=True) on models that override
+                                # save() without **kwargs; sanitize and instantiate
+                                # and save()
+                                safe_kwargs = {k: v for k, v in kwargs.items() if v is not NOT_PROVIDED}
+                                # Ensure FK instances are persisted, or attempt to
+                                # replace them with persisted minimal instances
                                 skip_due_to_unsaved_fk = False
                                 for k, v in list(safe_kwargs.items()):
                                     try:
                                         from django.db.models import Model
 
-                                        if (
-                                            isinstance(v, Model)
-                                            and getattr(v, "pk", None) is None
-                                        ):
+                                        if isinstance(v, Model) and getattr(v, "pk", None) is None:
                                             try:
                                                 v.save()
                                             except Exception:
-                                                # attempt to create/obtain a minimal persisted instance for this related model
+                                                # attempt to create/obtain a minimal
+                                                # persisted instance for this related
+                                                # model
                                                 try:
-                                                    fallback = (
-                                                        self._create_minimal_instance(
-                                                            type(v)
-                                                        )
-                                                    )
-                                                    if fallback and getattr(
-                                                        fallback, "pk", None
-                                                    ):
+                                                    fallback = self._create_minimal_instance(type(v))
+                                                    if fallback and getattr(fallback, "pk", None):
                                                         safe_kwargs[k] = fallback
                                                         continue
                                                 except Exception:
@@ -482,9 +418,7 @@ class Command(BaseCommand):
                                     except Exception:
                                         continue
                                 if skip_due_to_unsaved_fk:
-                                    self.stderr.write(
-                                        f"Skipping {model.__name__} creation: related FK could not be persisted"
-                                    )
+                                    self.stderr.write((f"Skipping {model.__name__} creation: " "related FK could not be persisted"))
                                     continue
                                 inst = model(**safe_kwargs)
                                 try:
@@ -499,9 +433,7 @@ class Command(BaseCommand):
                                         rel_model = m2m.related_model
                                         rel = rel_model.objects.first()
                                         if not rel:
-                                            rel = self._create_minimal_instance(
-                                                rel_model
-                                            )
+                                            rel = self._create_minimal_instance(rel_model)
                                         if rel:
                                             getattr(inst, m2m.name).add(rel)
                                     except Exception:
@@ -515,27 +447,21 @@ class Command(BaseCommand):
                             for f in opts.fields:
                                 if getattr(f, "unique", False) and f.name in kwargs:
                                     unique_lookup[f.name] = kwargs[f.name]
-                            if (
-                                unique_lookup
-                                and model.objects.filter(**unique_lookup).exists()
-                            ):
+                            if unique_lookup and model.objects.filter(**unique_lookup).exists():
                                 # already exists, skip
                                 continue
                         except Exception:
                             pass
-                        self.stderr.write(
-                            f"IntegrityError creating {model.__name__}: {ie}"
-                        )
+                        self.stderr.write(f"IntegrityError creating {model.__name__}: {ie}")
                         continue
                     except Exception as exc:
                         self.stderr.write(f"Error creating {model.__name__}: {exc}")
                         continue
                 else:
-                    # dry-run: just report what we would create (use safe repr to avoid __str__ side-effects)
+                    # dry-run: just report what we would create. Use a safe repr
+                    # to avoid __str__ side-effects
                     safe = self._safe_kwargs(kwargs)
-                    self.stdout.write(
-                        f"DRYRUN: would create {model.__name__} with: {safe}"
-                    )
+                    self.stdout.write(f"DRYRUN: would create {model.__name__} with: {safe}")
                     created += 1
 
             if created:
@@ -547,12 +473,11 @@ class Command(BaseCommand):
             self.stdout.write(f"Model {name}: existed={existed} added={added}")
 
         if not do_commit:
-            self.stdout.write(
-                "\nDry-run mode: no changes were written. Re-run with --commit to persist data."
-            )
+            self.stdout.write(("\nDry-run mode: no changes were written. " "Re-run with --commit to persist data."))
 
     def _create_minimal_instance(self, model, _depth=0):
-        """Create a minimal instance for `model` (used for FK/M2M targets).
+        """
+        Create a minimal instance for `model` (used for FK/M2M targets).
         Returns the created instance or None on failure.
         Depth prevents infinite recursion.
         """
@@ -561,15 +486,9 @@ class Command(BaseCommand):
         # avoid creating ContentType / Permission rows which have strict uniqueness and
         # are managed by Django; let existing ones be used instead.
         try:
-            if (
-                model._meta.app_label == "contenttypes"
-                and model._meta.object_name == "ContentType"
-            ):
+            if model._meta.app_label == "contenttypes" and model._meta.object_name == "ContentType":
                 return None
-            if (
-                model._meta.app_label == "auth"
-                and model._meta.object_name == "Permission"
-            ):
+            if model._meta.app_label == "auth" and model._meta.object_name == "Permission":
                 return None
         except Exception:
             pass
@@ -589,24 +508,19 @@ class Command(BaseCommand):
             if getattr(field, "many_to_many", False):
                 m2m_fields.append(field)
                 continue
-            if getattr(field, "auto_created", False) and getattr(
-                field, "primary_key", False
-            ):
+            if getattr(field, "auto_created", False) and getattr(field, "primary_key", False):
                 continue
             # similar to the generic path, allow non-editable relationship fields
             # to be considered when creating minimal instances, because many
             # models mark FKs editable=False but still require them at DB level.
             if getattr(field, "editable", True) is False and not (
-                getattr(field, "many_to_one", False)
-                or getattr(field, "one_to_one", False)
+                getattr(field, "many_to_one", False) or getattr(field, "one_to_one", False)
             ):
                 continue
 
             if field.many_to_one or field.one_to_one:
                 rel_model = field.related_model
-                rel_instance = self._create_minimal_instance(
-                    rel_model, _depth=_depth + 1
-                )
+                rel_instance = self._create_minimal_instance(rel_model, _depth=_depth + 1)
                 if rel_instance is None:
                     continue
                 kwargs[field.name] = rel_instance
@@ -615,11 +529,7 @@ class Command(BaseCommand):
             internal_type = getattr(field, "get_internal_type", lambda: "").__call__()
             if internal_type in ("CharField", "TextField"):
                 base = f"{model.__name__}_example_{field.name}"
-                kwargs[field.name] = (
-                    base[: (field.max_length or 60)]
-                    if getattr(field, "max_length", None)
-                    else base
-                )
+                kwargs[field.name] = base[: (field.max_length or 60)] if getattr(field, "max_length", None) else base
             elif internal_type in (
                 "IntegerField",
                 "PositiveIntegerField",
@@ -649,11 +559,7 @@ class Command(BaseCommand):
                 continue
             try:
                 # avoid assigning the NOT_PROVIDED sentinel into kwargs
-                if (
-                    getattr(f, "default", None) is not None
-                    and f.default is not NOT_PROVIDED
-                    and f.default is not None
-                ):
+                if getattr(f, "default", None) is not None and f.default is not NOT_PROVIDED and f.default is not None:
                     kwargs[f.name] = f.default() if callable(f.default) else f.default
                     continue
                 if getattr(f, "choices", None):
@@ -675,9 +581,7 @@ class Command(BaseCommand):
                         rel_model = m2m.related_model
                         rel = rel_model.objects.first()
                         if not rel:
-                            rel = self._create_minimal_instance(
-                                rel_model, _depth=_depth + 1
-                            )
+                            rel = self._create_minimal_instance(rel_model, _depth=_depth + 1)
                         if rel:
                             getattr(inst, m2m.name).add(rel)
                     except Exception:
@@ -688,7 +592,8 @@ class Command(BaseCommand):
 
     # Curated seeding helpers + per-model factory overrides
     def _seed_curated(self, count: int, do_commit: bool):
-        """Seed a small, coherent dataset for core developer workflows.
+        """
+        Seed a small, coherent dataset for core developer workflows.
 
         This creates users, then creates a small set of 'item' and 'job'-like records
         if those models exist in the `workflow` app. It is intentionally conservative
@@ -697,28 +602,22 @@ class Command(BaseCommand):
         # create some base users first
         users = self._create_users(count, do_commit)
 
-        # ensure a Site exists for workflow-related factories and cache it
+        # ensure a Site exists for workflow-related factories
+        # and cache it
         try:
-            Site = (
-                apps.get_model("sites", "Site") if apps.is_installed("sites") else None
-            )
+            SiteModel = apps.get_model("sites", "Site") if apps.is_installed("sites") else None
             curated_site = None
-            if Site:
+            if SiteModel:
                 if do_commit:
                     try:
-                        curated_site, _ = Site.objects.get_or_create(
-                            domain="dev.local", defaults={"name": "DevWorkflow"}
-                        )
+                        curated_site, _ = SiteModel.objects.get_or_create(domain="dev.local", defaults={"name": "DevWorkflow"})
                     except Exception:
                         # fallback to first existing or minimal instance
-                        curated_site = (
-                            Site.objects.first() or self._create_minimal_instance(Site)
-                        )
+                        curated_site = SiteModel.objects.first() or self._create_minimal_instance(SiteModel)
                 else:
-                    # dry-run: prefer an existing Site, otherwise create minimal instance in memory
-                    curated_site = (
-                        Site.objects.first() or self._create_minimal_instance(Site)
-                    )
+                    # Dry-run: prefer an existing Site. Otherwise create a
+                    # minimal instance in memory for simulation.
+                    curated_site = SiteModel.objects.first() or self._create_minimal_instance(SiteModel)
             # store for factories to reuse (may be None)
             self._curated_site = curated_site
         except Exception:
@@ -734,7 +633,7 @@ class Command(BaseCommand):
         # Run Job factory first (many other models depend on Job/Item existing)
         # collect created Job instances so other factories can reference them
         self._curated_jobs = []
-        job_factory = getattr(self, "_factory__Job", None)
+        job_factory = getattr(self, "_factory__job", None)
         if callable(job_factory):
             self.stdout.write("Curated: running factory for workflow.Job (first)")
             try:
@@ -751,7 +650,11 @@ class Command(BaseCommand):
             if getattr(model, "_meta", None) and model._meta.object_name == "Job":
                 continue
             label = f"{model._meta.app_label}.{model._meta.object_name}"
-            factory = getattr(self, f"_factory__{model._meta.object_name}", None)
+            factory = getattr(
+                self,
+                f"_factory__{model._meta.object_name.lower()}",
+                None,
+            )
             if callable(factory):
                 self.stdout.write(f"Curated: running factory for {label}")
                 try:
@@ -760,8 +663,9 @@ class Command(BaseCommand):
                 except Exception as exc:
                     self.stderr.write(f"Factory error for {label}: {exc}")
 
-        # fallback: ensure there's at least `count` rows for models that look like items/jobs
-        # We look for models with a 'name' or 'title' field and create instances via existing logic.
+        # Fallback: ensure there's at least `count` rows for models that look
+        # like items/jobs. We look for models with a 'name' or 'title' field
+        # and create instances via existing logic.
         for model in workflow_models:
             opts = model._meta
             field_names = {f.name for f in opts.fields}
@@ -775,16 +679,12 @@ class Command(BaseCommand):
             to_create = max(0, count - existing)
             if to_create <= 0:
                 continue
-            self.stdout.write(
-                f"Curated: ensuring {to_create} instances of {model._meta.label}"
-            )
+            self.stdout.write(f"Curated: ensuring {to_create} instances of {model._meta.label}")
             for i in range(to_create):
                 # delegate to generic path but try to satisfy fks with users/items
                 kwargs = {}
                 for f in opts.fields:
-                    if getattr(f, "auto_created", False) and getattr(
-                        f, "primary_key", False
-                    ):
+                    if getattr(f, "auto_created", False) and getattr(f, "primary_key", False):
                         continue
                     if not getattr(f, "editable", True):
                         continue
@@ -800,10 +700,7 @@ class Command(BaseCommand):
                         if rel_model._meta.label == "auth.User" and users:
                             kwargs[f.name] = users[0]
                         else:
-                            rel = (
-                                rel_model.objects.first()
-                                or self._create_minimal_instance(rel_model)
-                            )
+                            rel = rel_model.objects.first() or self._create_minimal_instance(rel_model)
                             if rel:
                                 kwargs[f.name] = rel
                     elif internal in ("IntegerField", "PositiveIntegerField"):
@@ -818,47 +715,39 @@ class Command(BaseCommand):
                         inst.save()
                     except Exception:
                         continue
-                else:
-                    self.stdout.write(
-                        f"DRYRUN curated: would create {model._meta.label} with {kwargs}"
-                    )
+                    else:
+                        # Dry-run: report what would be created without persisting.
+                        self.stdout.write(("DRYRUN curated: would create " f"{model._meta.label} with {kwargs}"))
 
-        # Ensure at least one instance per workflow/site for models that include a workflow FK.
-        # This makes sure every Site/workflow has an example Job and related workflow-scoped records.
+        # Ensure at least one instance per workflow/site for models that
+        # include a workflow FK. This makes sure every Site/workflow has
+        # an example Job and related workflow-scoped records.
         try:
-            Site = (
-                apps.get_model("sites", "Site") if apps.is_installed("sites") else None
-            )
-            if Site:
+            site_model = apps.get_model("sites", "Site") if apps.is_installed("sites") else None
+            if site_model:
                 sites = (
-                    list(Site.objects.all())
+                    list(site_model.objects.all())
                     if do_commit
-                    else (
-                        [getattr(self, "_curated_site", None)]
-                        if getattr(self, "_curated_site", None)
-                        else []
-                    )
+                    else ([getattr(self, "_curated_site", None)] if getattr(self, "_curated_site", None) else [])
                 )
                 if sites:
-                    self.stdout.write(
-                        "Curated: ensuring at least one per workflow/site for workflow-scoped models"
-                    )
+                    # Notify that we will ensure at least one instance per
+                    # workflow/site for workflow-scoped models
+                    self.stdout.write(("Curated: ensuring at least one per workflow/site " "for workflow-scoped models"))
                     for model in workflow_models:
                         opts = model._meta
                         # find a field that points to Site (workflow FK)
                         workflow_field = None
                         for f in opts.fields:
                             try:
-                                if (
-                                    getattr(f, "related_model", None) is Site
-                                    or f.name == "workflow"
-                                ):
+                                if getattr(f, "related_model", None) is site_model or f.name == "workflow":
                                     workflow_field = f
                                     break
                             except Exception:
                                 continue
                         if not workflow_field:
                             continue
+
                         for site in sites:
                             try:
                                 qs = model.objects.filter(**{workflow_field.name: site})
@@ -870,57 +759,54 @@ class Command(BaseCommand):
 
                             # Need to create one for this site
                             if do_commit:
-                                try:
-                                    factory = getattr(
-                                        self, f"_factory__{opts.object_name}", None
-                                    )
-                                    inst = None
-                                    if callable(factory):
-                                        try:
-                                            inst = factory(0, True, users)
-                                        except Exception:
-                                            inst = None
+                                factory = getattr(self, f"_factory__{opts.object_name.lower()}", None)
+                                inst = None
+                                if callable(factory):
+                                    try:
+                                        inst = factory(0, True, users)
+                                    except Exception:
+                                        inst = None
 
-                                    if inst is None:
-                                        # try create minimal instance and attach the site
-                                        inst = self._create_minimal_instance(model)
-                                        if inst:
-                                            try:
-                                                setattr(inst, workflow_field.name, site)
-                                                inst.save()
-                                            except Exception:
-                                                # fallback: attempt direct instantiation with minimal data
-                                                try:
-                                                    data = {workflow_field.name: site}
-                                                    if "name" in {
-                                                        f.name for f in opts.fields
-                                                    }:
-                                                        data["name"] = (
-                                                            f"{opts.object_name}_for_{getattr(site,'name',site)}"
-                                                        )
-                                                    inst = model(**data)
-                                                    inst.save()
-                                                except Exception as exc:
-                                                    self.stderr.write(
-                                                        f"Curated: failed create {opts.label} for site {site}: {exc}"
-                                                    )
-                                                    inst = None
-
+                                if inst is None:
+                                    # try create minimal instance and attach the site
+                                    inst = self._create_minimal_instance(model)
                                     if inst:
                                         try:
-                                            self.stdout.write(
-                                                f"Curated: created {opts.label} for site={getattr(site,'name',site)} pk={getattr(inst,'pk',None)}"
-                                            )
+                                            setattr(inst, workflow_field.name, site)
+                                            inst.save()
                                         except Exception:
-                                            pass
-                                except Exception as exc:
-                                    self.stderr.write(
-                                        f"Curated: error ensuring {opts.label} for site {site}: {exc}"
-                                    )
+                                            # fallback: attempt direct instantiation
+                                            # with minimal data
+                                            try:
+                                                data = {workflow_field.name: site}
+                                                field_names = {f.name for f in opts.fields}
+                                                if "name" in field_names:
+                                                    # short site name retrieval
+                                                    site_name = getattr(site, "name", site)
+                                                    data["name"] = f"{opts.object_name}_for_{site_name}"
+                                                inst = model(**data)
+                                                inst.save()
+                                            except Exception as exc:
+                                                site_name = getattr(site, "name", site)
+                                                label = opts.label
+                                                msg = "Curated: failed create " f"{label} " f"for site {site_name}: " f"{exc}"
+                                                self.stderr.write(msg)
+                                                inst = None
+
+                                if inst:
+                                    try:
+                                        msg = "Curated: created " f"{opts.label} for " f"site={site_name} " f"pk={getattr(inst,'pk',None)}"
+                                        self.stdout.write(msg)
+                                    except Exception:
+                                        pass
                             else:
-                                self.stdout.write(
-                                    f"DRYRUN curated: would create {opts.label} for site={getattr(site,'name',site)}"
-                                )
+                                # Dry-run: report which curated instance would be
+                                # created
+                                try:
+                                    msg = "DRYRUN curated: would create " f"{opts.label} for " f"site={getattr(site,'name',site)}"
+                                    self.stdout.write(msg)
+                                except Exception:
+                                    pass
         except Exception:
             pass
 
@@ -936,7 +822,8 @@ class Command(BaseCommand):
             email = f"devuser{i}@example.com"
             if do_commit:
                 try:
-                    # instantiate and save to avoid manager.create() passing force_insert kwargs
+                    # instantiate and save to avoid manager.create() passing
+                    # force_insert kwargs
                     u = User(username=username, email=email)
                     try:
                         u.set_password("password")
@@ -948,10 +835,7 @@ class Command(BaseCommand):
                         u.save()
                     users.append(u)
                 except IntegrityError:
-                    u = (
-                        User.objects.filter(username=username).first()
-                        or User.objects.first()
-                    )
+                    u = User.objects.filter(username=username).first() or User.objects.first()
                     if u:
                         users.append(u)
                 except Exception:
@@ -960,14 +844,19 @@ class Command(BaseCommand):
                 self.stdout.write(f"DRYRUN curated: would create User {username}")
         return users
 
-    # Example per-model factories. Add more by creating methods named _factory__<ModelName>
-    def _factory__Job(self, index: int, do_commit: bool, users: list):
-        """Factory for a Job-like model: set a name/title and link to a dev user if possible."""
+    # Example per-model factories. Add more by creating methods named
+    # _factory__<ModelName>
+    def _factory__job(self, index: int, do_commit: bool, users: list):
+        """
+        Factory for a Job-like model: set a name/title and link to a
+        dev user if possible.
+        """
         try:
             model = apps.get_model("workflow", "Job")
         except Exception:
             return
-        # create a minimal Job: only set name and workflow to avoid save-time relation access
+        # create a minimal Job: only set name and workflow to avoid
+        # save-time relation access
         kwargs = {"name": f"Job_{index}"}
         # Resolve workflow FK dynamically (some installs don't declare 'sites' app)
         try:
@@ -1000,7 +889,8 @@ class Command(BaseCommand):
 
         if do_commit:
             try:
-                # Temporarily disconnect job signals to avoid pre_save accessing related sets
+                # Temporarily disconnect job signals to avoid pre_save
+                # accessing related sets
                 try:
                     from django.db.models import signals
 
@@ -1021,9 +911,11 @@ class Command(BaseCommand):
                     # if we can't import or disconnect, continue and try create anyway
                     pass
 
-                # prefer direct manager create to ensure PK is assigned before any relation access
+                # prefer direct manager create to ensure PK is assigned
+                # before any relation access
                 try:
-                    # instantiate and call save() directly to avoid unwanted kwargs like force_insert
+                    # Instantiate and call save() directly to avoid passing
+                    # unwanted kwargs like `force_insert` through managers.
                     inst = model(**{k: v for k, v in kwargs.items() if v is not None})
                     try:
                         inst.save()
@@ -1032,24 +924,13 @@ class Command(BaseCommand):
                         inst.save()
                     # explicit log after save
                     try:
-                        self.stdout.write(
-                            f"Created Job pk={getattr(inst,'pk',None)} name={getattr(inst,'name',None)}"
-                        )
+                        msg = "Created Job pk=" f"{getattr(inst,'pk',None)} " f"name={getattr(inst,'name',None)}"
+                        self.stdout.write(msg)
                     except Exception:
                         pass
-                    # Ensure instance was saved and has PK
-                    if not getattr(inst, "pk", None):
-                        raise Exception("Job instance created but has no PK")
-                except Exception as inner_exc:
-                    # Log detailed exception for debugging
-                    self.stderr.write(f"Job create exception: {inner_exc}")
-                    raise
-            except Exception as exc:
-                # fallback: try minimal instance creation helper
-                try:
-                    inst = self._create_minimal_instance(model)
                 except Exception:
-                    self.stderr.write(f"Error creating curated Job: {exc}")
+                    # If creation failed, log a generic message (exc not available here)
+                    self.stderr.write("Error creating curated Job")
             finally:
                 # Reconnect signals if we disconnected them
                 try:
@@ -1079,12 +960,10 @@ class Command(BaseCommand):
             except Exception:
                 return None
         else:
-            self.stdout.write(
-                f"DRYRUN curated: would create Job with {self._safe_kwargs(kwargs)}"
-            )
+            self.stdout.write(f"DRYRUN curated: would create Job with {self._safe_kwargs(kwargs)}")
             return None
 
-    def _factory__Item(self, index: int, do_commit: bool, users: list):
+    def _factory__item(self, index: int, do_commit: bool, users: list):
         """Factory for an Item-like model (common pattern in workflow apps)."""
         # try some common item model names
         for name in ("Item", "ItemCatalog", "ItemSpec"):
@@ -1094,12 +973,13 @@ class Command(BaseCommand):
                 continue
 
             kwargs = {}
-            # First, ensure any FK to Job is assigned from curated jobs so we don't create
-            # orphaned Items. Do a pre-pass over fields to set required relation fields.
+            # First, ensure any FK to Job is assigned from curated jobs so we
+            # don't create orphaned Items during the curated pass. Do a
+            # pre-pass over fields to set required relation fields.
+            # This avoids passing unexpected kwargs like `force_insert`
+            # through the manager layer which can cause errors.
             for f in model._meta.fields:
-                if getattr(f, "auto_created", False) and getattr(
-                    f, "primary_key", False
-                ):
+                if getattr(f, "auto_created", False) and getattr(f, "primary_key", False):
                     continue
                 if not getattr(f, "editable", True):
                     continue
@@ -1107,24 +987,19 @@ class Command(BaseCommand):
                 # handle relationship fields first
                 if f.many_to_one or f.one_to_one:
                     rel_model = getattr(f, "related_model", None)
-                    if (
-                        rel_model
-                        and getattr(rel_model._meta, "object_name", "") == "Job"
-                    ):
+                    if rel_model and getattr(rel_model._meta, "object_name", "") == "Job":
                         # prefer curated job instances
-                        curated = [
-                            j
-                            for j in getattr(self, "_curated_jobs", [])
-                            if j and getattr(j, "pk", None)
-                        ]
+                        curated = [j for j in getattr(self, "_curated_jobs", []) if j and getattr(j, "pk", None)]
                         if curated:
                             kwargs[f.name] = curated[0]
                             continue
                         else:
-                            # no curated job available; we cannot safely create this Item
+                            # No curated job available — cannot safely create
+                            # this Item without a curated Job FK
                             kwargs = None
                             break
-                    # non-Job FK: try to use an existing instance or create a minimal one
+                    # For non-Job foreign keys: try to use an existing instance
+                    # or create a minimal one so related constraints are satisfied
                     try:
                         rel = rel_model.objects.first() if rel_model else None
                     except Exception:
@@ -1143,20 +1018,14 @@ class Command(BaseCommand):
             if kwargs is None:
                 # required FK missing (e.g. no Job); skip creating this item
                 if do_commit:
-                    self.stderr.write(
-                        f"Skipping curated {model._meta.object_name}: required FK not available"
-                    )
+                    self.stderr.write((f"Skipping curated {model._meta.object_name}: " "required FK not available"))
                 else:
-                    self.stdout.write(
-                        f"DRYRUN curated: would skip {model._meta.object_name} (no Job available)"
-                    )
+                    self.stdout.write((f"DRYRUN curated: would skip {model._meta.object_name} " "(no Job available)"))
                 return
 
             # Second pass: fill in simple fields like name/title and basic scalars
             for f in model._meta.fields:
-                if getattr(f, "auto_created", False) and getattr(
-                    f, "primary_key", False
-                ):
+                if getattr(f, "auto_created", False) and getattr(f, "primary_key", False):
                     continue
                 if not getattr(f, "editable", True):
                     continue
@@ -1175,25 +1044,19 @@ class Command(BaseCommand):
                     inst = model(**kwargs)
                     inst.save()
                     try:
-                        self.stdout.write(
-                            f"Created {model._meta.object_name} pk={getattr(inst,'pk',None)}"
-                        )
+                        self.stdout.write((f"Created {model._meta.object_name} " f"pk={getattr(inst,'pk',None)}"))
                     except Exception:
                         pass
                 except Exception as exc:
-                    self.stderr.write(
-                        f"Error creating curated {model._meta.object_name}: {exc}"
-                    )
+                    self.stderr.write(f"Error creating curated {model._meta.object_name}: {exc}")
             else:
-                self.stdout.write(
-                    f"DRYRUN curated: would create {model._meta.object_name} with {kwargs}"
-                )
+                self.stdout.write((f"DRYRUN curated: would create {model._meta.object_name} " f"with {kwargs}"))
 
             # only create the first matching model type
             return
 
     # Additional per-model factories for problematic models
-    def _factory__ItemCatalog(self, index: int, do_commit: bool, users: list):
+    def _factory__itemcatalog(self, index: int, do_commit: bool, users: list):
         try:
             model = apps.get_model("workflow", "ItemCatalog")
         except Exception:
@@ -1208,12 +1071,7 @@ class Command(BaseCommand):
                 site = RelModel.objects.first() if RelModel else None
             except Exception:
                 site = None
-            if (
-                site is None
-                and do_commit
-                and "RelModel" in locals()
-                and RelModel is not None
-            ):
+            if site is None and do_commit and "RelModel" in locals() and RelModel is not None:
                 try:
                     candidate = RelModel(name="DevWorkflow", domain="dev.local")
                     try:
@@ -1225,7 +1083,8 @@ class Command(BaseCommand):
                     site = self._create_minimal_instance(RelModel)
 
         unique_suffix = uuid.uuid4().hex[:6]
-        # truncate mfg and size to fit DB column constraints (some fields are varchar(20))
+        # Truncate manufacturer and size values so they fit typical DB
+        # column constraints (several fields are varchar(20)).
         raw_mfg = f"ItemCatalog_mfg_{index}_{unique_suffix}"
         mfg = raw_mfg[:20]
         raw_size = f"DEV-SIZE-{index}-{unique_suffix}"
@@ -1237,15 +1096,18 @@ class Command(BaseCommand):
             "product_board": 100,
             "active": True,
         }
-        # ensure workflow is present in defaults; ItemCatalog.workflow is NOT NULL in model
+        # Ensure workflow is present in defaults. Note: ItemCatalog.workflow is
+        # NOT NULL in the model and must be provided when creating instances.
         if site is not None:
             defaults["workflow"] = site
         else:
-            # if we couldn't resolve a Site, and we're committing, try to create a minimal Site
+            # If we couldn't resolve a Site and we're committing, try to create
+            # a minimal Site to satisfy foreign key constraints.
             if do_commit and apps.is_installed("sites"):
                 try:
                     Site = apps.get_model("sites", "Site")
-                    # instantiate/save to avoid manager.create() passing unexpected kwargs
+                    # Instantiate and save directly to avoid the manager.create()
+                    # path passing unexpected kwargs which can fail.
                     candidate = Site(domain="dev.local", name="DevWorkflow")
                     try:
                         candidate.save()
@@ -1254,48 +1116,48 @@ class Command(BaseCommand):
                     site = candidate
                     defaults["workflow"] = site
                 except Exception:
-                    # leave defaults without workflow and let get_or_create raise a clear IntegrityError
+                    # Leave defaults without workflow and allow get_or_create to
+                    # raise a clear IntegrityError if the workflow is missing.
                     pass
         try:
             if do_commit:
                 try:
-                    inst, created = model.objects.get_or_create(
-                        mfg_name=mfg, defaults=defaults
-                    )
+                    inst, created = model.objects.get_or_create(mfg_name=mfg, defaults=defaults)
                     if created:
-                        self.stdout.write(
-                            f"Created ItemCatalog {mfg} pk={getattr(inst,'pk',None)}"
-                        )
+                        try:
+                            msg = "Created ItemCatalog " f"{mfg} pk={getattr(inst,'pk',None)}"
+                            self.stdout.write(msg)
+                        except Exception:
+                            pass
                 except Exception:
-                    # fallback: attempt to instantiate and save to surface save-time errors
+                    # Fallback: attempt to instantiate and save the instance so
+                    # any save-time errors surface immediately.
                     try:
                         inst = model(
                             mfg_name=mfg,
-                            **{
-                                k: v
-                                for k, v in defaults.items()
-                                if v is not NOT_PROVIDED
-                            },
+                            **{k: v for k, v in defaults.items() if v is not NOT_PROVIDED},
                         )
                         try:
                             inst.save()
                         except TypeError:
                             inst.save()
-                        self.stdout.write(
-                            f"Created ItemCatalog {mfg} pk={getattr(inst,'pk',None)}"
-                        )
+                        try:
+                            msg = "Created ItemCatalog " f"{mfg} pk={getattr(inst,'pk',None)}"
+                            self.stdout.write(msg)
+                        except Exception:
+                            pass
                     except Exception as exc:
-                        self.stderr.write(
-                            f"Error creating ItemCatalog (fallback): {exc}"
-                        )
+                        self.stderr.write(f"Error creating ItemCatalog (fallback): {exc}")
             else:
-                self.stdout.write(
-                    f"DRYRUN curated: would get_or_create ItemCatalog mfg={mfg} defaults={defaults}"
-                )
+                try:
+                    msg = "DRYRUN curated: would get_or_create ItemCatalog mfg=" f"{mfg} defaults={defaults}"
+                    self.stdout.write(msg)
+                except Exception:
+                    pass
         except Exception as exc:
             self.stderr.write(f"Error creating ItemCatalog: {exc}")
 
-    def _factory__ItemSpec(self, index: int, do_commit: bool, users: list):
+    def _factory__itemspec(self, index: int, do_commit: bool, users: list):
         try:
             model = apps.get_model("workflow", "ItemSpec")
         except Exception:
@@ -1306,13 +1168,12 @@ class Command(BaseCommand):
         # choose or create a printlocation
         pl = None
         try:
-            pl = PrintLocation.objects.first() or self._create_minimal_instance(
-                PrintLocation
-            )
+            pl = PrintLocation.objects.first() or self._create_minimal_instance(PrintLocation)
         except Exception:
             pl = None
 
-        # ensure a workflow-related instance exists for ItemSpec/ItemCatalog size creation
+        # Ensure a workflow-related instance exists for ItemSpec and
+        # ItemCatalog size creation steps.
         site = getattr(self, "_curated_site", None)
         if site is None:
             try:
@@ -1321,12 +1182,7 @@ class Command(BaseCommand):
                 site = RelModel.objects.first() if RelModel else None
             except Exception:
                 site = None
-            if (
-                site is None
-                and do_commit
-                and "RelModel" in locals()
-                and RelModel is not None
-            ):
+            if site is None and do_commit and "RelModel" in locals() and RelModel is not None:
                 try:
                     candidate = RelModel(name="DevWorkflow", domain="dev.local")
                     try:
@@ -1352,15 +1208,12 @@ class Command(BaseCommand):
                 "workflow": site,
                 "active": True,
             }
-            size_obj, _ = ItemCatalog.objects.get_or_create(
-                mfg_name=mfg, defaults=defaults
-            )
+            size_obj, _ = ItemCatalog.objects.get_or_create(mfg_name=mfg, defaults=defaults)
         except Exception:
-            size_obj = ItemCatalog.objects.first() or self._create_minimal_instance(
-                ItemCatalog
-            )
+            size_obj = ItemCatalog.objects.first() or self._create_minimal_instance(ItemCatalog)
 
-        # avoid creating duplicate ItemSpec for the same size+printlocation by using get_or_create
+        # Avoid creating duplicate ItemSpec for the same
+        # size+printlocation by using get_or_create
         defaults = {
             "stepping_notes": f"ItemSpec_{index}_stepping_notes",
             "active": False,
@@ -1373,13 +1226,18 @@ class Command(BaseCommand):
         try:
             if do_commit:
                 try:
-                    inst, created = model.objects.get_or_create(
-                        size=size_obj, printlocation=pl, defaults=defaults
-                    )
+                    inst, created = model.objects.get_or_create(size=size_obj, printlocation=pl, defaults=defaults)
                     if created:
-                        self.stdout.write(
-                            f"Created ItemSpec for size={self._repr_safe(size_obj)} pl={self._repr_safe(pl)} pk={getattr(inst,'pk',None)}"
-                        )
+                        try:
+                            msg = (
+                                "Created ItemSpec for size="
+                                f"{self._repr_safe(size_obj)} "
+                                f"pl={self._repr_safe(pl)} "
+                                f"pk={getattr(inst,'pk',None)}"
+                            )
+                            self.stdout.write(msg)
+                        except Exception:
+                            pass
                 except Exception:
                     inst = model(
                         size=size_obj,
@@ -1390,31 +1248,36 @@ class Command(BaseCommand):
                         inst.save()
                     except TypeError:
                         inst.save()
-                    self.stdout.write(
-                        f"Created ItemSpec (fallback) pk={getattr(inst,'pk',None)}"
-                    )
+                    self.stdout.write(f"Created ItemSpec (fallback) pk={getattr(inst,'pk',None)}")
             else:
-                self.stdout.write(
-                    f"DRYRUN curated: would get_or_create ItemSpec size={self._repr_safe(size_obj)} printlocation={self._repr_safe(pl)} defaults={defaults}"
-                )
+                try:
+                    msg = (
+                        "DRYRUN curated: would get_or_create ItemSpec size="
+                        f"{self._repr_safe(size_obj)} "
+                        f"printlocation={self._repr_safe(pl)} "
+                        f"defaults={defaults}"
+                    )
+                    self.stdout.write(msg)
+                except Exception:
+                    pass
         except Exception as exc:
             self.stderr.write(f"Error creating ItemSpec: {exc}")
 
-    def _factory__StepSpec(self, index: int, do_commit: bool, users: list):
+    def _factory__stepspec(self, index: int, do_commit: bool, users: list):
         try:
             model = apps.get_model("workflow", "StepSpec")
         except Exception:
             return
         ItemSpec = apps.get_model("workflow", "ItemSpec")
-        # To satisfy UNIQUE(itemspec, special_mfg) create or choose a distinct itemspec per step
+        # To satisfy UNIQUE(itemspec, special_mfg) create or choose a
+        # distinct itemspec per step
         try:
             unique_suffix = uuid.uuid4().hex[:6]
-            # create a minimal ItemSpec specifically for this StepSpec using get_or_create patterns
+            # create a minimal ItemSpec specifically for this StepSpec using
+            # get_or_create patterns
             ItemCatalog = apps.get_model("workflow", "ItemCatalog")
             PrintLocation = apps.get_model("workflow", "PrintLocation")
-            pl = PrintLocation.objects.first() or self._create_minimal_instance(
-                PrintLocation
-            )
+            pl = PrintLocation.objects.first() or self._create_minimal_instance(PrintLocation)
             # prefer cached curated site
             site = getattr(self, "_curated_site", None)
             if site is None and apps.is_installed("sites"):
@@ -1433,9 +1296,7 @@ class Command(BaseCommand):
                 "active": True,
             }
             try:
-                size = ItemCatalog.objects.get_or_create(
-                    mfg_name=mfg, defaults=cat_defaults
-                )[0]
+                size = ItemCatalog.objects.get_or_create(mfg_name=mfg, defaults=cat_defaults)[0]
             except Exception:
                 size = ItemCatalog(
                     mfg_name=mfg,
@@ -1455,42 +1316,35 @@ class Command(BaseCommand):
                 "min_case": 6,
             }
             try:
-                itemspec = ItemSpec.objects.get_or_create(
-                    size=size, printlocation=pl, defaults=itemspec_defaults
-                )[0]
+                itemspec = ItemSpec.objects.get_or_create(size=size, printlocation=pl, defaults=itemspec_defaults)[0]
             except Exception:
                 itemspec = ItemSpec(
                     size=size,
                     printlocation=pl,
-                    **{
-                        k: v
-                        for k, v in itemspec_defaults.items()
-                        if v is not NOT_PROVIDED
-                    },
+                    **{k: v for k, v in itemspec_defaults.items() if v is not NOT_PROVIDED},
                 )
                 try:
                     itemspec.save()
                 except TypeError:
                     itemspec.save()
         except Exception:
-            itemspec = ItemSpec.objects.first() or self._create_minimal_instance(
-                ItemSpec
-            )
+            itemspec = ItemSpec.objects.first() or self._create_minimal_instance(ItemSpec)
 
-        SpecialMfg = apps.get_model("workflow", "SpecialMfgConfiguration")
-        special = SpecialMfg.objects.first() or self._create_minimal_instance(
-            SpecialMfg
-        )
+        special_mfg_model = apps.get_model("workflow", "SpecialMfgConfiguration")
+        special = special_mfg_model.objects.first() or self._create_minimal_instance(special_mfg_model)
         # avoid duplicate (itemspec, special_mfg)
-        try:
-            if model.objects.filter(itemspec=itemspec, special_mfg=special).exists():
-                if not do_commit:
-                    self.stdout.write(
-                        f"DRYRUN curated: skip StepSpec (exists) itemspec={self._repr_safe(itemspec)} special={self._repr_safe(special)}"
+        if model.objects.filter(itemspec=itemspec, special_mfg=special).exists():
+            if not do_commit:
+                try:
+                    msg = (
+                        "DRYRUN curated: skip StepSpec (exists) itemspec="
+                        f"{self._repr_safe(itemspec)} "
+                        f"special={self._repr_safe(special)}"
                     )
-                return
-        except Exception:
-            pass
+                    self.stdout.write(msg)
+                except Exception:
+                    pass
+            return
         kwargs = {
             "itemspec": itemspec,
             "special_mfg": special,
@@ -1505,68 +1359,64 @@ class Command(BaseCommand):
         }
         try:
             if do_commit:
-                inst, created = model.objects.get_or_create(
-                    itemspec=itemspec, special_mfg=special, defaults=kwargs
-                )
+                inst, created = model.objects.get_or_create(itemspec=itemspec, special_mfg=special, defaults=kwargs)
                 if created:
-                    self.stdout.write(
-                        f"Created StepSpec for itemspec={self._repr_safe(itemspec)} special={self._repr_safe(special)}"
-                    )
+                    try:
+                        msg = "Created StepSpec for itemspec=" f"{self._repr_safe(itemspec)} " f"special={self._repr_safe(special)}"
+                        self.stdout.write(msg)
+                    except Exception:
+                        pass
             else:
-                self.stdout.write(
-                    f"DRYRUN curated: would get_or_create StepSpec itemspec={self._repr_safe(itemspec)} special={self._repr_safe(special)} defaults={kwargs}"
-                )
+                try:
+                    msg = (
+                        "DRYRUN curated: would get_or_create StepSpec itemspec="
+                        f"{self._repr_safe(itemspec)} "
+                        f"special={self._repr_safe(special)} "
+                        f"defaults={kwargs}"
+                    )
+                    self.stdout.write(msg)
+                except Exception:
+                    pass
         except Exception as exc:
             self.stderr.write(f"Error creating StepSpec: {exc}")
 
-    def _factory__TiffToPDF(self, index: int, do_commit: bool, users: list):
+    def _factory__tifftopdf(self, index: int, do_commit: bool, users: list):
         try:
             model = apps.get_model("workflow", "TiffToPDF")
         except Exception:
             return
-        Item = (
-            apps.get_model("workflow", "Item")
-            if apps.is_installed("workflow")
-            else None
-        )
+        item_model = apps.get_model("workflow", "Item") if apps.is_installed("workflow") else None
         item = None
         try:
-            if Item:
-                item = Item.objects.first() or self._create_minimal_instance(Item)
+            if item_model:
+                item = item_model.objects.first() or self._create_minimal_instance(item_model)
         except Exception:
             item = None
 
         if item is None:
             # item is required by this model; skip to avoid NOT NULL constraint failures
             if do_commit:
-                self.stderr.write(
-                    "Skipping TiffToPDF creation: no Item available to assign (would violate NOT NULL)"
-                )
+                self.stderr.write(("Skipping TiffToPDF creation: no Item available to assign " "(would violate NOT NULL)"))
             else:
-                self.stdout.write(
-                    "DRYRUN curated: would skip TiffToPDF (no item available)"
-                )
+                self.stdout.write("DRYRUN curated: would skip TiffToPDF (no item available)")
             return
         # ensure item is persisted
         try:
             if getattr(item, "pk", None) is None:
-                # try to persist the instance; if it fails, try obtaining a minimal persisted Item
+                # Try to persist the instance; if it fails, fall back to obtaining
+                # a minimal persisted Item to satisfy relations.
                 try:
                     item.save()
                 except Exception:
                     try:
-                        item = self._create_minimal_instance(Item)
+                        item = self._create_minimal_instance(item_model)
                     except Exception:
                         item = None
                     if not item or getattr(item, "pk", None) is None:
                         if do_commit:
-                            self.stderr.write(
-                                "Skipping TiffToPDF creation: Item could not be persisted"
-                            )
+                            self.stderr.write(("Skipping TiffToPDF creation: Item could not " "be persisted"))
                         else:
-                            self.stdout.write(
-                                "DRYRUN curated: would skip TiffToPDF (item could not be persisted)"
-                            )
+                            self.stdout.write(("DRYRUN curated: would skip TiffToPDF " "(item could not be persisted)"))
                         return
         except Exception:
             pass
@@ -1579,11 +1429,11 @@ class Command(BaseCommand):
             try:
                 # TEMP DIAGNOSTIC: show item identity and pk before creating queue row
                 try:
-                    self.stderr.write(
-                        f"[DIAG][TiffToPDF] item={repr(item)} pk={getattr(item,'pk',None)}"
-                    )
+                    msg = "[DIAG][TiffToPDF] item=" + repr(item) + " pk=" + str(getattr(item, "pk", None))
+                    self.stderr.write(msg)
                 except Exception:
                     self.stderr.write("[DIAG][TiffToPDF] item repr failed")
+
                 inst = model(**kwargs)
                 inst.save()
             except Exception as exc:
@@ -1591,32 +1441,24 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f"DRYRUN curated: would create TiffToPDF with {kwargs}")
 
-    def _factory__ColorKeyQueue(self, index: int, do_commit: bool, users: list):
+    def _factory__colorkeyqueue(self, index: int, do_commit: bool, users: list):
         try:
             model = apps.get_model("workflow", "ColorKeyQueue")
         except Exception:
             return
-        Item = (
-            apps.get_model("workflow", "Item")
-            if apps.is_installed("workflow")
-            else None
-        )
+        item_model = apps.get_model("workflow", "Item") if apps.is_installed("workflow") else None
         item = None
         try:
-            if Item:
-                item = Item.objects.first() or self._create_minimal_instance(Item)
+            if item_model:
+                item = item_model.objects.first() or self._create_minimal_instance(item_model)
         except Exception:
             item = None
 
         if item is None:
             if do_commit:
-                self.stderr.write(
-                    "Skipping ColorKeyQueue creation: no Item available to assign (would violate NOT NULL)"
-                )
+                self.stderr.write(("Skipping ColorKeyQueue creation: no Item available " "to assign (would violate NOT NULL)"))
             else:
-                self.stdout.write(
-                    "DRYRUN curated: would skip ColorKeyQueue (no Item available)"
-                )
+                self.stdout.write("DRYRUN curated: would skip ColorKeyQueue (no Item available)")
             return
 
         # ensure item is persisted
@@ -1626,18 +1468,14 @@ class Command(BaseCommand):
                     item.save()
                 except Exception:
                     try:
-                        item = self._create_minimal_instance(Item)
+                        item = self._create_minimal_instance(item_model)
                     except Exception:
                         item = None
                     if not item or getattr(item, "pk", None) is None:
                         if do_commit:
-                            self.stderr.write(
-                                "Skipping ColorKeyQueue creation: Item could not be persisted"
-                            )
+                            self.stderr.write(("Skipping ColorKeyQueue creation: Item could " "not be persisted"))
                         else:
-                            self.stdout.write(
-                                "DRYRUN curated: would skip ColorKeyQueue (item could not be persisted)"
-                            )
+                            self.stdout.write(("DRYRUN curated: would skip ColorKeyQueue " "(item could not be persisted)"))
                         return
         except Exception:
             pass
@@ -1651,21 +1489,25 @@ class Command(BaseCommand):
             try:
                 # TEMP DIAGNOSTIC: show item identity and pk before creating queue row
                 try:
-                    self.stderr.write(
-                        f"[DIAG][ColorKeyQueue] item={repr(item)} pk={getattr(item,'pk',None)}"
-                    )
+                    try:
+                        msg = "[DIAG][ColorKeyQueue] item=" + repr(item) + " pk=" + str(getattr(item, "pk", None))
+                        self.stderr.write(msg)
+                    except Exception:
+                        self.stderr.write("[DIAG][ColorKeyQueue] item repr failed")
                 except Exception:
                     self.stderr.write("[DIAG][ColorKeyQueue] item repr failed")
                 inst = model(**{k: v for k, v in kwargs.items() if v is not None})
                 inst.save()
             except Exception as exc:
                 self.stderr.write(f"Error creating ColorKeyQueue: {exc}")
-        else:
-            self.stdout.write(
-                f"DRYRUN curated: would create ColorKeyQueue with {self._safe_kwargs(kwargs)}"
-            )
+            else:
+                try:
+                    msg = "DRYRUN curated: would create ColorKeyQueue with " f"{self._safe_kwargs(kwargs)}"
+                    self.stdout.write(msg)
+                except Exception:
+                    pass
 
-    def _factory__QCResponse(self, index: int, do_commit: bool, users: list):
+    def _factory__qcresponse(self, index: int, do_commit: bool, users: list):
         try:
             model = apps.get_model("workflow", "QCResponse")
         except Exception:
@@ -1687,11 +1529,13 @@ class Command(BaseCommand):
             except Exception as exc:
                 self.stderr.write(f"Error creating QCResponse: {exc}")
         else:
-            self.stdout.write(
-                f"DRYRUN curated: would create QCResponse with {self._safe_kwargs(kwargs)}"
-            )
+            try:
+                msg = "DRYRUN curated: would create QCResponse with " f"{self._safe_kwargs(kwargs)}"
+                self.stdout.write(msg)
+            except Exception:
+                pass
 
-    def _factory__QCWhoops(self, index: int, do_commit: bool, users: list):
+    def _factory__qcwhoops(self, index: int, do_commit: bool, users: list):
         try:
             model = apps.get_model("workflow", "QCWhoops")
         except Exception:
@@ -1711,33 +1555,31 @@ class Command(BaseCommand):
             except Exception as exc:
                 self.stderr.write(f"Error creating QCWhoops: {exc}")
         else:
-            self.stdout.write(
-                f"DRYRUN curated: would create QCWhoops with {self._safe_kwargs(kwargs)}"
-            )
+            try:
+                msg = "DRYRUN curated: would create QCWhoops with " f"{self._safe_kwargs(kwargs)}"
+                self.stdout.write(msg)
+            except Exception:
+                pass
 
-    def _factory__PlateOrder(self, index: int, do_commit: bool, users: list):
+    def _factory__plateorder(self, index: int, do_commit: bool, users: list):
         try:
             model = apps.get_model("workflow", "PlateOrder")
         except Exception:
             return
         User = apps.get_model("auth", "User")
         user = User.objects.first() or (users[0] if users else None)
-        Item = apps.get_model("workflow", "Item")
+        item_model = apps.get_model("workflow", "Item")
         item = None
         try:
-            item = Item.objects.first()
+            item = item_model.objects.first()
         except Exception:
             item = None
 
         if item is None:
             if do_commit:
-                self.stderr.write(
-                    "Skipping PlateOrder creation: no Item available to assign (would violate NOT NULL)"
-                )
+                self.stderr.write(("Skipping PlateOrder creation: no Item available to " "assign (would violate NOT NULL)"))
             else:
-                self.stdout.write(
-                    "DRYRUN curated: would skip PlateOrder (no item available)"
-                )
+                self.stdout.write("DRYRUN curated: would skip PlateOrder (no item available)")
             return
 
         kwargs = {
@@ -1752,11 +1594,9 @@ class Command(BaseCommand):
             except Exception as exc:
                 self.stderr.write(f"Error creating PlateOrder: {exc}")
         else:
-            self.stdout.write(
-                f"DRYRUN curated: would create PlateOrder with {self._safe_kwargs(kwargs)}"
-            )
+            self.stdout.write("DRYRUN curated: would create PlateOrder with " f"{self._safe_kwargs(kwargs)}")
 
-    def _factory__PlateOrderItem(self, index: int, do_commit: bool, users: list):
+    def _factory__plateorderitem(self, index: int, do_commit: bool, users: list):
         try:
             model = apps.get_model("workflow", "PlateOrderItem")
         except Exception:
@@ -1765,17 +1605,14 @@ class Command(BaseCommand):
         order = PlateOrder.objects.first() if PlateOrder else None
         if order is None:
             if do_commit:
-                self.stderr.write(
-                    "Skipping PlateOrderItem creation: no PlateOrder available (would violate NOT NULL)"
-                )
+                self.stderr.write("Skipping PlateOrderItem creation: no PlateOrder available " "(would violate NOT NULL)")
             else:
-                self.stdout.write(
-                    "DRYRUN curated: would skip PlateOrderItem (no PlateOrder available)"
-                )
+                self.stdout.write("DRYRUN curated: would skip PlateOrderItem " "(no PlateOrder available)")
             return
 
-        ItemColor = apps.get_model("workflow", "ItemColor")
-        color = ItemColor.objects.first() or self._create_minimal_instance(ItemColor)
+        item_color_model = apps.get_model("workflow", "ItemColor")
+        # use the model retrieved via apps.get_model to avoid top-level imports
+        color = item_color_model.objects.first() or self._create_minimal_instance(item_color_model)
         kwargs = {"order": order, "color": color, "quantity_needed": 6 + index}
         if do_commit:
             try:
@@ -1784,11 +1621,9 @@ class Command(BaseCommand):
             except Exception as exc:
                 self.stderr.write(f"Error creating PlateOrderItem: {exc}")
         else:
-            self.stdout.write(
-                f"DRYRUN curated: would create PlateOrderItem with {self._safe_kwargs(kwargs)}"
-            )
+            self.stdout.write("DRYRUN curated: would create PlateOrderItem with " f"{self._safe_kwargs(kwargs)}")
 
-    def _factory__ColorDefinition(self, index: int, do_commit: bool, users: list):
+    def _factory__colordefinition(self, index: int, do_commit: bool, users: list):
         try:
             model = apps.get_model("color_mgt", "ColorDefinition")
         except Exception:
@@ -1799,22 +1634,17 @@ class Command(BaseCommand):
         defaults = {"description": f"Auto-generated {name}", "coating": coating}
         try:
             if do_commit:
-                inst, created = model.objects.get_or_create(
-                    name=name, coating=coating, defaults=defaults
-                )
+                inst, created = model.objects.get_or_create(name=name, coating=coating, defaults=defaults)
                 if created:
-                    self.stdout.write(
-                        f"Created ColorDefinition {name} coating={coating}"
-                    )
+                    self.stdout.write(f"Created ColorDefinition {name} coating={coating}")
             else:
-                self.stdout.write(
-                    f"DRYRUN curated: would get_or_create ColorDefinition name={name} coating={coating}"
-                )
+                self.stdout.write("DRYRUN curated: would get_or_create ColorDefinition " f"name={name} coating={coating}")
         except Exception as exc:
             self.stderr.write(f"Error creating ColorDefinition: {exc}")
 
-    def _factory__AdminLog(self, index: int, do_commit: bool, users: list):
-        """Create a safe AdminLog entry using the AdminLog.create helper.
+    def _factory__adminlog(self, index: int, do_commit: bool, users: list):
+        """
+        Create a safe AdminLog entry using the AdminLog.create helper.
         Prefer to attach an origin (Job then Item) if a persisted instance exists.
         """
         try:
@@ -1842,9 +1672,7 @@ class Command(BaseCommand):
                 if origin and getattr(origin, "pk", None):
                     # create an error-level entry tied to the origin
                     try:
-                        model.create.error(
-                            f"Auto-generated admin log {index}", origin=origin
-                        )
+                        model.create.error(f"Auto-generated admin log {index}", origin=origin)
                     except Exception:
                         # fallback to generic info entry if error creation fails
                         model.create.info(f"Auto-generated admin log {index}")
@@ -1855,18 +1683,12 @@ class Command(BaseCommand):
                 self.stderr.write(f"Error creating AdminLog: {exc}")
         else:
             if origin and getattr(origin, "pk", None):
-                self.stdout.write(
-                    f"DRYRUN curated: would create AdminLog with origin={self._repr_safe(origin)}"
-                )
+                self.stdout.write("DRYRUN curated: would create AdminLog with origin=" f"{self._repr_safe(origin)}")
             else:
-                self.stdout.write(
-                    "DRYRUN curated: would create AdminLog without origin"
-                )
+                self.stdout.write("DRYRUN curated: would create AdminLog without origin")
 
     # Helper generators for plausible data
-    def _make_string_for_field(
-        self, model_name: str, field_name: str, index: int, field
-    ) -> str:
+    def _make_string_for_field(self, model_name: str, field_name: str, index: int, field) -> str:
         """Return a plausible string value for a field based on its name."""
         name_l = field_name.lower()
         if "email" in name_l:
@@ -1893,16 +1715,18 @@ class Command(BaseCommand):
         return random.randint(1, 100)
 
     def _repr_safe(self, obj):
-        """Return a safe, non-evaluating representation for common objects (models, lists, dicts)."""
+        """
+        Return a safe, non-evaluating representation for common objects
+        (models, lists, dicts).
+        """
         try:
-            # avoid importing Model at module top-level to keep Django import semantics friendly
+            # avoid importing Model at module top-level to keep Django import
+            # semantics friendly
             from django.db.models import Model
 
             if isinstance(obj, Model):
                 pk = getattr(obj, "pk", None)
-                return (
-                    f"<{obj.__class__.__name__}:{pk if pk is not None else 'unsaved'}>"
-                )
+                return f"<{obj.__class__.__name__}:{pk if pk is not None else 'unsaved'}>"
         except Exception:
             # not a model or django not loaded
             pass

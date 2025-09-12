@@ -14,7 +14,8 @@ from gchub_db.apps.workflow.models import Charge
 
 
 def generate_pdf_invoice(invoice_id, invoice_pdf):
-    """Generate an Invoice for the given invoice id.
+    """
+    Generate an Invoice for the given invoice id.
     An invoice will only contain charges from one Job.
     """
     invoice = BevInvoice.objects.get(id=invoice_id)
@@ -207,12 +208,8 @@ def generate_pdf_invoice(invoice_id, invoice_pdf):
         if item_art_charges != 0:
             c.setFont("Helvetica-Bold", 8)
             # Draw at item start y (top line of item)
-            c.drawRightString(
-                (COLUMN_FOUR_X - 0.10) * inch, item_start_y * inch, "Item Art:"
-            )
-            c.drawRightString(
-                7.95 * inch, item_start_y * inch, "$%.2f" % float(item_art_charges)
-            )
+            c.drawRightString((COLUMN_FOUR_X - 0.10) * inch, item_start_y * inch, "Item Art:")
+            c.drawRightString(7.95 * inch, item_start_y * inch, "$%.2f" % float(item_art_charges))
 
         # Do plate charges for each item.
         for charge in plate_charges:

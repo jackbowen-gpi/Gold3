@@ -49,9 +49,7 @@ class JobModelIntegrationTests(TestCase, JobTestMixin):
         all_jobs = []
         for site in sites:
             for i in range(jobs_per_site):
-                job = self.create_test_job(
-                    name=f"Site {site.id} Job {i+1}", workflow=site
-                )
+                job = self.create_test_job(name=f"Site {site.id} Job {i+1}", workflow=site)
                 all_jobs.append(job)
 
         # Verify relationships are correct
@@ -68,9 +66,7 @@ class JobModelIntegrationTests(TestCase, JobTestMixin):
         user2 = self.create_test_user()
 
         # Mock threadlocals for user tracking
-        with patch(
-            "gchub_db.middleware.threadlocals.get_current_user", return_value=user1
-        ):
+        with patch("gchub_db.middleware.threadlocals.get_current_user", return_value=user1):
             job = self.create_test_job(name="User Tracked Job")
 
             # Check if created_by is set (if field exists)
@@ -78,9 +74,7 @@ class JobModelIntegrationTests(TestCase, JobTestMixin):
                 self.assertEqual(job.created_by, user1)
 
         # Update job as different user
-        with patch(
-            "gchub_db.middleware.threadlocals.get_current_user", return_value=user2
-        ):
+        with patch("gchub_db.middleware.threadlocals.get_current_user", return_value=user2):
             job.name = "Updated Job Name"
             job.save()
             job.refresh_from_db()
@@ -125,9 +119,7 @@ class JobModelIntegrationTests(TestCase, JobTestMixin):
         Job.objects.bulk_create(jobs)
 
         # Verify all jobs were created correctly
-        created_jobs = Job.objects.filter(
-            workflow=self.site, name__startswith="Bulk Job"
-        )
+        created_jobs = Job.objects.filter(workflow=self.site, name__startswith="Bulk Job")
         self.assertEqual(created_jobs.count(), 10)
 
         # Verify relationships are intact
@@ -188,9 +180,7 @@ class JobModelIntegrationTests(TestCase, JobTestMixin):
         self.assertEqual(active_jobs.count(), 2)
 
         # Test complex filtering
-        active_techcorp = Job.objects.filter(
-            status="Active", brand_name="TechCorp", workflow=self.site
-        )
+        active_techcorp = Job.objects.filter(status="Active", brand_name="TechCorp", workflow=self.site)
         self.assertEqual(active_techcorp.count(), 1)
 
     def test_job_date_calculations_integration(self):
@@ -226,9 +216,7 @@ class JobModelIntegrationTests(TestCase, JobTestMixin):
         base_date = timezone.now() - timedelta(days=5)
 
         for i in range(5):
-            job = self.create_test_job(
-                name=f"Job {i+1}", creation_date=base_date + timedelta(days=i)
-            )
+            job = self.create_test_job(name=f"Job {i+1}", creation_date=base_date + timedelta(days=i))
             jobs.append(job)
 
         # Test ordering by creation date
@@ -244,9 +232,7 @@ class JobModelIntegrationTests(TestCase, JobTestMixin):
         job = self.create_test_job(name="Test Job", status="active")
 
         # Test status validation
-        self.assertIn(
-            job.status, ["draft", "active", "completed", "cancelled", "on_hold"]
-        )
+        self.assertIn(job.status, ["draft", "active", "completed", "cancelled", "on_hold"])
 
         # Test status change
         job.status = "completed"
@@ -368,9 +354,7 @@ class JobModelTransactionTests(TransactionTestCase, JobTestMixin):
             Job.objects.bulk_create(jobs)
 
         # Verify all jobs were created
-        created_jobs = Job.objects.filter(
-            workflow=site, name__startswith="Transaction Job"
-        )
+        created_jobs = Job.objects.filter(workflow=site, name__startswith="Transaction Job")
         self.assertEqual(created_jobs.count(), 5)
 
 

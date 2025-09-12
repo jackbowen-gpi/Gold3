@@ -32,24 +32,17 @@ COOL_POINTS_TYPES = (
 
 
 class CodeChange(models.Model):
-    """This model tracks incremental changes to GOLD over time so that users can
+    """
+    This model tracks incremental changes to GOLD over time so that users can
     see what is being worked on. A lot of new features are implemented and
     improvements are being made without ever being noticed by users.
     """
 
-    change = models.TextField(
-        help_text="A description of the change, in terms that the end users can understand."
-    )
-    workflows_affected = models.ManyToManyField(
-        Site, help_text="Which workflows are affected by the change."
-    )
+    change = models.TextField(help_text="A description of the change, in terms that the end users can understand.")
+    workflows_affected = models.ManyToManyField(Site, help_text="Which workflows are affected by the change.")
     change_type = models.IntegerField(choices=CHANGE_TYPES)
-    impact_level = models.IntegerField(
-        choices=IMPACT_LEVELS, help_text="How big or important of a change this is."
-    )
-    cool_points = models.PositiveSmallIntegerField(
-        choices=COOL_POINTS_TYPES, default=5, help_text="How cool this change is."
-    )
+    impact_level = models.IntegerField(choices=IMPACT_LEVELS, help_text="How big or important of a change this is.")
+    cool_points = models.PositiveSmallIntegerField(choices=COOL_POINTS_TYPES, default=5, help_text="How cool this change is.")
     creation_date = models.DateTimeField(
         default=timezone.now,
         help_text="The post date. May be changed to affect sorting.",

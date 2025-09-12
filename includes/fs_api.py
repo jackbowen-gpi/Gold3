@@ -1,5 +1,6 @@
 #!/usr/bin/python
-"""GCHUB Filesystem API
+"""
+GCHUB Filesystem API
 Handles finding, creating, deleting, re-naming, and interacting with files
 so that the rest of the application doesn't have to.
 
@@ -125,7 +126,8 @@ def get_fsb_production_templates_folder():
 
 
 def get_job_folder(jobnum, validity_check=False):
-    """Returns the folder matching a certain job number.
+    """
+    Returns the folder matching a certain job number.
     This should only be one, but sometimes people leave stuff
     laying around in the directories that could confuse
     things.
@@ -146,7 +148,8 @@ def get_job_folder(jobnum, validity_check=False):
 
 
 def find_job_folder(folder, jobnum):
-    """Searches an arbitrary path for a job's folder.
+    """
+    Searches an arbitrary path for a job's folder.
 
     NOTE: This is much slower than get_job_folder() and should never be used
     unless there is a good reason!
@@ -213,7 +216,8 @@ def delete_job_folder(jobnum, fail_silently=True):
 
 
 def _recursive_chmod(root_path, permission_bits):
-    """Recursively chmod all of the files and directories (including the top)
+    """
+    Recursively chmod all of the files and directories (including the top)
     root_path. permission_bits is the 'mode' argument outlined by Py docs.
 
     Currently will ignore OSErrors on files and directories, but not the
@@ -252,7 +256,8 @@ def restart_fs_server():
 
 
 def direct_lock_job_folder(jobnum):
-    """Locks a job folder directly through filesystem calls.
+    """
+    Locks a job folder directly through filesystem calls.
     This is typically only done by master.
     """
     job_path = get_job_folder(jobnum)
@@ -268,7 +273,8 @@ def direct_lock_job_folder(jobnum):
 
 
 def lock_job_folder(jobnum):
-    """Calls on the GOLD FS server running on master to lock the specified
+    """
+    Calls on the GOLD FS server running on master to lock the specified
     job folder.
     """
     message = "lock_job_folder %s" % jobnum
@@ -276,7 +282,8 @@ def lock_job_folder(jobnum):
 
 
 def unlock_job_folder(jobnum):
-    """Calls on the GOLD FS server running on master to unlock the specified
+    """
+    Calls on the GOLD FS server running on master to unlock the specified
     job folder.
     """
     message = "unlock_job_folder %s" % jobnum
@@ -284,7 +291,8 @@ def unlock_job_folder(jobnum):
 
 
 def direct_unlock_job_folder(jobnum):
-    """Unlocks a job folder directly through filesystem calls.
+    """
+    Unlocks a job folder directly through filesystem calls.
     This is typically only done by master.
     """
     job_path = get_job_folder(jobnum)
@@ -293,7 +301,8 @@ def direct_unlock_job_folder(jobnum):
 
 
 def strip_for_valid_filename(filename):
-    """Strips a string of all invalid characters that are unsuitable for
+    """
+    Strips a string of all invalid characters that are unsuitable for
     file/directory names.
 
     TODO: Once we move to Python 2.6, we can use string.translate() as a MUCH
@@ -308,7 +317,8 @@ def strip_for_valid_filename(filename):
 
 
 def get_jobnum_itemnum_finder_regexp(jobnum, itemnum, extension=None):
-    """Returns the generic regular expression for finding things that match
+    """
+    Returns the generic regular expression for finding things that match
     patterns similar to the following:
 
     53363-1
@@ -390,7 +400,8 @@ def _generic_item_file_search(
 
 
 def find_item_folder(jobnum, itemnum, search_dir="final_files"):
-    """Returns the full path to the item's Final File subfolder.
+    """
+    Returns the full path to the item's Final File subfolder.
 
     jobnum: (int) Job number
     itemnum: (int or str) Item number to find
@@ -433,7 +444,8 @@ def create_item_folder(jobnum, itemnum, itemname):
 
 
 def rename_item_folders(jobnum, itemnum, itemname):
-    """Renmames the necessary folders for an item in the event of an
+    """
+    Renmames the necessary folders for an item in the event of an
     intermixed job that has manual folder    creation components. This
     throws off the naming scheme and doesnt update folder names on the server.
     """
@@ -467,7 +479,8 @@ def rename_item_folders(jobnum, itemnum, itemname):
 
 
 def create_tiff_folder(jobnum, itemnum, itemname):
-    """Creates a tiff folder for an item. This is primarily used by Backstage,
+    """
+    Creates a tiff folder for an item. This is primarily used by Backstage,
     and new jobs automatically get a tiffs folder.
     """
     item_folder_str = "%s-%s %s" % (jobnum, itemnum, itemname)
@@ -479,7 +492,8 @@ def create_tiff_folder(jobnum, itemnum, itemname):
 
 
 def delete_item_folders(jobnum, itemnum):
-    """Looks through a Job folder and deletes all of the specified item's folders
+    """
+    Looks through a Job folder and deletes all of the specified item's folders
     recursively. Be careful with this!
     """
     pattern = get_jobnum_itemnum_finder_regexp(jobnum, itemnum)
@@ -496,7 +510,8 @@ def delete_item_folders(jobnum, itemnum):
 
 
 def rename_item_folder(jobnum, itemnum, newname, remove_itemnum_prefix=False):
-    """Re-names an item's folder.
+    """
+    Re-names an item's folder.
 
     remove_itemnum_prefix: (bool) If True, don't include the item number in
     the beginning of the folder's name. This will avoid future conflicts when
@@ -514,7 +529,8 @@ def rename_item_folder(jobnum, itemnum, newname, remove_itemnum_prefix=False):
 
 
 def get_item_finalfile_folder(jobnum, itemnum):
-    """Returns the path to the item's production files folder under the
+    """
+    Returns the path to the item's production files folder under the
     Job/Final Files folder.
     For example: Final Files/51234-1 SMR-16/
     """
@@ -529,7 +545,8 @@ def get_item_finalfile_folder(jobnum, itemnum):
 
 
 def get_item_finalfile(jobnum, itemnum):
-    """Return an item's production/final file PDF.
+    """
+    Return an item's production/final file PDF.
     JobFolder/Final_Files/jobnum-itemnum size/jobnum-itemnum.pdf
     (ie, Final_Files/51234-1 SMR-16/51234-1.pdf)
     """
@@ -541,7 +558,8 @@ def get_item_finalfile(jobnum, itemnum):
 
 
 def get_item_outputs_folder(jobnum, itemnum):
-    """Return an item's "Outputs" folder. Carton items usually have these.
+    """
+    Return an item's "Outputs" folder. Carton items usually have these.
     For example: Final_Files/87968-1 Carton SBS/Outputs/
     """
     item_ff_folder = get_item_finalfile_folder(jobnum, itemnum)
@@ -552,7 +570,8 @@ def get_item_outputs_folder(jobnum, itemnum):
 
 
 def get_item_outputs(jobnum, itemnum):
-    """Return an item's "Outputs" PDF file. Carton items usually have these.
+    """
+    Return an item's "Outputs" PDF file. Carton items usually have these.
     For example: Final_Files/87968-1 Carton SBS/Outputs/87968-1 59355A1_x1a.pdf
     """
     item_subfolder = get_item_outputs_folder(jobnum, itemnum)
@@ -563,7 +582,8 @@ def get_item_outputs(jobnum, itemnum):
 
 
 def get_item_deleteonoutput_folder(jobnum, itemnum):
-    """Returns the path to the item's DeleteOnOutput folder under the
+    """
+    Returns the path to the item's DeleteOnOutput folder under the
     Job/Final Files folder.
     For example: Final Files/84837-1 Carton CRB/DeleteOnOutput
     """
@@ -585,7 +605,8 @@ def delete_item_deleteonoutput_folder(jobnum, itemnum):
 
 
 def make_thumbnail_item_finalfile(jobnum, itemnum, width=155):
-    """Generates a thumbnail of an items final file PDF. This is put in a
+    """
+    Generates a thumbnail of an items final file PDF. This is put in a
     hidden directory under the item's final file folder.
     For example: Final Files/51234-1 SMR-16/.thumbnails/
     """
@@ -601,7 +622,8 @@ def make_thumbnail_item_finalfile(jobnum, itemnum, width=155):
 
 
 def get_thumbnail_item_finalfile(jobnum, itemnum, width=155):
-    """Retrieves the final file thumbnail for an item.
+    """
+    Retrieves the final file thumbnail for an item.
 
     Returns the string path to the thumbnail, or a None value if none can
     be found.
@@ -618,7 +640,8 @@ def get_thumbnail_item_finalfile(jobnum, itemnum, width=155):
 
 
 def get_item_proof_folder(jobnum, itemnum):
-    """Returns the path to the item's proofs folder under the Job/Proofs folder.
+    """
+    Returns the path to the item's proofs folder under the Job/Proofs folder.
     For example: Proofs/51234-1 SMR-16/
     """
     # TODO: Replace this function with find_item_folder()
@@ -634,7 +657,8 @@ def get_item_proof_folder(jobnum, itemnum):
 
 
 def copy_carton_imp_files(jobnum, itemnum, dest_jobnum, dest_itemnum):
-    """Copies files needed when duplicating carton imposition jobs.
+    """
+    Copies files needed when duplicating carton imposition jobs.
     For example:
         Final_Files/87968-1 Carton SBS/87968-1 59355A1_x1a.pdf
         Database_Documents/Approval_Scans/87968_1.pdf
@@ -678,7 +702,8 @@ def copy_carton_imp_files(jobnum, itemnum, dest_jobnum, dest_itemnum):
 
 
 def copy_carton_diestruct(jobnum, dest_jobnum, diename):
-    """Copies 1up die structure files needed when duplicating carton imposition
+    """
+    Copies 1up die structure files needed when duplicating carton imposition
     jobs. Usually a PDF and an EPS file.
     For example:
         Reference_Files/59355A1 [Converted].pdf
@@ -727,7 +752,8 @@ def copy_item_proof_folder(jobnum, itemnum, proof_log_id):
 
 
 def get_item_proof(jobnum, itemnum, quality=None, proof_log_id=None, return_first=True):
-    """Return an item's approval or print card proof file.
+    """
+    Return an item's approval or print card proof file.
     JobFolder/Proofs/jobnum-itemnum size/jobnum-itemnum.pdf
     (ie, Proofs/51234-1 SMR-16/51234-1.pdf)
 
@@ -758,7 +784,8 @@ def get_item_proof(jobnum, itemnum, quality=None, proof_log_id=None, return_firs
 
 
 def get_item_approval_pdf(jobnum, itemnum):
-    """Pulls the approval PDF for a given item.
+    """
+    Pulls the approval PDF for a given item.
     JobFolder/DatabaseDocs/Approvals/xxx.pdf
     Only exists for FSB, and even then, not all the time.
     Will need to first check the job folder directories,
@@ -771,7 +798,8 @@ def get_item_approval_pdf(jobnum, itemnum):
 
 
 def get_item_preview_art(jobnum, itemnum):
-    """Pulls the preview artwork for a given item.
+    """
+    Pulls the preview artwork for a given item.
     JobFolder/DatabaseDocs/Preview/ap_jobnum_itemnum.pdf
     Will need to first check the job folder directories, then look on the archive server for it.
     """
@@ -787,7 +815,8 @@ def get_item_preview_art(jobnum, itemnum):
 
 
 def get_item_print_seps(jobnum, itemnum):
-    """Pulls the printable separations pdf for a given item.
+    """
+    Pulls the printable separations pdf for a given item.
     JobFolder/Database_Documents/Printable_Separations/jobnum-itemnum_size_Seps.pdf
     """
     # Check if file system access is disabled for development
@@ -802,14 +831,16 @@ def get_item_print_seps(jobnum, itemnum):
 
 
 def get_item_3drender(jobnum, itemnum):
-    """Not sure where this will come from...
+    """
+    Not sure where this will come from...
     Me neither.
     """
     pass
 
 
 def get_item_3drender_texture(jobnum, itemnum):
-    """Returns the path to the item's 3D render texture JPG. If no matches are
+    """
+    Returns the path to the item's 3D render texture JPG. If no matches are
     found, return None.
     """
     jpg_path = os.path.join(
@@ -831,7 +862,8 @@ def get_mimetype(file):
 
 
 def list_job_database_docs(jobnum):
-    """Non-item specific. Could be PDF, JPG, TXT, ???
+    """
+    Non-item specific. Could be PDF, JPG, TXT, ???
     JobFolder/DatabaseDocs/*  (anything not in approval or preview subfolders)
     """
     doc_list = []
@@ -906,7 +938,8 @@ def get_pdf_templates():
 
 
 def get_fsb_production_template(size_name, product_type, plantcode, press_shortname):
-    """Given the size and printlocation (plant and press), return the appropriate
+    """
+    Given the size and printlocation (plant and press), return the appropriate
     production template file.
     """
     folder = get_fsb_production_templates_folder()
@@ -954,7 +987,8 @@ def copy_fsb_production_template(
 
 
 def list_item_tiffs(jobnum, itemnum):
-    """Return a dictionary of information about each tiff in an item's tiffs
+    """
+    Return a dictionary of information about each tiff in an item's tiffs
     directory.
     """
     jobfolder = get_job_folder(jobnum)
@@ -1032,7 +1066,8 @@ def list_item_tiffs(jobnum, itemnum):
 
 
 def get_item_tiff_path(jobnum, itemnum, filename):
-    """Retrieves a tiff's full path for retrieval via a view.
+    """
+    Retrieves a tiff's full path for retrieval via a view.
     filename: (string) Either the file name or a regex string
     """
     # Path to the 1_Bit_Tiffs directory
@@ -1072,7 +1107,8 @@ def get_zip_all_tiffs(jobnum, itemnum):
 
 
 def get_ftp_plate_files(jobnum, itemnum):
-    """Return a zip file containing all of an items tiffs and the low res proof
+    """
+    Return a zip file containing all of an items tiffs and the low res proof
     file. Suitable for uploading to an FTP server.
     """
     # Get the tiff info dictionary
@@ -1112,7 +1148,8 @@ def get_ftp_plate_files(jobnum, itemnum):
 
 
 def list_job_proofs(jobnum, itemcount):
-    """Return a dictionary of information (filename and path) about each proof in
+    """
+    Return a dictionary of information (filename and path) about each proof in
     a job.
     """
     proof_dict = []

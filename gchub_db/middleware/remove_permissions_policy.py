@@ -1,4 +1,5 @@
-"""Development middleware to remove restrictive Permissions-Policy/Feature-Policy
+"""
+Development middleware to remove restrictive Permissions-Policy/Feature-Policy
 headers so legacy vendor scripts that register "unload" handlers continue to work
 when running with DEBUG=True.
 
@@ -10,7 +11,8 @@ from typing import Callable
 
 
 class RemovePermissionsPolicyHeaderMiddleware:
-    """Remove Permissions-Policy and Feature-Policy response headers.
+    """
+    Remove Permissions-Policy and Feature-Policy response headers.
 
     Many older libraries (Prototype, YUI, SWF helpers) register `unload` event
     handlers. Newer browsers may block those handlers unless the document's

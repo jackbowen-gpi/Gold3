@@ -17,7 +17,8 @@ WIKI_DATABASE_PORT = "5432"
 
 
 def dump_backup():
-    """Runs pg_dump to a location based on values in settings.py.
+    """
+    Runs pg_dump to a location based on values in settings.py.
 
     Make sure that pg_dump is in the path!
     """
@@ -41,7 +42,8 @@ def dump_backup():
 
 
 def remove_old_backups():
-    """Cycles out backups older than the tolerance defined in
+    """
+    Cycles out backups older than the tolerance defined in
 
     settings.py
     """

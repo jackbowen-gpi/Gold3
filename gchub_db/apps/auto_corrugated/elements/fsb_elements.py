@@ -23,13 +23,9 @@ CORRUGATED_BARCODE_DIR = os.path.join(settings.PRODUCTION_DIR, "barcodes")
 # will trigger the automation engine workflow
 CORRUGATED_BARTEMP_DIR = os.path.join(settings.PRODUCTION_DIR, "autocorr_elements")
 # this is the hot folder automation engine is looking at for files to trigger the barcode workflow
-CORRUGATED_BARHOTFOLDER_DIR = os.path.join(
-    settings.PRODUCTION_DIR, "AutoCorrugatedAE_queue"
-)
+CORRUGATED_BARHOTFOLDER_DIR = os.path.join(settings.PRODUCTION_DIR, "AutoCorrugatedAE_queue")
 # this is the hot folder automation engine is looking at for files to trigger the label workflow
-CORRUGATED_LABEL_DIR = os.path.join(
-    settings.PRODUCTION_DIR, "AutoCorrugatedAE-LabelOnly_queue"
-)
+CORRUGATED_LABEL_DIR = os.path.join(settings.PRODUCTION_DIR, "AutoCorrugatedAE-LabelOnly_queue")
 
 # these are the stock names of the barcode files
 labelArea = "CorrugatedLabelArea"
@@ -43,16 +39,10 @@ only labelAreaElement for type = label
 
 def barcodeFileExists(label_id, type):
     # check to make sure labelArea is here for both types (box_pdf and label only)
-    if os.path.exists(
-        os.path.join(CORRUGATED_BARCODE_DIR, str(label_id) + "_" + labelArea + ".pdf")
-    ):
+    if os.path.exists(os.path.join(CORRUGATED_BARCODE_DIR, str(label_id) + "_" + labelArea + ".pdf")):
         # if the type is box_pdf we need to check for the other 6 digit file as well
         if type == "box_pdf":
-            if os.path.exists(
-                os.path.join(
-                    CORRUGATED_BARCODE_DIR, str(label_id) + "_" + sixDigit + ".pdf"
-                )
-            ):
+            if os.path.exists(os.path.join(CORRUGATED_BARCODE_DIR, str(label_id) + "_" + sixDigit + ".pdf")):
                 # at this point both files exist for type box_pdf so return true
                 return True
             else:
@@ -78,23 +68,17 @@ def triggerBarcodeCreation(label_id, type):
     if type == "box_pdf":
         copyfile(
             os.path.join(CORRUGATED_BARTEMP_DIR, sixDigit + ".pdf"),
-            os.path.join(
-                CORRUGATED_BARHOTFOLDER_DIR, str(label_id) + "_" + sixDigit + ".pdf"
-            ),
+            os.path.join(CORRUGATED_BARHOTFOLDER_DIR, str(label_id) + "_" + sixDigit + ".pdf"),
         )
         copyfile(
             os.path.join(CORRUGATED_BARTEMP_DIR, labelArea + ".pdf"),
-            os.path.join(
-                CORRUGATED_BARHOTFOLDER_DIR, str(label_id) + "_" + labelArea + ".pdf"
-            ),
+            os.path.join(CORRUGATED_BARHOTFOLDER_DIR, str(label_id) + "_" + labelArea + ".pdf"),
         )
     else:
         # The label type runs through a different workflow from a different hotfolder
         copyfile(
             os.path.join(CORRUGATED_BARTEMP_DIR, labelArea + ".pdf"),
-            os.path.join(
-                CORRUGATED_LABEL_DIR, str(label_id) + "_" + labelArea + ".pdf"
-            ),
+            os.path.join(CORRUGATED_LABEL_DIR, str(label_id) + "_" + labelArea + ".pdf"),
         )
 
 
@@ -148,20 +132,20 @@ def place_barcode(self, barcode_file):
 
 
 class StamperBoxElement(CollidableElement):
-    """This class represents a single stamper box. This is an empty rectangle that
+    """
+    This class represents a single stamper box. This is an empty rectangle that
     is situated on one of the upper corners of a label barcode area.
     """
 
     def __init__(self, name, bottom_left_x, bottom_left_y, width, height, **kwargs):
-        """name: (str) Description name of the object.
+        """
+        name: (str) Description name of the object.
         bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         width: (float) Width of element (in inches).
         height: (float) Height of element (in inches).
         """
-        super(StamperBoxElement, self).__init__(
-            name, bottom_left_x, bottom_left_y, width, height, **kwargs
-        )
+        super(StamperBoxElement, self).__init__(name, bottom_left_x, bottom_left_y, width, height, **kwargs)
         self.drawing = Drawing()
         self.drawing.add(
             Rect(
@@ -177,20 +161,20 @@ class StamperBoxElement(CollidableElement):
 
 
 class MachineBarcodeBoxElement(CollidableElement):
-    """This class represents a single machine bar code box. This is an empty
+    """
+    This class represents a single machine bar code box. This is an empty
     rectangle that is situated to the left of a label bar code area.
     """
 
     def __init__(self, name, bottom_left_x, bottom_left_y, width, height, **kwargs):
-        """name: (str) Description name of the object.
+        """
+        name: (str) Description name of the object.
         bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         width: (float) Width of element (in inches).
         height: (float) Height of element (in inches).
         """
-        super(MachineBarcodeBoxElement, self).__init__(
-            name, bottom_left_x, bottom_left_y, width, height, **kwargs
-        )
+        super(MachineBarcodeBoxElement, self).__init__(name, bottom_left_x, bottom_left_y, width, height, **kwargs)
         self.drawing = Drawing()
         self.drawing.add(
             Rect(
@@ -206,7 +190,8 @@ class MachineBarcodeBoxElement(CollidableElement):
 
 
 class CompanyLogoElement(CollidableSVGGraphicElement):
-    """This class represents a single stamper box. This is an empty rectangle that
+    """
+    This class represents a single stamper box. This is an empty rectangle that
     is situated on one of the upper corners of a label barcode area.
     """
 
@@ -221,7 +206,8 @@ class CompanyLogoElement(CollidableSVGGraphicElement):
         align="left",
         **kwargs,
     ):
-        """name: (str) Description name of the object.
+        """
+        name: (str) Description name of the object.
         bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         file_name: (str) Path to the SVG file.
@@ -245,7 +231,8 @@ class CompanyLogoElement(CollidableSVGGraphicElement):
 
 
 class SpecialtyLogoElement(CollidableSVGGraphicElement):
-    """This class represents a single stamper box. This is an empty rectangle that
+    """
+    This class represents a single stamper box. This is an empty rectangle that
     is situated on one of the upper corners of a label barcode area. Specialty
     logos include things like Ecotainer logos, Hold&Go logos, and Hold&Cold
     logos.
@@ -262,7 +249,8 @@ class SpecialtyLogoElement(CollidableSVGGraphicElement):
         align="left",
         **kwargs,
     ):
-        """name: (str) Description name of the object.
+        """
+        name: (str) Description name of the object.
         bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         file_name: (str) Path to the SVG file.
@@ -287,7 +275,8 @@ class SpecialtyLogoElement(CollidableSVGGraphicElement):
 
 
 class CountLabelElement(CollidableElement, MultiLineTextElement):
-    """This is a container for the sleeve/case count multi-line text labels that
+    """
+    This is a container for the sleeve/case count multi-line text labels that
     go on many of the panels.
 
     NOTE: This class is a child of both CollidableElement and
@@ -304,7 +293,8 @@ class CountLabelElement(CollidableElement, MultiLineTextElement):
         size=26,
         **kwargs,
     ):
-        """name: (str) Description name of the object.
+        """
+        name: (str) Description name of the object.
         bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         lines: (list of strings) Lines of text to be rendered.
@@ -314,9 +304,7 @@ class CountLabelElement(CollidableElement, MultiLineTextElement):
         # Call the CollidableElement superclass's __init__ method. This sets
         # the coordinate attributes up. Note that we'll set the width and
         # height attributes later, None works for now.
-        CollidableElement.__init__(
-            self, name, bottom_left_x, bottom_left_y, None, None, **kwargs
-        )
+        CollidableElement.__init__(self, name, bottom_left_x, bottom_left_y, None, None, **kwargs)
 
         # Call the MultiLineTextElement's superclass's __init__ method, which
         # also calculates and sets the width and height attributes, along with
@@ -328,7 +316,8 @@ class CountLabelElement(CollidableElement, MultiLineTextElement):
 
 
 class FlapTextElement(CollidableElement, MultiLineTextElement):
-    """This is a container text on the flaps that say "This side XXX" in
+    """
+    This is a container text on the flaps that say "This side XXX" in
     three different languages (English, Spanish, French)
 
     NOTE: This class is a child of both CollidableElement and
@@ -345,7 +334,8 @@ class FlapTextElement(CollidableElement, MultiLineTextElement):
         size=26,
         **kwargs,
     ):
-        """name: (str) Description name of the object.
+        """
+        name: (str) Description name of the object.
         bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         lines: (list of strings) Lines of text to be rendered.
@@ -355,9 +345,7 @@ class FlapTextElement(CollidableElement, MultiLineTextElement):
         # Call the CollidableElement superclass's __init__ method. This sets
         # the coordinate attributes up. Note that we'll set the width and
         # height attributes later, None works for now.
-        CollidableElement.__init__(
-            self, name, bottom_left_x, bottom_left_y, None, None, **kwargs
-        )
+        CollidableElement.__init__(self, name, bottom_left_x, bottom_left_y, None, None, **kwargs)
 
         # Call the MultiLineTextElement's superclass's __init__ method, which
         # also calculates and sets the width and height attributes, along with
@@ -369,7 +357,8 @@ class FlapTextElement(CollidableElement, MultiLineTextElement):
 
 
 class ItemDescriptionElement(CollidableElement, MultiLineTextElement):
-    """This is a container for the item description and lid information
+    """
+    This is a container for the item description and lid information
     multi-line text labels that go on many of the panels.
 
     NOTE: This class is a child of both CollidableElement and
@@ -386,7 +375,8 @@ class ItemDescriptionElement(CollidableElement, MultiLineTextElement):
         size=17.5,
         **kwargs,
     ):
-        """name: (str) Description name of the object.
+        """
+        name: (str) Description name of the object.
         bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         lines: (list of strings) Lines of text to be rendered.
@@ -396,9 +386,7 @@ class ItemDescriptionElement(CollidableElement, MultiLineTextElement):
         # Call the CollidableElement superclass's __init__ method. This sets
         # the coordinate attributes up. Note that we'll set the width and
         # height attributes later, None works for now.
-        CollidableElement.__init__(
-            self, name, bottom_left_x, bottom_left_y, None, None, **kwargs
-        )
+        CollidableElement.__init__(self, name, bottom_left_x, bottom_left_y, None, None, **kwargs)
 
         # Call the MultiLineTextElement's superclass's __init__ method, which
         # also calculates and sets the width and height attributes, along with
@@ -412,10 +400,9 @@ class ItemDescriptionElement(CollidableElement, MultiLineTextElement):
 class Code128Barcode_Kenton(CollidableElement):
     """6-digit barcode for Kenton that goes on the underside of the box."""
 
-    def __init__(
-        self, name, bottom_left_x, bottom_left_y, six_digit_code, box_id, method
-    ):
-        """name: (str) Description name of the object.
+    def __init__(self, name, bottom_left_x, bottom_left_y, six_digit_code, box_id, method):
+        """
+        name: (str) Description name of the object.
         bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         six_digit_code: (int) An identifying number.
@@ -426,9 +413,7 @@ class Code128Barcode_Kenton(CollidableElement):
         height = 1.5
 
         # Set up the stuff the collision detection needs.
-        super(Code128Barcode_Kenton, self).__init__(
-            name, bottom_left_x, bottom_left_y, width, height
-        )
+        super(Code128Barcode_Kenton, self).__init__(name, bottom_left_x, bottom_left_y, width, height)
 
         self.drawing = Drawing()
 
@@ -456,7 +441,8 @@ class Code128Barcode_Kenton(CollidableElement):
 
 
 class LabelAreaElement(CollidableElement):
-    """The label area element is a big box containing barcodes and description
+    """
+    The label area element is a big box containing barcodes and description
     text, straddling panels A and B (the left two).
     """
 
@@ -476,7 +462,8 @@ class LabelAreaElement(CollidableElement):
         method,
         **kwargs,
     ):
-        """Place label area, barcodes, and other text.
+        """
+        Place label area, barcodes, and other text.
 
         name: (str) Description name of the object.
         bottom_left_x: (float) X coordinate for object's bottom left point.
@@ -497,9 +484,7 @@ class LabelAreaElement(CollidableElement):
 
         self.drawing = Drawing()
         # Set up the stuff the collision detection needs.
-        super(LabelAreaElement, self).__init__(
-            name, bottom_left_x, bottom_left_y, self.width, self.height, **kwargs
-        )
+        super(LabelAreaElement, self).__init__(name, bottom_left_x, bottom_left_y, self.width, self.height, **kwargs)
 
         # Dashed box containing barcodes, crosses corner
         if plant:
@@ -721,7 +706,8 @@ class LabelAreaElement(CollidableElement):
             self.__generate_barcode("I2of5", fourteen_digit_num, 7.0, 0.1)
 
     def __generate_barcode(self, type, code, x, y):
-        """Generate some barcodes, fool!
+        """
+        Generate some barcodes, fool!
 
         type: (str) One of either 'code128' or 'I2of5' for barcode type.
         code: (str) Number to encode.

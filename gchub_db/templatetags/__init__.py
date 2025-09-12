@@ -1,4 +1,5 @@
-"""Shim to expose the repo-level `templatetags/` directory as
+"""
+Shim to expose the repo-level `templatetags/` directory as
 `gchub_db.templatetags` for legacy template library imports.
 """
 

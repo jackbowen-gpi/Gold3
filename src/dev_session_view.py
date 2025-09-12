@@ -1,3 +1,7 @@
+r"""
+Module src\dev_session_view.py
+"""
+
 import os
 
 from django.conf import settings
@@ -7,7 +11,8 @@ from django.shortcuts import redirect
 
 
 def set_dev_session(request):
-    """Read the dev/admin_session_cookie.txt file and set sessionid cookie then redirect to '/'.
+    """
+    Read the dev/admin_session_cookie.txt file and set sessionid cookie then redirect to '/'.
 
     Only enabled when settings.DEBUG is True.
     """

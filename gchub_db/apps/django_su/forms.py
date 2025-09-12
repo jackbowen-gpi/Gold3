@@ -1,3 +1,7 @@
+"""
+Module gchub_db\apps\\django_su\forms.py
+"""
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -5,16 +9,12 @@ from django.utils.translation import gettext_lazy as _
 
 
 class UserSuForm(forms.Form):
-    user = forms.ModelChoiceField(
-        label=_("users"), queryset=User.objects.all(), required=True
-    )
+    user = forms.ModelChoiceField(label=_("users"), queryset=User.objects.all(), required=True)
 
     def __init__(self, *args, **kwargs):
         super(UserSuForm, self).__init__(*args, **kwargs)
         self.need_jquery = False
-        if "ajax_select" in settings.INSTALLED_APPS and getattr(
-            settings, "AJAX_LOOKUP_CHANNELS", None
-        ):
+        if "ajax_select" in settings.INSTALLED_APPS and getattr(settings, "AJAX_LOOKUP_CHANNELS", None):
             django_su_lookup = settings.AJAX_LOOKUP_CHANNELS.get(
                 "django_su",
             )
@@ -22,9 +22,7 @@ class UserSuForm(forms.Form):
                 from ajax_select.fields import AutoCompleteSelectField
 
                 old_field = self.fields["user"]
-                self.fields["user"] = AutoCompleteSelectField(
-                    "django_su", required=old_field.required, label=old_field.label
-                )
+                self.fields["user"] = AutoCompleteSelectField("django_su", required=old_field.required, label=old_field.label)
                 self.need_jquery = True
 
     def get_user(self):

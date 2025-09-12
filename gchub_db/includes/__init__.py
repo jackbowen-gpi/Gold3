@@ -1,4 +1,5 @@
-"""Shim to expose the repo-level `includes/` directory as
+"""
+Shim to expose the repo-level `includes/` directory as
 `gchub_db.includes` so legacy imports work without moving files.
 """
 

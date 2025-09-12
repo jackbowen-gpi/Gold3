@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-"""Archives jobs that have not seen activity for extended periods of time.
+"""
+Archives jobs that have not seen activity for extended periods of time.
 
 Removes symlinks from Active directories and moves them to the Archive dir.
 """
@@ -28,7 +29,8 @@ COMPLETE_CUTOFF_DATE = 120
 
 
 def main():
-    """Find jobs that should be archived and perform archiving.
+    """
+    Find jobs that should be archived and perform archiving.
 
     Minimal wrapper for batch invocation.
     """
@@ -44,9 +46,7 @@ def main():
         last_joblog = job.job_set.all().order_by("-event_time")
         if last_joblog:
             last_joblog_date = last_joblog[0].event_time
-            if last_joblog_date < archival_cutoff_date or (
-                last_joblog_date < complete_cutoff_date and job.status == "Complete"
-            ):
+            if last_joblog_date < archival_cutoff_date or (last_joblog_date < complete_cutoff_date and job.status == "Complete"):
                 print("Archiving", job)
                 try:
                     job.delete_folder_symlink()

@@ -1,4 +1,5 @@
-"""Calculate the name of the tiff_to_pdf binary for this platform.
+"""
+Calculate the name of the tiff_to_pdf binary for this platform.
 
 This module's sole purpose is to calculate the name of the binary for
 tiff_to_pdf when compiling or attempting to run via Popen in GOLD.
@@ -11,7 +12,8 @@ import os
 
 
 def tiff_to_pdf_bin():
-    """Return the expected tiff_to_pdf binary name for the current platform.
+    """
+    Return the expected tiff_to_pdf binary name for the current platform.
 
     The binary name is constructed from members of os.uname() including the
     kernel version and architecture.

@@ -1,0 +1,10 @@
+from celery import shared_task  # type: ignore[import-not-found]
+import time
+
+
+@shared_task
+def example_task():
+    print("Example task is running!")
+    time.sleep(2)
+    print("Example task complete.")
+    return "Task finished!"

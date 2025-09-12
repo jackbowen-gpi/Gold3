@@ -32,7 +32,8 @@ from . import ioloop
 
 
 class HTTPClient(object):
-    """A blocking HTTP client backed with pycurl.
+    """
+    A blocking HTTP client backed with pycurl.
 
     Typical usage looks like this:
 
@@ -54,7 +55,8 @@ class HTTPClient(object):
         self._curl.close()
 
     def fetch(self, request, **kwargs):
-        """Executes an HTTPRequest, returning an HTTPResponse.
+        """
+        Executes an HTTPRequest, returning an HTTPResponse.
 
         If an error occurs during the fetch, we raise an HTTPError.
         """
@@ -83,7 +85,8 @@ class HTTPClient(object):
 
 
 class AsyncHTTPClient(object):
-    """An non-blocking HTTP client backed with pycurl.
+    """
+    An non-blocking HTTP client backed with pycurl.
 
     Example usage:
 
@@ -132,7 +135,8 @@ class AsyncHTTPClient(object):
             return instance
 
     def fetch(self, request, callback, **kwargs):
-        """Executes an HTTPRequest, calling callback with an HTTPResponse.
+        """
+        Executes an HTTPRequest, calling callback with an HTTPResponse.
 
         If an error occurs during the fetch, the HTTPResponse given to the
         callback has a non-None error attribute that contains the exception

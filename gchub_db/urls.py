@@ -1,4 +1,5 @@
-"""Package-level urls shim that delegates to the repo-root `urls.py`.
+"""
+Package-level urls shim that delegates to the repo-root `urls.py`.
 This lets DJANGO_SETTINGS_MODULE='gchub_db.settings' reference
 `gchub_db.urls` while keeping the canonical URL definitions at the repo root.
 """
@@ -17,9 +18,7 @@ try:
 except Exception:
     tb = traceback.format_exc()
     try:
-        with open(
-            os.path.join(os.getcwd(), "urls_import_error.txt"), "w", encoding="utf-8"
-        ) as f:
+        with open(os.path.join(os.getcwd(), "urls_import_error.txt"), "w", encoding="utf-8") as f:
             f.write(tb)
     except Exception:
         # best-effort: if we can't write the file, ignore
@@ -167,9 +166,7 @@ try:
                 def _fallback_job_search(request):
                     return HttpResponse("job_search fallback")
 
-                urlpatterns.insert(
-                    0, url(r"^job/search/$", _fallback_job_search, name="job_search")
-                )
+                urlpatterns.insert(0, url(r"^job/search/$", _fallback_job_search, name="job_search"))
             except Exception:
                 # best-effort: ignore failures in fallback job_search setup
                 pass

@@ -1,4 +1,5 @@
-"""Seed dev data for local development.
+"""
+Seed dev data for local development.
 
 Creates a few users, jobs and joblog entries.
 Run with: .venv/Scripts/python.exe manage.py runscript seed_dev_data.
@@ -40,9 +41,7 @@ def run():
             users.append(user)
 
         # Ensure a Site exists for workflow.ForeignKey to Site
-        site, _ = Site.objects.get_or_create(
-            id=1, defaults={"domain": "localhost", "name": "Local"}
-        )
+        site, _ = Site.objects.get_or_create(id=1, defaults={"domain": "localhost", "name": "Local"})
 
         # Create jobs (avoid get_or_create because Job.save overrides signature)
         jobs = []
@@ -76,9 +75,7 @@ def run():
 
         # Add job logs
         for job in jobs:
-            jl = JobLog(
-                job=job, user=users[0], type=1, log_text=f"Created job {job.name}"
-            )
+            jl = JobLog(job=job, user=users[0], type=1, log_text=f"Created job {job.name}")
             jl.save()
 
     print(
@@ -124,9 +121,7 @@ def run():
             try:
                 from gchub_db.apps.workflow.models.item import Item
 
-                it = Item(
-                    job=j, workflow=site, size=catalog, bev_item_name=f"Item {n + 1}"
-                )
+                it = Item(job=j, workflow=site, size=catalog, bev_item_name=f"Item {n + 1}")
                 it.save()
                 # Set num_in_job if the manager expects it; attempt to set to 1
                 try:

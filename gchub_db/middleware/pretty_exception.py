@@ -1,4 +1,5 @@
-"""Middleware that logs a concise, nicely formatted exception summary for dev.
+"""
+Middleware that logs a concise, nicely formatted exception summary for dev.
 
 This middleware is intended for use in DEBUG/dev only. It logs the exception
 type, message and a short stack trace (last few frames) to the standard logging
@@ -14,7 +15,8 @@ logger = logging.getLogger("pretty_exceptions")
 
 
 class PrettyExceptionMiddleware(MiddlewareMixin):
-    """Catch unhandled exceptions and emit a concise formatted log entry.
+    """
+    Catch unhandled exceptions and emit a concise formatted log entry.
 
     Django's debug page is still shown when DEBUG=True. This middleware only
     improves the log output so terminal/CI logs are easier to scan.

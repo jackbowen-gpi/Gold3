@@ -24,7 +24,8 @@ COLUMN_THREE_X = 6.6
 
 
 def generate_carton_invoice(save_destination, job_id, item_list):
-    """Generates PDF invoices for every item in the item_list. Each item gets it's
+    """
+    Generates PDF invoices for every item in the item_list. Each item gets it's
     own page. Items with too many charges for one page can span multiple pages.
 
     The item list contains database IDs for each item like this:
@@ -48,9 +49,7 @@ def generate_carton_invoice(save_destination, job_id, item_list):
         draw_job_info(c, job, item, page)
 
         # Iterate through charges for the item.
-        y_cursor = (
-            6.750  # Starting point for all line items to be written. Higher is up.
-        )
+        y_cursor = 6.750  # Starting point for all line items to be written. Higher is up.
         c.setFont("Helvetica", 12)
 
         charges = Charge.objects.filter(item=item).order_by("creation_date")
@@ -100,9 +99,7 @@ def generate_carton_invoice(save_destination, job_id, item_list):
                         "%s" % charge.description,
                     )
                     # Price
-                    c.drawRightString(
-                        7.95 * inch, y_cursor * inch, "${:,.2f}".format(charge.amount)
-                    )
+                    c.drawRightString(7.95 * inch, y_cursor * inch, "${:,.2f}".format(charge.amount))
                     total += charge.amount
                     # Move the cursor down to make room for the wrapped paragraph.
                     y_cursor -= LINE_SPACING
@@ -153,9 +150,7 @@ def generate_carton_invoice(save_destination, job_id, item_list):
                 total += charge.amount
 
             # Check height left.
-            avail_height = (
-                y_cursor - 0.75
-            )  # Invoice box ends a 0.75 inches from the bottom.
+            avail_height = y_cursor - 0.75  # Invoice box ends a 0.75 inches from the bottom.
             avail_height -= LINE_SPACING * 3  # Minimum height for another comment.
             if avail_height <= 0:  # Start a new page if there's no room.
                 # Move the y cursor back up.
@@ -205,19 +200,16 @@ def draw_header(c):
 
 
 def draw_job_info(c, job, item, page=None):
-    """Draws the job info in the middle of the page and a blank invoice datail
+    """
+    Draws the job info in the middle of the page and a blank invoice datail
     block at the bottom.
     """
     c.setFont("Helvetica-Bold", 14)
-    c.drawString(
-        0.5 * inch, 9 * inch, "%s-%s %s" % (str(job.id), str(item.num_in_job), job.name)
-    )
+    c.drawString(0.5 * inch, 9 * inch, "%s-%s %s" % (str(job.id), str(item.num_in_job), job.name))
 
     # Left column
     c.setFont("Helvetica", 12)
-    c.drawString(
-        0.5 * inch, 8.7 * inch, "Date: %s" % (date.today().strftime("%m/%d/%Y"))
-    )
+    c.drawString(0.5 * inch, 8.7 * inch, "Date: %s" % (date.today().strftime("%m/%d/%Y")))
     c.drawString(0.5 * inch, 8.5 * inch, "GOLD Job Number: %s" % (str(job.id)))
     c.drawString(0.5 * inch, 8.3 * inch, "GOLD Job Name: %s" % (job.name))
     c.drawString(0.5 * inch, 8.1 * inch, "Graphic PO # : %s" % (item.graphic_po))

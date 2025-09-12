@@ -12,15 +12,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="kentonarchive",
             name="plates_ordered",
-            field=models.DateField(
-                blank=True, null=True, verbose_name="Date Plates Ordered"
-            ),
+            field=models.DateField(blank=True, null=True, verbose_name="Date Plates Ordered"),
         ),
         migrations.AlterField(
             model_name="renmarkarchive",
             name="folder_creation",
-            field=models.DateField(
-                blank=True, null=True, verbose_name="Date Folder Created"
-            ),
+            field=models.DateField(blank=True, null=True, verbose_name="Date Folder Created"),
         ),
     ]

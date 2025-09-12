@@ -9,7 +9,8 @@ gps_server = "gpicstfms01"
 
 
 def _get_customer_data(sap_num):
-    """Query for retrieving customer info from GPS connect. We look up the customer
+    """
+    Query for retrieving customer info from GPS connect. We look up the customer
     using a number that everyone calls by a different name.
 
     SAP: Payer Customer
@@ -56,7 +57,8 @@ def _get_customer_data(sap_num):
 
 
 def _get_customer_field_names(sap_num):
-    """Looks up a csutomer and then returns only the names of the fields. Use this
+    """
+    Looks up a csutomer and then returns only the names of the fields. Use this
     if you suspect a field has changed or been added. You can also specify a
     different sap number if the default one doesn't work for whatever reason.
     """

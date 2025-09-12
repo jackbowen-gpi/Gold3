@@ -29,9 +29,7 @@ class Migration(migrations.Migration):
                 ("job_name", models.CharField(blank=True, max_length=30255)),
                 (
                     "plates_ordered",
-                    models.DateField(
-                        blank=True, null=True, verbose_name=b"Date Plates Ordered"
-                    ),
+                    models.DateField(blank=True, null=True, verbose_name=b"Date Plates Ordered"),
                 ),
                 ("size", models.CharField(blank=True, max_length=255)),
                 ("item_number", models.CharField(blank=True, max_length=255)),
@@ -54,9 +52,7 @@ class Migration(migrations.Migration):
                 ("size", models.CharField(blank=True, max_length=255)),
                 (
                     "folder_creation",
-                    models.DateField(
-                        blank=True, null=True, verbose_name=b"Date Folder Created"
-                    ),
+                    models.DateField(blank=True, null=True, verbose_name=b"Date Folder Created"),
                 ),
                 ("folder_items", models.TextField(blank=True)),
             ],

@@ -1,4 +1,5 @@
-"""Codemod: convert simple Site/User creation calls in test files to factory helpers.
+"""
+Codemod: convert simple Site/User creation calls in test files to factory helpers.
 
 This script searches for test modules under apps/**/tests and replaces
 - `Site.objects.create(` -> `create_site(`

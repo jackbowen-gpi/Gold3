@@ -1,5 +1,6 @@
 #!/usr/bin/python
-"""Create volume trend reports across workflows and years.
+"""
+Create volume trend reports across workflows and years.
 
 Produces an Excel spreadsheet summarizing item counts per workflow.
 """

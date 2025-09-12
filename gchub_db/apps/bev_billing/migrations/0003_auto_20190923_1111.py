@@ -32,8 +32,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="bevinvoice",
             name="qad_entry_date",
-            field=models.DateField(
-                blank=True, null=True, verbose_name="QAD Entry Date"
-            ),
+            field=models.DateField(blank=True, null=True, verbose_name="QAD Entry Date"),
         ),
     ]

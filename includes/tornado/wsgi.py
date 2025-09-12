@@ -14,7 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""WSGI support for the Tornado web framework.
+"""
+WSGI support for the Tornado web framework.
 
 We export WSGIApplication, which is very similar to web.Application, except
 no asynchronous methods are supported (since WSGI does not support
@@ -64,7 +65,8 @@ from . import escape, web
 
 
 class WSGIApplication(web.Application):
-    """A WSGI-equivalent of web.Application.
+    """
+    A WSGI-equivalent of web.Application.
 
     We support the same interface, but handlers running in a WSGIApplication
     do not support flush() or asynchronous methods.
@@ -197,7 +199,8 @@ class HTTPRequest(object):
 
 
 class WSGIContainer(object):
-    """Makes a WSGI-compatible function runnable on Tornado's HTTP server.
+    """
+    Makes a WSGI-compatible function runnable on Tornado's HTTP server.
 
     Wrap a WSGI function in a WSGIContainer and pass it to HTTPServer to
     run it. For example:

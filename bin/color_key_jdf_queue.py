@@ -62,14 +62,10 @@ for entry in pending_items:
             mail_send_to = []
             for admin in settings.ADMINS:
                 mail_send_to.append(admin[1])
-            group_members = User.objects.filter(
-                groups__name="EmailGCHubColorManagement", is_active=True
-            )
+            group_members = User.objects.filter(groups__name="EmailGCHubColorManagement", is_active=True)
             for user in group_members:
                 mail_send_to.append(user.email)
-            general_funcs.send_info_mail(
-                mail_subject, mail_body.render(mail_context), mail_send_to
-            )
+            general_funcs.send_info_mail(mail_subject, mail_body.render(mail_context), mail_send_to)
         # if there is an issue at least try and process the next one
         continue
     else:

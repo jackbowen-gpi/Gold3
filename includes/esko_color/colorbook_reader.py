@@ -1,4 +1,5 @@
-"""Module for reading Esko's proprietary colorbook files. This exposes almost all
+"""
+Module for reading Esko's proprietary colorbook files. This exposes almost all
 of the color definitions in kalleidescope.
 """
 
@@ -21,12 +22,14 @@ class InvalidColorBook(Exception):
 
 
 class EskoColorBook(object):
-    """Abstracts access to Esko CMS ColorBook data. From this class, you can gain
+    """
+    Abstracts access to Esko CMS ColorBook data. From this class, you can gain
     access to individual colors within colorbooks, along with its color data.
     """
 
     def __init__(self, colorbook_name):
-        """Constructor.
+        """
+        Constructor.
 
         colorbook_name: (str) Name of the colorbook, as per Kalleidescope.
         """
@@ -49,7 +52,8 @@ class EskoColorBook(object):
         return "EskoColorBook: %s" % self.name
 
     def _calc_path_from_colorbook_name(self, colorbook_name):
-        """Given an colorbook name, calculate the path.
+        """
+        Given an colorbook name, calculate the path.
 
         colorbook_name: (str) Name of the colorbook, as per Kalleidescope.
         """
@@ -81,7 +85,8 @@ class EskoColorBook(object):
         return self.config_parser.sections()
 
     def get_color(self, color_name):
-        """Retrieves an EskoColorBookColor object for the specified color.
+        """
+        Retrieves an EskoColorBookColor object for the specified color.
 
         color_name: (str) Raw color name as it appears in the Kalleidescope
                           color listing/colorbook.

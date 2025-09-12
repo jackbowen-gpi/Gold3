@@ -1,3 +1,7 @@
+"""
+Module tools\test_db_conn.py
+"""
+
 import psycopg2
 import sys
 

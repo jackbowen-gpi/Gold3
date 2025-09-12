@@ -1,4 +1,5 @@
-"""Ensure a local 'Beverage' Site exists using Django ORM (uses configured DATABASES).
+"""
+Ensure a local 'Beverage' Site exists using Django ORM (uses configured DATABASES).
 
 This avoids direct sqlite usage and will work with Postgres or whatever DB is configured
 via settings/local_settings/env vars.
@@ -18,9 +19,7 @@ django.setup()
 
 from django.contrib.sites.models import Site
 
-site, created = Site.objects.get_or_create(
-    domain="localhost", defaults={"name": "Beverage"}
-)
+site, created = Site.objects.get_or_create(domain="localhost", defaults={"name": "Beverage"})
 if created:
     print("Inserted Beverage site (domain=localhost)")
 else:

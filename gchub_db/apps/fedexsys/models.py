@@ -1,3 +1,7 @@
+"""
+Module gchub_db\apps\fedexsys\\models.py
+"""
+
 import binascii
 
 from django.conf import settings
@@ -30,14 +34,13 @@ from .config_factory import create_fedex_config
 
 
 class Shipment(models.Model):
-    """Represents a Fedex Shipment. These may be directed to individual people,
+    """
+    Represents a Fedex Shipment. These may be directed to individual people,
     or sent automatically when a job is proofed out.
     """
 
     # When associating to a JobAddress, store the Job here for easier retrieval.
-    job = models.ForeignKey(
-        "workflow.Job", on_delete=models.CASCADE, blank=True, null=True
-    )
+    job = models.ForeignKey("workflow.Job", on_delete=models.CASCADE, blank=True, null=True)
     """
     The next three fields form a generic relation to JobAddress and Contact
     models. The two models must preserve cross-compatibility in methods and
@@ -53,17 +56,11 @@ class Shipment(models.Model):
     # When this is None, the label printing queue checker will print the label.
     date_label_printed = models.DateTimeField(blank=True, null=True)
     # This will pretty much always be Fedex Express (FDXE).
-    ship_carrier_code = models.CharField(
-        max_length=15, choices=CARRIER_CODES, default="FDXE"
-    )
-    ship_packaging = models.CharField(
-        max_length=50, choices=PACKAGING_CODES, default="FEDEX_PAK"
-    )
+    ship_carrier_code = models.CharField(max_length=15, choices=CARRIER_CODES, default="FDXE")
+    ship_packaging = models.CharField(max_length=50, choices=PACKAGING_CODES, default="FEDEX_PAK")
     # Our packages are almost always very light.
     ship_weight = models.FloatField(default=1.0)
-    ship_service = models.CharField(
-        max_length=75, choices=SHIPPING_SERVICES, default="PRIORITY_OVERNIGHT"
-    )
+    ship_service = models.CharField(max_length=75, choices=SHIPPING_SERVICES, default="PRIORITY_OVERNIGHT")
     label_data = models.TextField(blank=True, null=True)
     # Net (total) cost of shipping.
     net_shipping_cost = models.FloatField(blank=True, null=True)
@@ -72,7 +69,8 @@ class Shipment(models.Model):
         return self.get_ref_string()
 
     def get_ref_string(self):
-        """Returns the shipment's reference string. For example:
+        """
+        Returns the shipment's reference string. For example:
         50883 SMRE_12 SD
         """
         if self.job:
@@ -92,7 +90,8 @@ class Shipment(models.Model):
         return countries.full_to_abbrev(self.address.country) != "US"
 
     def print_label(self, debug=False):
-        """Grabs the textual representation of the label from the XML response,
+        """
+        Grabs the textual representation of the label from the XML response,
         converts it to base64, and pipes it directly into the label printer
         via a device node in /dev/
         """
@@ -121,7 +120,8 @@ class Shipment(models.Model):
         self.save()
 
     def get_shipment_request(self):
-        """Populates and returns a FedexProcessShipmentRequest object that
+        """
+        Populates and returns a FedexProcessShipmentRequest object that
         is pretty much ready for sending. Final adjustments may be applied
         in the view.
         """
@@ -141,22 +141,16 @@ class Shipment(models.Model):
             settings.GCHUB_ADDRESS2,
         ]
         shipment.RequestedShipment.Shipper.Address.City = settings.GCHUB_CITY
-        shipment.RequestedShipment.Shipper.Address.StateOrProvinceCode = (
-            settings.GCHUB_STATE
-        )
+        shipment.RequestedShipment.Shipper.Address.StateOrProvinceCode = settings.GCHUB_STATE
         shipment.RequestedShipment.Shipper.Address.PostalCode = settings.GCHUB_ZIP
-        shipment.RequestedShipment.Shipper.Address.CountryCode = (
-            settings.GCHUB_COUNTRY_CODE
-        )
+        shipment.RequestedShipment.Shipper.Address.CountryCode = settings.GCHUB_COUNTRY_CODE
         shipment.RequestedShipment.Shipper.Address.Residential = False
 
         # Recipient contact info.
         if self.address.name:
             shipment.RequestedShipment.Recipient.Contact.PersonName = self.address.name
         if self.address.company:
-            shipment.RequestedShipment.Recipient.Contact.CompanyName = (
-                self.address.company
-            )
+            shipment.RequestedShipment.Recipient.Contact.CompanyName = self.address.company
         shipment.RequestedShipment.Recipient.Contact.PhoneNumber = self.address.phone
 
         # Recipient address
@@ -166,9 +160,7 @@ class Shipment(models.Model):
 
         shipment.RequestedShipment.Recipient.Address.StreetLines = address_lines
         shipment.RequestedShipment.Recipient.Address.City = self.address.city
-        shipment.RequestedShipment.Recipient.Address.StateOrProvinceCode = (
-            self.address.state
-        )
+        shipment.RequestedShipment.Recipient.Address.StateOrProvinceCode = self.address.state
         shipment.RequestedShipment.Recipient.Address.PostalCode = self.address.zip
         country_code = countries.full_to_abbrev(self.address.country)
         shipment.RequestedShipment.Recipient.Address.CountryCode = country_code
@@ -177,13 +169,9 @@ class Shipment(models.Model):
         shipment.RequestedShipment.ShippingChargesPayment.PaymentType = "SENDER"
         shipment.RequestedShipment.LabelSpecification.LabelFormatType = "COMMON2D"
         shipment.RequestedShipment.LabelSpecification.ImageType = "EPL2"
-        shipment.RequestedShipment.LabelSpecification.LabelStockType = (
-            "STOCK_4X6.75_LEADING_DOC_TAB"
-        )
+        shipment.RequestedShipment.LabelSpecification.LabelStockType = "STOCK_4X6.75_LEADING_DOC_TAB"
         #         shipment.RequestedShipment.LabelSpecification.LabelStockType = 'STOCK_4X6'
-        shipment.RequestedShipment.LabelSpecification.LabelPrintingOrientation = (
-            "BOTTOM_EDGE_OF_TEXT_FIRST"
-        )
+        shipment.RequestedShipment.LabelSpecification.LabelPrintingOrientation = "BOTTOM_EDGE_OF_TEXT_FIRST"
 
         package1_weight = shipment.create_wsdl_object_of_type("Weight")
         # Weight, in pounds.
@@ -194,15 +182,9 @@ class Shipment(models.Model):
         package1.Weight = package1_weight
 
         if self.is_international():
-            shipment.RequestedShipment.CustomsClearanceDetail.DocumentContent = (
-                "DOCUMENTS_ONLY"
-            )
-            shipment.RequestedShipment.CustomsClearanceDetail.CustomsValue.Currency = (
-                "USD"
-            )
-            shipment.RequestedShipment.CustomsClearanceDetail.CustomsValue.Amount = (
-                "1.00"
-            )
+            shipment.RequestedShipment.CustomsClearanceDetail.DocumentContent = "DOCUMENTS_ONLY"
+            shipment.RequestedShipment.CustomsClearanceDetail.CustomsValue.Currency = "USD"
+            shipment.RequestedShipment.CustomsClearanceDetail.CustomsValue.Amount = "1.00"
 
             commod = shipment.create_wsdl_object_of_type("Commodity")
             commod.NumberOfPieces = "1"
@@ -234,7 +216,8 @@ class Shipment(models.Model):
 
 
 class AddressValidationModel(models.Model):
-    """This abstract model enables any sub-classes to validate their addresses.
+    """
+    This abstract model enables any sub-classes to validate their addresses.
     Note that the fields must match up with the apps.address.models.Contact
     for this to work.
     """
@@ -243,7 +226,8 @@ class AddressValidationModel(models.Model):
         abstract = True
 
     def validate_address(self):
-        """Sends a FedEx validation request. Returns the response directly. Check
+        """
+        Sends a FedEx validation request. Returns the response directly. Check
         the score or overall status attributes for the result.
         """
         config_obj = create_fedex_config()

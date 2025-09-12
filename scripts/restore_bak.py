@@ -1,4 +1,5 @@
-"""Restore .bak backups created by the convert_tests_to_factories codemod.
+"""
+Restore .bak backups created by the convert_tests_to_factories codemod.
 
 Usage:
     python scripts/restore_bak.py path/to/file.py

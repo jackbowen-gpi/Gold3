@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-"""Create a sample PeriodicTask (django-celery-beat) for `bin.tasks.bin_test` and trigger it once.
+"""
+Create a sample PeriodicTask (django-celery-beat) for `bin.tasks.bin_test` and trigger it once.
 
 Usage (inside project):
   python scripts/create_periodic_task.py
@@ -22,9 +23,7 @@ from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
 def main():
     print("Creating interval schedule (1 minute) if missing...")
-    sched, created = IntervalSchedule.objects.get_or_create(
-        every=1, period=IntervalSchedule.MINUTES
-    )
+    sched, created = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.MINUTES)
     print(f"IntervalSchedule id={sched.id} created={created}")
 
     name = "bin_test_every_min"

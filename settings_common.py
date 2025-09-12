@@ -1,4 +1,5 @@
-"""This file holds common configuration that may be used between more than
+"""
+This file holds common configuration that may be used between more than
 two different sites. This should generally never be modified, override values
 via a local_settings.py file.
 """
@@ -6,7 +7,8 @@ via a local_settings.py file.
 import os
 import sys
 
-# The path to the root directory of the project (has this settings.py file in it) with trailing slash.
+# The path to the root directory of the project (has this settings.py file in it) with
+# trailing slash.
 MAIN_PATH = os.path.abspath(os.path.split(__file__)[0])
 sys.path.insert(0, os.path.join(MAIN_PATH, "includes"))
 sys.path.insert(0, os.path.join(MAIN_PATH, "middleware"))
@@ -94,11 +96,11 @@ BIN_PATH = os.path.join(MAIN_PATH, "bin")
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        "ENGINE": "django.db.backends.postgresql_psycopg2",  # Add 'postgresql_psycopg2'
         "NAME": "thundercuddles",  # Or path to database file if using sqlite3.
         "USER": "thundercuddles",  # Not used with sqlite3.
         "PASSWORD": "332088",  # Not used with sqlite3.
-        "HOST": "172.23.8.73",  # Set to empty string for localhost. Not used with sqlite3.
+        "HOST": "172.23.8.73",  # Set to empty string for localhost. Not used w/sqlite3.
         "PORT": "5432",  # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -124,10 +126,13 @@ DATABASES_RAW_PROD = {
 DATABASES_RAW_DEV = {
     "ENGINE": os.environ.get("DEV_DB_ENGINE", "django.db.backends.postgresql"),
     "NAME": os.environ.get("DEV_DB_NAME", "gchub_dev"),
-    "USER": os.environ.get("DEV_DB_USER", "gchub"),
-    "PASSWORD": os.environ.get("DEV_DB_PASSWORD", "gchub"),
+    # Allow overriding the dev DB user/password/port via environment variables.
+    # Default to the 'gchub' role and the PostgreSQL default port so compose
+    # services and the local Postgres image work without further edits.
+    "USER": os.environ.get("DEV_DB_USER", os.environ.get("POSTGRES_USER", "gchub")),
+    "PASSWORD": os.environ.get("DEV_DB_PASSWORD", os.environ.get("POSTGRES_PASSWORD", "gchub")),
     "HOST": os.environ.get("DEV_DB_HOST", "127.0.0.1"),
-    "PORT": os.environ.get("DEV_DB_PORT", "5433"),
+    "PORT": os.environ.get("DEV_DB_PORT", os.environ.get("POSTGRES_PORT", "5432")),
 }
 
 # Apply the selected profile. Keep the final DATABASES dict shape the same.
@@ -156,7 +161,8 @@ if not _allow_sqlite:
     if _default_engine and "sqlite3" in _default_engine:
         raise RuntimeError(
             "Project-level DATABASES is configured to use sqlite3. "
-            "This is not allowed by default. To bypass, set ALLOW_PROJECT_SQLITE=1 in the environment."
+            "This is not allowed by default. To bypass, set "
+            "ALLOW_PROJECT_SQLITE=1 in the environment."
         )
 
 # The host/port of the FS daemon. Should run on master.
@@ -455,7 +461,8 @@ TEMPLATES = [
             # Register legacy template tags as builtins so old templates work
             "builtins": ["gchub_db.templatetags.legacy_tags"],
             "loaders": [
-                # List of callables that know how to import templates from various sources.
+                # List of callables that know how to import templates from various
+                # sources.
                 "django.template.loaders.filesystem.Loader",
                 "django.template.loaders.app_directories.Loader",
             ],

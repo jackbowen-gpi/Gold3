@@ -30,16 +30,12 @@ class PlateOrderSearchForm(forms.Form):
 
     job = forms.IntegerField(min_value=1, max_value=99999, required=False)
     size = forms.CharField(required=False)
-    plant = forms.ModelChoiceField(
-        queryset=Plant.objects.all().order_by("name"), required=False
-    )
+    plant = forms.ModelChoiceField(queryset=Plant.objects.all().order_by("name"), required=False)
 
     def __init__(self, request, *args, **kwargs):
         super(PlateOrderSearchForm, self).__init__(*args, **kwargs)
         self.fields["plant"] = forms.ModelChoiceField(
-            queryset=Plant.objects.filter(workflow__name__in=("Beverage",)).order_by(
-                "name"
-            ),
+            queryset=Plant.objects.filter(workflow__name__in=("Beverage",)).order_by("name"),
             required=False,
         )
 
@@ -53,9 +49,7 @@ class PlateOrderSubmitForm(ModelForm):
     quantity4 = forms.IntegerField(max_value=99, min_value=0, required=False)
     quantity5 = forms.IntegerField(max_value=99, min_value=0, required=False)
     quantity6 = forms.IntegerField(max_value=99, min_value=0, required=False)
-    instructions = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "4"}), required=False
-    )
+    instructions = forms.CharField(widget=forms.Textarea(attrs={"rows": "4"}), required=False)
     date_needed = forms.DateField(
         widget=GCH_SelectDateWidget,
         initial=general_funcs._utcnow_naive().date() + timedelta(days=3),
@@ -75,9 +69,7 @@ def plate_reorder_search(request):
         "display": "search",
     }
 
-    search_page = render(
-        request, "workflow/platemaking/plate_order_search.html", context=pagevars
-    )
+    search_page = render(request, "workflow/platemaking/plate_order_search.html", context=pagevars)
 
     if request.GET:
         form = PlateOrderSearchForm(request, request.GET)
@@ -87,9 +79,7 @@ def plate_reorder_search(request):
         else:
             # Errors in form data, return the form with messages.
             for error in form.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
             # return search_page
     else:
         # No POST data, return an empty form.
@@ -175,9 +165,7 @@ def plate_reorder_form(request, order_id):
         "form": PlateOrderSubmitForm(),
     }
 
-    return render(
-        request, "workflow/platemaking/plate_order_form.html", context=pagevars
-    )
+    return render(request, "workflow/platemaking/plate_order_form.html", context=pagevars)
 
 
 def plate_reorder_submit(request, item_id):
@@ -196,10 +184,7 @@ def plate_reorder_submit(request, item_id):
             form_num = i + 1
             new_plate = PlateOrderItem()
             new_plate.color = item_colors[i]
-            if (
-                "quantity%s" % form_num in request.POST
-                and request.POST["quantity%s" % form_num] != ""
-            ):
+            if "quantity%s" % form_num in request.POST and request.POST["quantity%s" % form_num] != "":
                 new_plate.quantity_needed = int(request.POST["quantity%s" % form_num])
             else:
                 new_plate.quantity_needed = 0
@@ -224,36 +209,24 @@ def plate_reorder_submit(request, item_id):
             new_order.save()
 
             # Prepare an email notification.
-            mail_subject = (
-                "GOLD Plate Reorder Confirmation: %s" % item.bev_nomenclature()
-            )
+            mail_subject = "GOLD Plate Reorder Confirmation: %s" % item.bev_nomenclature()
             mail_body = loader.get_template("emails/on_plate_reorder_submit.txt")
             econtext = {"item": item, "new_order": new_order}
             mail_send_to = [request.user.email]
             # If the plant is Kalamazoo some other folks need to be copied.
             if item.printlocation.plant.name == "Kalamazoo":
-                group_members = User.objects.filter(
-                    groups__name="EmailEverpackPlatemaking", is_active=True
-                )
+                group_members = User.objects.filter(groups__name="EmailEverpackPlatemaking", is_active=True)
                 for user in group_members:
                     mail_send_to.append(user.email)
-            general_funcs.send_info_mail(
-                mail_subject, mail_body.render(econtext), mail_send_to
-            )
+            general_funcs.send_info_mail(mail_subject, mail_body.render(econtext), mail_send_to)
 
             return HttpResponse(JSMessage("Saved."))
         else:
-            return HttpResponse(
-                JSMessage(
-                    "At least one item quantity has to be greater than 0", is_error=True
-                )
-            )
+            return HttpResponse(JSMessage("At least one item quantity has to be greater than 0", is_error=True))
     else:
         # Form is invalid, show an error.
         for error in form.errors:
-            return HttpResponse(
-                JSMessage("Invalid value specified: " + error, is_error=True)
-            )
+            return HttpResponse(JSMessage("Invalid value specified: " + error, is_error=True))
 
 
 class Platemaking(ListView):
@@ -265,9 +238,7 @@ class Platemaking(ListView):
     # Searching and filtering.
     def get_queryset(self):
         platemaker = self.kwargs["platemaker"]
-        qset = PlateOrder.objects.filter(stage2_complete_date__isnull=True).order_by(
-            "-id"
-        )
+        qset = PlateOrder.objects.filter(stage2_complete_date__isnull=True).order_by("-id")
         # Unless user can see "All", filter by platemaker.
         if platemaker.lower() != "all":
             platemaker_obj = Platemaker.objects.get(name=platemaker)
@@ -306,14 +277,10 @@ class PlatemakingCompleted(ListView):
     # Searching and filtering.
     def get_queryset(self):
         platemaker = self.kwargs["platemaker"]
-        qset = PlateOrder.objects.filter(stage2_complete_date__isnull=False).order_by(
-            "-date_entered", "-id"
-        )
+        qset = PlateOrder.objects.filter(stage2_complete_date__isnull=False).order_by("-date_entered", "-id")
         # Unless user can see "All", filter by platemaker.
         if platemaker.lower() != "all":
-            qset = qset.filter(
-                item__platepackage__platemaker__name=platemaker
-            ).order_by("-stage2_complete_date", "-id")
+            qset = qset.filter(item__platepackage__platemaker__name=platemaker).order_by("-stage2_complete_date", "-id")
         return qset
 
     # Set context data.
@@ -332,7 +299,8 @@ class PlatemakingCompleted(ListView):
 
 
 def platemaking_canceled(request, order_id):
-    """Used to cancel plate orders. Gathers up all the plate order items and
+    """
+    Used to cancel plate orders. Gathers up all the plate order items and
     deletes them first. That may be an unnecessary step. I dunno.
     """
     order = PlateOrder.objects.get(id=order_id)

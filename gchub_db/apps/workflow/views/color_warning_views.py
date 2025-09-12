@@ -33,18 +33,12 @@ def add_warning(request):
         if warningForm.is_valid():
             try:
                 # Check and see if a colorwarning with this definition exists already
-                ColorWarning.objects.get(
-                    definition=warningForm.cleaned_data["definition"]
-                )
-                errors.append(
-                    "Pantone Color - A warning for this color definition already exists"
-                )
+                ColorWarning.objects.get(definition=warningForm.cleaned_data["definition"])
+                errors.append("Pantone Color - A warning for this color definition already exists")
             except Exception:
                 # If there is no color warning then create it
                 warningForm.save()
-                httpresp = HttpResponseRedirect(
-                    "/workflow/color_warning/color_warning/"
-                )
+                httpresp = HttpResponseRedirect("/workflow/color_warning/color_warning/")
                 return httpresp
         else:
             for error in warningForm.errors:
@@ -52,9 +46,7 @@ def add_warning(request):
 
     pagevars = {"page_title": "Color Warnings", "form": warningForm, "errors": errors}
 
-    return render(
-        request, "workflow/color_warning/add_color_warning.html", context=pagevars
-    )
+    return render(request, "workflow/color_warning/add_color_warning.html", context=pagevars)
 
 
 def edit_warning(request, warning_id):
@@ -67,9 +59,7 @@ def edit_warning(request, warning_id):
             # check to see what warning/definition we are editing
             oldWarning = ColorWarning.objects.filter(id=warning_id)
             # check to see what new warning we want to change to
-            newWarning = ColorWarning.objects.filter(
-                definition=warningForm.cleaned_data["definition"]
-            )
+            newWarning = ColorWarning.objects.filter(definition=warningForm.cleaned_data["definition"])
             """
             There are three cases here
             Can edit: If the new and old warnings are the same or if the new warning does not exist
@@ -86,21 +76,15 @@ def edit_warning(request, warning_id):
                         warningForm.save()
                     else:
                         warningForm.save()
-                    httpresp = HttpResponseRedirect(
-                        "/workflow/color_warning/color_warning/"
-                    )
+                    httpresp = HttpResponseRedirect("/workflow/color_warning/color_warning/")
                     return httpresp
                 else:
                     # if it is the same as an exisiting warning, throw an error - no duplicates allowed
-                    errors.append(
-                        "Pantone Color - A warning for this color definition already exists"
-                    )
+                    errors.append("Pantone Color - A warning for this color definition already exists")
             else:
                 # Color warning was not found and we are creating a new one
                 warningForm.save()
-                httpresp = HttpResponseRedirect(
-                    "/workflow/color_warning/color_warning/"
-                )
+                httpresp = HttpResponseRedirect("/workflow/color_warning/color_warning/")
                 return httpresp
         else:
             for error in warningForm.errors:
@@ -117,9 +101,7 @@ def edit_warning(request, warning_id):
     }
 
     # context_instance = RequestContext(request, {"body_wrap_color": "transparent"})
-    return render(
-        request, "workflow/color_warning/edit_color_warning.html", context=page_vars
-    )
+    return render(request, "workflow/color_warning/edit_color_warning.html", context=page_vars)
 
 
 def view_warning(request, warning_id):
@@ -130,9 +112,7 @@ def view_warning(request, warning_id):
         "warning": warning,
     }
 
-    return render(
-        request, "workflow/color_warning/view_color_warning.html", context=page_vars
-    )
+    return render(request, "workflow/color_warning/view_color_warning.html", context=page_vars)
 
 
 def color_warning(request):
@@ -148,6 +128,4 @@ def color_warning(request):
         "errors": errors,
     }
 
-    return render(
-        request, "workflow/color_warning/color_warning.html", context=pagevars
-    )
+    return render(request, "workflow/color_warning/color_warning.html", context=pagevars)

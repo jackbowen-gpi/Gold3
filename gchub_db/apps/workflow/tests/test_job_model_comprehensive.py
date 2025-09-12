@@ -36,9 +36,7 @@ class JobModelComprehensiveTests(TestCase):
 
     def test_job_creation_basic(self):
         """Test basic job creation and string representation."""
-        job = Job.objects.create(
-            name="Test Job", workflow=self.site, brand_name="Test Brand"
-        )
+        job = Job.objects.create(name="Test Job", workflow=self.site, brand_name="Test Brand")
 
         self.assertEqual(job.name, "Test Job")
         self.assertEqual(job.workflow, self.site)
@@ -71,9 +69,7 @@ class JobModelComprehensiveTests(TestCase):
 
     def test_keyword_generation(self):
         """Test automatic keyword generation on save."""
-        job = Job.objects.create(
-            name="Special Brand Job", workflow=self.site, brand_name="TestBrand"
-        )
+        job = Job.objects.create(name="Special Brand Job", workflow=self.site, brand_name="TestBrand")
 
         # Clear generated keywords and save to trigger regeneration
         job.generated_keywords = ""
@@ -195,9 +191,7 @@ class JobModelComprehensiveTests(TestCase):
         job = Job.objects.create(name="ModifiedJob", workflow=self.site)
 
         # Mock threadlocals to return our test user
-        with patch(
-            "gchub_db.middleware.threadlocals.get_current_user", return_value=self.user
-        ):
+        with patch("gchub_db.middleware.threadlocals.get_current_user", return_value=self.user):
             job.name = "Modified Name"
             job.save()
 
@@ -254,12 +248,8 @@ class JobModelComprehensiveTests(TestCase):
     def test_job_manager_methods(self):
         """Test custom manager methods if they exist."""
         # Create some test jobs
-        active_job = Job.objects.create(
-            name="ActiveJob", workflow=self.site, is_deleted=False
-        )
-        deleted_job = Job.objects.create(
-            name="DeletedJob", workflow=self.site, is_deleted=True
-        )
+        active_job = Job.objects.create(name="ActiveJob", workflow=self.site, is_deleted=False)
+        deleted_job = Job.objects.create(name="DeletedJob", workflow=self.site, is_deleted=True)
 
         # Test that we can query for non-deleted jobs
         active_jobs = Job.objects.filter(is_deleted=False)
@@ -304,9 +294,7 @@ class JobModelComprehensiveTests(TestCase):
 
     def test_job_repr_and_str(self):
         """Test string representations of job objects."""
-        job = Job.objects.create(
-            name="ReprJob", workflow=self.site, brand_name="ReprBrand"
-        )
+        job = Job.objects.create(name="ReprJob", workflow=self.site, brand_name="ReprBrand")
 
         str_repr = str(job)
         self.assertIsInstance(str_repr, str)
@@ -415,9 +403,7 @@ class JobModelPerformanceTests(TestCase):
 
         # Test select_related for workflow
         with self.assertNumQueries(1):
-            jobs = list(
-                Job.objects.select_related("workflow").filter(workflow=self.site)
-            )
+            jobs = list(Job.objects.select_related("workflow").filter(workflow=self.site))
             # Access workflow without additional queries
             for job in jobs:
                 _ = job.workflow.name
@@ -438,7 +424,5 @@ class JobModelPerformanceTests(TestCase):
         self.assertEqual(active_jobs.count(), 5)
 
         # Test complex filters
-        complex_filter = Job.objects.filter(
-            workflow=self.site, is_deleted=False, name__icontains="Filter"
-        )
+        complex_filter = Job.objects.filter(workflow=self.site, is_deleted=False, name__icontains="Filter")
         self.assertEqual(complex_filter.count(), 10)

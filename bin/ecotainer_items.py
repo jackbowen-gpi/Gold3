@@ -15,9 +15,7 @@ workBookDocument = openpyxl.Workbook()
 
 # Grab all ecotainer items.
 item_set = (
-    Item.objects.filter(
-        job__workflow__name="Foodservice", size__size__icontains="e-", is_deleted=False
-    )
+    Item.objects.filter(job__workflow__name="Foodservice", size__size__icontains="e-", is_deleted=False)
     .exclude(size__size__istartswith="b")
     .exclude(size__size__iendswith="kd")
 )

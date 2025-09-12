@@ -1,4 +1,5 @@
-"""Main Workflow App: Contains jobs, items, item revisions, item ink usage,
+"""
+Main Workflow App: Contains jobs, items, item revisions, item ink usage,
 item QCs, and item specification information.
 """
 
@@ -56,7 +57,10 @@ class Plant(models.Model):
     workflow: Site = models.ForeignKey(Site, on_delete=models.CASCADE)
     code: str = models.CharField(max_length=50, blank=True)
     bev_controller = models.ManyToManyField(
-        User, related_name="beverage_controllers", blank=True
+        User,
+        related_name="beverage_controllers",
+        blank=True,
+        through="PlantBevController",
     )
     # Does this plant show up in the automated corrugated system?
     is_in_acs: bool = models.BooleanField(default=False)
@@ -66,6 +70,18 @@ class Plant(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class PlantBevController(models.Model):
+    """Through model for Plant.bev_controller ManyToMany relationship."""
+
+    plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        app_label = "workflow"
+        db_table = "workflow_plant_bev_controller"
+        unique_together = ("plant", "user")
 
 
 class Press(models.Model):
@@ -85,7 +101,8 @@ class Press(models.Model):
 
 
 class PrintLocation(models.Model):
-    """Intermediary model: Plant - Press combinations.
+    """
+    Intermediary model: Plant - Press combinations.
     This model lists all actual combinations of Plant and Press, with
     plants tied to Sites.
     """
@@ -116,12 +133,8 @@ class Platemaker(models.Model):
     """Represents a Plate Maker."""
 
     name: str = models.CharField(max_length=255, unique=True)
-    workflow = models.ManyToManyField(
-        Site, related_name="platemaking_sites", blank=True
-    )
-    contacts = models.ManyToManyField(
-        User, related_name="platemaking_contacts", blank=True
-    )
+    workflow = models.ManyToManyField(Site, related_name="platemaking_sites", blank=True)
+    contacts = models.ManyToManyField(User, related_name="platemaking_contacts", blank=True)
 
     class Meta:
         app_label = "workflow"
@@ -131,7 +144,8 @@ class Platemaker(models.Model):
 
 
 class SpecialMfgConfiguration(models.Model):
-    """Represents a special manufacturing instruction. Typically effects S&R.
+    """
+    Represents a special manufacturing instruction. Typically effects S&R.
     Examples would be Big Cylinder, Small Cylinder, Blank Fed, Roll Fed
     Forms Somewhere Else, etc...
     """
@@ -147,14 +161,13 @@ class SpecialMfgConfiguration(models.Model):
 
 
 class PlatePackage(models.Model):
-    """Intermediary model: Platemaker - Platetype - Workflow combinations.
+    """
+    Intermediary model: Platemaker - Platetype - Workflow combinations.
     For example Acme Plates makes Digital Flexo plates for Foodservice.
     """
 
     platetype: str = models.CharField(max_length=50, choices=PLATE_OPTIONS)
-    workflow = models.ManyToManyField(
-        Site, related_name="platepackage_sites", blank=True
-    )
+    workflow = models.ManyToManyField(Site, related_name="platepackage_sites", blank=True)
     platemaker: Platemaker = models.ForeignKey(Platemaker, on_delete=models.CASCADE)
     active: bool = models.BooleanField(default=True)
 
@@ -177,18 +190,12 @@ class ItemCatalog(models.Model):
         blank=True,
         verbose_name="Prod. Category",
     )
-    product_substrate = models.IntegerField(
-        "Substrate", blank=True, null=True, choices=PROD_SUBSTRATES
-    )
-    product_board = models.IntegerField(
-        "Board", blank=True, null=True, choices=PROD_BOARDS
-    )
+    product_substrate = models.IntegerField("Substrate", blank=True, null=True, choices=PROD_SUBSTRATES)
+    product_board = models.IntegerField("Board", blank=True, null=True, choices=PROD_BOARDS)
     # mfg_name: Foodservice 8 char. unique code from MFGPRO system.
     # ie SMR-16 =  SMR-0160
     # This will be used to translate incoming art request information.
-    mfg_name = models.CharField(
-        "MFG Name", max_length=20, blank=True, null=True, unique=True
-    )
+    mfg_name = models.CharField("MFG Name", max_length=20, blank=True, null=True, unique=True)
     template = models.CharField(max_length=100, blank=True)
     photo: str = models.CharField(max_length=100, blank=True)
     active: bool = models.BooleanField(default=True)
@@ -215,33 +222,29 @@ class ItemCatalog(models.Model):
         return self.size
 
     def is_metric(self) -> bool:
-        """Returns True if the item is a metric size."""
+        """
+        Returns True if the item is a metric size.
+
+        Metric sizes are defined as: '250ml', '500ml', 'liter', '2liter', or '1liter'
+        (case-insensitive, spaces ignored).
+        """
         return self.size.lower().replace(" ", "") in [
             "250ml",
             "500ml",
             "liter",
-            "2liter",
-            "1liter",
+            """Return True if item is a Beverage carton.""" "1liter",
         ]
 
     def is_bev_panel(self) -> bool:
         """Return True if item is a Beverage side panel."""
-        if (
-            self.workflow.name == "Beverage"
-            and ProductSubCategory.objects.get(sub_category="Panel")
-            in self.productsubcategory.all()
-        ):
+        if self.workflow.name == "Beverage" and ProductSubCategory.objects.get(sub_category="Panel") in self.productsubcategory.all():
             return True
         else:
             return False
 
     def is_bev_carton(self) -> bool:
         """Return True if item is a Beverage side panel."""
-        if (
-            self.workflow.name == "Beverage"
-            and ProductSubCategory.objects.get(sub_category="Carton")
-            in self.productsubcategory.all()
-        ):
+        if self.workflow.name == "Beverage" and ProductSubCategory.objects.get(sub_category="Carton") in self.productsubcategory.all():
             return True
         else:
             return False
@@ -259,7 +262,8 @@ class ItemCatalog(models.Model):
         return self.size.replace(" ", "").lower()
 
     def get_coating_type(self, return_abbrev: bool = False) -> str:
-        """Returns a string representation of this item type's coating.
+        """
+        Returns a string representation of this item type's coating.
 
         Can be one of the following, abbreviations are in parenthesis:
         * Uncoated (or U)
@@ -286,13 +290,12 @@ class ItemCatalog(models.Model):
 
     def active_specs(self) -> QuerySet["ItemSpec"]:
         """Return active specs associated with catalog."""
-        return ItemSpec.objects.filter(size=self.id, active=True).order_by(
-            "printlocation__plant__name", "printlocation__press__name"
-        )
+        return ItemSpec.objects.filter(size=self.id, active=True).order_by("printlocation__plant__name", "printlocation__press__name")
 
 
 class BevItemColorCodes(models.Model):
-    """Codes for Beverage nomenclature. Use item and number of colors to determine
+    """
+    Codes for Beverage nomenclature. Use item and number of colors to determine
     code. (ie. Size: Quart + Colors: 3 = Code: 61) And no, there's no
     logic to it...
     """
@@ -309,7 +312,8 @@ class BevItemColorCodes(models.Model):
 
 
 class ItemCatalogPhoto(models.Model):
-    """Photos and models of stock designs.
+    """
+    Photos and models of stock designs.
     Not currently in use -- will be a Phase 2 feature.
     """
 
@@ -346,9 +350,7 @@ class ItemSpec(models.Model):
     case_dim_w = models.CharField("Case width", max_length=25, blank=True)
     case_dim_h = models.CharField("Case height", max_length=25, blank=True)
     case_dim_d = models.CharField("Case depth", max_length=25, blank=True)
-    total_print_area = models.DecimalField(
-        "Total Print Area", max_digits=7, decimal_places=2, blank=True, null=True
-    )
+    total_print_area = models.DecimalField("Total Print Area", max_digits=7, decimal_places=2, blank=True, null=True)
     case_wt = models.CharField("Case weight", max_length=100, blank=True)
     case_pack = models.IntegerField(blank=True, null=True)
     # Minimum case order quantities.
@@ -374,9 +376,7 @@ class StepSpec(models.Model):
     """Defines specifications for step and repeat tickets."""
 
     itemspec = models.ForeignKey("ItemSpec", on_delete=models.CASCADE)
-    special_mfg = models.ForeignKey(
-        "SpecialMfgConfiguration", on_delete=models.CASCADE, blank=True, null=True
-    )
+    special_mfg = models.ForeignKey("SpecialMfgConfiguration", on_delete=models.CASCADE, blank=True, null=True)
     eng_num = models.CharField("Engineering drawing number", max_length=20, blank=True)
     num_colors = models.IntegerField("Number of colors", blank=True, null=True)
     status_types = (
@@ -442,7 +442,8 @@ class Substrate(models.Model):
 
 
 class CartonWorkflow(models.Model):
-    """Represents a carton workflow. Not to be confused with our usual workflows
+    """
+    Represents a carton workflow. Not to be confused with our usual workflows
     like Foodservice and Beverage.
     """
 
@@ -523,18 +524,12 @@ class CartonProfile(models.Model):
 
     name: str = models.CharField(max_length=100)
     active: bool = models.BooleanField(default=True)
-    carton_workflow = models.ManyToManyField(
-        CartonWorkflow, related_name="carton_workflows"
-    )
+    carton_workflow = models.ManyToManyField(CartonWorkflow, related_name="carton_workflows")
     line_screen = models.ManyToManyField(LineScreen, related_name="line_screens")
     ink_set = models.ManyToManyField(InkSet, related_name="ink_sets")
     substrate = models.ManyToManyField(Substrate, related_name="substrates")
-    print_location = models.ManyToManyField(
-        PrintLocation, related_name="print_locations"
-    )
-    print_condition = models.ManyToManyField(
-        PrintCondition, related_name="print_conditions"
-    )
+    print_location = models.ManyToManyField(PrintLocation, related_name="print_locations")
+    print_condition = models.ManyToManyField(PrintCondition, related_name="print_conditions")
 
     class Meta:
         app_label = "workflow"
@@ -546,7 +541,8 @@ class CartonProfile(models.Model):
 
 
 class TiffCrop(models.Model):
-    """Stores crop dimension for the beverage tiff to PDF workflow. Storing the
+    """
+    Stores crop dimension for the beverage tiff to PDF workflow. Storing the
     dimensions here makes them easier to maintain and easier for Esko software
     to read them.
     """
@@ -554,9 +550,7 @@ class TiffCrop(models.Model):
     size: "ItemCatalog" = models.ForeignKey("ItemCatalog", on_delete=models.CASCADE)
     plant: Plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
     num_up: int = models.IntegerField()
-    special_mfg = models.ForeignKey(
-        "SpecialMfgConfiguration", on_delete=models.CASCADE, blank=True, null=True
-    )
+    special_mfg = models.ForeignKey("SpecialMfgConfiguration", on_delete=models.CASCADE, blank=True, null=True)
     x_size: float = models.FloatField()
     y_size: float = models.FloatField()
     x_offset: float = models.FloatField()
@@ -577,7 +571,8 @@ class TiffCrop(models.Model):
 
 
 class TrackedArt(models.Model):
-    """Tracks certain art elements that we need to keep track of for reporting
+    """
+    Tracks certain art elements that we need to keep track of for reporting
     and regulatory purposes. Things like Ecotainer logos and erviromental
     verbage.
     """
@@ -596,14 +591,10 @@ class TrackedArt(models.Model):
     art_catagory: str = models.CharField(max_length=30, choices=art_types)
     addition_comments: str = models.CharField(max_length=500, blank=True)
     addition_date: date = models.DateField("Date Added", blank=True, null=True)
-    edited_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=True, null=True, related_name="edited_by"
-    )
+    edited_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name="edited_by")
     removal_comments: str = models.CharField(max_length=500, blank=True)
     removal_date: date = models.DateField("Date Removed", blank=True, null=True)
-    removed_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=True, null=True, related_name="removed_by"
-    )
+    removed_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name="removed_by")
 
     class Meta:
         app_label = "workflow"
@@ -621,7 +612,8 @@ class TrackedArt(models.Model):
 
 
 class ItemTracker(models.Model):
-    """These objects are assigned to items to track things like SFI logos and
+    """
+    These objects are assigned to items to track things like SFI logos and
     QR codes (we'll call these tracker types or just types). Each tracker type
     can also be assigned to a tracker category like marketing or promotional.
     This set-up will make it very easy to run a report for marketing that lists
@@ -630,12 +622,8 @@ class ItemTracker(models.Model):
     categories as needed.
     """
 
-    item = models.ForeignKey(
-        "Item", on_delete=models.CASCADE
-    )  # Which item is being tracked.
-    type = models.ForeignKey(
-        "ItemTrackerType", on_delete=models.CASCADE
-    )  # What in the item is being tracked.
+    item = models.ForeignKey("Item", on_delete=models.CASCADE)  # Which item is being tracked.
+    type = models.ForeignKey("ItemTrackerType", on_delete=models.CASCADE)  # What in the item is being tracked.
     addition_comments: str = models.CharField(max_length=500, blank=True, null=True)
     addition_date: date = models.DateField("Date Added", blank=True, null=True)
     edited_by = models.ForeignKey(
@@ -665,7 +653,8 @@ class ItemTracker(models.Model):
 
 
 class ItemTrackerType(models.Model):
-    """The various types of things we track on items. SFI logos, QR Codes, or
+    """
+    The various types of things we track on items. SFI logos, QR Codes, or
     whatever else we can think of the we might want to keep tabs on for
     reporting purposes.
     """
@@ -684,7 +673,8 @@ class ItemTrackerType(models.Model):
 
 
 class ItemTrackerCategory(models.Model):
-    """These are the categories that item trackers fall into. For example, we track
+    """
+    These are the categories that item trackers fall into. For example, we track
     SFI logos for marketing so SFI trackers would use the marketing category.
     These categories are mainly used to limit who should see them and what
     reports the various trackers should show up in.
@@ -716,7 +706,8 @@ class ChargeCategory(models.Model):
 
 
 class ChargeType(models.Model):
-    """Defines billing charge types (ie, proof, pdf, revision, etc...),
+    """
+    Defines billing charge types (ie, proof, pdf, revision, etc...),
     determines actual cost
     """
 
@@ -746,7 +737,8 @@ class ChargeType(models.Model):
         return str(self.category) + " - " + str(self.type)
 
     def actual_charge(self, num_colors=1, quality="B", rush_days="", item=None):
-        """Return the actual charge amount, based on number of colors,
+        """
+        Return the actual charge amount, based on number of colors,
         quality and rush days.
         """
         amount = self.base_amount
@@ -883,16 +875,13 @@ class ChargeType(models.Model):
                 amount = amount * 2
 
             # Raleigh BHS work has separate pricing.
-            if (
-                item.job.temp_printlocation.plant.name == "Raleigh"
-                and item.job.temp_printlocation.press.name == "BHS"
-            ):
+            if item.job.temp_printlocation.plant.name == "Raleigh" and item.job.temp_printlocation.press.name == "BHS":
                 if simple_size == "Half Gallon":
                     amount = 254.33
                 if simple_size == "Quart":
                     amount = 197.82
                 if simple_size == "Pint":
-                    amount == 197.82
+                    amount = 197.82
                 if simple_size == "Half Pint":
                     amount = 197.82
 
@@ -955,9 +944,7 @@ class Charge(models.Model):
     invoice_number = models.CharField(max_length=25, blank=True)
     bill_to = models.CharField(max_length=255, blank=True)
     rush_days = models.IntegerField(blank=True, null=True)
-    bev_invoice = models.ForeignKey(
-        "bev_billing.BevInvoice", on_delete=models.CASCADE, blank=True, null=True
-    )
+    bev_invoice = models.ForeignKey("bev_billing.BevInvoice", on_delete=models.CASCADE, blank=True, null=True)
     artist = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
@@ -970,7 +957,8 @@ class Charge(models.Model):
         return self.__str__()
 
     def is_billable(self, year, month):
-        """Determines wether or not the charge is billable for the given year
+        """
+        Determines wether or not the charge is billable for the given year
         and month. This will be used for budget reporting and for invoicing.
         Assume that the workflow is filtered in the code calling this method.
         (ie, Beverage invoicing)
@@ -979,12 +967,7 @@ class Charge(models.Model):
         # - It has already been invoiced (invoice date)
         # - It's item is marked as deleted.
         # - The item was worked on by another supplied.
-        if (
-            self.invoice_date
-            or not self.item.is_deleted
-            or self.item.job.prepress_supplier
-            in ("PHT", "Phototype", "SGS", "Southern Graphics")
-        ):
+        if self.invoice_date or self.item.is_deleted or self.item.job.prepress_supplier in ("PHT", "Phototype", "SGS", "Southern Graphics"):
             return False
 
         # Now establish billing cycle for each workflow.
@@ -1013,10 +996,11 @@ class Charge(models.Model):
             start_date = date(year, month, 1)
             end_date = date(next_year, next_month, 1)
 
-        if (
-            self.item.final_file_date() > start_date
-            and self.item.final_file_date() < end_date
-        ):
+        final_file_date = self.item.final_file_date()
+        if final_file_date is None:
+            return False
+
+        if final_file_date > start_date and final_file_date < end_date:
             return True
         else:
             return False
@@ -1041,13 +1025,9 @@ class PlateOrder(models.Model):
     date_needed = models.DateField("Date Needed", blank=True, null=True)
     instructions = models.CharField(max_length=250, blank=True)
     # Stage 1 would be for film-based workflows.
-    stage1_complete_date = models.DateField(
-        "Stage1 Complete Date", blank=True, null=True
-    )
+    stage1_complete_date = models.DateField("Stage1 Complete Date", blank=True, null=True)
     # Stage 2 is for the actual plate being made.
-    stage2_complete_date = models.DateField(
-        "Stage2 Complete Date", blank=True, null=True
-    )
+    stage2_complete_date = models.DateField("Stage2 Complete Date", blank=True, null=True)
     completed_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -1082,7 +1062,8 @@ class PlateOrder(models.Model):
 
 
 class PlateOrderItem(models.Model):
-    """Individual plates needed on a plate order. This will refer to a physical
+    """
+    Individual plates needed on a plate order. This will refer to a physical
     printing plate.
     """
 
@@ -1112,7 +1093,8 @@ class SalesServiceRep(models.Model):
 
 
 class BeverageCenterCode(models.Model):
-    """Beverage center codes for item nomenclature. Customer/Dairy/Filling
+    """
+    Beverage center codes for item nomenclature. Customer/Dairy/Filling
     station ID. Nomenclature in the item model would
     use this for old nomenclature, or BeverageBrandCode for new.
     """
@@ -1128,7 +1110,8 @@ class BeverageCenterCode(models.Model):
 
 
 class BeverageBrandCode(models.Model):
-    """This replaces the center code for Evergreen items. Acts exactly the same
+    """
+    This replaces the center code for Evergreen items. Acts exactly the same
     way, they're just starting all over. Nomenclature in the item model would
     use this for new nomenclature, or BeverageCenterCode for old.
     """
@@ -1140,19 +1123,16 @@ class BeverageBrandCode(models.Model):
         app_label = "workflow"
 
     def __str__(self):
-        return (
-            self.code + " (" + self.highest_end_code() + ") - " + self.name[:18] + "..."
-        )
+        return self.code + " (" + self.highest_end_code() + ") - " + self.name[:18] + "..."
 
     def highest_end_code(self):
-        """Returns the highest end code assigned to an item with the given
+        """
+        Returns the highest end code assigned to an item with the given
         brand code. Used for analysts to figure out which codes are already in use.
         For example: for items X-A212-001, X-A212-002, X-A212-003: return 003.
         """
         # Filter out any end codes containing non-digit characters.
-        items_with_brand_code = self.item_set.filter(
-            bev_end_code__regex=r"^\d*$"
-        ).order_by("-bev_end_code")
+        items_with_brand_code = self.item_set.filter(bev_end_code__regex=r"^\d*$").order_by("-bev_end_code")
         # items_with_brand_code = self.item_set.all().order_by('-bev_end_code')
         if items_with_brand_code:
             return items_with_brand_code[0].bev_end_code
@@ -1161,7 +1141,8 @@ class BeverageBrandCode(models.Model):
 
 
 class BeverageLiquidContents(models.Model):
-    """Actual liquid contents of a carton (ie. Low Fat Milk, Heavy Cream, Orange
+    """
+    Actual liquid contents of a carton (ie. Low Fat Milk, Heavy Cream, Orange
     Juice...) This code goes on the end of the item nomenclature.
     """
 
@@ -1192,7 +1173,8 @@ class Customer(models.Model):
 
 
 class JobComplexity(models.Model):
-    """A job complexity report that tells us what sort of job we're starting with
+    """
+    A job complexity report that tells us what sort of job we're starting with
     and how much work it will be. We're making this a stand-alone model because
     we've been told it could change a lot going forward so we want it
     semi-decoupled from the existing job model.
@@ -1200,13 +1182,9 @@ class JobComplexity(models.Model):
 
     job = models.ForeignKey("Job", on_delete=models.CASCADE)
     # What sort of job we're starting with.
-    category = models.CharField(
-        max_length=100, choices=COMPLEXITY_CATEGORIES, blank=True
-    )
+    category = models.CharField(max_length=100, choices=COMPLEXITY_CATEGORIES, blank=True)
     # How much work we think it will be.
-    complexity = models.CharField(
-        max_length=100, choices=COMPLEXITY_OPTIONS, blank=True
-    )
+    complexity = models.CharField(max_length=100, choices=COMPLEXITY_OPTIONS, blank=True)
 
     class Meta:
         app_label = "workflow"
@@ -1217,7 +1195,8 @@ class JobComplexity(models.Model):
 
 
 class JobAddress(AddressValidationModel):
-    """Addresses tied specifically to a Job. If proofs are to be sent out via
+    """
+    Addresses tied specifically to a Job. If proofs are to be sent out via
     Fedex, these are the addresses to be used.
     This was intentionally separate from the Address App, so that addresses can
     be changed and not affect multiple jobs.
@@ -1290,8 +1269,9 @@ class JobAddress(AddressValidationModel):
         if self.email is None:
             self.email = ""
 
-        first_name = self.name.split()[0]
-        last_name = self.name.split()[1]
+        name_parts = self.name.split()
+        first_name = name_parts[0] if len(name_parts) > 0 else ""
+        last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
         new_contact = Contact(
             first_name=first_name,
             last_name=last_name,
@@ -1311,13 +1291,12 @@ class JobAddress(AddressValidationModel):
         return new_contact
 
     def get_shipments(self):
-        """Returns a list of shipments associated with this JobAddress. Can't just
+        """
+        Returns a list of shipments associated with this JobAddress. Can't just
         use a typical reverse _set attribute since it's a Generic relation.
         """
         jobaddress_type = ContentType.objects.get_for_model(self)
-        return Shipment.objects.filter(
-            address_content_type=jobaddress_type, address_id=self.id
-        )
+        return Shipment.objects.filter(address_content_type=jobaddress_type, address_id=self.id)
 
 
 def jobaddress_post_save(sender, instance, created, *args, **kwargs):
@@ -1330,9 +1309,7 @@ class ItemColor(models.Model):
     """Colors used in an item."""
 
     item = models.ForeignKey("Item", on_delete=models.CASCADE)
-    definition = models.ForeignKey(
-        ColorDefinition, on_delete=models.CASCADE, blank=True, null=True
-    )
+    definition = models.ForeignKey(ColorDefinition, on_delete=models.CASCADE, blank=True, null=True)
     color = models.CharField(max_length=255)
     # Calculated from RGB values given through Backstage XML ink coverage file.
     hexvalue = models.CharField(max_length=12, blank=True)
@@ -1340,12 +1317,8 @@ class ItemColor(models.Model):
     sequence = models.IntegerField(blank=True, null=True)
     plate_code = models.CharField(max_length=255, blank=True)
     # More data captured from the Backstage XML ink coverage file.
-    coverage_sqin = models.DecimalField(
-        max_digits=7, decimal_places=2, blank=True, null=True
-    )
-    coverage_perc = models.DecimalField(
-        max_digits=7, decimal_places=2, blank=True, null=True
-    )
+    coverage_sqin = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    coverage_perc = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
     lpi = models.CharField(max_length=5, blank=True)
     angle = models.CharField(max_length=5, blank=True)
     num_plates = models.IntegerField(blank=True, null=True)
@@ -1367,21 +1340,17 @@ class ItemColor(models.Model):
         except Item.DoesNotExist:
             return "Unknown Item - %s" % str(self.color)
 
+    # Legacy logic previously used for color checks (kept for reference):
+    # or self.color.lower().startswith('dpe') \
+    # or self.color.lower().startswith('mcd') \
+    # or self.color.lower().startswith('gpi') \
+    # or colorCheck.lower().startswith('pms') \
+    # or re.match(r'^\d{5}$', colorCheck) \
+
     def fsb_display_name(self):
-        """Return a color name for Foodservice display, adding GCH- or PMS- where
+        """
+        Return a color name for Foodservice display, adding GCH- or PMS- where
         applicable.
-        """
-        """
-        Try and see if the color is a number, if not then set ten mill to letters so it fails the regex check
-        for ten mill numbers. We have to use a try catch here cause it will error if it is a string.
-
-        These are old checks that we have since gone away with but I am noting in case we need them again:
-
-            or self.color.lower().startswith('dpe') \
-            or self.color.lower().startswith('mcd') \
-            or self.color.lower().startswith('gpi') \
-            or colorCheck.lower().startswith('pms') \
-            or re.match(r'^\\d{5}$', colorCheck) \\
         """
         # This check is for all of the HAVI colors that have underscores
         colorCheck = self.color.split("_")
@@ -1403,9 +1372,7 @@ class ItemColor(models.Model):
     def calculated_lch(self):
         """From the given measured Lab values, calculate the C value."""
         if self.measured_lab_l:
-            lab = LabColor(
-                self.measured_lab_l, self.measured_lab_a, self.measured_lab_b
-            )
+            lab = LabColor(self.measured_lab_l, self.measured_lab_a, self.measured_lab_b)
             lch = convert_color(lab, LCHabColor)
             return lch
         else:
@@ -1445,9 +1412,7 @@ class ItemColor(models.Model):
 
 class ColorWarning(models.Model):
     pantone_color = models.CharField(max_length=64)
-    definition = models.ForeignKey(
-        ColorDefinition, on_delete=models.CASCADE, blank=True, null=True
-    )
+    definition = models.ForeignKey(ColorDefinition, on_delete=models.CASCADE, blank=True, null=True)
     date_added = models.DateTimeField(auto_now_add=True)
     qpo_number = models.CharField(max_length=32)
     active = models.BooleanField(default=True)
@@ -1487,9 +1452,7 @@ class ItemReview(models.Model):
     entry_comments = models.CharField(max_length=500, blank=True)
     comments = models.CharField(max_length=500, blank=True)
     resub_comments = models.CharField(max_length=500, blank=True)
-    review_initiated_date = models.DateTimeField(
-        "Date Review Initiated", auto_now_add=True
-    )
+    review_initiated_date = models.DateTimeField("Date Review Initiated", auto_now_add=True)
     review_date = models.DateField("Date Reviewed", blank=True, null=True)
     review_ok = models.BooleanField(default=False)
     reviewer = models.ForeignKey(
@@ -1512,7 +1475,8 @@ class ItemReview(models.Model):
         )
 
     def status(self):
-        """Determines if the review is approved, rejected, waiting, or expired.
+        """
+        Determines if the review is approved, rejected, waiting, or expired.
         Also returns icon name so it can be displayed with the status.
         """
         status = {}
@@ -1536,7 +1500,8 @@ class ItemReview(models.Model):
         return status
 
     def do_ok(self, update_type, comment=False):
-        """Function for handling market review objects being accepted,
+        """
+        Function for handling market review objects being accepted,
         rejected, or resubmitted. Results are listed on the Review page.
         """
         self.review_date = date.today()
@@ -1580,9 +1545,7 @@ class ItemReview(models.Model):
                 if self.item.job.artist:
                     mail_list.append(self.item.job.artist.email)
                 else:
-                    fd_group = User.objects.filter(
-                        groups__name="EmailGCHubFrontDesk", is_active=True
-                    )
+                    fd_group = User.objects.filter(groups__name="EmailGCHubFrontDesk", is_active=True)
                     for user in fd_group:
                         mail_list.append(user.email)
                 # Fill in email template vars
@@ -1669,7 +1632,8 @@ class ItemReview(models.Model):
         return super(ItemReview, self).save()
 
     def expires(self):
-        """Calculates when a review will expire based on allowing three business
+        """
+        Calculates when a review will expire based on allowing three business
         days. Mostly this is just to help skip weekends.
         """
         start_date = self.review_initiated_date

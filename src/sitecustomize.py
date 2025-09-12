@@ -1,4 +1,5 @@
-"""Early sys.path normalizer for developer/test runs.
+"""
+Early sys.path normalizer for developer/test runs.
 
 Place this file at the repository root so when Python starts (and runs
 `site`) it will import this module and normalize sys.path to avoid the

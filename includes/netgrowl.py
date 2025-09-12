@@ -18,7 +18,8 @@ GROWL_TYPE_NOTIFICATION = 1
 
 
 class GrowlRegistrationPacket:
-    """Builds a Growl Network Registration packet.
+    """
+    Builds a Growl Network Registration packet.
     Defaults to emulating the command-line growlnotify utility.
     """
 
@@ -70,7 +71,8 @@ class GrowlRegistrationPacket:
 
 
 class GrowlNotificationPacket:
-    """Builds a Growl Network Notification packet.
+    """
+    Builds a Growl Network Notification packet.
     Defaults to emulating the command-line growlnotify utility.
     """
 

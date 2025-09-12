@@ -128,9 +128,7 @@ class Migration(migrations.Migration):
                 ("resolution_date", models.DateTimeField(blank=True, null=True)),
                 (
                     "qc_response",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="qc.QCResponse"
-                    ),
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="qc.QCResponse"),
                 ),
             ],
             options={

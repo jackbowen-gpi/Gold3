@@ -24,11 +24,14 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy project files
 COPY . .
 
+# Make scripts executable
+RUN chmod +x /app/scripts/docker-entrypoint.sh
+
 # Collect static files (if needed)
 # RUN python manage.py collectstatic --noinput
 
 # Expose port (Django default)
 EXPOSE 8000
 
-# Start server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Start server with entrypoint script
+CMD ["/app/scripts/docker-entrypoint.sh"]

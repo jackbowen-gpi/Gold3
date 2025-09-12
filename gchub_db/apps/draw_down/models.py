@@ -46,9 +46,7 @@ class DrawDownItem(models.Model):
     colors_needed = models.CharField(max_length=255)
     number_copies = models.IntegerField(blank=True, null=True)
     artwork = models.BooleanField(default=True)
-    draw_down_request = models.ForeignKey(
-        DrawDownRequest, on_delete=models.CASCADE, null=True, blank=True
-    )
+    draw_down_request = models.ForeignKey(DrawDownRequest, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         ordering = ["item_number"]

@@ -1,3 +1,7 @@
+r"""
+Module .scripts\http_check_login_csrf.py
+"""
+
 import requests
 
 resp = requests.get("http://127.0.0.1:8000/accounts/login/")

@@ -23,6 +23,7 @@ from django.views.decorators.http import require_POST
 from mwclient import Site
 
 from gchub_db.includes.notification_manager import send_user_notification
+
 # windows_notifications import removed; use plyer or notification_daemon instead
 
 import gchub_db.apps.workflow.app_defs as workflow_defs
@@ -78,9 +79,7 @@ def preferences_settings(request):
         item_search_brand = request.POST.get("item_search_brand") == "1"
         item_search_customer = request.POST.get("item_search_customer") == "1"
         item_search_comments = request.POST.get("item_search_comments") == "1"
-        item_search_specifications = (
-            request.POST.get("item_search_specifications") == "1"
-        )
+        item_search_specifications = request.POST.get("item_search_specifications") == "1"
 
         # Update user profile notifications setting
         if hasattr(request.user, "profile"):
@@ -118,11 +117,9 @@ def preferences_settings(request):
     pagevars = {
         "page_title": "Preferences - Settings",
         "use_legacy_search": request.session.get("use_legacy_search", True),
-        "notifications_enabled": getattr(
-            request.user.profile, "notifications_enabled", True
-        )
-        if hasattr(request.user, "profile")
-        else True,
+        "notifications_enabled": (
+            getattr(request.user.profile, "notifications_enabled", True) if hasattr(request.user, "profile") else True
+        ),
         # Job search criteria
         "job_search_brand": request.session.get("job_search_brand", True),
         "job_search_customer": request.session.get("job_search_customer", True),
@@ -137,9 +134,7 @@ def preferences_settings(request):
         "item_search_brand": request.session.get("item_search_brand", True),
         "item_search_customer": request.session.get("item_search_customer", True),
         "item_search_comments": request.session.get("item_search_comments", True),
-        "item_search_specifications": request.session.get(
-            "item_search_specifications", True
-        ),
+        "item_search_specifications": request.session.get("item_search_specifications", True),
     }
     return render(request, "preferences/settings.html", context=pagevars)
 
@@ -161,7 +156,8 @@ def change_password(request):
 
 
 def _seperate_events_by_day(events, date_attrib_name):
-    """This is a generic function to separate events into a list representing
+    """
+    This is a generic function to separate events into a list representing
     days of the month that contain events occuring on that day.
     """
     # Stores the integer day of the month of the last event.
@@ -222,9 +218,7 @@ def _get_events_by_day():
     # use timezone-aware now and dates
     today = timezone.now().date()
     end_event_range = today + timedelta(days=7)
-    events = Event.objects.filter(event_date__range=(today, end_event_range)).order_by(
-        "event_date"
-    )
+    events = Event.objects.filter(event_date__range=(today, end_event_range)).order_by("event_date")
     return _seperate_events_by_day(events, "event_date")
 
 
@@ -358,9 +352,9 @@ def _get_user_hold_job_list(request):
         .query
     )
     if job_activity:
-        user_approve_list = Job.objects.filter(
-            workflow__name="Foodservice", id__in=job_activity, salesperson=this_user
-        ).order_by("-due_date")
+        user_approve_list = Job.objects.filter(workflow__name="Foodservice", id__in=job_activity, salesperson=this_user).order_by(
+            "-due_date"
+        )
 
     print(user_approve_list)
 
@@ -414,9 +408,7 @@ def index(request):
     )
 
     rejections_plant = (
-        ItemReview.objects.filter(
-            review_catagory="plant", review_date__isnull=False, review_ok=False
-        )
+        ItemReview.objects.filter(review_catagory="plant", review_date__isnull=False, review_ok=False)
         .exclude(resubmitted=True)
         .exclude(comments="Resubmitted")
         .count()
@@ -425,9 +417,7 @@ def index(request):
     items_rejected = rejections_demand + rejections_plant + rejections_mkt
 
     user_hold_list, user_job_list, user_approve_list = _get_user_hold_job_list(request)
-    stickied_jobs = Job.objects.filter(
-        artist=request.user, todo_list_mode=workflow_defs.TODO_LIST_MODE_STICKIED
-    )
+    stickied_jobs = Job.objects.filter(artist=request.user, todo_list_mode=workflow_defs.TODO_LIST_MODE_STICKIED)
 
     # Calculate the time since the last error was recorded.
     # Use .first() to avoid IndexError if no Error records exist.
@@ -482,16 +472,15 @@ def index(request):
         # Calculate what changes happened today using UTC-naive now.
         today = general_funcs._utcnow_naive().date()
         start_date = today - timedelta(days=3)
-        changes_today = CodeChange.objects.filter(
-            creation_date__range=(start_date, today)
-        ).count()
+        changes_today = CodeChange.objects.filter(creation_date__range=(start_date, today)).count()
         pagevars["gold_changes_today"] = changes_today
 
     return render(request, "accounts/index.html", context=pagevars)
 
 
 def home(request):
-    """Public homepage: show the authenticated index to logged-in users,
+    """
+    Public homepage: show the authenticated index to logged-in users,
     otherwise render a simple public landing page.
     """
     if request.user.is_authenticated:
@@ -502,7 +491,8 @@ def home(request):
 
 
 def logout_get(request):
-    """Allow logout via GET for compatibility with older templates/links.
+    """
+    Allow logout via GET for compatibility with older templates/links.
 
     This performs the same action as the Django `LogoutView` but accepts GET
     so legacy anchors that point to the logout URL don't get 405.
@@ -514,7 +504,8 @@ def logout_get(request):
 
 
 def office_contacts(request):
-    """Contacts for the Clemson Office. We'll totally link this to the User
+    """
+    Contacts for the Clemson Office. We'll totally link this to the User
     system later, huh? HELL YES WE WILL. Go Thundercuddles!
     """
     pagevars = {
@@ -528,15 +519,12 @@ class LoginForm(forms.Form):
     """Used to render the user login form."""
 
     # Username field
-    username = forms.ChoiceField(
-        choices=[], widget=forms.Select(attrs={"style": "width:174px"})
-    )
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"style": "width:170px"})
-    )
+    username = forms.ChoiceField(choices=[], widget=forms.Select(attrs={"style": "width:174px"}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={"style": "width:170px"}))
 
     def __init__(self, request, *args, **kwargs):
-        """Generate the drop-down of active users so they don't have to type their
+        """
+        Generate the drop-down of active users so they don't have to type their
         username in.
         """
         super(LoginForm, self).__init__(*args, **kwargs)
@@ -621,9 +609,7 @@ def test_notification(request):
         if notification_type == "direct":
             # Test direct Windows notification manager
             # WindowsNotificationManager removed; use plyer or notification_daemon instead
-            print(
-                "NOTIFICATION: Direct Notification Test - This is a direct test of the Windows notification manager."
-            )
+            print("NOTIFICATION: Direct Notification Test - This is a direct test of the Windows notification manager.")
             return JsonResponse(
                 {
                     "success": True,

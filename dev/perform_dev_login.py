@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-"""Perform a login flow against the local dev server to obtain a sessionid cookie.
+"""
+Perform a login flow against the local dev server to obtain a sessionid cookie.
 
 This helper GETs the login page to obtain a CSRF token, POSTs credentials, and
 writes the resulting sessionid cookie to dev/session_cookie.txt for easy use
@@ -33,12 +34,11 @@ def write_cookie(value: str) -> None:
 
 def main() -> int:
     try:
-        import requests
+        import requests  # type: ignore[import-untyped]
     except Exception:
-        print(
-            "`requests` library not available. Install it in the venv: pip install requests",
-            file=sys.stderr,
-        )
+        # Keep the message short per-line to satisfy line-length checks.
+        print("`requests` library not available. Install in the venv:", file=sys.stderr)
+        print("  pip install requests", file=sys.stderr)
         return 2
 
     s = requests.Session()
@@ -54,16 +54,15 @@ def main() -> int:
         csrf_token = s.cookies["csrftoken"]
 
     if not csrf_token:
-        m = re.search(
-            r"name=['\"]csrfmiddlewaretoken['\"] value=['\"]([0-9a-fA-F-]+)['\"]",
-            r.text,
-        )
+        pattern1 = r"name=['\"]csrfmiddlewaretoken['\"] " r"value=['\"]([0-9a-fA-F-]+)['\"]"
+        m = re.search(pattern1, r.text)
         if m:
             csrf_token = m.group(1)
 
     if not csrf_token:
         # try a more permissive search
-        m = re.search(r"csrfmiddlewaretoken['\"]\s+value=['\"]([^'\"]+)['\"]", r.text)
+        pattern2 = r"csrfmiddlewaretoken['\"]\s+" r"value=['\"]([^'\"]+)['\"]"
+        m = re.search(pattern2, r.text)
         if m:
             csrf_token = m.group(1)
 
@@ -74,7 +73,8 @@ def main() -> int:
         alt_path = os.path.join(os.path.dirname(__file__), "admin_session_cookie.txt")
         if os.path.exists(alt_path):
             print(
-                f"CSRF token not found; using existing admin session cookie at {alt_path}"
+                "CSRF token not found; using existing admin session cookie at",
+                alt_path,
             )
             with open(alt_path, "r", encoding="utf-8") as f:
                 data = f.read().strip()
@@ -99,7 +99,11 @@ def main() -> int:
     headers = {"Referer": LOGIN_URL}
     try:
         s.post(
-            LOGIN_URL, data=payload, headers=headers, timeout=5, allow_redirects=False
+            LOGIN_URL,
+            data=payload,
+            headers=headers,
+            timeout=5,
+            allow_redirects=False,
         )
     except Exception as exc:
         print(f"POST to login failed: {exc}", file=sys.stderr)
@@ -110,7 +114,8 @@ def main() -> int:
     if not session_value:
         # Sometimes login view returns 200 and still sets cookie via JS or other flow.
         print(
-            "Login did not produce a sessionid cookie; check credentials and login URL.",
+            "Login did not produce a sessionid cookie; check credentials",
+            "and login URL.",
             file=sys.stderr,
         )
         return 6
@@ -118,10 +123,9 @@ def main() -> int:
     cookie_line = f"sessionid={session_value}\n"
     write_cookie(cookie_line)
     print(f"Wrote session cookie to {OUT_PATH}")
-    print(
-        "To use this cookie in your browser, open DevTools -> Application -> Cookies -> "
-        "127.0.0.1 and add cookie 'sessionid' with the value above."
-    )
+    # Shorter lines to satisfy ruff/line-length rules
+    print("To use this cookie in your browser, open DevTools -> Application ->")
+    print("Cookies -> 127.0.0.1 and add cookie 'sessionid' with the value above.")
     return 0
 
 

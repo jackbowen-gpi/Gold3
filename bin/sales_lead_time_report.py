@@ -1,5 +1,6 @@
 #!/usr/bin/python
-"""Produce lead time reports for salespeople in Foodservice workflow.
+"""
+Produce lead time reports for salespeople in Foodservice workflow.
 
 Exports an XLS with average lead times per salesperson.
 """
@@ -25,9 +26,7 @@ workBookDocument = openpyxl.Workbook()
 workflow = "Foodservice"
 
 start_date = date(2007, 1, 1)
-job_set = Job.objects.filter(
-    creation_date__gte=start_date, workflow__name=workflow
-).exclude(status="Cancelled")
+job_set = Job.objects.filter(creation_date__gte=start_date, workflow__name=workflow).exclude(status="Cancelled")
 
 print("Total jobs:", job_set.count())
 
@@ -35,9 +34,7 @@ SALES_PERMISSION = Permission.objects.get(codename="salesperson")
 sales = User.objects.filter(groups__in=SALES_PERMISSION.group_set.all(), is_active=True)
 
 workflow_permission = Permission.objects.get(codename="foodservice_access")
-qset_fsb = (
-    sales.filter(Q(groups__in=workflow_permission.group_set.all())).values("id").query
-)
+qset_fsb = sales.filter(Q(groups__in=workflow_permission.group_set.all())).values("id").query
 
 fsb_sales = User.objects.filter(Q(id__in=qset_fsb)).order_by("username")
 

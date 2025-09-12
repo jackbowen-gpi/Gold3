@@ -49,9 +49,7 @@ def shipment_instance(db, mock_address, mock_job):
     # MockAddress which requires a Django model _meta; instead create
     # or get a harmless ContentType row to stand in for the address
     # content type during tests.
-    ct, _ = ContentType.objects.get_or_create(
-        app_label="gchub_db.apps.fedexsys", model="mockaddress"
-    )
+    ct, _ = ContentType.objects.get_or_create(app_label="gchub_db.apps.fedexsys", model="mockaddress")
     # Create the Shipment without assigning a Job instance so tests
     # can monkeypatch `shipment_instance.job` with a plain mock when
     # required. Assigning a non-Job object to the ForeignKey fails.
@@ -94,38 +92,26 @@ def test_str_returns_ref_string(shipment_instance, mock_address, mock_job, monke
     # Patch the Shipment.address descriptor at the class level to return
     # the plain mock address object during this test. This avoids
     # triggering ContentType lookups against the mock.
-    monkeypatch.setattr(
-        Shipment, "address", property(lambda self: mock_address), raising=False
-    )
+    monkeypatch.setattr(Shipment, "address", property(lambda self: mock_address), raising=False)
     assert str(shipment_instance) == shipment_instance.get_ref_string()
     shipment_instance.__dict__.pop("_job_cache", None)
     assert shipment_instance.get_ref_string() == str(mock_address.name)
 
 
-def test_get_recipient_returns_name_or_company(
-    shipment_instance, mock_address, monkeypatch
-):
+def test_get_recipient_returns_name_or_company(shipment_instance, mock_address, monkeypatch):
     # Set the GenericForeignKey cache directly to avoid ContentType
     # resolution on the mock object.
-    monkeypatch.setattr(
-        Shipment, "address", property(lambda self: mock_address), raising=False
-    )
+    monkeypatch.setattr(Shipment, "address", property(lambda self: mock_address), raising=False)
     assert shipment_instance.get_recipient() == mock_address.name
     mock_address.name = ""
     assert shipment_instance.get_recipient() == mock_address.company
 
 
 def test_is_international_true_false(shipment_instance, mock_address, monkeypatch):
-    monkeypatch.setattr(
-        Shipment, "address", property(lambda self: mock_address), raising=False
-    )
-    with mock.patch(
-        "gchub_db.apps.fedexsys.countries.full_to_abbrev", return_value="CA"
-    ):
+    monkeypatch.setattr(Shipment, "address", property(lambda self: mock_address), raising=False)
+    with mock.patch("gchub_db.apps.fedexsys.countries.full_to_abbrev", return_value="CA"):
         assert shipment_instance.is_international() is True
-    with mock.patch(
-        "gchub_db.apps.fedexsys.countries.full_to_abbrev", return_value="US"
-    ):
+    with mock.patch("gchub_db.apps.fedexsys.countries.full_to_abbrev", return_value="US"):
         assert shipment_instance.is_international() is False
 
 
@@ -141,24 +127,18 @@ def test_print_label(monkeypatch, shipment_instance):
 
 
 def test_get_shipment_request(monkeypatch, shipment_instance, mock_address):
-    monkeypatch.setattr(
-        Shipment, "address", property(lambda self: mock_address), raising=False
-    )
+    monkeypatch.setattr(Shipment, "address", property(lambda self: mock_address), raising=False)
     mock_config = mock.Mock(account_number="123456")
     mock_shipment = mock.Mock()
     mock_shipment.RequestedShipment = mock.Mock()
     mock_shipment.create_wsdl_object_of_type.side_effect = lambda x: mock.Mock()
     mock_shipment.add_package = mock.Mock()
-    monkeypatch.setattr(
-        "gchub_db.apps.fedexsys.models.create_fedex_config", lambda: mock_config
-    )
+    monkeypatch.setattr("gchub_db.apps.fedexsys.models.create_fedex_config", lambda: mock_config)
     monkeypatch.setattr(
         "gchub_db.apps.fedexsys.models.FedexProcessShipmentRequest",
         lambda config: mock_shipment,
     )
-    monkeypatch.setattr(
-        "gchub_db.apps.fedexsys.countries.full_to_abbrev", lambda country: "US"
-    )
+    monkeypatch.setattr("gchub_db.apps.fedexsys.countries.full_to_abbrev", lambda country: "US")
     result = shipment_instance.get_shipment_request()
     assert result == mock_shipment
     mock_shipment.add_package.assert_called_once()
@@ -189,9 +169,7 @@ def test_address_validation_model(monkeypatch):
     mock_config = mock.Mock()
     mock_request = mock.Mock()
     mock_address1 = mock.Mock()
-    monkeypatch.setattr(
-        "gchub_db.apps.fedexsys.models.create_fedex_config", lambda: mock_config
-    )
+    monkeypatch.setattr("gchub_db.apps.fedexsys.models.create_fedex_config", lambda: mock_config)
     monkeypatch.setattr(
         "gchub_db.apps.fedexsys.models.FedexAddressValidationRequest",
         lambda config: mock_request,
@@ -199,9 +177,7 @@ def test_address_validation_model(monkeypatch):
     mock_request.create_wsdl_object_of_type.return_value = mock_address1
     mock_request.add_address = mock.Mock()
     mock_request.send_request = mock.Mock()
-    monkeypatch.setattr(
-        "gchub_db.apps.fedexsys.countries.full_to_abbrev", lambda country: "US"
-    )
+    monkeypatch.setattr("gchub_db.apps.fedexsys.countries.full_to_abbrev", lambda country: "US")
     instance.validate_address()
     mock_request.add_address.assert_called_once_with(mock_address1)
     mock_request.send_request.assert_called_once()

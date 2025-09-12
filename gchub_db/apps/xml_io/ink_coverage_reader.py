@@ -26,48 +26,29 @@ class InkNode(object):
     def __init__(self, ink_node):
         self.ink_node = ink_node
         self.ink_name = self.determine_ink_db_name()
-        self.ink_angle = float(
-            self.ink_node.getElementsByTagName("egInk:angle")[0].firstChild.nodeValue
-        )
-        self.rgb_r = float(
-            self.ink_node.getElementsByTagName("egInk:r")[0].firstChild.nodeValue
-        )
-        self.rgb_g = float(
-            self.ink_node.getElementsByTagName("egInk:g")[0].firstChild.nodeValue
-        )
-        self.rgb_b = float(
-            self.ink_node.getElementsByTagName("egInk:b")[0].firstChild.nodeValue
-        )
-        self.ink_lpi = float(
-            self.ink_node.getElementsByTagName("egInk:frequency")[
-                0
-            ].firstChild.nodeValue
-        )
+        self.ink_angle = float(self.ink_node.getElementsByTagName("egInk:angle")[0].firstChild.nodeValue)
+        self.rgb_r = float(self.ink_node.getElementsByTagName("egInk:r")[0].firstChild.nodeValue)
+        self.rgb_g = float(self.ink_node.getElementsByTagName("egInk:g")[0].firstChild.nodeValue)
+        self.rgb_b = float(self.ink_node.getElementsByTagName("egInk:b")[0].firstChild.nodeValue)
+        self.ink_lpi = float(self.ink_node.getElementsByTagName("egInk:frequency")[0].firstChild.nodeValue)
 
     def __str__(self):
         return self.ink_name
 
     def get_coverage_percentage(self):
-        """Abstract this here, since it sometimes throws an IndexError if the
+        """
+        Abstract this here, since it sometimes throws an IndexError if the
         node is without coverage data.
         """
-        return float(
-            self.ink_node.getElementsByTagName("egInkCov:pct")[0].firstChild.nodeValue
-        )
+        return float(self.ink_node.getElementsByTagName("egInkCov:pct")[0].firstChild.nodeValue)
 
     def get_coverage_sq_inch(self):
-        """Abstract this here, since it sometimes throws an IndexError if the
+        """
+        Abstract this here, since it sometimes throws an IndexError if the
         node is without coverage data.
         """
         # .00155 Converts from inches to mm
-        return (
-            float(
-                self.ink_node.getElementsByTagName("egInkCov:mm2")[
-                    0
-                ].firstChild.nodeValue
-            )
-            * 0.00155
-        )
+        return float(self.ink_node.getElementsByTagName("egInkCov:mm2")[0].firstChild.nodeValue) * 0.00155
 
     def get_color_hex_value(self):
         """Get the RGB values and spit out some hex."""
@@ -88,15 +69,12 @@ class InkNode(object):
         return True
 
     def determine_ink_db_name(self):
-        """Given an ink_node, determine the ink's name as per the database. For
+        """
+        Given an ink_node, determine the ink's name as per the database. For
         example, GCH 123 or Warm Red.
         """
-        ink_book = self.ink_node.getElementsByTagName("egInk:book")[
-            0
-        ].firstChild.nodeValue
-        ink_name = self.ink_node.getElementsByTagName("egInk:name")[
-            0
-        ].firstChild.nodeValue
+        ink_book = self.ink_node.getElementsByTagName("egInk:book")[0].firstChild.nodeValue
+        ink_name = self.ink_node.getElementsByTagName("egInk:name")[0].firstChild.nodeValue
 
         if "ppasc" in ink_book:
             temp_ink_name = ink_name.split(" ")
@@ -107,16 +85,13 @@ class InkNode(object):
                 ink_name = temp_ink_name[1]
             else:
                 raise InkCoverageException(
-                    "Proper ink name could not be determined for %s in the inkbook: %s. Ink coverage failed."
-                    % (ink_name, ink_book)
+                    "Proper ink name could not be determined for %s in the inkbook: %s. Ink coverage failed." % (ink_name, ink_book)
                 )
 
         try:
             # Sometimes ink that aren't in the ink book won't have a TYPE
             # attribute.
-            ink_type = self.ink_node.getElementsByTagName("egInk:type")[
-                0
-            ].firstChild.nodeValue
+            ink_type = self.ink_node.getElementsByTagName("egInk:type")[0].firstChild.nodeValue
         except KeyError:
             # In these cases, it's unknown whether we're dealing with a
             # process color. 99% of the times, this will not be a process
@@ -133,7 +108,8 @@ class InkNode(object):
         return "%s%s" % (name_prefix, ink_name)
 
     def lookup_itemcolor(self, item):
-        """Searches for an itemcolor by name. If it doesn't exist return None.
+        """
+        Searches for an itemcolor by name. If it doesn't exist return None.
 
         item: (Item) The item that's being manipulated.
         """
@@ -144,26 +120,18 @@ class InkNode(object):
             Beverage and carton items work the same here, error if the itemcolor is not already in GOLD
             """
             if workflow_name == "Foodservice":
-                return ItemColor.objects.get(
-                    item=item, color__iexact=self.ink_name, angle=str(self.ink_angle)
-                )
+                return ItemColor.objects.get(item=item, color__iexact=self.ink_name, angle=str(self.ink_angle))
             elif workflow_name == "Beverage":
                 return ItemColor.objects.get(item=item, color__iexact=self.ink_name)
             else:
                 # This should be just carton items at this point.
-                ink_type = self.ink_node.getElementsByTagName("egInk:type")[
-                    0
-                ].firstChild.nodeValue
+                ink_type = self.ink_node.getElementsByTagName("egInk:type")[0].firstChild.nodeValue
                 # Need to capitalize the first color here to match how colors are in our system
-                ink_name = self.ink_node.getElementsByTagName("egInk:name")[
-                    0
-                ].firstChild.nodeValue.capitalize()
+                ink_name = self.ink_node.getElementsByTagName("egInk:name")[0].firstChild.nodeValue.capitalize()
                 # Sometimes process black is used as a place-holder for low carbon black.
                 if ink_type == "process" and ink_name == "Black":
                     try:  # Return the low carbon item color, if there is one.
-                        return ItemColor.objects.get(
-                            item=item, definition__name="Low-Carbon Black"
-                        )
+                        return ItemColor.objects.get(item=item, definition__name="Low-Carbon Black")
                     except Exception:  # No low carbon ink item color? Carry on.
                         pass
                 # Process color logic
@@ -188,15 +156,11 @@ class InkNode(object):
                 else:
                     # Search by color first.
                     try:
-                        return ItemColor.objects.get(
-                            item=item, color__iexact=self.ink_name
-                        )
+                        return ItemColor.objects.get(item=item, color__iexact=self.ink_name)
                     except Exception:
                         pass
                     # Search by defintion if nothing was found by color.
-                    return ItemColor.objects.get(
-                        item=item, definition__name=self.ink_name
-                    )
+                    return ItemColor.objects.get(item=item, definition__name=self.ink_name)
 
         except ItemColor.DoesNotExist:
             """
@@ -208,8 +172,7 @@ class InkNode(object):
                 print("-!> No ItemColor match found, ink coverage failed.")
                 # Kill it here, this gets JobLogged as well.
                 raise InkCoverageException(
-                    "No match could be found for the ink named %s on item %d. Ink coverage failed."
-                    % (self.ink_name, item.num_in_job)
+                    "No match could be found for the ink named %s on item %d. Ink coverage failed." % (self.ink_name, item.num_in_job)
                 )
             else:
                 """
@@ -238,7 +201,8 @@ class InkCoverageDocument(object):
     xml_file = None
 
     def __init__(self, xml_file_path, debug=False):
-        """Arguments:
+        """
+        Arguments:
         * xml_file_path (String): Full path to the XML file to parse
         * debug (bool): When true, print debugging info
 
@@ -271,15 +235,14 @@ class InkCoverageDocument(object):
         return minus_nojdf
 
     def get_pdf_path(self, windows_format=True):
-        """Returns the path to the PDF file being manipulated.
+        """
+        Returns the path to the PDF file being manipulated.
 
         If windows_format is True, make the slashes forward slashes and
         pre-pend file://. If False, return the raw path (more UNIX-style).
         """
         jobRef = self.jdoc.getElementsByTagName("egPrF:DerivedFrom")[0]
-        raw_path = jobRef.getElementsByTagName("stRef:instanceID")[
-            0
-        ].firstChild.nodeValue
+        raw_path = jobRef.getElementsByTagName("stRef:instanceID")[0].firstChild.nodeValue
         less_raw_path = str(urllib.parse.unquote(urllib.parse.unquote(str(raw_path))))
         if windows_format:
             new_path = less_raw_path.replace("\\", "/")
@@ -290,9 +253,7 @@ class InkCoverageDocument(object):
 
     def _get_ink_nodes(self):
         """Returns a NodeList of ink nodes."""
-        return self.jdoc.getElementsByTagName("egGr:inks")[0].getElementsByTagName(
-            "rdf:li"
-        )
+        return self.jdoc.getElementsByTagName("egGr:inks")[0].getElementsByTagName("rdf:li")
 
     def get_ink_str_list(self):
         """Returns a list of the PDF's ink names in string format."""
@@ -302,7 +263,8 @@ class InkCoverageDocument(object):
         return inks
 
     def _round_dimension(self, dim_float):
-        """Given a float template dimension, round it to the 3 places then use
+        """
+        Given a float template dimension, round it to the 3 places then use
         a string formatting function to lop off the funkyness at the end of
         the number that arises from fp math.
 
@@ -312,27 +274,16 @@ class InkCoverageDocument(object):
         return "%.3f" % rounded
 
     def compare_dimensions(self, item):
-        """Looks up the ItemSpec for this item and compares the VSIZE and HSIZE
+        """
+        Looks up the ItemSpec for this item and compares the VSIZE and HSIZE
         tag values to expected values. This helps catch when a job is proofed
         out on the wrong template.
 
         Returns True when dimensions match, False otherwise.
         """
-        vsize = (
-            float(
-                self.doc_rootjdoc.getElementsByTagName("egGr:vsize")[
-                    0
-                ].firstChild.nodeValue
-            )
-            * 0.0393701
-        )  # Convert from mm to inch
+        vsize = float(self.doc_rootjdoc.getElementsByTagName("egGr:vsize")[0].firstChild.nodeValue) * 0.0393701  # Convert from mm to inch
         vsize = self._round_dimension(vsize)
-        hsize = (
-            float(
-                self.doc_root.getElementsByTagName("egGr:hsize")[0].firstChild.nodeValue
-            )
-            * 0.0393701
-        )  # Convert from mm to inch
+        hsize = float(self.doc_root.getElementsByTagName("egGr:hsize")[0].firstChild.nodeValue) * 0.0393701  # Convert from mm to inch
         hsize = self._round_dimension(hsize)
 
         try:
@@ -354,7 +305,10 @@ class InkCoverageDocument(object):
                 return (True, "No problem.")
             else:
                 error_msg = (
-                    "An ink coverage was sent for item number %s (<a href='%s' target='_blank'>%s</a>), but its dimensions (%s x %s) did not match the values in our Item Specifications (%s x %s). Please correct the art or the Item Specification."
+                    "An ink coverage was sent for item number %s "
+                    "(<a href='%s' target='_blank'>%s</a>), but its dimensions "
+                    "(%s x %s) did not match the values in our Item Specifications "
+                    "(%s x %s). Please correct the art or the Item Specification."
                     % (
                         item.num_in_job,
                         ispec.get_absolute_url(),
@@ -368,7 +322,8 @@ class InkCoverageDocument(object):
                 return (False, error_msg)
 
     def import_disclaimer(self, item):
-        """Imports the disclaimer text (if there is any).
+        """
+        Imports the disclaimer text (if there is any).
 
         item: (Item) The workflow Item object to import to.
         """
@@ -407,16 +362,12 @@ class InkCoverageDocument(object):
         inkNodes = self._get_ink_nodes()
         for x in range(len(inkNodes)):
             newElement = self.jdoc.createElement("egInkCov:pct")
-            newElementText = self.jdoc.createTextNode(
-                covers[x].getElementsByTagName("egInkCov:pct")[0].firstChild.nodeValue
-            )
+            newElementText = self.jdoc.createTextNode(covers[x].getElementsByTagName("egInkCov:pct")[0].firstChild.nodeValue)
             newElement.appendChild(newElementText)
             inkNodes[x].appendChild(newElement)
 
             newElement = self.jdoc.createElement("egInkCov:mm2")
-            newElementText = self.jdoc.createTextNode(
-                covers[x].getElementsByTagName("egInkCov:mm2")[0].firstChild.nodeValue
-            )
+            newElementText = self.jdoc.createTextNode(covers[x].getElementsByTagName("egInkCov:mm2")[0].firstChild.nodeValue)
             newElement.appendChild(newElementText)
             inkNodes[x].appendChild(newElement)
 
@@ -428,9 +379,7 @@ class InkCoverageDocument(object):
         itemcolor_count = item.itemcolor_set.all().count()
 
         # If the ink coverage node count for Beverage doesn't match the DB, fail.
-        if (
-            workflow_name == "Beverage" or workflow_name == "Carton"
-        ) and ink_node_count != itemcolor_count:
+        if (workflow_name == "Beverage" or workflow_name == "Carton") and ink_node_count != itemcolor_count:
             # This gets JobLogged, the ink coverage is aborted.
             raise InkCoverageException(
                 "Mis-match in ink count between the ink coverage (%d) and the item in the database (%d). Ink coverage failed."
@@ -465,9 +414,10 @@ class InkCoverageDocument(object):
                         # Go ahead if this isn't an excluded size.
                         if not exclude_flag:
                             count = count + 1
-                            total_error_message += (
-                                "%d) Color warning: cannot hit %s. Replace with %s. \n "
-                                % (count, ic.color, warning.qpo_number)
+                            total_error_message += "%d) Color warning: cannot hit %s. Replace with %s. \n " % (
+                                count,
+                                ic.color,
+                                warning.qpo_number,
                             )
                             exception = True
 
@@ -475,9 +425,10 @@ class InkCoverageDocument(object):
                     # Ink coverage fails if any inks are greater than 65 lpi.
                     print("-!> LPI greater than 65, failing.")
                     count = count + 1
-                    total_error_message += (
-                        "%d) LPI on the ink named %s on item %d is greater than 65. Ink coverage failed. \n"
-                        % (count, ic.color, item.num_in_job)
+                    total_error_message += "%d) LPI on the ink named %s on item %d is greater than 65. Ink coverage failed. \n" % (
+                        count,
+                        ic.color,
+                        item.num_in_job,
                     )
                     exception = True
 
@@ -509,16 +460,15 @@ class InkCoverageDocument(object):
             item.do_jdf_bev_workflow()
 
     def populate_itemcolor(self, ink_node, job, item):
-        """Populates and returns an ItemColor object that is ready to be saved.
+        """
+        Populates and returns an ItemColor object that is ready to be saved.
         Returns an ItemColor object to be saved by import_itemcolors().
         """
         # Returns a 'C' or 'U' for coated/uncoated.
         coating = item.size.get_coating_type(return_abbrev=True)
 
         # Print a summary of everything found so far.
-        print(
-            "#> %s %s (%s)" % (ink_node.ink_name, coating, item.size.product_substrate)
-        )
+        print("#> %s %s (%s)" % (ink_node.ink_name, coating, item.size.product_substrate))
 
         # This must be found now to check against other colors.
         color_angle = ink_node.ink_angle
@@ -533,9 +483,7 @@ class InkCoverageDocument(object):
         # Try to look up a color definition based on name. On failure,
         # set the definition to None.
         try:
-            ic.definition = ColorDefinition.objects.get(
-                name__iexact=ic.color, coating=coating
-            )
+            ic.definition = ColorDefinition.objects.get(name__iexact=ic.color, coating=coating)
         except ColorDefinition.DoesNotExist:
             # Foodservice colors don't need to match against library.
             print("-!> No matching color definition for: %s" % ic.color)

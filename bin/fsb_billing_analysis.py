@@ -39,9 +39,7 @@ master_job_list = Job.objects.filter(workflow__name="Foodservice",
                                      creation_date__range=(start_date, end_date))
 
 """
-master_job_list = Job.objects.filter(
-    workflow__name="Foodservice", name__icontains="infinity"
-)
+master_job_list = Job.objects.filter(workflow__name="Foodservice", name__icontains="infinity")
 
 print("Job count:", master_job_list.count())
 
@@ -79,9 +77,7 @@ def _do_billing_analysis():
             for plant in plant_set:
                 plant_charges = charges.filter(item__printlocation__plant__name=plant)
                 if plant_charges:
-                    docSheet8.cell(
-                        row=i + 1, column=plant_col + 1
-                    ).value = plant_charges.aggregate(total=Sum("amount"))["total"]
+                    docSheet8.cell(row=i + 1, column=plant_col + 1).value = plant_charges.aggregate(total=Sum("amount"))["total"]
                 plant_col += 1
             # Iterate row for new month/year
             i += 1

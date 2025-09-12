@@ -40,8 +40,8 @@ def send_user_notification(
 
     Returns:
         bool: True if notification sent successfully
-    """
 
+    """
     # Check master notification toggle first
     try:
         if not getattr(user_profile, "notifications_enabled", True):
@@ -135,6 +135,7 @@ def bulk_notify_users(
         message: Notification message
         sticky: Whether notifications should be persistent
         pref_field: User preference field to check
+
     """
     success_count = 0
 

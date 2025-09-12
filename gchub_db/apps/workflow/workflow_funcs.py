@@ -11,7 +11,8 @@ def recalc_bev_nomenclature(
     bev_liquid_code,
     prepress_supplier,
 ):
-    """Separating this out so both the model and Javascript can access.
+    """
+    Separating this out so both the model and Javascript can access.
     Need to be able to calculate without attachment to an existing item
     Build the Evergreen nomenclature from size/color, center code, & end code.
     """
@@ -31,21 +32,11 @@ def recalc_bev_nomenclature(
                     item_code = "HU"
                 else:
                     item_code = "Panel"
-            nomenclature = (
-                item_code
-                + "-"
-                + str(bev_center_code.code)
-                + "-"
-                + str(bev_liquid_code.code)
-            )
+            nomenclature = item_code + "-" + str(bev_center_code.code) + "-" + str(bev_liquid_code.code)
         # Else, assume carton.
         else:
             # Raleigh is the only plant with a BHS press, and it gets different nomenclature.
-            if (
-                printlocation.plant.name
-                in ("Kalamazoo", "Framingham", "Turlock", "Raleigh")
-                and printlocation.press.name != "BHS"
-            ):
+            if printlocation.plant.name in ("Kalamazoo", "Framingham", "Turlock", "Raleigh") and printlocation.press.name != "BHS":
                 # This will be the majority of items.
                 if bev_itemcolorcode:
                     # Looksup a alphanumeric code based on the size and the number of colors.
@@ -67,10 +58,7 @@ def recalc_bev_nomenclature(
                 except Exception:
                     item_code = "HE Carton"
                 nomenclature = item_code
-            elif (
-                printlocation.plant.name in ("Raleigh")
-                and printlocation.press.name == "BHS"
-            ):
+            elif printlocation.plant.name in ("Raleigh") and printlocation.press.name == "BHS":
                 # Use the alt code as the item prefix, then append the prepress supplier code.
                 try:
                     item_code = bev_alt_code

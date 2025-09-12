@@ -21,9 +21,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="product",
             name="size",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="workflow.ItemCatalog"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="workflow.ItemCatalog"),
         ),
         migrations.AddField(
             model_name="partialartreq",
@@ -49,9 +47,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="extraproof",
             name="artreq",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="art_req.ArtReq"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="art_req.ArtReq"),
         ),
         migrations.AddField(
             model_name="artreq",
@@ -76,9 +72,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="artreq",
             name="mkt_segment",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="art_req.MarketSegment"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="art_req.MarketSegment"),
         ),
         migrations.AddField(
             model_name="artreq",
@@ -100,8 +94,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="additionalinfo",
             name="artreq",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="art_req.ArtReq"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="art_req.ArtReq"),
         ),
     ]

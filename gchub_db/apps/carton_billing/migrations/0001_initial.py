@@ -28,21 +28,15 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "creation_date",
-                    models.DateTimeField(
-                        auto_now_add=True, verbose_name="Date Created"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name="Date Created"),
                 ),
                 (
                     "qad_entry_date",
-                    models.DateField(
-                        blank=True, null=True, verbose_name="QAD Entry Date"
-                    ),
+                    models.DateField(blank=True, null=True, verbose_name="QAD Entry Date"),
                 ),
                 (
                     "job",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="workflow.Job"
-                    ),
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="workflow.Job"),
                 ),
                 (
                     "qad_entry_user",

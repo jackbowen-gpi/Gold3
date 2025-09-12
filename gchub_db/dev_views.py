@@ -24,16 +24,15 @@ def set_dev_session(request):
     else:
         val = raw
 
-    resp = HttpResponse(
-        '<html><body>Setting dev session and redirecting...<script>window.location="/"</script></body></html>'
-    )
+    resp = HttpResponse('<html><body>Setting dev session and redirecting...<script>window.location="/"</script></body></html>')
     # set cookie for the current host
     resp.set_cookie("sessionid", val, path="/", httponly=False)
     return resp
 
 
 def dev_whoami(request):
-    """Dev-only endpoint: return a small JSON summary of request.user.
+    """
+    Dev-only endpoint: return a small JSON summary of request.user.
 
     Useful to verify that the session cookie produced by the helper is
     actually authenticating requests.

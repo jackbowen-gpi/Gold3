@@ -34,8 +34,8 @@ def send_user_notification(
 
     Returns:
         bool: True if notification sent successfully
-    """
 
+    """
     # Check user preferences if specified (same logic as original Growl)
     if pref_field:
         from gchub_db.apps.accounts.models import (
@@ -89,6 +89,7 @@ def bulk_notify_users(
         message: Notification message
         sticky: Whether notifications should be persistent
         pref_field: User preference field to check
+
     """
     success_count = 0
 

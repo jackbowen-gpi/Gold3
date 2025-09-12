@@ -1,4 +1,5 @@
-"""Command handlers for the GOLD FS UDP server.
+"""
+Command handlers for the GOLD FS UDP server.
 
 Each incoming UDP packet is expected to be in the form: <command> [arg1 [arg2 ...]].
 Handler functions are looked up using getattr() with the prefix 'cmd_'.
@@ -9,7 +10,8 @@ from gchub_db.includes import fs_api
 
 
 def cmd_lock_job_folder(args, server):
-    """Lock job folders recursively.
+    """
+    Lock job folders recursively.
 
     Only integers are accepted as the job number.
     """

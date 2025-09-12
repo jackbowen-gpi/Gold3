@@ -1,0 +1,132 @@
+services:
+  web:
+    build: .
+    command: >
+      sh -c "python manage.py migrate && if [ -f setup_dev_admin_permissions.py ]; then python setup_dev_admin_permissions.py || true; fi && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DEV_DB_HOST: db
+      DEV_DB_PORT: "5432"
+      DEV_DB_USER: gchub
+      DEV_DB_PASSWORD: gchub
+      NOTIFICATION_DAEMON_URL: "http://notification-daemon:5341/notify"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: gchub_dev
+      POSTGRES_USER: gchub
+      POSTGRES_PASSWORD: gchub
+    ports:
+      - "5438:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  notification-daemon:
+    build: .
+    command: >
+      sh -c "python tools/notification_daemon.py --host 0.0.0.0 --port 5341"
+    volumes:
+      - .:/app
+    ports:
+      - "5341:5341"
+    depends_on:
+      - db
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  celery:
+    build: .
+    # use startup wrapper that waits for web readiness and runs django.setup()
+    command: sh -c "sh ./scripts/start-celery-worker.sh"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      # Ensure the Django settings read the correct DB credentials/host
+      DEV_DB_HOST: db
+      DEV_DB_PORT: "5432"
+      DEV_DB_USER: gchub
+      DEV_DB_PASSWORD: gchub
+      PYTHONPATH: /app
+      # Worker processes use a shim settings module to avoid importing
+      # django_celery_beat at import time.
+      DJANGO_SETTINGS_MODULE: gchub_db.worker_settings
+      # Do not enable the database-backed beat scheduler for plain workers
+      ENABLE_CELERY_BEAT: "0"
+    depends_on:
+      - web
+      - redis
+
+  celery-beat:
+    build: .
+    # use scripts/wait-and-start-celery-beat.sh so waiting logic is robust
+    command: sh -c "sh ./scripts/wait-and-start-celery-beat.sh"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      # Ensure the Django settings read the correct DB credentials/host
+      DEV_DB_HOST: db
+      DEV_DB_PORT: "5432"
+      DEV_DB_USER: gchub
+      DEV_DB_PASSWORD: gchub
+      PYTHONPATH: /app
+      # Use the normal project settings for celery-beat so django_celery_beat
+      # remains in INSTALLED_APPS and its models can be registered correctly.
+      DJANGO_SETTINGS_MODULE: gchub_db.settings
+      # Explicitly enable the DB-backed celery beat scheduler in this service
+      ENABLE_CELERY_BEAT: "1"
+    depends_on:
+      - web
+      - redis
+
+  flower:
+    image: mher/flower:2.0
+    command: flower --broker=redis://redis:6379/0 --port=5555
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    # If you have a prometheus config, mount it here. Without a config the container will use the image default.
+    # volumes:
+    #  - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+
+volumes:
+  pgdata:
+    # Persistent Postgres data
+    driver: local
+  grafana-storage:
+    driver: local

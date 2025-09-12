@@ -25,21 +25,15 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "date_queued",
-                    models.DateTimeField(
-                        auto_now_add=True, verbose_name=b"Date Queued"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name=b"Date Queued"),
                 ),
                 (
                     "date_processed",
-                    models.DateTimeField(
-                        blank=True, null=True, verbose_name=b"Date Processed"
-                    ),
+                    models.DateTimeField(blank=True, null=True, verbose_name=b"Date Processed"),
                 ),
                 (
                     "number_of_attempts",
-                    models.IntegerField(
-                        blank=True, default=0, null=True, verbose_name=b"Attempts"
-                    ),
+                    models.IntegerField(blank=True, default=0, null=True, verbose_name=b"Attempts"),
                 ),
             ],
             options={
@@ -60,15 +54,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "date_queued",
-                    models.DateTimeField(
-                        auto_now_add=True, verbose_name=b"Date Queued"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name=b"Date Queued"),
                 ),
                 (
                     "date_processed",
-                    models.DateTimeField(
-                        blank=True, null=True, verbose_name=b"Date Processed"
-                    ),
+                    models.DateTimeField(blank=True, null=True, verbose_name=b"Date Processed"),
                 ),
             ],
             options={

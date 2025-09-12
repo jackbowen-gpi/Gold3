@@ -1,4 +1,5 @@
-"""Definitions that are specific to the workflow app. This file should never
+"""
+Definitions that are specific to the workflow app. This file should never
 include other files aside from Django stuff.
 """
 

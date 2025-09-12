@@ -1,3 +1,7 @@
+"""
+Module gchub_db\apps\\color_mgt\\models.py
+"""
+
 from django.db import models
 from django.db.models import Avg
 
@@ -27,20 +31,17 @@ class ColorDefinition(models.Model):
 
     def fsb_usage_count(self):
         """From the given color def, return usage count."""
-        return self.itemcolor_set.filter(
-            item__job__workflow__name="Foodservice", delta_e__isnull=False
-        ).count()
+        return self.itemcolor_set.filter(item__job__workflow__name="Foodservice", delta_e__isnull=False).count()
 
     def avg_delta(self):
         """From the given color def, return the average delta-e."""
-        x = self.itemcolor_set.filter(
-            item__job__workflow__name="Foodservice", delta_e__isnull=False
-        ).aggregate(Avg("delta_e"))
+        x = self.itemcolor_set.filter(item__job__workflow__name="Foodservice", delta_e__isnull=False).aggregate(Avg("delta_e"))
 
         return x["delta_e__avg"]
 
     def avg_delta_warning(self):
-        """From the given color def check if the avg. detla-e is greater than two and
+        """
+        From the given color def check if the avg. detla-e is greater than two and
         return true or false.
         """
         if self.avg_delta() >= 2:

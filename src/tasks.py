@@ -1,3 +1,7 @@
+"""
+Module src\tasks.py
+"""
+
 from celery import shared_task  # type: ignore[import-not-found]
 import time
 

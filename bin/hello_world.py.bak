@@ -1,0 +1,17 @@
+# bin/hello_world.py
+import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.celery_app import app  # project Celery app module used in this repo
+
+
+@app.task
+def hello_world():
+    print("Hello, world!")
+
+
+if __name__ == "__main__":
+    # fire-and-forget when run directly (calls the task asynchronously)
+    hello_world.delay()

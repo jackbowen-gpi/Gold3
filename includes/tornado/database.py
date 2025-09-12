@@ -26,7 +26,8 @@ import MySQLdb.cursors
 
 
 class Connection(object):
-    """A lightweight wrapper around MySQLdb DB-API connections.
+    """
+    A lightweight wrapper around MySQLdb DB-API connections.
 
     The main value we provide is wrapping rows in a dict/object so that
     columns can be accessed by name. Typical usage:
@@ -137,7 +138,8 @@ class Connection(object):
             cursor.close()
 
     def executemany(self, query, parameters):
-        """Executes the given query against all the given param sequences.
+        """
+        Executes the given query against all the given param sequences.
 
         We return the lastrowid from the query.
         """

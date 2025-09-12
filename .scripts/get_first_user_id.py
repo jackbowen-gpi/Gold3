@@ -1,3 +1,7 @@
+r"""
+Module .scripts\get_first_user_id.py
+"""
+
 import os
 import django
 import sys

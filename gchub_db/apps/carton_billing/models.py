@@ -11,9 +11,7 @@ class CartonSapEntry(models.Model):
     job = models.ForeignKey("workflow.Job", on_delete=models.CASCADE)
     creation_date = models.DateTimeField("Date Created", auto_now_add=True)
     qad_entry_date = models.DateField("QAD Entry Date", blank=True, null=True)
-    qad_entry_user = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=True, null=True
-    )
+    qad_entry_user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         """String representation."""

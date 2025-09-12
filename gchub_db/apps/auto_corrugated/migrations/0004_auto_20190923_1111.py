@@ -45,9 +45,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="generatedbox",
             name="creation_date",
-            field=models.DateTimeField(
-                auto_now_add=True, verbose_name="Date Info Entered"
-            ),
+            field=models.DateTimeField(auto_now_add=True, verbose_name="Date Info Entered"),
         ),
         migrations.AlterField(
             model_name="generatedbox",
@@ -123,8 +121,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="generatedlabel",
             name="creation_date",
-            field=models.DateTimeField(
-                auto_now_add=True, verbose_name="Date Info Entered"
-            ),
+            field=models.DateTimeField(auto_now_add=True, verbose_name="Date Info Entered"),
         ),
     ]

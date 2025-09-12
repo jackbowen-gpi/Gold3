@@ -29,9 +29,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="generatedbox",
             name="plant",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="workflow.Plant"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="workflow.Plant"),
         ),
         migrations.AddField(
             model_name="generatedbox",

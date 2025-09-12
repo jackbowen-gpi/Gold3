@@ -1,3 +1,7 @@
+r"""
+Module .scripts\get_dev_admin_id.py
+"""
+
 import os
 import sys
 

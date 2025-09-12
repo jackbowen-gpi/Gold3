@@ -23,15 +23,13 @@ class AccountsConfig(AppConfig):
 
             User = get_user_model()
 
-            username = getattr(settings, "DEV_ADMIN_USERNAME", "devadmin")
-            password = getattr(settings, "DEV_ADMIN_PASSWORD", "devpass")
+            username = getattr(settings, "DEV_ADMIN_USERNAME", "devtest")
+            password = getattr(settings, "DEV_ADMIN_PASSWORD", "devtest")
             email = getattr(settings, "DEV_ADMIN_EMAIL", "devadmin@example.com")
 
             # Create user if missing
             try:
-                user, created = User.objects.get_or_create(
-                    username=username, defaults={"email": email}
-                )
+                user, created = User.objects.get_or_create(username=username, defaults={"email": email})
                 if created:
                     user.set_password(password)
                     user.is_active = True

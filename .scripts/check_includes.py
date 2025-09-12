@@ -1,3 +1,7 @@
+r"""
+Module .scripts\check_includes.py
+"""
+
 import os
 import sys
 import re
@@ -45,11 +49,7 @@ for mod in includes:
 
 # Summarize failures
 fails = [r for r in results if not r[1]]
-print(
-    "\nSummary: {} includes failed, {} succeeded".format(
-        len(fails), len(results) - len(fails)
-    )
-)
+print("\nSummary: {} includes failed, {} succeeded".format(len(fails), len(results) - len(fails)))
 for mod, ok, tb in fails:
     print("\nFAILED MODULE:", mod)
     print(tb)

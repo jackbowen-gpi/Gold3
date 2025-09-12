@@ -43,16 +43,8 @@ def search_printgroup(request):
 
             # Then we can do this all in one step instead of needing to call
             # 'filter' and deal with intermediate data structures.
-            q_objs = [
-                Q(**{qdict[k]: form.cleaned_data[k]})
-                for k in list(qdict.keys())
-                if form.cleaned_data.get(k, None)
-            ]
-            search_results = (
-                QAD_PrintGroups.objects.select_related()
-                .filter(*q_objs)
-                .order_by("name")
-            )
+            q_objs = [Q(**{qdict[k]: form.cleaned_data[k]}) for k in list(qdict.keys()) if form.cleaned_data.get(k, None)]
+            search_results = QAD_PrintGroups.objects.select_related().filter(*q_objs).order_by("name")
 
             # Call the result view directly for display.
             return PrintgroupSearchResults.as_view(queryset=search_results)(request)

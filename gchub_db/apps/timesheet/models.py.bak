@@ -1,0 +1,39 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.contrib.auth.models import User
+from django.db import models
+
+
+class TimeSheetCategory(models.Model):
+    """The different types of work that can be recorded on a time sheet."""
+
+    name = models.CharField(max_length=50)
+    code = models.IntegerField(blank=True, null=True)
+    order = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+
+    def __unicode__(self):
+        return self.__str__()
+
+
+class TimeSheet(models.Model):
+    """A single timesheet for a job. Usually represents a days work on a given job."""
+
+    # Importing the Job model name as a string to avoid a circular dependencey.
+    job = models.ForeignKey(
+        "workflow.Job", blank=True, null=True, on_delete=models.CASCADE
+    )
+    artist = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
+    category = models.ForeignKey(TimeSheetCategory, on_delete=models.CASCADE)
+    hours = models.FloatField()
+    comments = models.TextField(max_length=500, blank=True, null=True)
+
+    def __str__(self):
+        return str("%s - %s" % (self.category, self.date))
+
+    def __unicode__(self):
+        return self.__str__()

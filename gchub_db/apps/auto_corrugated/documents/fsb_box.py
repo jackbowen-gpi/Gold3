@@ -92,7 +92,8 @@ class FSBBox(GenericBox):
         job_id=None,
         watermark=False,
     ):
-        """Handles drawing the canvas and preparing other storage variables.
+        """
+        Handles drawing the canvas and preparing other storage variables.
 
         file_name: (str) Path to the eventual finished PDF.
         width: (float) Width of the box (in inches)
@@ -127,9 +128,7 @@ class FSBBox(GenericBox):
         else:
             encrypt = False
         # Call GenericBox's __init__() method.
-        super(FSBBox, self).__init__(
-            file_name, width, height, length, format, print_header, encrypt, plant
-        )
+        super(FSBBox, self).__init__(file_name, width, height, length, format, print_header, encrypt, plant)
         # Transfer variables that are specific to FSBBox objects.
         self.file_name = file_name
         self.format = format
@@ -262,10 +261,7 @@ class FSBBox(GenericBox):
             panel_d_top_label = CountLabelElement(
                 "CaseCountD",
                 self.X_PANEL_C + self.C_PANEL_SIDE - self.MARGIN_WIDTH,
-                (self.box_height - self.heightMod)
-                - 0.7
-                + (self.FLAP_HEIGHT * 2)
-                - self.MARGIN_WIDTH,
+                (self.box_height - self.heightMod) - 0.7 + (self.FLAP_HEIGHT * 2) - self.MARGIN_WIDTH,
                 text_lines,
                 can_move_x=False,
                 can_move_y=False,
@@ -277,9 +273,7 @@ class FSBBox(GenericBox):
             panel_d_top_label_usa = CountLabelElement(
                 "CaseCountD_USA",
                 self.X_PANEL_C + self.C_PANEL_SIDE - self.MARGIN_WIDTH,
-                (self.box_height - self.heightMod)
-                + (self.FLAP_HEIGHT * 2)
-                - self.MARGIN_WIDTH,
+                (self.box_height - self.heightMod) + (self.FLAP_HEIGHT * 2) - self.MARGIN_WIDTH,
                 text_lines_usa,
                 can_move_x=False,
                 can_move_y=False,
@@ -293,10 +287,7 @@ class FSBBox(GenericBox):
             panel_d_top_label = CountLabelElement(
                 "CaseCountD",
                 self.X_PANEL_D + self.D_PANEL_SIDE - self.MARGIN_WIDTH,
-                (self.box_height - self.heightMod)
-                - 0.7
-                + (self.FLAP_HEIGHT * 2)
-                - self.MARGIN_WIDTH,
+                (self.box_height - self.heightMod) - 0.7 + (self.FLAP_HEIGHT * 2) - self.MARGIN_WIDTH,
                 text_lines,
                 can_move_x=False,
                 can_move_y=False,
@@ -308,9 +299,7 @@ class FSBBox(GenericBox):
             panel_d_top_label_usa = CountLabelElement(
                 "CaseCountD_USA",
                 self.X_PANEL_D + self.D_PANEL_SIDE - self.MARGIN_WIDTH,
-                (self.box_height - self.heightMod)
-                + (self.FLAP_HEIGHT * 2)
-                - self.MARGIN_WIDTH,
+                (self.box_height - self.heightMod) + (self.FLAP_HEIGHT * 2) - self.MARGIN_WIDTH,
                 text_lines_usa,
                 can_move_x=False,
                 can_move_y=False,
@@ -431,7 +420,8 @@ class FSBBox(GenericBox):
         self.place_element(self.stamper, ignore_margins=True)
 
     def __draw_machine_barcode_box(self):
-        """Draws the machine bar code box to the left of the label area. Only for
+        """
+        Draws the machine bar code box to the left of the label area. Only for
         Kenton with box format left.
         """
         if self.format.lower() == "left" and self.plant.lower() == "kenton":
@@ -449,13 +439,9 @@ class FSBBox(GenericBox):
 
     def __draw_barcode_six_digit_barcode(self):
         if self.format.lower() == "left":
-            six_digit_barcode_x_location = (
-                self.X_PANEL_B + (self.B_PANEL_SIDE / 2) - 1.0
-            )
+            six_digit_barcode_x_location = self.X_PANEL_B + (self.B_PANEL_SIDE / 2) - 1.0
         else:
-            six_digit_barcode_x_location = (
-                self.X_PANEL_C + (self.C_PANEL_SIDE / 2) - 1.0
-            )
+            six_digit_barcode_x_location = self.X_PANEL_C + (self.C_PANEL_SIDE / 2) - 1.0
 
         # Draw the barcode for Kenton.
         barcode_y_location = self.FLAP_HEIGHT / 2.0 - 0.69
@@ -474,17 +460,13 @@ class FSBBox(GenericBox):
         # Misc. text and codes.
         if self.format.lower() == "left":
             six_digit_x_location = self.X_PANEL_C + self.MARGIN_WIDTH
-            six_digit_barcode_x_location = (
-                self.X_PANEL_B + (self.B_PANEL_SIDE / 2) - 1.0
-            )
+            six_digit_barcode_x_location = self.X_PANEL_B + (self.B_PANEL_SIDE / 2) - 1.0
             topflap_1_location = self.X_PANEL_A + self.MARGIN_WIDTH
             topflap_2_location = self.X_PANEL_C + self.MARGIN_WIDTH
             bottomflap_location = self.X_PANEL_D - self.MARGIN_WIDTH
         else:
             six_digit_x_location = self.X_PANEL_D + self.MARGIN_WIDTH
-            six_digit_barcode_x_location = (
-                self.X_PANEL_C + (self.C_PANEL_SIDE / 2) - 1.0
-            )
+            six_digit_barcode_x_location = self.X_PANEL_C + (self.C_PANEL_SIDE / 2) - 1.0
             topflap_1_location = self.X_PANEL_B + self.MARGIN_WIDTH
             topflap_2_location = self.X_PANEL_D + self.MARGIN_WIDTH
             bottomflap_location = self.X_PANEL_D + self.B_PANEL_SIDE - self.MARGIN_WIDTH
@@ -531,23 +513,14 @@ class FSBBox(GenericBox):
         ]
 
         this_side_text_height = len(text_lines_up) * (this_side_text_size / 72.0)
-        this_side_up_y = (
-            (self.box_height - self.heightMod)
-            + (self.FLAP_HEIGHT * 2)
-            - this_side_text_height
-            - self.MARGIN_WIDTH
-        )
+        this_side_up_y = (self.box_height - self.heightMod) + (self.FLAP_HEIGHT * 2) - this_side_text_height - self.MARGIN_WIDTH
 
         # Draw the first 'This side up' label on the top flap.
-        this_side_up_1_text = FlapTextElement(
-            "ThisSideUpTop", topflap_1_location, this_side_up_y, text_lines_up
-        )
+        this_side_up_1_text = FlapTextElement("ThisSideUpTop", topflap_1_location, this_side_up_y, text_lines_up)
         self.place_element(this_side_up_1_text)
 
         # Draw the second 'This side up' label on the top flap.
-        this_side_up_2_text = FlapTextElement(
-            "ThisSideUpTop2", topflap_2_location, this_side_up_y, text_lines_up
-        )
+        this_side_up_2_text = FlapTextElement("ThisSideUpTop2", topflap_2_location, this_side_up_y, text_lines_up)
         self.place_element(this_side_up_2_text)
 
         # Draw the second 'This side up' label on the top flap.
@@ -560,9 +533,7 @@ class FSBBox(GenericBox):
         this_side_text_height = len(text_lines_down) * (this_side_text_size / 72.0)
         this_side_down_y = self.MARGIN_WIDTH + this_side_text_height
 
-        this_side_down_text = FlapTextElement(
-            "ThisSideUpDown", bottomflap_location, this_side_down_y, text_lines_down
-        )
+        this_side_down_text = FlapTextElement("ThisSideUpDown", bottomflap_location, this_side_down_y, text_lines_down)
         self.place_element(this_side_down_text, rotated=True)
 
     def __draw_item_name(self, short_mode=False):
@@ -586,9 +557,7 @@ class FSBBox(GenericBox):
                 # print total_width
             else:
                 type_size -= 8.0
-                total_width = check_text_width(
-                    type_size, "VAG Rounded BT", self.item_name
-                )
+                total_width = check_text_width(type_size, "VAG Rounded BT", self.item_name)
 
         # In short mode the item name's vertical size must be limited.
         if short_mode:
@@ -609,9 +578,7 @@ class FSBBox(GenericBox):
             if short_mode:  # For short boxes go directly under the GPI logo.
                 item_name_a_y = self.ip_logo_a.bottom_left_y - text_height - 0.5
             else:  # For bigger boxes leave a gap.
-                item_name_a_y = (
-                    (self.box_height - self.heightMod) * 0.65 + self.SHORT_SIDE / 2.0
-                ) - (text_height / 2.0)
+                item_name_a_y = ((self.box_height - self.heightMod) * 0.65 + self.SHORT_SIDE / 2.0) - (text_height / 2.0)
         self.item_name_a = CollidableTextElement(
             "ItemNameA",
             self.X_PANEL_A + self.MARGIN_WIDTH,
@@ -632,9 +599,7 @@ class FSBBox(GenericBox):
             if short_mode:  # For short boxes go directly under the GPI logo.
                 item_name_b_y = self.ip_logo_a.bottom_left_y - text_height - 0.5
             else:  # For bigger boxes leave a gap.
-                item_name_b_y = (
-                    (self.box_height - self.heightMod) * 0.65 + self.SHORT_SIDE / 2.0
-                ) - (text_height / 2.0)
+                item_name_b_y = ((self.box_height - self.heightMod) * 0.65 + self.SHORT_SIDE / 2.0) - (text_height / 2.0)
         item_name_b_x = self.X_PANEL_C - self.MARGIN_WIDTH - total_width
         self.item_name_b = CollidableTextElement(
             "ItemNamB",
@@ -656,9 +621,7 @@ class FSBBox(GenericBox):
             if short_mode:  # For short boxes go directly under the GPI logo.
                 item_name_c_y = self.ip_logo_a.bottom_left_y - text_height - 0.5
             else:  # For bigger boxes leave a gap.
-                item_name_c_y = (
-                    (self.box_height - self.heightMod) * 0.65 + self.SHORT_SIDE / 2.0
-                ) - (text_height / 2.0)
+                item_name_c_y = ((self.box_height - self.heightMod) * 0.65 + self.SHORT_SIDE / 2.0) - (text_height / 2.0)
         item_name_c_x = self.X_PANEL_C + self.MARGIN_WIDTH
         self.item_name_c = CollidableTextElement(
             "ItemNameC",
@@ -680,12 +643,8 @@ class FSBBox(GenericBox):
             if short_mode:  # For short boxes go directly under the GPI logo.
                 item_name_d_y = self.ip_logo_a.bottom_left_y - text_height - 0.5
             else:  # For bigger boxes leave a gap.
-                item_name_d_y = (
-                    (self.box_height - self.heightMod) * 0.65 + self.SHORT_SIDE / 2.0
-                ) - (text_height / 2.0)
-        item_name_d_x = (
-            self.X_PANEL_D + self.D_PANEL_SIDE - self.MARGIN_WIDTH - total_width
-        )
+                item_name_d_y = ((self.box_height - self.heightMod) * 0.65 + self.SHORT_SIDE / 2.0) - (text_height / 2.0)
+        item_name_d_x = self.X_PANEL_D + self.D_PANEL_SIDE - self.MARGIN_WIDTH - total_width
 
         self.item_name_d = CollidableTextElement(
             "ItemNameD",
@@ -708,12 +667,7 @@ class FSBBox(GenericBox):
             item_name_top_x = self.X_PANEL_D + self.B_PANEL_SIDE - self.MARGIN_WIDTH
 
         # Set up y position for top logo, accounting for rotation.
-        item_name_top_y = (
-            (self.box_height - self.heightMod)
-            + self.FLAP_HEIGHT
-            + self.MARGIN_WIDTH
-            + text_height
-        )
+        item_name_top_y = (self.box_height - self.heightMod) + self.FLAP_HEIGHT + self.MARGIN_WIDTH + text_height
 
         # Draw item name on top.
         self.item_name_top = CollidableTextElement(
@@ -728,7 +682,8 @@ class FSBBox(GenericBox):
         self.place_element(self.item_name_top, rotated=True)
 
     def __draw_item_description(self):
-        """Draw item descriptions & lid information under the item names.
+        """
+        Draw item descriptions & lid information under the item names.
         Three different languages.
         """
         # Setup kwargs for this set of elements.
@@ -807,9 +762,7 @@ class FSBBox(GenericBox):
 
         if self.item_name_d.draw_element:
             # Draw descriptions for panel D
-            item_description_d_x = (
-                self.X_PANEL_D + self.D_PANEL_SIDE - self.MARGIN_WIDTH
-            )
+            item_description_d_x = self.X_PANEL_D + self.D_PANEL_SIDE - self.MARGIN_WIDTH
             item_description_y = self.item_name_d.bottom_left_y - 0.25
             item_description_y -= text_height * len(text_lines)
             item_description_d = ItemDescriptionElement(
@@ -856,9 +809,7 @@ class FSBBox(GenericBox):
 
         # Calculate y position for initial placement.
         # This will get moved down the height of the logo later.
-        ip_logo_y = (
-            self.Y_PANEL_A + (self.box_height - self.heightMod) - self.MARGIN_WIDTH
-        )
+        ip_logo_y = self.Y_PANEL_A + (self.box_height - self.heightMod) - self.MARGIN_WIDTH
 
         # In short mode the IP logo can't take up more than 1/6th of the
         # vertical space.
@@ -868,9 +819,7 @@ class FSBBox(GenericBox):
             available_area_y = None
 
         if (ip_logo_y - 2.5) < (self.stamper.bottom_left_x + self.stamper.height):
-            available_area_A_side_label = (
-                self.A_PANEL_SIDE - 6.0 - 2 * self.MARGIN_WIDTH
-            )
+            available_area_A_side_label = self.A_PANEL_SIDE - 6.0 - 2 * self.MARGIN_WIDTH
             if available_area_A_side_label < available_area_AC_side_x:
                 available_area_AC_side_x = available_area_A_side_label * 0.85
 
@@ -963,9 +912,7 @@ class FSBBox(GenericBox):
 
         available_area_y = self.FLAP_HEIGHT - (2.0 * self.MARGIN_WIDTH)
         # Calculate y positon of top panel logo.
-        ip_logo_top_y = (
-            (self.FLAP_HEIGHT) + self.MARGIN_WIDTH + (self.box_height - self.heightMod)
-        )
+        ip_logo_top_y = (self.FLAP_HEIGHT) + self.MARGIN_WIDTH + (self.box_height - self.heightMod)
         # Create and place logo for top flap -- this one is different!
 
         # Here us some statements that will let us control the sizes of the Top panel logos.
@@ -1015,9 +962,7 @@ class FSBBox(GenericBox):
 
         if short_mode:
             # In short mode let to graphic grow all the way to the top of the panel.
-            available_area_y = (
-                self.Y_PANEL_A + (self.box_height - self.heightMod) - item_graphic_y
-            )
+            available_area_y = self.Y_PANEL_A + (self.box_height - self.heightMod) - item_graphic_y
         else:
             # Set the upper limit of the graphic to be the lowest of the
             # GPI logos.
@@ -1029,9 +974,7 @@ class FSBBox(GenericBox):
             top_limit -= 0.5
             available_area_y = top_limit - item_graphic_y - 0.25
 
-        graphic_file = os.path.join(
-            CORRUGATED_MEDIA_DIR, self.item_name.lower() + ".svg"
-        )
+        graphic_file = os.path.join(CORRUGATED_MEDIA_DIR, self.item_name.lower() + ".svg")
 
         adjustmentArr = []
         elementArr = []
@@ -1148,14 +1091,18 @@ class FSBBox(GenericBox):
                 if not adjustmentArr[x]:
                     elementArr[x].height *= currentSmallestItem["scaling"]
                     elementArr[x].width *= currentSmallestItem["scaling"]
-                    elementArr[x].drawing.scale(
-                        currentSmallestItem["scaling"], currentSmallestItem["scaling"]
-                    )
+                    elementArr[x].drawing.scale(currentSmallestItem["scaling"], currentSmallestItem["scaling"])
                     elementArr[x].bottom_left_y = currentSmallestItem["draw_y"]
             #                 elif adjustmentArr[x]['scaling'] > currentSmallestItem['scaling']:
-            #                     elementArr[x].height *= (elementArr[x].height*(1 + (1 - adjustmentArr[x]['scaling'])))*currentSmallestItem['scaling']
-            #                     elementArr[x].width *= (elementArr[x].width*(1 + (1 - adjustmentArr[x]['scaling'])))*currentSmallestItem['scaling']
-            #                     elementArr[x].drawing.scale(currentSmallestItem['scaling'], currentSmallestItem['scaling'])
+            #                     elementArr[x].height *= (
+            #                         elementArr[x].height * (1 + (1 - adjustmentArr[x]['scaling']))
+            #                     ) * currentSmallestItem['scaling']
+            #                     elementArr[x].width *= (
+            #                         elementArr[x].width * (1 + (1 - adjustmentArr[x]['scaling']))
+            #                     ) * currentSmallestItem['scaling']
+            #                     elementArr[x].drawing.scale(
+            #                         currentSmallestItem['scaling'], currentSmallestItem['scaling']
+            #                     )
             #                     elementArr[x].bottom_left_y = currentSmallestItem['draw_y']
             elementArr[x].draw_element = True
             self.draw_element(self.canvas, elementArr[x], rotated=False)
@@ -1338,7 +1285,8 @@ class FSBBox(GenericBox):
         # self.place_element(sfi_graphic)
 
     def __draw_specialty_logo(self, type=False, short_mode=False):
-        """Draw specialty logos on the box, near the middle of each panel as
+        """
+        Draw specialty logos on the box, near the middle of each panel as
         needed. Specialty logos include Ecotainer Logos, Hold&Go Logos, and
         Hold&Cold logos.
         """
@@ -1348,9 +1296,7 @@ class FSBBox(GenericBox):
 
         # Path to SVG file for the logo.
         if type == "ecotainer":
-            specialty_logo_file_name = os.path.join(
-                CORRUGATED_MEDIA_DIR, "ecotainer.svg"
-            )
+            specialty_logo_file_name = os.path.join(CORRUGATED_MEDIA_DIR, "ecotainer.svg")
         elif type == "holdngo":
             specialty_logo_file_name = os.path.join(CORRUGATED_MEDIA_DIR, "holdngo.svg")
         else:
@@ -1372,9 +1318,7 @@ class FSBBox(GenericBox):
             # vertical space.
             available_area_y = (self.box_height - self.heightMod) * (0.167)
         else:  # Leave a gap for longer boxes.
-            specialty_logo_Y = self.Y_PANEL_A + (
-                (self.box_height - self.heightMod) * 0.75
-            )
+            specialty_logo_Y = self.Y_PANEL_A + ((self.box_height - self.heightMod) * 0.75)
             available_area_y = None
 
         # Begin graphic creation and placement.
@@ -1421,9 +1365,7 @@ class FSBBox(GenericBox):
         self.place_element(self.specialty_logo_c)
 
         # Create and place logo for panel D.
-        specialty_logo_X = (
-            self.X_PANEL_D + self.B_PANEL_SIDE - self.MARGIN_WIDTH - available_area_x
-        )
+        specialty_logo_X = self.X_PANEL_D + self.B_PANEL_SIDE - self.MARGIN_WIDTH - available_area_x
         self.specialty_logo_d = SpecialtyLogoElement(
             "SpecialtyLogoD",
             specialty_logo_X,
@@ -1443,9 +1385,7 @@ class FSBBox(GenericBox):
         else:
             specialty_logo_X = self.X_PANEL_D + self.MARGIN_WIDTH + available_area_x
 
-        specialty_logo_Y = (
-            self.Y_PANEL_A + (self.box_height - self.heightMod) + self.MARGIN_WIDTH
-        )
+        specialty_logo_Y = self.Y_PANEL_A + (self.box_height - self.heightMod) + self.MARGIN_WIDTH
         self.specialty_logo_top = SpecialtyLogoElement(
             "SpecialtyLogoTop",
             specialty_logo_X,
@@ -1456,13 +1396,12 @@ class FSBBox(GenericBox):
             can_move_x=can_move_x,
             can_move_y=can_move_y,
         )
-        self.specialty_logo_top.bottom_left_y = (
-            specialty_logo_Y + self.specialty_logo_top.height
-        )
+        self.specialty_logo_top.bottom_left_y = specialty_logo_Y + self.specialty_logo_top.height
         self.place_element(self.specialty_logo_top, rotated=True)
 
     def __draw_fsb_elements(self):
-        """Draws and places all of the elements on the FSBBox.
+        """
+        Draws and places all of the elements on the FSBBox.
         Currently, the draw order determines the drawing priority. Elements
         drawn last are more likely to move/be deleted in event of collisions.
         """
@@ -1500,9 +1439,7 @@ class FSBBox(GenericBox):
             # Check if any specialty logos need to be placed.
             try:
                 # Hold&Gos start with "SD" or have "D" as the 3rd letter in their size.
-                if (self.item_name[0] == "S" and self.item_name[1] == "D") or (
-                    self.item_name[0] == "L" and self.item_name[2] == "D"
-                ):
+                if (self.item_name[0] == "S" and self.item_name[1] == "D") or (self.item_name[0] == "L" and self.item_name[2] == "D"):
                     print("Hold&Go size. Placing Hold&Go logo.")
                     self.__draw_specialty_logo("holdngo", short_mode)
                 # Ecotainers will have an "E" as the 4th or 5th letter in their size.
@@ -1544,12 +1481,7 @@ class FSBBox(GenericBox):
         # Print card header outline.
         header_x1 = self.X_PANEL_A
         header_y1 = 0.5 + self.SHORT_SIDE + self.box_height
-        header_x2 = (
-            self.A_PANEL_SIDE
-            + self.B_PANEL_SIDE
-            + self.C_PANEL_SIDE
-            + self.D_PANEL_SIDE
-        )
+        header_x2 = self.A_PANEL_SIDE + self.B_PANEL_SIDE + self.C_PANEL_SIDE + self.D_PANEL_SIDE
         header_y2 = self.canvas_height - self.box_height - self.SHORT_SIDE - 8.0
 
         c.rect(
@@ -1699,8 +1631,7 @@ class FSBBox(GenericBox):
         c.drawString(
             (header_x1 + column_a_x) * inch,
             (TEXT_START - 4.0 * TEXT_SPACING) * inch,
-            "%s x %s x %s inches"
-            % (str(self.box_length), str(self.box_width), str(self.box_height)),
+            "%s x %s x %s inches" % (str(self.box_length), str(self.box_width), str(self.box_height)),
         )
         c.drawString(
             (header_x1 + column_a_x) * inch,
@@ -1784,13 +1715,7 @@ class FSBBox(GenericBox):
 
         # Impression slug designation, Order#, and Date on the D flap of the box for Kenton
         if self.plant == "Kenton":
-            bottomLeftFlap_location = (
-                self.A_PANEL_SIDE
-                + self.B_PANEL_SIDE
-                + self.C_PANEL_SIDE
-                + (self.D_PANEL_SIDE / 2)
-                + 1
-            )
+            bottomLeftFlap_location = self.A_PANEL_SIDE + self.B_PANEL_SIDE + self.C_PANEL_SIDE + (self.D_PANEL_SIDE / 2) + 1
             c = self.canvas
             # Sets the color of the panel outlines. Original values were (0, 0, 0, 0.75) for both
             c.setStrokeColorCMYK(0.65, 0.60, 0.55, 0)
@@ -1828,13 +1753,7 @@ class FSBBox(GenericBox):
         # Impression slug designation.
         imp_slug_plants = ["Clarksville", "Visalia"]
         if self.plant in imp_slug_plants:
-            bottomLeftFlap_location = (
-                self.A_PANEL_SIDE
-                + self.B_PANEL_SIDE
-                + self.C_PANEL_SIDE
-                + (self.D_PANEL_SIDE / 2)
-                + 1
-            )
+            bottomLeftFlap_location = self.A_PANEL_SIDE + self.B_PANEL_SIDE + self.C_PANEL_SIDE + (self.D_PANEL_SIDE / 2) + 1
             c = self.canvas
             # Sets the color of the panel outlines. Original values were (0, 0, 0, 0.75) for both
             c.setStrokeColorCMYK(0.65, 0.60, 0.55, 0)
@@ -1857,7 +1776,8 @@ class FSBBox(GenericBox):
             )
 
     def __draw_watermark(self):
-        """Draws watermark over artwork. This is for pre-approval PDF artwork.
+        """
+        Draws watermark over artwork. This is for pre-approval PDF artwork.
         Discourages use of art before it is approved and paid for.
         """
         c = self.canvas
@@ -1881,7 +1801,8 @@ class FSBBox(GenericBox):
 
 
 class FSBLabel(GenericLabel):
-    """Standard Foodservice label object. Labels are placed on the corner of
+    """
+    Standard Foodservice label object. Labels are placed on the corner of
     a corrugated box. The standard FSBBox has a pre-printed label. This label
     would be placed on top of that with updated/different information.
     """
@@ -1896,7 +1817,8 @@ class FSBLabel(GenericLabel):
         pdf_type,
         label_id,
     ):
-        """Handles drawing the canvas and preparing other storage variables.
+        """
+        Handles drawing the canvas and preparing other storage variables.
 
         file_name: (str) Path to the eventual finished PDF.
         nine_digit_num: (int) Barcode number 1.
@@ -1923,7 +1845,8 @@ class FSBLabel(GenericLabel):
         self.canvas.showPage()
 
     def __draw_label_area(self):
-        """Draw the label area and accompanying barcodes. Label area falls on
+        """
+        Draw the label area and accompanying barcodes. Label area falls on
         the corner of the box, and is equally distributed on two panels.
         """
         label_area_bottom_left_x = 0.0

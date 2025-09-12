@@ -1,4 +1,5 @@
-"""Shim to expose repo-level middleware/ as gchub_db.middleware
+"""
+Shim to expose repo-level middleware/ as gchub_db.middleware
 for legacy imports.
 """
 

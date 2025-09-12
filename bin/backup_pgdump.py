@@ -17,7 +17,8 @@ BACKUP_DIR = os.path.join(settings.BACKUP_DIR, "pg_gold")
 
 
 def dump_backup():
-    """Runs pg_dump to a location based on values in settings.py. Make
+    """
+    Runs pg_dump to a location based on values in settings.py. Make
 
     sure that pg_dump is in the path!
     """
@@ -44,7 +45,8 @@ def dump_backup():
 
 
 def remove_old_backups():
-    """Cycles out backups older than the tolerance defined in
+    """
+    Cycles out backups older than the tolerance defined in
 
     settings.py
     """

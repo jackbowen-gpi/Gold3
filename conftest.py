@@ -1,9 +1,14 @@
+"""
+Module conftest.py
+"""
+
 import os
 import sys
 
 
 def pytest_configure(config):
-    """Ensure repo root and its parent are on sys.path early during pytest startup.
+    """
+    Ensure repo root and its parent are on sys.path early during pytest startup.
     This helps imports like `import settings_common` and `gchub_db.apps.*` work when
     pytest-django calls django.setup().
     """
@@ -23,6 +28,8 @@ except NameError:
     collect_ignore = [
         "gchub_db/test_urls.py",
         "test_urls.py",
+        "dev/",  # Exclude dev directory from model discovery
+        "dev/_.dev.md",  # Specifically exclude the problematic markdown file
     ]
 
 
@@ -50,8 +57,18 @@ try:
     # Provide a sensible default settings module if one is not provided by the
     # environment or by pytest config. This prevents certain import-time
     # failures during collection in this repository.
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
+    # Use test settings for pytest, regular settings for other Django operations
+    if "pytest" in sys.modules:
+        os.environ["DJANGO_SETTINGS_MODULE"] = "gchub_db.test_settings"
+    else:
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
 except Exception:
     # Be defensive: don't allow the conftest import hook to crash pytest
     # collection in case something about the environment is unexpected.
     pass
+
+
+# NOTE: The aggressive skipping hook was removed to restore normal test
+# discovery and allow the app-by-app tests in `gchub_db/apps` to be collected.
+# If specific tests are flaky, prefer adding targeted pytest.mark.skip on the
+# test itself or a small, well-documented collection filter here.

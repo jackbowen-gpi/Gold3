@@ -1,4 +1,5 @@
-"""Daemon package for small helper daemons used by the project.
+"""
+Daemon package for small helper daemons used by the project.
 
 This package intentionally contains simple scripts and small servers used by
 developers and the deployed system (for example, the GOLD FS UDP server and

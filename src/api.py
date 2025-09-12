@@ -1,4 +1,5 @@
-"""Local shim module named `api` to satisfy legacy imports during local development.
+"""
+Local shim module named `api` to satisfy legacy imports during local development.
 
 This module intentionally provides a minimal surface so `import api` does
 not raise ModuleNotFoundError. It's a temporary workaround — replace or

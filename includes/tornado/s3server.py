@@ -14,7 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Implementation of an S3-like storage server based on local files.
+"""
+Implementation of an S3-like storage server based on local files.
 
 Useful to test features that will eventually run on S3, or if you want to
 run something locally that was once running on S3.
@@ -52,7 +53,8 @@ def start(port, root_directory="/tmp/s3", bucket_depth=0):
 
 
 class S3Application(web.Application):
-    """Implementation of an S3-like storage server based on local files.
+    """
+    Implementation of an S3-like storage server based on local files.
 
     If bucket depth is given, we break files up into multiple directories
     to prevent hitting file system limits for number of files in each

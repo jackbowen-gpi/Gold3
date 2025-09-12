@@ -1,0 +1,21 @@
+services:
+  db:
+    # Add initialization script to replicate data on first startup
+    volumes:
+      - ./scripts/init-replicate.ps1:/docker-entrypoint-initdb.d/init-replicate.ps1
+      - pgdata:/var/lib/postgresql/data
+
+  # Add a replication service that can be run on-demand
+  db-replicator:
+    build: .
+    command: powershell -Command "Start-Sleep -Seconds 3600"
+    volumes:
+      - .:/app
+      - /tmp:/tmp
+    environment:
+      - SOURCE_DB=gchub_db-postgres-dev-1
+      - TARGET_DB=gold3-db-1
+    depends_on:
+      - db
+    profiles:
+      - replicator

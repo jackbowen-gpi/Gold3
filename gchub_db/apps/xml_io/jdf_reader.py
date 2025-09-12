@@ -8,7 +8,8 @@ class JDFAuditPool(object):
     """A class for storing information from a JDF AuditPool."""
 
     def __init__(self, audit_pool_node):
-        """Pass an AuditPool XML node to this constructor to parse and store the
+        """
+        Pass an AuditPool XML node to this constructor to parse and store the
         data in a more convenient format.
         """
         self.root_node = audit_pool_node
@@ -26,9 +27,7 @@ class JDFAuditPool(object):
                 # Cosmetic more than anything. Don't line break on first comment.
                 if self.comments != "":
                     self.comments += "\n\r"
-                self.comments += (
-                    child.getElementsByTagName("Comment")[0].childNodes[0].data
-                )
+                self.comments += child.getElementsByTagName("Comment")[0].childNodes[0].data
             elif child.tagName == "ProcessRun":
                 # This is the overall end result of this process.
                 self.end_status = child.getAttribute("EndStatus")
@@ -38,7 +37,8 @@ class JDFTask(object):
     """Stores one of the JDF tag sections."""
 
     def __init__(self, jdf_task_node):
-        """Pass a JDF XML node to this constructor to parse and store the
+        """
+        Pass a JDF XML node to this constructor to parse and store the
         data in a more convenient format.
         """
         # Reference to the JDF task node.
@@ -54,7 +54,8 @@ class JDFTask(object):
         self._store_auditpool_nodes()
 
     def _store_auditpool_nodes(self):
-        """Store the AuditPool tags into JDFAuditPool objects and stuff them in
+        """
+        Store the AuditPool tags into JDFAuditPool objects and stuff them in
         the audit_pools list on this JDFTask object for easy retrieval.
         """
         audit_pools = self.root_node.getElementsByTagName("AuditPool")
@@ -68,7 +69,8 @@ class JDFTask(object):
 
 
 class JDFReader(object):
-    """Reads a JDF that has been parsed and spat back out by Backstage. Looks
+    """
+    Reads a JDF that has been parsed and spat back out by Backstage. Looks
     for the presence of errors and other important things.
     """
 
@@ -99,7 +101,8 @@ class JDFReader(object):
             self._store_jdf_tasks()
 
     def _calc_job_and_item_nums(self):
-        """Calculates the job number and the item's num_in_job based on the
+        """
+        Calculates the job number and the item's num_in_job based on the
         JDf filename.
         """
         # This lops off the path and just leaves the filename.
@@ -111,7 +114,8 @@ class JDFReader(object):
         self.item_num_in_job = split_name[1]
 
     def _store_jdf_tasks(self):
-        """Stores all of the JDF nodes in JDFTask objects and stuffs them in the
+        """
+        Stores all of the JDF nodes in JDFTask objects and stuffs them in the
         self.jdf_tasks lists for easy later retrieval.
         """
         jdf_tasks = self.doc.getElementsByTagName("JDF")
@@ -119,7 +123,8 @@ class JDFReader(object):
             self.jdf_tasks.append(JDFTask(jtask))
 
     def _detect_aborted_processes(self):
-        """Look for ProcessRun tags with an EndStatus attribute containing
+        """
+        Look for ProcessRun tags with an EndStatus attribute containing
         'Aborted'. This lets us know something went wrong and further
         investigation is needed.
         """

@@ -21,4 +21,4 @@ if [ $i -ge $MAX_TRIES ]; then
 fi
 
 echo "Starting celery beat with DatabaseScheduler; it will retry on DB errors."
-exec celery -A celery_app beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+exec celery -A src.celery_app beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler

@@ -1,0 +1,19 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-8.4.2, pluggy-1.6.0 -- C:\Dev\Gold3\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.6, settings: gchub_db.test_settings (from ini)
+rootdir: C:\Dev\Gold3
+configfile: pytest.ini
+plugins: anyio-4.10.0, Faker-37.6.0, django-4.11.1
+collecting ... collected 0 items / 1 error
+
+=================================== ERRORS ====================================
+_____________________ ERROR collecting bin/etools_test.py _____________________
+bin\etools_test.py:14: in <module>
+    for ejob in cursor:
+                ^^^^^^
+E   TypeError: 'MockCursor' object is not iterable
+=========================== short test summary info ===========================
+ERROR bin/etools_test.py - TypeError: 'MockCursor' object is not iterable
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+============================== 1 error in 0.68s ===============================

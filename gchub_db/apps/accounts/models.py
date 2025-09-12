@@ -22,7 +22,8 @@ GROWL_STATUS_TYPES = (
 
 
 class UserProfile(models.Model):
-    """The UserProfile model acts as an extension of Django's User class. Code
+    """
+    The UserProfile model acts as an extension of Django's User class. Code
     can get to this model by using a User object's profile attribute.
     For more information on this, see:
     http://www.djangoproject.com/documentation/authentication/#storing-additional-information-about-users
@@ -39,12 +40,8 @@ class UserProfile(models.Model):
     # The name of the user's workstation.
     machine_name = models.CharField(max_length=100, blank=True)
 
-    total_vacation = models.IntegerField(
-        default=0, editable=False, verbose_name="Total Vacation"
-    )
-    total_sick = models.IntegerField(
-        default=5, editable=False, verbose_name="Total Sick"
-    )
+    total_vacation = models.IntegerField(default=0, editable=False, verbose_name="Total Vacation")
+    total_sick = models.IntegerField(default=5, editable=False, verbose_name="Total Sick")
 
     """
     Growl preferences
@@ -278,13 +275,9 @@ class UserProfile(models.Model):
         return self.user.username
 
     def number_qcs(self):
-        QCResponseDoc = ContentType.objects.get(
-            app_label="qc", model="qcresponsedoc"
-        ).model_class()
+        QCResponseDoc = ContentType.objects.get(app_label="qc", model="qcresponsedoc").model_class()
         year_num = date.today().year
-        num_qcs = QCResponseDoc.objects.filter(
-            reviewer=self.user, parent=None, review_date__year=year_num
-        )
+        num_qcs = QCResponseDoc.objects.filter(reviewer=self.user, parent=None, review_date__year=year_num)
 
         # get all qc items from a responseDOC and add them up
         total_num_qcs = 0
@@ -294,13 +287,9 @@ class UserProfile(models.Model):
         return total_num_qcs
 
     def number_qc_reviews(self):
-        QCResponseDoc = ContentType.objects.get(
-            app_label="qc", model="qcresponsedoc"
-        ).model_class()
+        QCResponseDoc = ContentType.objects.get(app_label="qc", model="qcresponsedoc").model_class()
         year_num = date.today().year
-        num_qc_reviews = QCResponseDoc.objects.filter(
-            reviewer=self.user, parent__isnull=False, review_date__year=year_num
-        )
+        num_qc_reviews = QCResponseDoc.objects.filter(reviewer=self.user, parent__isnull=False, review_date__year=year_num)
 
         # get all qc review items from a responseDOC and add them up
         total_num_qcs_reviews = 0
@@ -311,38 +300,26 @@ class UserProfile(models.Model):
 
     def vacation_used(self):
         """Returns the number of vacation days used for a given year."""
-        Event = ContentType.objects.get(
-            app_label="calendar", model="event"
-        ).model_class()
+        Event = ContentType.objects.get(app_label="calendar", model="event").model_class()
 
         year_num = date.today().year
 
         # Query number of days used this year.
-        vacation_used_full = Event.objects.filter(
-            employee__username=self.user.username, type="VA", event_date__year=year_num
-        ).count()
-        vacation_used_half = Event.objects.filter(
-            employee__username=self.user.username, type="HV", event_date__year=year_num
-        ).count()
+        vacation_used_full = Event.objects.filter(employee__username=self.user.username, type="VA", event_date__year=year_num).count()
+        vacation_used_half = Event.objects.filter(employee__username=self.user.username, type="HV", event_date__year=year_num).count()
         vacation_used = vacation_used_full + (vacation_used_half / 2.0)
 
         return vacation_used
 
     def sick_days_taken(self):
         """Returns the number of sick days used for a given year."""
-        Event = ContentType.objects.get(
-            app_label="calendar", model="event"
-        ).model_class()
+        Event = ContentType.objects.get(app_label="calendar", model="event").model_class()
 
         year_num = date.today().year
 
         # Query number of days used this year.
-        sick_fulldays = Event.objects.filter(
-            employee__username=self.user.username, type="SD", event_date__year=year_num
-        ).count()
-        sick_halfdays = Event.objects.filter(
-            employee__username=self.user.username, type="SH", event_date__year=year_num
-        ).count()
+        sick_fulldays = Event.objects.filter(employee__username=self.user.username, type="SD", event_date__year=year_num).count()
+        sick_halfdays = Event.objects.filter(employee__username=self.user.username, type="SH", event_date__year=year_num).count()
         sick_days = sick_fulldays + (sick_halfdays / 2.0)
 
         return sick_days
@@ -351,16 +328,12 @@ class UserProfile(models.Model):
         """Returns number of items assigned to the artist."""
         Item = ContentType.objects.get(app_label="workflow", model="item").model_class()
         year_num = date.today().year
-        num_items = Item.objects.filter(
-            creation_date__year=year_num, job__artist=self.user
-        ).count()
+        num_items = Item.objects.filter(creation_date__year=year_num, job__artist=self.user).count()
         return num_items
 
     def amount_charged(self):
         """Returns total dollars charges (regardless of file out status) for the year."""
-        Charge = ContentType.objects.get(
-            app_label="workflow", model="charge"
-        ).model_class()
+        Charge = ContentType.objects.get(app_label="workflow", model="charge").model_class()
         year_num = date.today().year
         preAug2015_charges = (
             Charge.objects.filter(
@@ -371,9 +344,7 @@ class UserProfile(models.Model):
             .exclude(item__job__id=99999)
             .exclude(artist=self.user)
         )
-        preAug2015_charges = preAug2015_charges.exclude(
-            description__type="Plates"
-        ).aggregate(Sum("amount"))
+        preAug2015_charges = preAug2015_charges.exclude(description__type="Plates").aggregate(Sum("amount"))
         if preAug2015_charges["amount__sum"] is None:
             preAug2015_charges["amount__sum"] = 0
 
@@ -382,28 +353,23 @@ class UserProfile(models.Model):
             item__job__is_deleted=False,
             artist=self.user,
         ).exclude(item__job__id=99999)
-        postAug2015_charges = postAug2015_charges.exclude(
-            description__type="Plates"
-        ).aggregate(Sum("amount"))
+        postAug2015_charges = postAug2015_charges.exclude(description__type="Plates").aggregate(Sum("amount"))
         if postAug2015_charges["amount__sum"] is None:
             postAug2015_charges["amount__sum"] = 0
 
-        total_charges = (
-            preAug2015_charges["amount__sum"] + postAug2015_charges["amount__sum"]
-        )
+        total_charges = preAug2015_charges["amount__sum"] + postAug2015_charges["amount__sum"]
         if total_charges:
             return total_charges
         else:
             return 0
 
     def amount_billed(self):
-        """Returns total dollars billed (regardless of file out status) for the
+        """
+        Returns total dollars billed (regardless of file out status) for the
         year. This function is different than amount_charged because it keys off
         the date the charge was applied and not the item creation date.
         """
-        Charge = ContentType.objects.get(
-            app_label="workflow", model="charge"
-        ).model_class()
+        Charge = ContentType.objects.get(app_label="workflow", model="charge").model_class()
         year_num = date.today().year
         preAug2015_charges = (
             Charge.objects.filter(
@@ -414,24 +380,18 @@ class UserProfile(models.Model):
             .exclude(item__job__id=99999)
             .exclude(artist=self.user)
         )
-        preAug2015_charges = preAug2015_charges.exclude(
-            description__type="Plates"
-        ).aggregate(Sum("amount"))
+        preAug2015_charges = preAug2015_charges.exclude(description__type="Plates").aggregate(Sum("amount"))
         if preAug2015_charges["amount__sum"] is None:
             preAug2015_charges["amount__sum"] = 0
 
-        postAug2015_charges = Charge.objects.filter(
-            creation_date__year=year_num, item__job__is_deleted=False, artist=self.user
-        ).exclude(item__job__id=99999)
-        postAug2015_charges = postAug2015_charges.exclude(
-            description__type="Plates"
-        ).aggregate(Sum("amount"))
+        postAug2015_charges = Charge.objects.filter(creation_date__year=year_num, item__job__is_deleted=False, artist=self.user).exclude(
+            item__job__id=99999
+        )
+        postAug2015_charges = postAug2015_charges.exclude(description__type="Plates").aggregate(Sum("amount"))
         if postAug2015_charges["amount__sum"] is None:
             postAug2015_charges["amount__sum"] = 0
 
-        total_charges = (
-            preAug2015_charges["amount__sum"] + postAug2015_charges["amount__sum"]
-        )
+        total_charges = preAug2015_charges["amount__sum"] + postAug2015_charges["amount__sum"]
 
         if total_charges:
             return total_charges
@@ -440,18 +400,15 @@ class UserProfile(models.Model):
 
     def errors_committed(self):
         """Return the number of errors the user has logged."""
-        Error = ContentType.objects.get(
-            app_label="error_tracking", model="error"
-        ).model_class()
+        Error = ContentType.objects.get(app_label="error_tracking", model="error").model_class()
         year_num = date.today().year
-        num_errors = Error.objects.filter(
-            reported_date__year=year_num, item__job__artist=self.user
-        ).count()
+        num_errors = Error.objects.filter(reported_date__year=year_num, item__job__artist=self.user).count()
 
         return num_errors
 
     def on_time_percentage(self):
-        """Return percentage of items that went out on-time for the given
+        """
+        Return percentage of items that went out on-time for the given
         artist.
         """
         Item = ContentType.objects.get(app_label="workflow", model="item").model_class()
@@ -473,17 +430,11 @@ class UserProfile(models.Model):
                 # Foodservice jobs need to finish beofre the due date.
                 if i.job.workflow.name == "Foodservice":
                     # Proofed on or after job due date, and added before due date.
-                    if (
-                        proof.date() >= i.job.due_date
-                        and i.creation_date.date() < i.job.due_date
-                    ):
+                    if proof.date() >= i.job.due_date and i.creation_date.date() < i.job.due_date:
                         overdue.append(i)
                 else:
                     # Proofed after job due date, and added before due date.
-                    if (
-                        proof.date() > i.job.due_date
-                        and i.creation_date.date() < i.job.due_date
-                    ):
+                    if proof.date() > i.job.due_date and i.creation_date.date() < i.job.due_date:
                         overdue.append(i)
 
         # Number overdue items / items assigned.
@@ -494,7 +445,8 @@ class UserProfile(models.Model):
             return 100.0
 
     def growl_at(self, title, description, sticky=False, pref_field=None):
-        """Sends a Windows notification to the user via win10toast
+        """
+        Sends a Windows notification to the user via win10toast
 
         title: (str) Title of the notification
         description: (str) The message to be displayed below the title.

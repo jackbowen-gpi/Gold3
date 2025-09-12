@@ -23,8 +23,6 @@ urlpatterns = [
     url(r"^view/(?P<contact_id>\d+)/$", view_drawdown, name="drawdown_view"),
     url(r"^search/$", drawdown_search, name="drop_down_search"),
     url(r"^search_results/$", drawdown_search_results, name="drop_down_search"),
-    url(
-        r"^complete/(?P<drawdown_id>\d+)/$", complete_drawdown, name="drawdown_complete"
-    ),
+    url(r"^complete/(?P<drawdown_id>\d+)/$", complete_drawdown, name="drawdown_complete"),
     url(r"^pending/(?P<drawdown_id>\d+)/$", pending_drawdown, name="drawdown_pending"),
 ]

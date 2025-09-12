@@ -1,4 +1,8 @@
 # pytest plugin to ensure parent of repo is on sys.path early
+r"""
+Module data\pytest_local_path.py
+"""
+
 import os
 import sys
 

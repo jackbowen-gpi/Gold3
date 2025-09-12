@@ -68,7 +68,8 @@ signals.post_save.connect(boxitem_pre_save, sender=BoxItem)
 
 
 class BoxItemSpec(models.Model):
-    """Different variants for FSB corrugated. Each BoxItem may have several
+    """
+    Different variants for FSB corrugated. Each BoxItem may have several
     combinations of dimensions and case/sleeve counts.
     """
 
@@ -118,9 +119,7 @@ BOX_FORMAT_CHOICES = (
 class GeneratedBox(models.Model):
     """Stored inputs from online form."""
 
-    pdf_type = models.IntegerField(
-        choices=PDF_ART_CHOICES, default=ART_LABEL, null=True
-    )
+    pdf_type = models.IntegerField(choices=PDF_ART_CHOICES, default=ART_LABEL, null=True)
     creation_date = models.DateTimeField("Date Info Entered", auto_now_add=True)
     six_digit_num = models.IntegerField()
     replaced_6digit = models.IntegerField(null=True)
@@ -147,9 +146,7 @@ class GeneratedBox(models.Model):
     sfi_stamp_box = models.BooleanField(default=True)
     sfi_stamp_cup = models.BooleanField("SFI Content Stamp", default=False)
     blank_label = models.BooleanField(default=False)
-    box_format = models.IntegerField(
-        choices=BOX_FORMAT_CHOICES, default=BOX_FORMAT_LEFT
-    )
+    box_format = models.IntegerField(choices=BOX_FORMAT_CHOICES, default=BOX_FORMAT_LEFT)
     pdf_output = models.FileField(upload_to="autocorrugated_output", blank=True)
     approved = models.BooleanField(default=False)
 
@@ -193,7 +190,8 @@ class GeneratedBox(models.Model):
     # mcdonalds_barcode = models.IntegerField()
 
     def generate_box_pdf(self, box_pdf, method, save_to_job=False, creator=None):
-        """Generates a box PDF from the saved values.
+        """
+        Generates a box PDF from the saved values.
         box_pdf: (file-like object) - also, the filename
         """
         # Set up save path. If save_to_job is True, override the given box_pdf (filename)
@@ -307,7 +305,8 @@ class GeneratedBox(models.Model):
         return box_pdf
 
     def create_job_for_box(self, creation_type="PDF_Only", change_requested=""):
-        """Creates a job in the workflow app that the box is linked to. The job will
+        """
+        Creates a job in the workflow app that the box is linked to. The job will
         serve billing purposes, as well as allow for custom modifications by
         an artist to a automatically generated box.
         Three options for creation:
@@ -349,16 +348,12 @@ class GeneratedBox(models.Model):
         try:
             catalog_link = ItemCatalog.objects.get(size=catalog_name)
         except ItemCatalog.DoesNotExist:
-            new_item = ItemCatalog(
-                size=catalog_name, mfg_name=catalog_name, workflow=workflow
-            )
+            new_item = ItemCatalog(size=catalog_name, mfg_name=catalog_name, workflow=workflow)
             new_item.save()
             catalog_link = new_item
 
         # Create item for the box.
-        printlocation = PrintLocation.objects.get(
-            press__name="Corrugated", plant=self.plant
-        )
+        printlocation = PrintLocation.objects.get(press__name="Corrugated", plant=self.plant)
         box_item = Item(
             job=box_job,
             workflow=workflow,
@@ -379,15 +374,11 @@ class GeneratedBox(models.Model):
         item = box_item
         # Apply billing for this item.
         charge_type = ChargeType.objects.get(type="Automated Corrugated")
-        charge = Charge(
-            item=item, description=charge_type, amount=charge_type.base_amount
-        )
+        charge = Charge(item=item, description=charge_type, amount=charge_type.base_amount)
         charge.save()
         # Add billing for PDF Proof.
         charge_type = ChargeType.objects.get(type="PDF Proof")
-        charge = Charge(
-            item=item, description=charge_type, amount=charge_type.base_amount
-        )
+        charge = Charge(item=item, description=charge_type, amount=charge_type.base_amount)
         charge.save()
         # TODO: Create ItemColor FK'd to Item using the GeneratedBox case_color field.
 
@@ -395,9 +386,7 @@ class GeneratedBox(models.Model):
         #        item.do_proof()
         if creation_type == "Changes":
             text = "Job was created by the Automated Corrugated System."
-            log = JobLog(
-                job=box_job, user=self.entered_by, type=JOBLOG_TYPE_NOTE, log_text=text
-            )
+            log = JobLog(job=box_job, user=self.entered_by, type=JOBLOG_TYPE_NOTE, log_text=text)
             log.save()
             change_requested = "See Changes."
             rev = Revision(item=item, comments=change_requested, due_date=due_date)
@@ -405,9 +394,7 @@ class GeneratedBox(models.Model):
         else:
             # Create JobLog reflecting creation from the ACS.
             text = "Job was created and approved by the Automated Corrugated System."
-            log = JobLog(
-                job=box_job, user=self.entered_by, type=JOBLOG_TYPE_NOTE, log_text=text
-            )
+            log = JobLog(job=box_job, user=self.entered_by, type=JOBLOG_TYPE_NOTE, log_text=text)
             log.save()
 
         # Save job link to model.
@@ -445,7 +432,8 @@ class GeneratedLabel(models.Model):
     pdf_type = 2
 
     def generate_label_pdf(self, label_pdf, label_id):
-        """Generates a label PDF from the saved values.
+        """
+        Generates a label PDF from the saved values.
         label_pdf: (file-like object)
         """
         glabel = FSBLabel(

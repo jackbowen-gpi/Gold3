@@ -1,5 +1,6 @@
 #!/usr/bin/python
-"""Generate weekly Foodservice billing spreadsheets and optionally send emails.
+"""
+Generate weekly Foodservice billing spreadsheets and optionally send emails.
 
 Produces Excel files summarizing billable charges for the Foodservice workflow.
 """
@@ -63,9 +64,7 @@ month_name = calendar.month_abbr[int(dateStartArr[0])]
 
 # Get billable charge qset for workflow.
 # Dates in format "5/10/2016"
-billable_charges = billing_funcs.get_billable_timeframe(startDate, endDate, workflow)[
-    "charges"
-]
+billable_charges = billing_funcs.get_billable_timeframe(startDate, endDate, workflow)["charges"]
 
 print(("Charges to invoice: %s" % str(billable_charges.count())))
 
@@ -129,9 +128,7 @@ for plant in plants:
     if plant == "Other":
         charge_set = billable_charges.filter(item__printlocation__isnull=True)
     elif plant == "Avante-QAD":
-        charge_set = billable_charges.filter(
-            item__job__name__startswith="Letica - QAD/Avante"
-        )
+        charge_set = billable_charges.filter(item__job__name__startswith="Letica - QAD/Avante")
     elif plant == memphisALL:
         charge_set = billable_charges.filter(
             item__printlocation__plant__name="Memphis",
@@ -155,9 +152,9 @@ for plant in plants:
             item__printlocation__press__name="Other",
         )
     else:
-        charge_set = billable_charges.filter(
-            item__printlocation__plant__name=plant
-        ).exclude(item__job__name__startswith="Letica - QAD/Avante")
+        charge_set = billable_charges.filter(item__printlocation__plant__name=plant).exclude(
+            item__job__name__startswith="Letica - QAD/Avante"
+        )
 
     if len(charge_set) == 0:
         continue
@@ -191,13 +188,9 @@ for plant in plants:
     for i in range(len(charge_set)):
         # Increment rows, write charge data.
         # docSheet1.write(row, column, value)creation_date
-        docSheet1.cell(row=i + 2, column=1).value = charge_set[
-            i
-        ].creation_date.strftime("%m/%d/%y")
+        docSheet1.cell(row=i + 2, column=1).value = charge_set[i].creation_date.strftime("%m/%d/%y")
         try:
-            docSheet1.cell(row=i + 2, column=2).value = str(
-                charge_set[i].item.job.salesperson.username
-            )
+            docSheet1.cell(row=i + 2, column=2).value = str(charge_set[i].item.job.salesperson.username)
         except Exception:
             pass
         name = charge_set[i].item.job.name.encode("utf8", "replace")
@@ -205,21 +198,15 @@ for plant in plants:
         docSheet1.cell(row=i + 2, column=4).value = str(name.decode("utf-8"))
         docSheet1.cell(row=i + 2, column=5).value = str(charge_set[i].item.size)
 
-        docSheet1.cell(row=i + 2, column=6).value = (
-            charge_set[i].item.final_file_date().strftime("%m/%d/%y")
-        )
+        docSheet1.cell(row=i + 2, column=6).value = charge_set[i].item.final_file_date().strftime("%m/%d/%y")
         docSheet1.cell(row=i + 2, column=7).value = str(charge_set[i].description)
         docSheet1.cell(row=i + 2, column=8).value = str(charge_set[i].rush_days)
         try:
-            docSheet1.cell(row=i + 2, column=9).value = str(
-                charge_set[i].item.printlocation.plant.name
-            )
+            docSheet1.cell(row=i + 2, column=9).value = str(charge_set[i].item.printlocation.plant.name)
         except AttributeError:
             docSheet1.cell(row=i + 2, column=9).value = "----"
         try:
-            docSheet1.cell(row=i + 2, column=10).value = str(
-                charge_set[i].item.printlocation.press.name
-            )
+            docSheet1.cell(row=i + 2, column=10).value = str(charge_set[i].item.printlocation.press.name)
         except AttributeError:
             docSheet1.cell(row=i + 2, column=10).value = "----"
         docSheet1.cell(row=i + 2, column=11).value = charge_set[i].amount

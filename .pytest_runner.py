@@ -1,0 +1,14 @@
+"""
+Module .pytest_runner.py
+"""
+
+import sys
+import subprocess
+
+cmd = [sys.executable, "-m", "pytest", "-vv"]
+proc = subprocess.run(cmd, capture_output=True)
+with open("test_run_output.txt", "wb") as f:
+    f.write(proc.stdout)
+    f.write(b"\n---STDERR---\n")
+    f.write(proc.stderr)
+print("PYTEST_SUBPROCESS_RETURN", proc.returncode)

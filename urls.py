@@ -1,4 +1,5 @@
-"""Top-level URL configuration for the gchub_db Django project.
+"""
+Top-level URL configuration for the gchub_db Django project.
 
 Compatibility wrapper to support Django <2.0 and >=2.0 URL imports.
 """
@@ -40,11 +41,7 @@ try:
 
     # django.apps.apps.ready is True only after django.setup(); only then
     # is it safe to autodiscover.
-    if (
-        getattr(django, "apps", None)
-        and getattr(django.apps, "apps", None)
-        and django.apps.apps.ready
-    ):
+    if getattr(django, "apps", None) and getattr(django.apps, "apps", None) and django.apps.apps.ready:
         admin.autodiscover()
 except Exception:
     # Best-effort: if anything goes wrong here, skip autodiscover to avoid
@@ -57,15 +54,13 @@ urlpatterns = []
 urlpatterns.append(
     url(
         r"^favicon\.ico$",
-        RedirectView.as_view(url="/media/favicon.ico", permanent=True),
+        RedirectView.as_view(url="/media/favicon.ico", permanent=False),
     )
 )
 
 # Maintenance mode toggle (optional package)
 try:
-    urlpatterns.append(
-        url(r"^maintenance-mode/", include("gchub_db.middleware.maintenance_mode.urls"))
-    )
+    urlpatterns.append(url(r"^maintenance-mode/", include("gchub_db.middleware.maintenance_mode.urls")))
 except Exception:
     # best-effort: skip maintenance mode if its urls or views fail to import
     pass
@@ -163,18 +158,12 @@ if getattr(settings, "DEBUG", False):
                 url(r"^__dev_set_session/$", set_dev_session, name="__dev_set_session"),
             )
         if set_dev_csrf:
-            urlpatterns.insert(
-                0, url(r"^__dev_set_csrf/$", set_dev_csrf, name="__dev_set_csrf")
-            )
+            urlpatterns.insert(0, url(r"^__dev_set_csrf/$", set_dev_csrf, name="__dev_set_csrf"))
         if dev_whoami:
-            urlpatterns.insert(
-                0, url(r"^__dev_whoami/$", dev_whoami, name="__dev_whoami")
-            )
+            urlpatterns.insert(0, url(r"^__dev_whoami/$", dev_whoami, name="__dev_whoami"))
     except Exception:
         # best-effort: don't break imports if something goes wrong
         pass
 
 # Add a URL pattern for testing the standard.html template
-urlpatterns.append(
-    url(r"^test-standard/$", test_standard_template, name="test_standard")
-)
+urlpatterns.append(url(r"^test-standard/$", test_standard_template, name="test_standard"))

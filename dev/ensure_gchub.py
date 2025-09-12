@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Idempotent helper to ensure a developer Postgres role and database exist.
+"""
+Idempotent helper to ensure a developer Postgres role and database exist.
 
 Connects to Postgres using a superuser account, creates a role and database if
 missing, and grants privileges. Intended for local dev and CI helper usage.
@@ -18,7 +19,7 @@ try:
     from psycopg2 import sql
 except Exception:
     print(
-        "psycopg2 is required. Install in the venv: python -m pip install psycopg2-binary",
+        "psycopg2 is required. Install in the venv: " "python -m pip install psycopg2-binary",
         file=sys.stderr,
     )
     raise
@@ -27,9 +28,7 @@ except Exception:
 HOST = os.environ.get("DEV_DB_HOST", "127.0.0.1")
 PORT = int(os.environ.get("DEV_DB_PORT", "5432"))
 SUPERUSER = os.environ.get("DEV_DB_SUPERUSER", "postgres")
-SUPERPASSWORD = os.environ.get(
-    "DEV_DB_SUPERUSER_PASSWORD", os.environ.get("DEV_DB_SUPERUSER_PASS", "postgres")
-)
+SUPERPASSWORD = os.environ.get("DEV_DB_SUPERUSER_PASSWORD", os.environ.get("DEV_DB_SUPERUSER_PASS", "postgres"))
 
 TARGET_USER = os.environ.get("DEV_DB_USER", "gchub")
 TARGET_PASSWORD = os.environ.get("DEV_DB_PASSWORD", "gchub")
@@ -60,15 +59,16 @@ def connect_superuser(timeout_seconds: int = 60) -> psycopg2.extensions.connecti
         except Exception as exc:
             last_exc = exc
             print(
-                f"Attempt {attempt}: Postgres not ready ({exc!r}) - retrying in {RETRY_SECONDS}s...",
+                (f"Attempt {attempt}: Postgres not ready ({exc!r}) - " f"retrying in {RETRY_SECONDS}s..."),
                 file=sys.stderr,
             )
             time.sleep(RETRY_SECONDS)
     print(f"Timed out connecting to Postgres at {HOST}:{PORT}; last error:")
-    traceback.print_exception(
-        type(last_exc), last_exc, getattr(last_exc, "__traceback__", None)
-    )
-    raise last_exc
+    if last_exc is not None:
+        traceback.print_exception(type(last_exc), last_exc, getattr(last_exc, "__traceback__", None))
+        raise last_exc
+    else:
+        raise RuntimeError("Failed to connect to Postgres but no exception was captured")
 
 
 def role_exists(cur, role_name: str) -> bool:
@@ -90,9 +90,7 @@ def ensure_role_and_db() -> int:
             print(f"Role '{TARGET_USER}' already exists")
             try:
                 cur.execute(
-                    sql.SQL("ALTER ROLE {} WITH LOGIN PASSWORD %s").format(
-                        sql.Identifier(TARGET_USER)
-                    ),
+                    sql.SQL("ALTER ROLE {} WITH LOGIN PASSWORD %s").format(sql.Identifier(TARGET_USER)),
                     (TARGET_PASSWORD,),
                 )
                 print(f"Updated password for role '{TARGET_USER}'")
@@ -104,9 +102,7 @@ def ensure_role_and_db() -> int:
         else:
             print(f"Creating role '{TARGET_USER}'")
             cur.execute(
-                sql.SQL("CREATE ROLE {} WITH LOGIN PASSWORD %s").format(
-                    sql.Identifier(TARGET_USER)
-                ),
+                sql.SQL("CREATE ROLE {} WITH LOGIN PASSWORD %s").format(sql.Identifier(TARGET_USER)),
                 (TARGET_PASSWORD,),
             )
             print(f"Created role '{TARGET_USER}'")
@@ -115,11 +111,7 @@ def ensure_role_and_db() -> int:
             print(f"Database '{TARGET_DB}' already exists")
         else:
             print(f"Creating database '{TARGET_DB}' owned by '{TARGET_USER}'")
-            cur.execute(
-                sql.SQL("CREATE DATABASE {} OWNER {}").format(
-                    sql.Identifier(TARGET_DB), sql.Identifier(TARGET_USER)
-                )
-            )
+            cur.execute(sql.SQL("CREATE DATABASE {} OWNER {}").format(sql.Identifier(TARGET_DB), sql.Identifier(TARGET_USER)))
             print(f"Created database '{TARGET_DB}'")
 
         # Best-effort: grant privileges inside the target DB
@@ -136,19 +128,11 @@ def ensure_role_and_db() -> int:
             cur_db = conn_db.cursor()
             print(f"Granting privileges on database '{TARGET_DB}' to '{TARGET_USER}'")
             cur_db.execute(
-                sql.SQL("GRANT ALL PRIVILEGES ON DATABASE {} TO {};").format(
-                    sql.Identifier(TARGET_DB), sql.Identifier(TARGET_USER)
-                )
+                sql.SQL("GRANT ALL PRIVILEGES ON DATABASE {} TO {};").format(sql.Identifier(TARGET_DB), sql.Identifier(TARGET_USER))
             )
+            cur_db.execute(sql.SQL("GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO {};").format(sql.Identifier(TARGET_USER)))
             cur_db.execute(
-                sql.SQL(
-                    "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO {};"
-                ).format(sql.Identifier(TARGET_USER))
-            )
-            cur_db.execute(
-                sql.SQL(
-                    "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO {};"
-                ).format(sql.Identifier(TARGET_USER))
+                sql.SQL("ALTER DEFAULT PRIVILEGES IN SCHEMA public " "GRANT ALL ON TABLES TO {};").format(sql.Identifier(TARGET_USER))
             )
             cur_db.close()
             conn_db.close()

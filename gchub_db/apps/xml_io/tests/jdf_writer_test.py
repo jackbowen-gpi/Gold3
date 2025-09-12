@@ -11,7 +11,8 @@ from gchub_db.apps.xml_io.jdf_writer import ItemJDF
 
 
 def test_new_fsb_ffo_proof(item):
-    """(ffo = final file out)
+    """
+    (ffo = final file out)
     Create JDF to:
     A) Tabular Step & Repeat using self.jdf_fsb_sr()
     B) Take resulting file from step A and use self.jdf_fsb_rip()
@@ -21,9 +22,7 @@ def test_new_fsb_ffo_proof(item):
         "TIFFList": {"Status": "Unavailable"},
     }
 
-    sr_jdf = ItemJDF(
-        item, {"SourceFileList": [item.path_to_file]}, extra_vars=extra_vars
-    )
+    sr_jdf = ItemJDF(item, {"SourceFileList": [item.path_to_file]}, extra_vars=extra_vars)
 
     sr_ticket = "/forktask/ForkTest"
     # print "SR TICKET", sr_ticket

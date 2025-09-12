@@ -14,7 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""A command line parsing module that lets modules define their own options.
+"""
+A command line parsing module that lets modules define their own options.
 
 Each module defines its own options, e.g.,
 
@@ -62,7 +63,8 @@ except Exception:
 
 
 def define(name, default=None, type=str, help=None, metavar=None, multiple=False):
-    """Defines a new command line option.
+    """
+    Defines a new command line option.
 
     If type is given (one of str, float, int, datetime, or timedelta),
     we parse the command line arguments based on the given type. If
@@ -100,7 +102,8 @@ def define(name, default=None, type=str, help=None, metavar=None, multiple=False
 
 
 def parse_command_line(args=None):
-    """Parses all options given on the command line.
+    """
+    Parses all options given on the command line.
 
     We return all command line arguments that are not options as a list.
     """

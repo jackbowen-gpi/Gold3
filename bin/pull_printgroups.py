@@ -7,9 +7,7 @@ bin_functions.setup_paths()
 from gchub_db.apps.workflow import etools
 from gchub_db.apps.workflow.models import Job
 
-job_set = Job.objects.exclude(workflow__name__in=("Beverage", "Container")).exclude(
-    e_tools_id=""
-)
+job_set = Job.objects.exclude(workflow__name__in=("Beverage", "Container")).exclude(e_tools_id="")
 
 for job in job_set:
     if not job.printgroup:

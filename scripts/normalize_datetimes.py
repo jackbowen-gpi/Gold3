@@ -1,7 +1,8 @@
-"""Normalize naive datetimes in DB to timezone-aware UTC datetimes.
+"""
+Normalize naive datetimes in DB to timezone-aware UTC datetimes.
 
 Run from repo root with the project venv activated:
-  .\.venv\Scripts\python.exe scripts\normalize_datetimes.py
+  .\\.venv\\Scripts\\python.exe scripts\normalize_datetimes.py
 
 This script does an in-place update. BACKUP your DB before running.
 """

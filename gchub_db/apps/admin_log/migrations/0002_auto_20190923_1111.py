@@ -17,8 +17,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="adminlog",
             name="type",
-            field=models.IntegerField(
-                choices=[(0, "General Information"), (5, "Warnings"), (10, "Error")]
-            ),
+            field=models.IntegerField(choices=[(0, "General Information"), (5, "Warnings"), (10, "Error")]),
         ),
     ]

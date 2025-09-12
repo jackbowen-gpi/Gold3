@@ -1,0 +1,70 @@
+import os
+import sys
+
+
+def pytest_configure(config):
+    """
+    Ensure repo root and its parent are on sys.path early during pytest startup.
+    This helps imports like `import settings_common` and `gchub_db.apps.*` work when
+    pytest-django calls django.setup().
+    """
+    root = os.path.abspath(os.path.dirname(__file__))
+    parent = os.path.dirname(root)
+    for p in (root, parent):
+        if p not in sys.path:
+            sys.path.insert(0, p)
+
+
+# Prevent pytest from collecting repository helper modules that are named like
+# tests but import heavy project code (e.g. `gchub_db/test_urls.py`) during
+# collection. Use `collect_ignore` so pytest skips them.
+try:
+    collect_ignore  # type: ignore
+except NameError:
+    collect_ignore = [
+        "gchub_db/test_urls.py",
+        "test_urls.py",
+        "dev/",  # Exclude dev directory from model discovery
+        "dev/_.dev.md",  # Specifically exclude the problematic markdown file
+    ]
+
+
+# Aggressive compatibility fix: ensure repo paths are on sys.path and set a
+# minimal environment so pytest collection / django.setup() behave the same way
+# as when running the devserver. This mirrors the earlier quick-fix used during
+# live debugging and is intentionally defensive.
+try:
+    _root = os.path.abspath(os.path.dirname(__file__))
+    _parent = os.path.dirname(_root)
+    # Insert parent then root at the front of sys.path if not present.
+    for _p in (_parent, _root):
+        _ap = os.path.abspath(_p)
+        if _ap not in [os.path.abspath(x) for x in sys.path]:
+            sys.path.insert(0, _p)
+
+    # Ensure PYTHONPATH includes the repository parent so imports work when
+    # pytest is invoked from different working directories.
+    existing = os.environ.get("PYTHONPATH", "")
+    parts = [p for p in existing.split(os.pathsep) if p]
+    if _parent not in parts:
+        parts.insert(0, _parent)
+        os.environ["PYTHONPATH"] = os.pathsep.join(parts)
+
+    # Provide a sensible default settings module if one is not provided by the
+    # environment or by pytest config. This prevents certain import-time
+    # failures during collection in this repository.
+    # Use test settings for pytest, regular settings for other Django operations
+    if "pytest" in sys.modules:
+        os.environ["DJANGO_SETTINGS_MODULE"] = "gchub_db.test_settings"
+    else:
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
+except Exception:
+    # Be defensive: don't allow the conftest import hook to crash pytest
+    # collection in case something about the environment is unexpected.
+    pass
+
+
+# NOTE: The aggressive skipping hook was removed to restore normal test
+# discovery and allow the app-by-app tests in `gchub_db/apps` to be collected.
+# If specific tests are flaky, prefer adding targeted pytest.mark.skip on the
+# test itself or a small, well-documented collection filter here.

@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+Module gchub_db\apps\timesheet\\models.py
+"""
+
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import User
@@ -23,9 +27,7 @@ class TimeSheet(models.Model):
     """A single timesheet for a job. Usually represents a days work on a given job."""
 
     # Importing the Job model name as a string to avoid a circular dependencey.
-    job = models.ForeignKey(
-        "workflow.Job", blank=True, null=True, on_delete=models.CASCADE
-    )
+    job = models.ForeignKey("workflow.Job", blank=True, null=True, on_delete=models.CASCADE)
     artist = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField()
     category = models.ForeignKey(TimeSheetCategory, on_delete=models.CASCADE)

@@ -10,7 +10,7 @@ from tempfile import NamedTemporaryFile
 import openpyxl
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import Permission, User, Group
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
@@ -52,6 +52,22 @@ from gchub_db.includes import general_funcs
 from gchub_db.includes.gold_json import JSMessage
 
 
+def _groups_for_permission(codename):
+    """
+    Return a Group queryset for the given permission codename or an empty
+    queryset if the permission is not present. This avoids hitting the DB at
+    import time with Permission.objects.get(...) raising when the permission
+    hasn't been created yet in the test database.
+    """
+    try:
+        perm = Permission.objects.get(codename=codename)
+        return perm.group_set.all()
+    except Permission.DoesNotExist:
+        return Group.objects.none()
+    except Exception:
+        return Group.objects.none()
+
+
 def pending_jobs(request):
     """Simple list of Pending Jobs, to ease in Job Assignment/Distribution"""
     pending_list = Job.objects.filter(status="Pending").order_by("-id")
@@ -66,24 +82,21 @@ class ReviewSearchForm(forms.Form):
 
     plants = ["Kenton", "Shelbyville", "Visalia", "Clarksville", "Pittston"]
     plant_choices = Plant.objects.filter(name__in=plants).order_by("name")
-    plant = forms.ModelMultipleChoiceField(
-        queryset=plant_choices, required=False, widget=forms.CheckboxSelectMultiple
-    )
+    plant = forms.ModelMultipleChoiceField(queryset=plant_choices, required=False, widget=forms.CheckboxSelectMultiple)
     status_choices = [
         ("approved", "Approved"),
         ("rejected", "Rejected"),
         ("expired", "Expired"),
     ]
-    status = forms.MultipleChoiceField(
-        choices=status_choices, required=False, widget=forms.CheckboxSelectMultiple
-    )
+    status = forms.MultipleChoiceField(choices=status_choices, required=False, widget=forms.CheckboxSelectMultiple)
 
     def __init__(self, request, *args, **kwargs):
         super(ReviewSearchForm, self).__init__(*args, **kwargs)
 
 
 def review(request, category):
-    """Displays item review objects to be review. Filters reviews into
+    """
+    Displays item review objects to be review. Filters reviews into
     market, demand plan, and plant reviews.
     """
     form = ReviewSearchForm(request, request.GET)
@@ -143,9 +156,7 @@ def review(request, category):
                 .exclude(item__printlocation__press__name="Other")
                 .exclude(item__press_change=True)
             )
-            resub_list = resub_list.filter(
-                review_initiated_date__gt=three_days_ago
-            ).exclude(item__printlocation__press__name="Other")
+            resub_list = resub_list.filter(review_initiated_date__gt=three_days_ago).exclude(item__printlocation__press__name="Other")
             expired_list = (
                 ItemReview.objects.filter(
                     review_ok=False,
@@ -178,26 +189,16 @@ def review(request, category):
                 if user.has_perm("accounts.clarksville_art_approval"):
                     permitted_plants.append("Clarksville")
                 # Filter to only show reviews for the user's permitted plants.
-                review_list = review_list.filter(
-                    item__printlocation__plant__name__in=permitted_plants
-                )
-                rejected_list = rejected_list.filter(
-                    item__printlocation__plant__name__in=permitted_plants
-                )
-                resub_list = resub_list.filter(
-                    item__printlocation__plant__name__in=permitted_plants
-                )
-                expired_list = expired_list.filter(
-                    item__printlocation__plant__name__in=permitted_plants
-                )
+                review_list = review_list.filter(item__printlocation__plant__name__in=permitted_plants)
+                rejected_list = rejected_list.filter(item__printlocation__plant__name__in=permitted_plants)
+                resub_list = resub_list.filter(item__printlocation__plant__name__in=permitted_plants)
+                expired_list = expired_list.filter(item__printlocation__plant__name__in=permitted_plants)
 
         elif category == "demand" or category == "market":
             # These reviews don't use the search form.
             form = False
             if category == "demand":
-                review_list = review_list.filter(
-                    review_initiated_date__gt=three_days_ago
-                )
+                review_list = review_list.filter(review_initiated_date__gt=three_days_ago)
 
         else:
             exit()
@@ -261,14 +262,10 @@ def review(request, category):
 
                     # percentages are added by dividing the float values of the lengths of the arrays and rounding them to the first decimal
                     plant_obj[time][plant] = {}
-                    plant_obj[time][plant]["accepted_rejected"] = len(
-                        review_approved_rejected_list
-                    )
+                    plant_obj[time][plant]["accepted_rejected"] = len(review_approved_rejected_list)
                     try:
                         plant_obj[time][plant]["accepted_rejected_percent"] = round(
-                            float(len(review_approved_rejected_list))
-                            / float(len(all_review_list))
-                            * 100,
+                            float(len(review_approved_rejected_list)) / float(len(all_review_list)) * 100,
                             1,
                         )
                     except Exception:
@@ -276,9 +273,7 @@ def review(request, category):
                     plant_obj[time][plant]["expired"] = len(review_expired_list)
                     try:
                         plant_obj[time][plant]["expired_percent"] = round(
-                            float(len(review_expired_list))
-                            / float(len(all_review_list))
-                            * 100,
+                            float(len(review_expired_list)) / float(len(all_review_list)) * 100,
                             1,
                         )
                     except Exception:
@@ -314,9 +309,7 @@ class ReviewSearchResults(ListView):
         # Press reviews used to get generated for things the plant didn't need to
         # check. This will exclude those old reviews so their numbers aren't affected.
         qset = qset.exclude(
-            Q(item__press_change=True)
-            | Q(item__printlocation__press__name="Other")
-            | Q(item__printlocation__press__name="Corrugated")
+            Q(item__press_change=True) | Q(item__printlocation__press__name="Other") | Q(item__printlocation__press__name="Corrugated")
         )
         if self.form:
             # Filter by plant.
@@ -341,9 +334,7 @@ class ReviewSearchResults(ListView):
                     # Otherwise just go three days back.
                     three_days_ago = now_dt - timedelta(3)
 
-                qset = qset.exclude(
-                    review_date=None, review_initiated_date__gt=three_days_ago
-                )
+                qset = qset.exclude(review_date=None, review_initiated_date__gt=three_days_ago)
                 # If a status isn't checked don't return it in the results.
                 if "approved" not in statuses:
                     qset = qset.exclude(review_ok=True)
@@ -382,9 +373,7 @@ def mkt_review(request):
 
     # Items that were reviewed and rejected.
     rejected_list = (
-        ItemReview.objects.filter(
-            review_date__isnull=False, review_ok=False, review_catagory="market"
-        )
+        ItemReview.objects.filter(review_date__isnull=False, review_ok=False, review_catagory="market")
         .exclude(comments="Resubmitted")
         .order_by("-item__id")
     )
@@ -418,7 +407,8 @@ def mkt_review(request):
 
 
 class MktReviewReport(ListView):
-    """Marketing sure loves their reports. Here's where we make them. Paginated for
+    """
+    Marketing sure loves their reports. Here's where we make them. Paginated for
     easy browsing.
     """
 
@@ -431,9 +421,7 @@ class MktReviewReport(ListView):
         qset = []
         # Lists the items that have tracked art types.
         if type == "trackedart":
-            qset = ItemTracker.objects.filter(
-                type__id=tracked_art_type, removal_date__isnull=True
-            )
+            qset = ItemTracker.objects.filter(type__id=tracked_art_type, removal_date__isnull=True)
 
         # Lists reviews that have been approvaed but not filed out.
         elif type == "pending":
@@ -486,7 +474,8 @@ class MktReviewReport(ListView):
 
 
 def mkt_review_excel(request, tracked_art_type):
-    """Creates a spreadsheet listing all the tracked art objects of a given type.
+    """
+    Creates a spreadsheet listing all the tracked art objects of a given type.
     In other words: if you want a spreadsheet listing all the items with SFI
     logos on them this is how you get it.
     """
@@ -494,9 +483,7 @@ def mkt_review_excel(request, tracked_art_type):
     workBookDocument = openpyxl.Workbook()
 
     # Get all the tracked art objects of the type we're looking for.
-    qset = ItemTracker.objects.filter(
-        type__id=tracked_art_type, removal_date__isnull=True
-    )
+    qset = ItemTracker.objects.filter(type__id=tracked_art_type, removal_date__isnull=True)
 
     title = ItemTrackerType.objects.get(id=tracked_art_type)
     title = title.name
@@ -555,9 +542,7 @@ def items_rejected(request):
     )
 
     pr_rejected_list = (
-        ItemReview.objects.filter(
-            review_catagory="plant", review_date__isnull=False, review_ok=False
-        )
+        ItemReview.objects.filter(review_catagory="plant", review_date__isnull=False, review_ok=False)
         .exclude(comments="Resubmitted")
         .exclude(resubmitted=True)
         .order_by("-item__id")
@@ -581,13 +566,12 @@ def items_rejected(request):
         "mkt_rejected_list": mkt_rejected_list,
     }
 
-    return render(
-        request, "workflow/plant_review/items_rejected.html", context=pagevars
-    )
+    return render(request, "workflow/plant_review/items_rejected.html", context=pagevars)
 
 
 def process_review(request, item_id, category, update_type):
-    """Handles plant or marketing employee either accepting, rejecting,
+    """
+    Handles plant or marketing employee either accepting, rejecting,
     or resubmitting artwork based on PDF, assignments, etc...
     Update type will be either Accept or Reject.
     """
@@ -609,7 +593,8 @@ class WorkflowModelChoiceField(forms.ModelChoiceField):
 
 
 class JobSearchForm(forms.Form):
-    """Main form for Job editing. Displayed in upper left corner of the job
+    """
+    Main form for Job editing. Displayed in upper left corner of the job
     detail page.
     """
 
@@ -636,18 +621,10 @@ class JobSearchForm(forms.Form):
 
     # Phase 2: Additional key fields for enhanced search
     comments = forms.CharField(required=False, help_text="Search in job comments")
-    instructions = forms.CharField(
-        required=False, help_text="Search in job instructions"
-    )
-    customer_email = forms.CharField(
-        required=False, help_text="Search by customer email"
-    )
-    graphic_supplier = forms.CharField(
-        required=False, help_text="Search by graphic supplier"
-    )
-    user_keywords = forms.CharField(
-        required=False, help_text="Search in user-defined keywords"
-    )
+    instructions = forms.CharField(required=False, help_text="Search in job instructions")
+    customer_email = forms.CharField(required=False, help_text="Search by customer email")
+    graphic_supplier = forms.CharField(required=False, help_text="Search by graphic supplier")
+    user_keywords = forms.CharField(required=False, help_text="Search in user-defined keywords")
 
     status_choices = []
     status_choices.append(("", "---------"))
@@ -661,35 +638,22 @@ class JobSearchForm(forms.Form):
     date_needed_end = forms.DateField(required=False)
     # customer = forms.ModelChoiceField(queryset=Customer.objects.all(), required=False)
 
-    # Limit the field to accounts with given permission.
+    # Limit the field to accounts with given permission. Use helper to avoid
+    # raising at import time when permissions aren't present in test DB.
     # This permission must be assigned via the Group.
-    permission = Permission.objects.get(codename="in_artist_pulldown")
     # This is a list of people past and present who have worked at clemson at some point
     # This is mainly used for job and item searching.
-    grouped_artist_users = group_members = User.objects.filter(
-        groups__name="ClemsonPersonnel"
-    ).order_by("username")
+    grouped_artist_users = group_members = User.objects.filter(groups__name="ClemsonPersonnel").order_by("username")
     artist = forms.ModelChoiceField(queryset=None, required=False)
 
-    permission = Permission.objects.get(codename="salesperson")
-    # Select users who are a member of the set of groups with the given permission.
-    # we are changing this to include all salespeople and not just the active ones.
-    grouped_sales_users = User.objects.filter(
-        groups__in=permission.group_set.all()
-    ).order_by("username")
+    grouped_sales_users = User.objects.filter(groups__in=_groups_for_permission("salesperson")).order_by("username")
     salesperson = forms.ModelChoiceField(queryset=None, required=False)
 
-    permission = Permission.objects.get(codename="is_fsb_csr")
-    # Select users who are a member of the set of groups with the given permission.
-    grouped_csr_users = User.objects.filter(
-        is_active=True, groups__in=permission.group_set.all()
-    ).order_by("username")
+    grouped_csr_users = User.objects.filter(is_active=True, groups__in=_groups_for_permission("is_fsb_csr")).order_by("username")
 
     csr = forms.ModelChoiceField(queryset=grouped_csr_users, required=False)
 
-    printgroup = forms.ModelChoiceField(
-        queryset=QAD_PrintGroups.objects.all().order_by("name"), required=False
-    )
+    printgroup = forms.ModelChoiceField(queryset=QAD_PrintGroups.objects.all().order_by("name"), required=False)
     # Build list of prepress suppliers, an option search field.
     prepress_choices = []
     prepress_choices.append(("", "---------"))
@@ -703,24 +667,16 @@ class JobSearchForm(forms.Form):
     for choice in app_defs.CARTON_JOB_TYPES:
         carton_type_choices.append(choice)
     carton_type = forms.ChoiceField(choices=carton_type_choices, required=False)
-    workflow = WorkflowModelChoiceField(
-        queryset=Site.objects.all().exclude(name="Container"), required=False
-    )
+    workflow = WorkflowModelChoiceField(queryset=Site.objects.all().exclude(name="Container"), required=False)
     sort_by = forms.ChoiceField(choices=[("id", "Job #")], required=False)
-    sort_order = forms.ChoiceField(
-        choices=[("desc", "Descending"), ("asc", "Ascending")], required=False
-    )
+    sort_order = forms.ChoiceField(choices=[("desc", "Descending"), ("asc", "Ascending")], required=False)
 
     def __init__(self, request, *args, **kwargs):
         """Populate some of the relational fields."""
         super(JobSearchForm, self).__init__(*args, **kwargs)
-        artist_qset = general_funcs.filter_query_same_perms(
-            request, self.grouped_artist_users
-        )
+        artist_qset = general_funcs.filter_query_same_perms(request, self.grouped_artist_users)
         self.fields["artist"].queryset = artist_qset
-        sales_qset = general_funcs.filter_query_same_perms(
-            request, self.grouped_sales_users
-        )
+        sales_qset = general_funcs.filter_query_same_perms(request, self.grouped_sales_users)
         self.fields["salesperson"].queryset = sales_qset
 
 
@@ -814,22 +770,16 @@ class JobSearchResultsView(ListView):
             s_job_date_in_end = self.form.cleaned_data.get("date_in_end", None)
             if s_job_date_in_end:
                 if s_job_date_in_start:
-                    qset = qset.filter(
-                        creation_date__range=(s_job_date_in_start, s_job_date_in_end)
-                    )
+                    qset = qset.filter(creation_date__range=(s_job_date_in_start, s_job_date_in_end))
             elif s_job_date_in_start:
                 qset = qset.filter(creation_date=s_job_date_in_start)
 
             # If start and end date given, search on range, else search on just start.
-            s_job_date_needed_start = self.form.cleaned_data.get(
-                "date_needed_start", None
-            )
+            s_job_date_needed_start = self.form.cleaned_data.get("date_needed_start", None)
             s_job_date_needed_end = self.form.cleaned_data.get("date_needed_end", None)
             if s_job_date_needed_end:
                 if s_job_date_needed_start:
-                    qset = qset.filter(
-                        due_date__range=(s_job_date_needed_start, s_job_date_needed_end)
-                    )
+                    qset = qset.filter(due_date__range=(s_job_date_needed_start, s_job_date_needed_end))
             elif s_job_date_needed_start:
                 qset = qset.filter(creation_date=s_job_date_needed_start)
 
@@ -845,9 +795,7 @@ class JobSearchResultsView(ListView):
             if s_job_csr:
                 qset = qset.filter(csr=s_job_csr)
 
-            s_job_prepress_supplier = self.form.cleaned_data.get(
-                "prepress_supplier", None
-            )
+            s_job_prepress_supplier = self.form.cleaned_data.get("prepress_supplier", None)
             if s_job_prepress_supplier:
                 qset = qset.filter(prepress_supplier=s_job_prepress_supplier)
 
@@ -892,9 +840,7 @@ class JobSearchResultsView(ListView):
 
             s_graphic_supplier = self.form.cleaned_data.get("graphic_supplier", None)
             if s_graphic_supplier:
-                qset = qset.filter(
-                    graphic_supplier__icontains=s_graphic_supplier.strip()
-                )
+                qset = qset.filter(graphic_supplier__icontains=s_graphic_supplier.strip())
 
             s_user_keywords = self.form.cleaned_data.get("user_keywords", None)
             if s_user_keywords:
@@ -916,9 +862,7 @@ class JobSearchResultsView(ListView):
         qset = qset.exclude(id=99999)
 
         # Filter based on user workflow access.
-        qset = qset.filter(
-            workflow__name__in=general_funcs.get_user_workflow_access(self.request)
-        )
+        qset = qset.filter(workflow__name__in=general_funcs.get_user_workflow_access(self.request))
 
         return qset
 
@@ -957,11 +901,7 @@ def job_search(request):
         if request.GET.get("legacy") is not None:
             use_legacy = request.GET.get("legacy") == "1"
 
-        template_name = (
-            "workflow/search/search_form_legacy.html"
-            if use_legacy
-            else "workflow/search/search_form.html"
-        )
+        template_name = "workflow/search/search_form_legacy.html" if use_legacy else "workflow/search/search_form.html"
 
         # This is the search page to be re-displayed if there's a problem or no
         # POST data.
@@ -1012,21 +952,13 @@ class ItemSearchForm(forms.Form):
 
     # Phase 2: Additional key fields for enhanced search
     customer_code = forms.CharField(required=False, help_text="Search by customer code")
-    graphic_req_number = forms.CharField(
-        required=False, help_text="Search by graphic request number"
-    )
-    plant_comments = forms.CharField(
-        required=False, help_text="Search in plant comments"
-    )
-    mkt_review_comments = forms.CharField(
-        required=False, help_text="Search in marketing review comments"
-    )
+    graphic_req_number = forms.CharField(required=False, help_text="Search by graphic request number")
+    plant_comments = forms.CharField(required=False, help_text="Search in plant comments")
+    mkt_review_comments = forms.CharField(required=False, help_text="Search in marketing review comments")
 
     plant = forms.ModelChoiceField(queryset=Plant.objects.none(), required=False)
     press = forms.ModelChoiceField(queryset=Press.objects.none(), required=False)
-    platemaker = forms.ModelChoiceField(
-        queryset=Platemaker.objects.none(), required=False
-    )
+    platemaker = forms.ModelChoiceField(queryset=Platemaker.objects.none(), required=False)
 
     # New code --- Search for number of colors in job
     color_num_low = forms.IntegerField(min_value=0, max_value=9, required=False)
@@ -1040,9 +972,7 @@ class ItemSearchForm(forms.Form):
         platetype_choices.append(type)
     platetype = forms.ChoiceField(choices=platetype_choices, required=False)
 
-    specialmfg = forms.ModelChoiceField(
-        queryset=SpecialMfgConfiguration.objects.none(), required=False
-    )
+    specialmfg = forms.ModelChoiceField(queryset=SpecialMfgConfiguration.objects.none(), required=False)
 
     # Build list of prepress suppliers, an option search field.
     prepress_choices = []
@@ -1077,17 +1007,10 @@ class ItemSearchForm(forms.Form):
     item_situation = forms.ChoiceField(choices=item_situation_choices, required=False)
     # This is a list of people past and present who have worked at clemson at some point
     # This is mainly used for job and item searching.
-    grouped_artist_users = group_members = User.objects.filter(
-        groups__name="ClemsonPersonnel"
-    ).order_by("username")
+    grouped_artist_users = group_members = User.objects.filter(groups__name="ClemsonPersonnel").order_by("username")
     artist = forms.ModelChoiceField(queryset=grouped_artist_users, required=False)
 
-    permission = Permission.objects.get(codename="salesperson")
-    # Select users who are a member of the set of groups with the given permission.
-    # we are changing this to include all salespeople and not just the active ones.
-    grouped_sales_users = User.objects.filter(
-        groups__in=permission.group_set.all()
-    ).order_by("username")
+    grouped_sales_users = User.objects.filter(groups__in=_groups_for_permission("salesperson")).order_by("username")
     salesperson = forms.ModelChoiceField(queryset=grouped_sales_users, required=False)
 
     nut_trackers = ItemTrackerType.objects.filter(category__name="Beverage Nutrition")
@@ -1096,13 +1019,9 @@ class ItemSearchForm(forms.Form):
     marketing = forms.ModelChoiceField(queryset=mkt_trackers, required=False)
     promo_trackers = ItemTrackerType.objects.filter(category__name="Promotional")
     promo = forms.ModelChoiceField(queryset=promo_trackers, required=False)
-    workflow = WorkflowModelChoiceField(
-        queryset=Site.objects.all().exclude(name="Container"), required=False
-    )
+    workflow = WorkflowModelChoiceField(queryset=Site.objects.all().exclude(name="Container"), required=False)
     sort_by = forms.ChoiceField(choices=[("id", "Job #")], required=False)
-    sort_order = forms.ChoiceField(
-        choices=[("desc", "Descending"), ("asc", "Ascending")], required=False
-    )
+    sort_order = forms.ChoiceField(choices=[("desc", "Descending"), ("asc", "Ascending")], required=False)
     # Carton job fields
     grn = forms.CharField(required=False)
     one_up_die = forms.CharField(required=False)
@@ -1114,38 +1033,24 @@ class ItemSearchForm(forms.Form):
     def __init__(self, request, *args, **kwargs):
         super(ItemSearchForm, self).__init__(*args, **kwargs)
         # Only display artists linked to workflows the user has access to.
-        artist_qset = general_funcs.filter_query_same_perms(
-            request, self.grouped_artist_users
-        )
+        artist_qset = general_funcs.filter_query_same_perms(request, self.grouped_artist_users)
         self.fields["artist"].queryset = artist_qset
 
         # Only display salespeople linked to workflows the user has access to.
-        sales_qset = general_funcs.filter_query_same_perms(
-            request, self.grouped_sales_users
-        )
+        sales_qset = general_funcs.filter_query_same_perms(request, self.grouped_sales_users)
         self.fields["salesperson"].queryset = sales_qset
 
         # Get the workflows that this user has access to.
         user_workflows = general_funcs.get_user_workflow_access(request)
         # Only display plants linked to workflows the user has access to.
-        self.fields["plant"].queryset = Plant.objects.filter(
-            workflow__name__in=user_workflows
-        ).order_by("name")
+        self.fields["plant"].queryset = Plant.objects.filter(workflow__name__in=user_workflows).order_by("name")
         # Only display presses linked to workflows the user has access to.
-        self.fields["press"].queryset = Press.objects.filter(
-            workflow__name__in=user_workflows
-        ).order_by("name")
+        self.fields["press"].queryset = Press.objects.filter(workflow__name__in=user_workflows).order_by("name")
         # Only display platemakers linked to workflows the user has access to.
-        self.fields["platemaker"].queryset = (
-            Platemaker.objects.filter(workflow__name__in=user_workflows)
-            .distinct()
-            .order_by("name")
-        )
+        self.fields["platemaker"].queryset = Platemaker.objects.filter(workflow__name__in=user_workflows).distinct().order_by("name")
         # Only display special mfg configs linked to the user workflows.
         self.fields["specialmfg"].queryset = (
-            SpecialMfgConfiguration.objects.filter(workflow__name__in=user_workflows)
-            .distinct()
-            .order_by("name")
+            SpecialMfgConfiguration.objects.filter(workflow__name__in=user_workflows).distinct().order_by("name")
         )
 
 
@@ -1196,10 +1101,7 @@ class ItemSearchResultsView(ListView):
                 s_item_size = self.form.cleaned_data.get("size", None)
                 if s_item_size:
                     stripped_size = s_item_size.strip()
-                    qset = qset.filter(
-                        Q(size__size__icontains=stripped_size)
-                        | Q(bev_item_name__icontains=stripped_size)
-                    )
+                    qset = qset.filter(Q(size__size__icontains=stripped_size) | Q(bev_item_name__icontains=stripped_size))
 
             # Hell yeah. Filters everything containing each word in the search.
             s_job_name = self.form.cleaned_data.get("name", None)
@@ -1251,9 +1153,7 @@ class ItemSearchResultsView(ListView):
             if s_item_press:
                 qset = qset.filter(printlocation__press=s_item_press)
 
-            s_item_prepress_supplier = self.form.cleaned_data.get(
-                "prepress_supplier", None
-            )
+            s_item_prepress_supplier = self.form.cleaned_data.get("prepress_supplier", None)
             if s_item_prepress_supplier:
                 qset = qset.filter(job__prepress_supplier=s_item_prepress_supplier)
 
@@ -1274,20 +1174,14 @@ class ItemSearchResultsView(ListView):
             s_item_date_in_end = self.form.cleaned_data.get("date_in_end", None)
             if s_item_date_in_end:
                 if s_item_date_in_start:
-                    qset = qset.filter(
-                        creation_date__range=(s_item_date_in_start, s_item_date_in_end)
-                    )
+                    qset = qset.filter(creation_date__range=(s_item_date_in_start, s_item_date_in_end))
             elif s_item_date_in_start:
                 qset = qset.filter(creation_date=s_item_date_in_start)
 
             # If start and end date given, search on range, else search on just start.
             # Get all the items proofed out between the dates.
-            s_item_all_proof_date_start = self.form.cleaned_data.get(
-                "all_proof_date_start", None
-            )
-            s_item_all_proof_date_end = self.form.cleaned_data.get(
-                "all_proof_date_end", None
-            )
+            s_item_all_proof_date_start = self.form.cleaned_data.get("all_proof_date_start", None)
+            s_item_all_proof_date_end = self.form.cleaned_data.get("all_proof_date_end", None)
             if s_item_all_proof_date_end:
                 if s_item_all_proof_date_start:
                     qlog_set = (
@@ -1314,9 +1208,7 @@ class ItemSearchResultsView(ListView):
                 qset = qset.filter(id__in=qlog_set)
 
             # If start and end date given, search on range, else search on just start.
-            s_item_apr_date_start = self.form.cleaned_data.get(
-                "approval_date_start", None
-            )
+            s_item_apr_date_start = self.form.cleaned_data.get("approval_date_start", None)
             s_item_apr_date_end = self.form.cleaned_data.get("approval_date_end", None)
             if s_item_apr_date_end:
                 if s_item_apr_date_start:
@@ -1333,22 +1225,12 @@ class ItemSearchResultsView(ListView):
                     )
                     qset = qset.filter(id__in=qlog_set)
             elif s_item_apr_date_start:
-                qlog_set = (
-                    JobLog.objects.filter(
-                        type=JOBLOG_TYPE_ITEM_APPROVED, event_time=s_item_apr_date_start
-                    )
-                    .values("item")
-                    .query
-                )
+                qlog_set = JobLog.objects.filter(type=JOBLOG_TYPE_ITEM_APPROVED, event_time=s_item_apr_date_start).values("item").query
                 qset = qset.filter(id__in=qlog_set)
 
             # If start and end date given, search on range, else search on just start.
-            s_item_ffo_date_start = self.form.cleaned_data.get(
-                "final_file_date_start", None
-            )
-            s_item_ffo_date_end = self.form.cleaned_data.get(
-                "final_file_date_end", None
-            )
+            s_item_ffo_date_start = self.form.cleaned_data.get("final_file_date_start", None)
+            s_item_ffo_date_end = self.form.cleaned_data.get("final_file_date_end", None)
             if s_item_ffo_date_end:
                 if s_item_ffo_date_start:
                     qlog_set = (
@@ -1388,34 +1270,22 @@ class ItemSearchResultsView(ListView):
 
             s_item_marketing = self.form.cleaned_data.get("marketing", None)
             if s_item_marketing:
-                qtracker_set = (
-                    ItemTracker.objects.filter(type=s_item_marketing)
-                    .values("item")
-                    .query
-                )
+                qtracker_set = ItemTracker.objects.filter(type=s_item_marketing).values("item").query
                 qset = qset.filter(id__in=qtracker_set)
 
             s_item_nutrition = self.form.cleaned_data.get("nutrition", None)
             if s_item_nutrition:
-                qtracker_set = (
-                    ItemTracker.objects.filter(type=s_item_nutrition)
-                    .values("item")
-                    .query
-                )
+                qtracker_set = ItemTracker.objects.filter(type=s_item_nutrition).values("item").query
                 qset = qset.filter(id__in=qtracker_set)
 
             s_item_promo = self.form.cleaned_data.get("promo", None)
             if s_item_promo:
-                qtracker_set = (
-                    ItemTracker.objects.filter(type=s_item_promo).values("item").query
-                )
+                qtracker_set = ItemTracker.objects.filter(type=s_item_promo).values("item").query
                 qset = qset.filter(id__in=qtracker_set)
 
             s_itemcolor = self.form.cleaned_data.get("itemcolor", None)
             if s_itemcolor:
-                thiscolor = ItemColor.objects.filter(
-                    color__icontains=s_itemcolor
-                ).values_list("item_id")
+                thiscolor = ItemColor.objects.filter(color__icontains=s_itemcolor).values_list("item_id")
                 qset = qset.filter(id__in=thiscolor)
 
             s_item_workflow = self.form.cleaned_data.get("workflow", None)
@@ -1438,13 +1308,9 @@ class ItemSearchResultsView(ListView):
             s_customer_code = self.form.cleaned_data.get("customer_code", None)
             if s_customer_code:
                 qset = qset.filter(customer_code__icontains=s_customer_code.strip())
-            s_graphic_req_number = self.form.cleaned_data.get(
-                "graphic_req_number", None
-            )
+            s_graphic_req_number = self.form.cleaned_data.get("graphic_req_number", None)
             if s_graphic_req_number:
-                qset = qset.filter(
-                    graphic_req_number__icontains=s_graphic_req_number.strip()
-                )
+                qset = qset.filter(graphic_req_number__icontains=s_graphic_req_number.strip())
 
             # Phase 2: Additional key field searches for items
             s_plant_comments = self.form.cleaned_data.get("plant_comments", None)
@@ -1455,9 +1321,7 @@ class ItemSearchResultsView(ListView):
                     q &= Q(plant_comments__icontains=word)
                 qset = qset.filter(q)
 
-            s_mkt_review_comments = self.form.cleaned_data.get(
-                "mkt_review_comments", None
-            )
+            s_mkt_review_comments = self.form.cleaned_data.get("mkt_review_comments", None)
             if s_mkt_review_comments:
                 search_words = s_mkt_review_comments.split(" ")
                 q = Q()
@@ -1466,9 +1330,7 @@ class ItemSearchResultsView(ListView):
                 qset = qset.filter(q)
 
             # Filter based on user status.
-            qset = qset.filter(
-                workflow__name__in=general_funcs.get_user_workflow_access(self.request)
-            )
+            qset = qset.filter(workflow__name__in=general_funcs.get_user_workflow_access(self.request))
 
             # Filter based on Number of Colors
             s_min_colors = self.form.cleaned_data.get("color_num_low", None)
@@ -1541,11 +1403,7 @@ def item_search(request):
         if request.GET.get("legacy") is not None:
             use_legacy = request.GET.get("legacy") == "1"
 
-        template_name = (
-            "workflow/search/search_form_legacy.html"
-            if use_legacy
-            else "workflow/search/search_form.html"
-        )
+        template_name = "workflow/search/search_form_legacy.html" if use_legacy else "workflow/search/search_form.html"
 
         # This is the search page to be re-displayed if there's a problem or no
         # POST data.
@@ -1593,7 +1451,8 @@ class ItemFindSame(ListView):
 
 
 def job_todo_list(request, manager_tools=False):
-    """Daily Report for the Clemson Graphics Hub
+    """
+    Daily Report for the Clemson Graphics Hub
     -Lists upcoming due jobs.
     -Account for jobs due on weekends.
     -List both due jobs and revisions.
@@ -1894,9 +1753,7 @@ def job_todo_list(request, manager_tools=False):
     ).order_by("-id")
 
     # Jobs with pending status.
-    jobs_pending = Job.objects.filter(
-        status="Pending", workflow__name__in=view_workflows
-    ).exclude(
+    jobs_pending = Job.objects.filter(status="Pending", workflow__name__in=view_workflows).exclude(
         prepress_supplier__in=(
             "PHT",
             "Phototype",
@@ -1915,15 +1772,9 @@ def job_todo_list(request, manager_tools=False):
         .query
     )
     # Carton items don't have fsb nine digit numbers. Search for them separately.
-    carton_items_to_file_out = (
-        Item.objects.filter(job__workflow__name="Carton", item_status="File Out")
-        .values("job__id")
-        .query
-    )
+    carton_items_to_file_out = Item.objects.filter(job__workflow__name="Carton", item_status="File Out").values("job__id").query
     jobs_needing_file_out = (
-        Job.objects.filter(
-            Q(id__in=items_to_file_out) | Q(id__in=carton_items_to_file_out)
-        )
+        Job.objects.filter(Q(id__in=items_to_file_out) | Q(id__in=carton_items_to_file_out))
         .exclude(status__in=("Hold", "Cancelled", "Complete"))
         .order_by("-id")
     )
@@ -2001,10 +1852,7 @@ def job_todo_list(request, manager_tools=False):
             job_list = [job]
             # Check for duplicates.
             for existing_address in shipto_list:
-                if (
-                    existing_address.name.lower() == address.name.lower()
-                    and existing_address.city.lower() == address.city.lower()
-                ):
+                if existing_address.name.lower() == address.name.lower() and existing_address.city.lower() == address.city.lower():
                     # artist averages may not be available in this scope; guard defensively
                     try:
                         # Use job_todo_estimates to compute artist and office averages
@@ -2013,10 +1861,7 @@ def job_todo_list(request, manager_tools=False):
                     except Exception:
                         # If something goes wrong computing estimates, skip it
                         pass
-            if (
-                existing_address.name == address.name
-                and existing_address.city == address.city
-            ):
+            if existing_address.name == address.name and existing_address.city == address.city:
                 job_list.append(existing_address.job)
             # End for existing_address
         # Record this address and the jobs associated with it
@@ -2099,7 +1944,8 @@ def job_todo_list(request, manager_tools=False):
 
 
 def job_todo_estimates(job):
-    """Estimate how long it should take an artitst to complete a given job based
+    """
+    Estimate how long it should take an artitst to complete a given job based
     on the job's type and job complexity. Also provides a similar estimate for
     all artists on average. Use by job_todo_list() for manager tools.
     """
@@ -2112,12 +1958,8 @@ def job_todo_estimates(job):
             job_complexity = JobComplexity.objects.get(job=job)
 
             # Use the get_item_average_hours() function to calculate average.
-            artist_averages = get_item_average_hours(
-                job_complexity.category, job.type, job.artist
-            )
-            all_artists_averages = get_item_average_hours(
-                job_complexity.category, job.type
-            )
+            artist_averages = get_item_average_hours(job_complexity.category, job.type, job.artist)
+            all_artists_averages = get_item_average_hours(job_complexity.category, job.type)
 
             # Count the items
             items = Item.objects.filter(job=job)
@@ -2137,7 +1979,8 @@ def job_todo_estimates(job):
 
 
 def list_reports(request):
-    """Displays a list of available custom reports.
+    """
+    Displays a list of available custom reports.
     Dukes mayo on a saltine cracker is the best!
     I always take a handful with me when
     I'm feedin my hog Myrtle. She loves it too. LOL
@@ -2181,14 +2024,10 @@ class GetReport(ListView):
         if self.table == "job":
             qset = Job.objects.exclude(prepress_supplier="Phototype")
         if self.table == "item":
-            qset = Item.objects.exclude(job__prepress_supplier="Phototype").exclude(
-                job__status="Cancelled"
-            )
+            qset = Item.objects.exclude(job__prepress_supplier="Phototype").exclude(job__status="Cancelled")
 
         # Filter based on user status.
-        qset = qset.filter(
-            workflow__name__in=general_funcs.get_user_workflow_access(self.request)
-        ).order_by("-id")
+        qset = qset.filter(workflow__name__in=general_funcs.get_user_workflow_access(self.request)).order_by("-id")
 
         # Filter using report_name, part 2.
         if self.search == "unassigned":
@@ -2214,9 +2053,7 @@ class GetReport(ListView):
             self.page_title = "Assigned Active Jobs"
 
         elif self.search == "revision":
-            revisions = (
-                Revision.objects.filter(complete_date__isnull=True).values("item").query
-            )
+            revisions = Revision.objects.filter(complete_date__isnull=True).values("item").query
             qset = (
                 qset.filter(id__in=revisions)
                 .exclude(
@@ -2252,14 +2089,8 @@ class GetReport(ListView):
                 .query
             )
             # IDs of items with pending revisions. (to exclude)
-            revisions = (
-                Revision.objects.filter(complete_date__isnull=True).values("item").query
-            )
-            qset = (
-                qset.filter(id__in=recent_proofed_log)
-                .exclude(id__in=recent_filedout_log)
-                .exclude(id__in=revisions)
-            )
+            revisions = Revision.objects.filter(complete_date__isnull=True).values("item").query
+            qset = qset.filter(id__in=recent_proofed_log).exclude(id__in=recent_filedout_log).exclude(id__in=revisions)
             self.page_title = "Items Recently Proofed/Posted"
 
         elif self.search == "ninedigit":
@@ -2298,21 +2129,13 @@ class GetReport(ListView):
                 .values("item")
                 .query
             )
-            qset = (
-                qset.filter(id__in=recent_log, fsb_nine_digit="")
-                .exclude(id__in=recent_log_fileout)
-                .order_by("-job__id")
-            )
+            qset = qset.filter(id__in=recent_log, fsb_nine_digit="").exclude(id__in=recent_log_fileout).order_by("-job__id")
             self.page_title = "Items Approved w/o Nine Digit Number"
         elif self.search == "new-nutrition":
             # TODO: speed this up.
             # Exclude items recently approved, or with that have been given a item_situation
             # (ie. Lost to Competitor, etc...)
-            tracked_items = (
-                ItemTracker.objects.filter(type__name="Nutrition Facts")
-                .values("item")
-                .query
-            )
+            tracked_items = ItemTracker.objects.filter(type__name="Nutrition Facts").values("item").query
 
             qset = qset.filter(id__in=tracked_items).order_by("-job__id")
 
@@ -2320,11 +2143,7 @@ class GetReport(ListView):
         elif self.search == "bioengineered":
             # All the bioengineered beverage labels like BE, BR, BS, etc.
             tracked_items = (
-                ItemTracker.objects.filter(
-                    type__category__name="Beverage Label", type__name__startswith="B"
-                )
-                .values("item")
-                .query
+                ItemTracker.objects.filter(type__category__name="Beverage Label", type__name__startswith="B").values("item").query
             )
 
             qset = qset.filter(id__in=tracked_items).order_by("-job__id")
@@ -2353,9 +2172,7 @@ class GetReport(ListView):
             # (ie. Lost to Competitor, etc...)
             qset = (
                 qset.filter(id__in=recent_log, proof_reminder_email_sent__isnull=False)
-                .exclude(
-                    Q(id__in=recent_log_approved) | Q(item_situation__isnull=False)
-                )
+                .exclude(Q(id__in=recent_log_approved) | Q(item_situation__isnull=False))
                 .order_by("-job__id")
             )
 
@@ -2382,12 +2199,7 @@ class GetReport(ListView):
             artreq_makeship_jobs = Job.objects.filter(id__in=artreqs.values("job_num"))
 
             # MakeShip Jobs from eTools. If it has an eTools id we assume its a makeship job.
-            etools_makeship_jobs = (
-                Job.objects.filter()
-                .exclude(e_tools_id__isnull=True)
-                .exclude(e_tools_id__exact="")
-                .order_by("-id")
-            )
+            etools_makeship_jobs = Job.objects.filter().exclude(e_tools_id__isnull=True).exclude(e_tools_id__exact="").order_by("-id")
 
             # Merge the two querysets.
             makeship_jobs = artreq_makeship_jobs | etools_makeship_jobs
@@ -2430,7 +2242,8 @@ def advanced_reports(request):
 
 @method_decorator(login_required)
 def otifne_report(request, year):
-    """Main OTIFNE report view.
+    """
+    Main OTIFNE report view.
     OTIFNE = On time, In full, No errors.
     Report calculates error percentages and late items for both proofing and
     file out the plant.
@@ -2444,9 +2257,7 @@ def otifne_report(request, year):
     )
     items = Item.objects.filter(job__id__in=jobs, is_deleted=False)
 
-    file_outs = JobLog.objects.filter(
-        type=JOBLOG_TYPE_ITEM_FILED_OUT, event_time__year=year
-    )
+    file_outs = JobLog.objects.filter(type=JOBLOG_TYPE_ITEM_FILED_OUT, event_time__year=year)
     num_file_outs = file_outs.count()
 
     error_list = Error.objects.filter(reported_date__year=year).order_by("-id")
@@ -2486,9 +2297,7 @@ def otifne_report(request, year):
 
 
 def get_fedex_shipment_pdf(request, start_date, end_date):
-    ship_list = Shipment.objects.filter(
-        date_shipped__range=(start_date, end_date)
-    ).order_by("-date_shipped")
+    ship_list = Shipment.objects.filter(date_shipped__range=(start_date, end_date)).order_by("-date_shipped")
 
     workBookDocument = openpyxl.Workbook()
     docSheet1 = workBookDocument.active
@@ -2509,18 +2318,12 @@ def get_fedex_shipment_pdf(request, start_date, end_date):
     for shipment in ship_list:
         if shipment.address:
             if shipment.address.name:
-                docSheet1.cell(row=row + 1, column=1).value = str(
-                    shipment.address.name.encode("utf-8")
-                )
+                docSheet1.cell(row=row + 1, column=1).value = str(shipment.address.name.encode("utf-8"))
             else:
-                docSheet1.cell(row=row + 1, column=1).value = str(
-                    shipment.address.company
-                )
+                docSheet1.cell(row=row + 1, column=1).value = str(shipment.address.company)
         else:
             continue
-        docSheet1.cell(row=row + 1, column=2).value = str(
-            shipment.date_shipped.strftime("%Y-%m-%d")
-        )
+        docSheet1.cell(row=row + 1, column=2).value = str(shipment.date_shipped.strftime("%Y-%m-%d"))
         docSheet1.cell(row=row + 1, column=3).value = str(shipment.job)
         docSheet1.cell(row=row + 1, column=4).value = shipment.tracking_num
 
@@ -2552,7 +2355,8 @@ class fedexShipForm(forms.Form):
 
 
 class FedexShipments(ListView):
-    """This page is for cindy mueller to query recent fedex shipments so that she can
+    """
+    This page is for cindy mueller to query recent fedex shipments so that she can
     compare them to the list of questionable fedex people for review
     """
 
@@ -2582,9 +2386,7 @@ class FedexShipments(ListView):
         self.starting_date = self.start_date.strftime("%d-%m-%Y")
         self.ending_date = self.end_date.strftime("%d-%m-%Y")
 
-        qset = Shipment.objects.filter(
-            date_shipped__range=(self.start_date, self.end_date)
-        ).order_by("-date_shipped")
+        qset = Shipment.objects.filter(date_shipped__range=(self.start_date, self.end_date)).order_by("-date_shipped")
         return qset
 
     def get_context_data(self, **kwargs):
@@ -2605,7 +2407,8 @@ class FedexShipments(ListView):
 
 
 class InkCovReport(ListView):
-    """Used by Evergreen to generate ink coverage reports by plant. Returns color
+    """
+    Used by Evergreen to generate ink coverage reports by plant. Returns color
     info for items that have filed out. Checks for duplicated by bev_item_name
     and returns only the most recent item with that name according to database
     ID.
@@ -2621,29 +2424,21 @@ class InkCovReport(ListView):
         except Exception:
             plant = None
         # Get items that have filed out for the given plant.
-        fileout_logs = JobLog.objects.filter(
-            type=JOBLOG_TYPE_ITEM_FILED_OUT, item__printlocation__plant__name=plant
-        ).values("item")
+        fileout_logs = JobLog.objects.filter(type=JOBLOG_TYPE_ITEM_FILED_OUT, item__printlocation__plant__name=plant).values("item")
         fileout_items = Item.objects.filter(id__in=fileout_logs).exclude(job__id=99999)
 
         # Here's how we'll remove duplicates
 
         # Make a list/dictionary of each unique bev_item_name in our filed-out items
         # and note the most recent item that uses that name.
-        unique_names = (
-            fileout_items.values("bev_item_name")
-            .order_by()
-            .annotate(max_id=models.Max("id"))
-        )
+        unique_names = fileout_items.values("bev_item_name").order_by().annotate(max_id=models.Max("id"))
         # Make a list of just the item IDs.
         unique_items = [str(item["max_id"]) for item in unique_names]
         # Filter filed-out items leaving only the most recent item to use that name.
         ready_items = fileout_items.filter(id__in=unique_items)
 
         # Gather the colors for the items specified.
-        colors = ItemColor.objects.filter(item__in=ready_items).order_by(
-            "-item__job__id"
-        )
+        colors = ItemColor.objects.filter(item__in=ready_items).order_by("-item__job__id")
 
         return colors
 
@@ -2656,11 +2451,7 @@ class InkCovReport(ListView):
             plant = "Plant"
         # Gather up the plants involved in this report. Exclude closed plants.
         exclude_plants = ["Clinton", "Framingham", "Raleigh", "Plant City"]
-        bev_plants = (
-            Plant.objects.filter(workflow__name="Beverage")
-            .order_by("name")
-            .exclude(name__in=exclude_plants)
-        )
+        bev_plants = Plant.objects.filter(workflow__name="Beverage").order_by("name").exclude(name__in=exclude_plants)
 
         context["page_title"] = "Ink Coverage by Plant"
         context["bev_plants"] = bev_plants
@@ -2676,7 +2467,8 @@ class InkCovReport(ListView):
 
 
 def inkcov_excel(request, plant):
-    """Used by Evergreen to generate ink coverage reports by plant. Basically uses
+    """
+    Used by Evergreen to generate ink coverage reports by plant. Basically uses
     the same logic as inkcov_report but spits it out as a spreadsheet for
     download.
     """
@@ -2686,20 +2478,14 @@ def inkcov_excel(request, plant):
     # Gather up the plants involved in this report. Exclude closed plants.
 
     # Get items that have filed out for the given plant.
-    fileout_logs = JobLog.objects.filter(
-        type=JOBLOG_TYPE_ITEM_FILED_OUT, item__printlocation__plant__name=plant
-    ).values("item")
+    fileout_logs = JobLog.objects.filter(type=JOBLOG_TYPE_ITEM_FILED_OUT, item__printlocation__plant__name=plant).values("item")
     fileout_items = Item.objects.filter(id__in=fileout_logs).exclude(job__id=99999)
 
     # Here's how we'll remove duplicates
 
     # Make a list/dictionary of each unique bev_item_name in our filed-out items
     # and note the most recent item that uses that name.
-    unique_names = (
-        fileout_items.values("bev_item_name")
-        .order_by()
-        .annotate(max_id=models.Max("id"))
-    )
+    unique_names = fileout_items.values("bev_item_name").order_by().annotate(max_id=models.Max("id"))
     # Make a list of just the item IDs.
     unique_items = [str(item["max_id"]) for item in unique_names]
     # Filter filed-out items leaving only the most recent item to use that name.
@@ -2766,7 +2552,8 @@ class FSB_InkCovReport_Form(forms.Form):
 
 
 class FSB_InkCovReport(ListView):
-    """Used by FSB to generate ink coverage reports by plant. Returns color
+    """
+    Used by FSB to generate ink coverage reports by plant. Returns color
     info for items that have filed out. Checks for duplicated by bev_item_name
     and returns only the most recent item with that name according to database
     ID.
@@ -2807,18 +2594,14 @@ class FSB_InkCovReport(ListView):
         # Here's how we'll remove duplicates
         # Make a list/dictionary of each unique bev_item_name in our filed-out items
         # and note the most recent item that uses that name.
-        unique_names = (
-            fileout_items.values("id").order_by().annotate(max_id=models.Max("id"))
-        )
+        unique_names = fileout_items.values("id").order_by().annotate(max_id=models.Max("id"))
         # Make a list of just the item IDs.
         unique_items = [str(item["max_id"]) for item in unique_names]
         # Filter filed-out items leaving only the most recent item to use that name.
         ready_items = fileout_items.filter(id__in=unique_items)
 
         # Gather the colors for the items specified.
-        colors = ItemColor.objects.filter(item__in=ready_items).order_by(
-            "-item__job__id", "item__num_in_job"
-        )
+        colors = ItemColor.objects.filter(item__in=ready_items).order_by("-item__job__id", "item__num_in_job")
 
         return colors
 
@@ -2841,7 +2624,8 @@ class FSB_InkCovReport(ListView):
 
 
 def fsb_inkcov_excel(request, start_date, end_date, plant):
-    """Used by Evergreen to generate ink coverage reports by plant. Basically uses
+    """
+    Used by Evergreen to generate ink coverage reports by plant. Basically uses
     the same logic as inkcov_report but spits it out as a spreadsheet for
     download.
     """
@@ -2859,18 +2643,14 @@ def fsb_inkcov_excel(request, start_date, end_date, plant):
     # Here's how we'll remove duplicates
     # Make a list/dictionary of each unique bev_item_name in our filed-out items
     # and note the most recent item that uses that name.
-    unique_names = (
-        fileout_items.values("id").order_by().annotate(max_id=models.Max("id"))
-    )
+    unique_names = fileout_items.values("id").order_by().annotate(max_id=models.Max("id"))
     # Make a list of just the item IDs.
     unique_items = [str(item["max_id"]) for item in unique_names]
     # Filter filed-out items leaving only the most recent item to use that name.
     ready_items = fileout_items.filter(id__in=unique_items)
 
     # Gather the colors for the items specified.
-    qset = ItemColor.objects.filter(item__in=ready_items).order_by(
-        "-item__job__id", "item__num_in_job"
-    )
+    qset = ItemColor.objects.filter(item__in=ready_items).order_by("-item__job__id", "item__num_in_job")
 
     title = "FSB Ink Coverage %s" % plant
 
@@ -2916,7 +2696,8 @@ def fsb_inkcov_excel(request, start_date, end_date, plant):
 
 
 def makeship_excel(request):
-    """Create an excel spreadsheet listing all make and ship items. Basically uses
+    """
+    Create an excel spreadsheet listing all make and ship items. Basically uses
     the same logic as the make and ship item report but spits it out as a
     spreadsheet for download.
     """
@@ -2928,12 +2709,7 @@ def makeship_excel(request):
     artreq_makeship_jobs = Job.objects.filter(id__in=artreqs.values("job_num"))
 
     # MakeShip Jobs from eTools. If it has an eTools id we assume its a makeship job.
-    etools_makeship_jobs = (
-        Job.objects.filter()
-        .exclude(e_tools_id__isnull=True)
-        .exclude(e_tools_id__exact="")
-        .order_by("-id")
-    )
+    etools_makeship_jobs = Job.objects.filter().exclude(e_tools_id__isnull=True).exclude(e_tools_id__exact="").order_by("-id")
     # Merge the two querysets.
     makeship_jobs = artreq_makeship_jobs | etools_makeship_jobs
 
@@ -2962,23 +2738,15 @@ def makeship_excel(request):
         docSheet1.cell(row=row + 1, column=2).value = str(item)
         if item.printlocation:
             if item.printlocation.plant:
-                docSheet1.cell(row=row + 1, column=3).value = str(
-                    item.printlocation.plant
-                )
+                docSheet1.cell(row=row + 1, column=3).value = str(item.printlocation.plant)
             if item.printlocation.press:
-                docSheet1.cell(row=row + 1, column=4).value = str(
-                    item.printlocation.press
-                )
+                docSheet1.cell(row=row + 1, column=4).value = str(item.printlocation.press)
         if item.approval_date():
-            docSheet1.cell(row=row + 1, column=5).value = str(
-                item.approval_date().strftime("%Y-%m-%d")
-            )
+            docSheet1.cell(row=row + 1, column=5).value = str(item.approval_date().strftime("%Y-%m-%d"))
         if item.fsb_nine_digit_date:
             docSheet1.cell(row=row + 1, column=6).value = str(item.fsb_nine_digit_date)
         if item.final_file_date():
-            docSheet1.cell(row=row + 1, column=7).value = str(
-                item.final_file_date().strftime("%Y-%m-%d")
-            )
+            docSheet1.cell(row=row + 1, column=7).value = str(item.final_file_date().strftime("%Y-%m-%d"))
         docSheet1.cell(row=row + 1, column=8).value = str(item.job.artist)
         docSheet1.cell(row=row + 1, column=9).value = str(item.job.salesperson)
 
@@ -2997,25 +2765,16 @@ def makeship_excel(request):
 
 
 def bioengineered_excel(request):
-    """Create an excel spreadsheet listing all bioengineered items. Basically uses
+    """
+    Create an excel spreadsheet listing all bioengineered items. Basically uses
     the same logic as the bioengineered item report but spits it out as a
     spreadsheet for download.
     """
     # Setup the Worksheet
     workBookDocument = openpyxl.Workbook()
     # All the bioengineered beverage labels like BE, BR, BS, etc.
-    tracked_items = (
-        ItemTracker.objects.filter(
-            type__category__name="Beverage Label", type__name__startswith="B"
-        )
-        .values("item")
-        .query
-    )
-    qset = (
-        Item.objects.filter(id__in=tracked_items)
-        .order_by("-job__id")
-        .exclude(job__status="Cancelled")
-    )
+    tracked_items = ItemTracker.objects.filter(type__category__name="Beverage Label", type__name__startswith="B").values("item").query
+    qset = Item.objects.filter(id__in=tracked_items).order_by("-job__id").exclude(job__status="Cancelled")
 
     title = "Bioengineered Items"
     # Add a page in the spreadsheet
@@ -3039,23 +2798,15 @@ def bioengineered_excel(request):
         docSheet1.cell(row=row + 1, column=2).value = str(item)
         if item.printlocation:
             if item.printlocation.plant:
-                docSheet1.cell(row=row + 1, column=3).value = str(
-                    item.printlocation.plant
-                )
+                docSheet1.cell(row=row + 1, column=3).value = str(item.printlocation.plant)
             if item.printlocation.press:
-                docSheet1.cell(row=row + 1, column=4).value = str(
-                    item.printlocation.press
-                )
+                docSheet1.cell(row=row + 1, column=4).value = str(item.printlocation.press)
         if item.approval_date():
-            docSheet1.cell(row=row + 1, column=5).value = str(
-                item.approval_date().strftime("%Y-%m-%d")
-            )
+            docSheet1.cell(row=row + 1, column=5).value = str(item.approval_date().strftime("%Y-%m-%d"))
         if item.fsb_nine_digit_date:
             docSheet1.cell(row=row + 1, column=6).value = str(item.fsb_nine_digit_date)
         if item.final_file_date():
-            docSheet1.cell(row=row + 1, column=7).value = str(
-                item.final_file_date().strftime("%Y-%m-%d")
-            )
+            docSheet1.cell(row=row + 1, column=7).value = str(item.final_file_date().strftime("%Y-%m-%d"))
         docSheet1.cell(row=row + 1, column=8).value = str(item.job.artist)
         docSheet1.cell(row=row + 1, column=9).value = str(item.job.salesperson)
 

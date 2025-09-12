@@ -1,4 +1,5 @@
-"""Country conversion table. Also note that the generated COUNTRY_CHOICES_LIST can
+"""
+Country conversion table. Also note that the generated COUNTRY_CHOICES_LIST can
 be used for any valid choices field thing.
 
 Note that while this is an extremely poopy, sloppy solution, we need it to
@@ -260,7 +261,8 @@ country_dict = {
 
 
 def full_to_abbrev(full_name):
-    """Returns the abbreviation for a country, given its full name. Default to US
+    """
+    Returns the abbreviation for a country, given its full name. Default to US
     when no match can be found.
     """
     if len(full_name) == 2:
@@ -329,7 +331,8 @@ state_dict = {
 
 
 def country_state_to_abbrev(country, state):
-    """Given a country name or abbreviation and the full spelled out name of one
+    """
+    Given a country name or abbreviation and the full spelled out name of one
     of its states, return a shortened state/province code that FedEx
     recognizes.
     """

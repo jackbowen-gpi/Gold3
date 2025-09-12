@@ -1,3 +1,7 @@
+"""
+Module gchub_db\apps\\calendar\views.py
+"""
+
 from __future__ import division
 
 import calendar
@@ -44,13 +48,21 @@ MIN_CHOICES = (
     ("45", ":45"),
 )
 
-# These are cached once when the server is started to avoid future queries.
-ARTIST_PERMISSION = Permission.objects.get(codename="in_artist_pulldown")
-CLEMSON_ARTIST = (
-    User.objects.filter(groups__in=ARTIST_PERMISSION.group_set.all())
-    .order_by("username")
-    .filter(is_active=True)
-)
+
+# Avoid database access at import time; resolve permission-based query lazily.
+def _get_artist_permission():
+    try:
+        return Permission.objects.get(codename="in_artist_pulldown")
+    except Exception:
+        return None
+
+
+def _get_clemson_artist_qs():
+    perm = _get_artist_permission()
+    if perm is None:
+        # Return an empty queryset when DB or auth tables aren't ready yet.
+        return User.objects.none()
+    return User.objects.filter(groups__in=perm.group_set.all()).order_by("username").filter(is_active=True)
 
 
 class ModelEventForm(ModelForm):
@@ -60,15 +72,14 @@ class ModelEventForm(ModelForm):
 
 
 class NewEventForm(ModelEventForm):
-    eventlength = forms.IntegerField(
-        initial="1", help_text="Number of days the event lasts.", required=True
-    )
+    eventlength = forms.IntegerField(initial="1", help_text="Number of days the event lasts.", required=True)
     email_notice = forms.BooleanField(required=False)
     time_start_hour = forms.ChoiceField(choices=HOUR_CHOICES, required=False)
     time_start_min = forms.ChoiceField(choices=MIN_CHOICES, required=False)
     time_end_hour = forms.ChoiceField(choices=HOUR_CHOICES, required=False)
     time_end_min = forms.ChoiceField(choices=MIN_CHOICES, required=False)
-    employee_override = forms.ModelChoiceField(queryset=CLEMSON_ARTIST, required=False)
+    # Use a lazy queryset so form construction doesn't trigger DB access at import time.
+    employee_override = forms.ModelChoiceField(queryset=_get_clemson_artist_qs(), required=False)
 
 
 @login_required
@@ -108,24 +119,14 @@ def month_overview(request, year_num, month_num):
 
     current_day = current_time[2]
 
-    events_for_month = Event.objects.filter(
-        event_date__year=year_num, event_date__month=month_num
-    )
+    events_for_month = Event.objects.filter(event_date__year=year_num, event_date__month=month_num)
 
-    vacation_used_full = Event.objects.filter(
-        employee__username=request.user.username, type="VA", event_date__year=year_num
-    ).count()
-    vacation_used_half = Event.objects.filter(
-        employee__username=request.user.username, type="HV", event_date__year=year_num
-    ).count()
+    vacation_used_full = Event.objects.filter(employee__username=request.user.username, type="VA", event_date__year=year_num).count()
+    vacation_used_half = Event.objects.filter(employee__username=request.user.username, type="HV", event_date__year=year_num).count()
     vacation_used = vacation_used_full + (vacation_used_half / 2)
 
-    sick_used_full = Event.objects.filter(
-        employee__username=request.user.username, type="SD", event_date__year=year_num
-    ).count()
-    sick_used_half = Event.objects.filter(
-        employee__username=request.user.username, type="SH", event_date__year=year_num
-    ).count()
+    sick_used_full = Event.objects.filter(employee__username=request.user.username, type="SD", event_date__year=year_num).count()
+    sick_used_half = Event.objects.filter(employee__username=request.user.username, type="SH", event_date__year=year_num).count()
     sick_used = sick_used_full + (sick_used_half / 2)
 
     # Return a list of weeks in the month. Each week is represented by a list
@@ -197,11 +198,7 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
         eventform = NewEventForm(request.POST)
 
         # Make sure the user isn't taking more than 5 consecutive vacation days.
-        if (
-            request.POST["type"] == "VA"
-            and int(request.POST["eventlength"]) > 5
-            and not manager
-        ):
+        if request.POST["type"] == "VA" and int(request.POST["eventlength"]) > 5 and not manager:
             message = "Sorry, you need approval from your manager to schedule a vacation that long. Please speak to your manager first."
             return HttpResponse(JSMessage(message, is_error=True))
 
@@ -211,29 +208,21 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
         check_event.type = request.POST["type"]
         if check_event.overload() and not manager:
             message = (
-                "Sorry, there are already too many vacations scheduled for %s. Please speak to your manager first."
-                % check_event.event_date
+                "Sorry, there are already too many vacations scheduled for %s. Please speak to your manager first." % check_event.event_date
             )
             return HttpResponse(JSMessage(message, is_error=True))
 
         if eventform.is_valid():
             # Make sure the user isn't taking more than 5 consecutive vacation days.
-            if (
-                check_event.five_consecutive(
-                    request.POST["employee"], int(request.POST["eventlength"])
+            if check_event.five_consecutive(request.POST["employee"], int(request.POST["eventlength"])) and not manager:
+                message = (
+                    "Sorry, you need approval from your manager to schedule "
+                    "a vacation over 5 consecutive days. Please speak to your manager first."
                 )
-                and not manager
-            ):
-                message = "Sorry, you need approval from your manager to schedule a vacation over 5 consecutive days. Please speak to your manager first."
                 return HttpResponse(JSMessage(message, is_error=True))
 
             # Make sure the user isn't taking more than 10 vacation days in one month.
-            if (
-                check_event.ten_in_month(
-                    request.POST["employee"], int(request.POST["eventlength"])
-                )
-                and not manager
-            ):
+            if check_event.ten_in_month(request.POST["employee"], int(request.POST["eventlength"])) and not manager:
                 message = "Sorry, you have 10 or more vacations scheduled for this month already. Please speak to your manager first."
                 return HttpResponse(JSMessage(message, is_error=True))
 
@@ -255,13 +244,7 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
             date = date.replace("-", "")
 
             # Send Manager an email if vacation, leave, doctor, or out.
-            if (
-                type == "VA"
-                or type == "HV"
-                or type == "LA"
-                or type == "DA"
-                or type == "OO"
-            ):
+            if type == "VA" or type == "HV" or type == "LA" or type == "DA" or type == "OO":
                 # remapped models.py EVENT_TYPES tuple as a dict
                 legend = {
                     "VA": "Vacation - Full Day",
@@ -290,9 +273,7 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
                 user = str(event.cleaned_data["employee"]).replace("_", " ")
                 # manager email goes next
                 mail_send_to = []
-                group_members = User.objects.filter(
-                    groups__name="EmailGCHubManager", is_active=True
-                )
+                group_members = User.objects.filter(groups__name="EmailGCHubManager", is_active=True)
                 for manager in group_members:
                     mail_send_to.append(manager.email)
                 mail_from = "Gold - Clemson Support <%s>" % settings.EMAIL_SUPPORT
@@ -376,15 +357,11 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
                 }
                 # Create an email message for attaching the invite to.
                 mail_list = []
-                group_members = User.objects.filter(
-                    groups__name="EmailGCHubEmployees", is_active=True
-                )
+                group_members = User.objects.filter(groups__name="EmailGCHubEmployees", is_active=True)
                 for user in group_members:
                     mail_list.append(user.email)
 
-                email = EmailMessage(
-                    "Office Event Notice", description, user.email, mail_list
-                )
+                email = EmailMessage("Office Event Notice", description, user.email, mail_list)
                 # Attach the file and specify type.
                 email.attach(filename, data.render(mail_context), "text/calendar")
                 # Poof goes the mail.
@@ -393,9 +370,7 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
             if event_length > 1:
                 while repeater < event_length:
                     event_mult = Event()
-                    curr_date = eventform.cleaned_data["event_date"] + timedelta(
-                        days=repeater
-                    )
+                    curr_date = eventform.cleaned_data["event_date"] + timedelta(days=repeater)
                     # See if this is a weekday.
                     day_check = curr_date.isoweekday()
                     if day_check == 6 or day_check == 7:  # If this a weekend.
@@ -406,9 +381,7 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
                         event_mult.type = eventform.cleaned_data["type"]
                         # Used when manager assigns vacations for other people.
                         if employee_override != "None":
-                            event_mult.employee = User.objects.get(
-                                username=employee_override
-                            )
+                            event_mult.employee = User.objects.get(username=employee_override)
                         else:
                             event_mult.employee = eventform.cleaned_data["employee"]
 
@@ -427,9 +400,7 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
             return HttpResponse(JSMessage("Event Added."))
         else:
             for error in eventform.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         eventform = NewEventForm()
 

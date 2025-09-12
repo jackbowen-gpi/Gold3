@@ -29,9 +29,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "change",
-                    models.TextField(
-                        help_text=b"A description of the change, in terms that the end users can understand."
-                    ),
+                    models.TextField(help_text=b"A description of the change, in terms that the end users can understand."),
                 ),
                 (
                     "change_type",

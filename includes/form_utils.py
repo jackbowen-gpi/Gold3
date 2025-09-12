@@ -4,7 +4,8 @@ from .gold_json import JSMessage
 
 
 class JSONErrorForm(object):
-    """This class is meant to be used in conjunction with a Django form. It
+    """
+    This class is meant to be used in conjunction with a Django form. It
     serializes any error messages and presents them in a unified way to the
     user via the JSMessage class.
     """

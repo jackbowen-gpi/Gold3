@@ -1,5 +1,6 @@
 #!/usr/bin/python
-"""Import StepSpec entries from active ItemSpec records.
+"""
+Import StepSpec entries from active ItemSpec records.
 
 This helper populates StepSpec objects based on existing ItemSpec data.
 """

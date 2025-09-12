@@ -83,7 +83,8 @@ OUTDATED_PRESS = (
 
 
 class ItemForm(ModelForm):
-    """Base auto-generated modelform from which the more specialized forms are
+    """
+    Base auto-generated modelform from which the more specialized forms are
     sub-classed.
     """
 
@@ -112,7 +113,8 @@ PLATE_QTY_CHOICES = (
 
 
 def json_get_item_specs(request):
-    """This view returns an options list for prototype.js to replace the
+    """
+    This view returns an options list for prototype.js to replace the
     'id_printlocation' select element. This is fired when an item type is selected.
     """
     # Get the Print Location id selected from POST.
@@ -147,9 +149,7 @@ def json_get_item_specs(request):
 # Subclass each Production form per workflow.
 class ItemFormSAPCarton(ModelForm, JSONErrorForm):
     # Note, bom_number (BEV usage) will be used as the scc_number for FSB
-    description = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
+    description = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
     printlocation = forms.ModelChoiceField(
         queryset=PrintLocation.objects.filter(plant__name="Marion", active=True),
         required=False,
@@ -157,39 +157,19 @@ class ItemFormSAPCarton(ModelForm, JSONErrorForm):
     workflow = _safe_get_site("Carton")
 
     distortion = forms.DecimalField(max_digits=10, decimal_places=4, required=False)
-    one_up_die = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=True
-    )
-    step_die = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
-    grn = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
+    one_up_die = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=True)
+    step_die = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
+    grn = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
     gdd_origin = forms.ChoiceField(choices=app_defs.GDD_ORIGINS, required=False)
-    customer_code = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
-    graphic_req_number = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
+    customer_code = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
+    graphic_req_number = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
     print_repeat = forms.DecimalField(max_digits=10, decimal_places=4, required=False)
-    coating_pattern = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
-    upc = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=True
-    )
-    product_group = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
+    coating_pattern = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
+    upc = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=True)
+    product_group = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
     location = forms.ChoiceField(choices=app_defs.LOCATION_OPTIONS)  # Inside/Outside
-    plate_thickness = forms.ChoiceField(
-        choices=app_defs.PLATE_THICKNESS, required=False
-    )
-    graphic_po = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False
-    )
+    plate_thickness = forms.ChoiceField(choices=app_defs.PLATE_THICKNESS, required=False)
+    graphic_po = forms.CharField(widget=forms.TextInput(attrs={"size": "30", "maxsize": "255"}), required=False)
     # A read-only field to show the user which carton profile has been selected.
     # The actual carton profile will be set via a hidden field. This is done
     # to prevent the user from manually selecting a carton profile.
@@ -232,52 +212,33 @@ class ItemFormSAPCarton(ModelForm, JSONErrorForm):
         self.fields["carton_profile_display"] = forms.CharField(
             initial=profile_name,
             required=False,
-            widget=forms.TextInput(
-                attrs={"size": "45", "maxsize": "255", "readonly": "True"}
-            ),
+            widget=forms.TextInput(attrs={"size": "45", "maxsize": "255", "readonly": "True"}),
         )
 
 
 # Subclass each Production form per workflow.
 class ItemFormProductionFSB(ModelForm, JSONErrorForm):
     # Note, bom_number (BEV usage) will be used as the scc_number for FSB
-    description = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
-    production_edit_notes = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "3"}), required=False
-    )
+    description = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
+    production_edit_notes = forms.CharField(widget=forms.Textarea(attrs={"rows": "3"}), required=False)
     workflow = _safe_get_site("Foodservice")
     color = forms.CharField(required=False)
     printlocation = forms.ModelChoiceField(
-        queryset=PrintLocation.objects.filter(plant__workflow=workflow, active=True)
-        .exclude(OUTDATED_PRESS)
-        .order_by("plant__name"),
+        queryset=PrintLocation.objects.filter(plant__workflow=workflow, active=True).exclude(OUTDATED_PRESS).order_by("plant__name"),
         required=False,
     )
     platepackage = forms.ModelChoiceField(
-        queryset=PlatePackage.objects.filter(workflow=workflow).order_by(
-            "platemaker__name"
-        ),
+        queryset=PlatePackage.objects.filter(workflow=workflow).order_by("platemaker__name"),
         required=False,
     )
-    size = forms.ModelChoiceField(
-        queryset=ItemCatalog.objects.filter(workflow=workflow, active=True).order_by(
-            "size"
-        )
-    )
+    size = forms.ModelChoiceField(queryset=ItemCatalog.objects.filter(workflow=workflow, active=True).order_by("size"))
     special_mfg = forms.ModelChoiceField(
         queryset=SpecialMfgConfiguration.objects.filter(workflow=workflow).exclude(
-            Q(name="Blank-Fed_Big Cylinder")
-            | Q(name="Blank-Fed_Small Cylinder")
-            | Q(name="Small Cylinder")
-            | Q(name="Big Cylinder")
+            Q(name="Blank-Fed_Big Cylinder") | Q(name="Blank-Fed_Small Cylinder") | Q(name="Small Cylinder") | Q(name="Big Cylinder")
         ),
         required=False,
     )
-    steps_with = forms.ModelChoiceField(
-        queryset=Item.objects.filter(workflow=workflow), required=False
-    )
+    steps_with = forms.ModelChoiceField(queryset=Item.objects.filter(workflow=workflow), required=False)
 
     class Meta:
         model = Item
@@ -301,9 +262,7 @@ class ItemFormProductionFSB(ModelForm, JSONErrorForm):
             "proof_type_notes",
         )
         widgets = {
-            "proof_type_notes": forms.Textarea(
-                attrs={"placeHolder": "Please explain the edits.", "rows": "3"}
-            ),
+            "proof_type_notes": forms.Textarea(attrs={"placeHolder": "Please explain the edits.", "rows": "3"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -349,48 +308,29 @@ class ItemFormProductionFSB(ModelForm, JSONErrorForm):
 # Subclass each Production form per workflow.
 class ItemFormProductionCarton(ModelForm, JSONErrorForm):
     # Note, bom_number (BEV usage) will be used as the scc_number for FSB
-    description = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
-    production_edit_notes = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "3"}), required=False
-    )
+    description = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
+    production_edit_notes = forms.CharField(widget=forms.Textarea(attrs={"rows": "3"}), required=False)
     # Carton items need to show FSB things sometimes.
     fsb_workflow = _safe_get_site("Foodservice")
     carton_workflow = _safe_get_site("Carton")
 
     color = forms.CharField(required=False)
     printlocation = forms.ModelChoiceField(
-        queryset=PrintLocation.objects.filter(
-            plant__workflow=carton_workflow, active=True
-        )
-        .exclude(OUTDATED_PRESS)
-        .order_by("plant__name"),
+        queryset=PrintLocation.objects.filter(plant__workflow=carton_workflow, active=True).exclude(OUTDATED_PRESS).order_by("plant__name"),
         required=False,
     )
     platepackage = forms.ModelChoiceField(
-        queryset=PlatePackage.objects.filter(workflow=fsb_workflow).order_by(
-            "platemaker__name"
-        ),
+        queryset=PlatePackage.objects.filter(workflow=fsb_workflow).order_by("platemaker__name"),
         required=False,
     )
-    size = forms.ModelChoiceField(
-        queryset=ItemCatalog.objects.filter(
-            workflow=carton_workflow, active=True
-        ).order_by("size")
-    )
+    size = forms.ModelChoiceField(queryset=ItemCatalog.objects.filter(workflow=carton_workflow, active=True).order_by("size"))
     special_mfg = forms.ModelChoiceField(
         queryset=SpecialMfgConfiguration.objects.filter(workflow=fsb_workflow).exclude(
-            Q(name="Blank-Fed_Big Cylinder")
-            | Q(name="Blank-Fed_Small Cylinder")
-            | Q(name="Small Cylinder")
-            | Q(name="Big Cylinder")
+            Q(name="Blank-Fed_Big Cylinder") | Q(name="Blank-Fed_Small Cylinder") | Q(name="Small Cylinder") | Q(name="Big Cylinder")
         ),
         required=False,
     )
-    steps_with = forms.ModelChoiceField(
-        queryset=Item.objects.filter(workflow=fsb_workflow), required=False
-    )
+    steps_with = forms.ModelChoiceField(queryset=Item.objects.filter(workflow=fsb_workflow), required=False)
 
     class Meta:
         model = Item
@@ -413,9 +353,7 @@ class ItemFormProductionCarton(ModelForm, JSONErrorForm):
             "proof_type_notes",
         )
         widgets = {
-            "proof_type_notes": forms.Textarea(
-                attrs={"placeHolder": "Please explain the edits.", "rows": "3"}
-            ),
+            "proof_type_notes": forms.Textarea(attrs={"placeHolder": "Please explain the edits.", "rows": "3"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -460,45 +398,29 @@ class ItemFormProductionCarton(ModelForm, JSONErrorForm):
 class ItemFormProductionBEV(ModelForm, JSONErrorForm):
     """Form for editing Beverage item production data."""
 
-    description = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
-    bev_center_code = forms.ModelChoiceField(
-        queryset=BeverageCenterCode.objects.all().order_by("code"), required=False
-    )
+    description = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
+    bev_center_code = forms.ModelChoiceField(queryset=BeverageCenterCode.objects.all().order_by("code"), required=False)
     bev_brand_code = forms.ModelChoiceField(
         queryset=BeverageBrandCode.objects.all().order_by("code"),
         required=False,
         widget=forms.HiddenInput,
     )
-    bev_liquid_code = forms.ModelChoiceField(
-        queryset=BeverageLiquidContents.objects.all().order_by("code"), required=False
-    )
+    bev_liquid_code = forms.ModelChoiceField(queryset=BeverageLiquidContents.objects.all().order_by("code"), required=False)
 
     bev_alt_code = forms.CharField(required=False)
     bev_end_code = forms.CharField(required=False)
     workflow = _safe_get_site("Beverage")
-    size = forms.ModelChoiceField(
-        queryset=ItemCatalog.objects.filter(workflow=workflow, active=True).order_by(
-            "size"
-        )
-    )
+    size = forms.ModelChoiceField(queryset=ItemCatalog.objects.filter(workflow=workflow, active=True).order_by("size"))
     special_mfg = forms.ModelChoiceField(
         queryset=SpecialMfgConfiguration.objects.filter(workflow=workflow),
         required=False,
     )
-    production_edit_notes = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "3"}), required=False
-    )
+    production_edit_notes = forms.CharField(widget=forms.Textarea(attrs={"rows": "3"}), required=False)
     uses_old_distortion = forms.BooleanField(required=False)
 
     # Item tracker fields.
-    label_tracker = forms.ModelChoiceField(
-        ItemTrackerType.objects.filter(category__name="Beverage Label"), required=False
-    )
-    fiber_tracker = forms.ModelChoiceField(
-        ItemTrackerType.objects.filter(category__name="Beverage Fiber"), required=False
-    )
+    label_tracker = forms.ModelChoiceField(ItemTrackerType.objects.filter(category__name="Beverage Label"), required=False)
+    fiber_tracker = forms.ModelChoiceField(ItemTrackerType.objects.filter(category__name="Beverage Fiber"), required=False)
 
     nutrition_facts = forms.BooleanField(required=False)
 
@@ -523,30 +445,18 @@ class ItemFormProductionBEV(ModelForm, JSONErrorForm):
 
 
 class ItemFormProductionCON(ModelForm, JSONErrorForm):
-    description = forms.CharField(
-        widget=forms.TextInput(attrs={"size": "50"}), required=False
-    )
-    production_edit_notes = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "3"}), required=False
-    )
+    description = forms.CharField(widget=forms.TextInput(attrs={"size": "50"}), required=False)
+    production_edit_notes = forms.CharField(widget=forms.Textarea(attrs={"rows": "3"}), required=False)
     workflow = _safe_get_site("Container")
     printlocation = forms.ModelChoiceField(
-        queryset=PrintLocation.objects.filter(plant__workflow=workflow)
-        .exclude(OUTDATED_PRESS)
-        .order_by("plant__name"),
+        queryset=PrintLocation.objects.filter(plant__workflow=workflow).exclude(OUTDATED_PRESS).order_by("plant__name"),
         required=False,
     )
     platepackage = forms.ModelChoiceField(
-        queryset=PlatePackage.objects.filter(workflow=workflow).order_by(
-            "platemaker__name"
-        ),
+        queryset=PlatePackage.objects.filter(workflow=workflow).order_by("platemaker__name"),
         required=False,
     )
-    size = forms.ModelChoiceField(
-        queryset=ItemCatalog.objects.filter(workflow=workflow, active=True).order_by(
-            "size"
-        )
-    )
+    size = forms.ModelChoiceField(queryset=ItemCatalog.objects.filter(workflow=workflow, active=True).order_by("size"))
 
     class Meta:
         model = Item
@@ -610,9 +520,7 @@ def item_production_detail(request, item_id):
         "view": "production",
         "inks_used": ItemColor.objects.filter(item=item).order_by("id"),
     }
-    return render(
-        request, "workflow/item/ajax/subview_production_detail.html", context=pagevars
-    )
+    return render(request, "workflow/item/ajax/subview_production_detail.html", context=pagevars)
 
 
 def item_sap_detail(request, item_id):
@@ -657,13 +565,12 @@ def item_sap_detail(request, item_id):
         "view": "sap",
         "inks_used": ItemColor.objects.filter(item=item).order_by("id"),
     }
-    return render(
-        request, "workflow/item/ajax/subview_sap_detail.html", context=pagevars
-    )
+    return render(request, "workflow/item/ajax/subview_sap_detail.html", context=pagevars)
 
 
 def tiff_rip(request, item_id):
-    """Display the Tiff RIP data for each Tiff in the tiff_folder of the item that was
+    """
+    Display the Tiff RIP data for each Tiff in the tiff_folder of the item that was
     clicked. Either FlexRip or ImagingEngine should be the RIP Programs.
     """
     item = Item.objects.get(id=item_id)
@@ -757,9 +664,7 @@ def edit_bev_brand_code(request, item_id):
 
 
 class BevBrandCodeForm(ModelForm):
-    all_brand_codes = forms.ModelChoiceField(
-        queryset=BeverageBrandCode.objects.all().order_by("code"), required=False
-    )
+    all_brand_codes = forms.ModelChoiceField(queryset=BeverageBrandCode.objects.all().order_by("code"), required=False)
 
     class Meta:
         model = BeverageBrandCode
@@ -780,9 +685,7 @@ def view_bev_brand_code(request, item_id, bev_brand_code):
         "all_brand_codes_form": all_brand_codes_form,
         "item": item,
     }
-    return render(
-        request, "workflow/item/ajax/view_bev_brand_code.html", context=pagevars
-    )
+    return render(request, "workflow/item/ajax/view_bev_brand_code.html", context=pagevars)
 
 
 class ItemFormTimeline(ModelForm, JSONErrorForm):
@@ -845,13 +748,12 @@ def item_timeline_detail(request, item_id):
         "proof_history": proof_history,
     }
 
-    return render(
-        request, "workflow/item/ajax/subview_timeline_detail.html", context=pagevars
-    )
+    return render(request, "workflow/item/ajax/subview_timeline_detail.html", context=pagevars)
 
 
 def delete_item_tracker(request, item_id, item_tracker_id, comment=""):
-    """Used to delete item trackers. We don't actually delete them but
+    """
+    Used to delete item trackers. We don't actually delete them but
     rather give them a removal date and comments. The view filters out trackers
     with a removal date. They are effectively deleted.
     """
@@ -978,21 +880,12 @@ def ajax_item_save(request, item_id, save_type):
                 lookup_size = ItemCatalog.objects.get(id=request.POST["size"])
                 newsize = lookup_size.size
                 if newsize != oldsize:
-                    logchanges = (
-                        logchanges
-                        + "<strong>Size:</strong> ("
-                        + oldsize
-                        + " to "
-                        + newsize
-                        + "). "
-                    )
+                    logchanges = logchanges + "<strong>Size:</strong> (" + oldsize + " to " + newsize + "). "
             # Log any change to the Print Location
             if "printlocation" in request.POST:
                 try:
                     if request.POST["printlocation"]:
-                        lookup_plant = PrintLocation.objects.get(
-                            id=request.POST["printlocation"]
-                        )
+                        lookup_plant = PrintLocation.objects.get(id=request.POST["printlocation"])
                         newplant = lookup_plant
                     else:
                         newplant = "None"
@@ -1019,14 +912,7 @@ def ajax_item_save(request, item_id, save_type):
                             item.plate_thickness = "0.067"
                             item.save()
                             item.calculate_item_distortion()
-                    logchanges = (
-                        logchanges
-                        + "<strong>Print Location:</strong> ("
-                        + str(oldplant)
-                        + " to "
-                        + str(newplant)
-                        + "). "
-                    )
+                    logchanges = logchanges + "<strong>Print Location:</strong> (" + str(oldplant) + " to " + str(newplant) + "). "
                     # If the change is from None to something, set the assignment date,
                     # unless it's been set already.
                     if oldplant == "None" and not item.assignment_date:
@@ -1050,9 +936,7 @@ def ajax_item_save(request, item_id, save_type):
             if "platepackage" in request.POST:
                 try:
                     if request.POST["platepackage"]:
-                        lookup_platemaker = PlatePackage.objects.get(
-                            id=request.POST["platepackage"]
-                        )
+                        lookup_platemaker = PlatePackage.objects.get(id=request.POST["platepackage"])
                         newplatemaker = lookup_platemaker
                     else:
                         newplatemaker = "None"
@@ -1060,12 +944,7 @@ def ajax_item_save(request, item_id, save_type):
                     newplatemaker = "None"
                 if newplatemaker != oldplate_maker:
                     logchanges = (
-                        logchanges
-                        + "<strong>Plate Package:</strong> ("
-                        + str(oldplate_maker)
-                        + " to "
-                        + str(newplatemaker)
-                        + "). "
+                        logchanges + "<strong>Plate Package:</strong> (" + str(oldplate_maker) + " to " + str(newplatemaker) + "). "
                     )
 
             #            if request.POST.has_key('bom_number'):
@@ -1075,12 +954,8 @@ def ajax_item_save(request, item_id, save_type):
             #                    item.do_nine_digit_email()
 
             if "bom_number" in request.POST or "upc_number" in request.POST:
-                if (
-                    request.POST["bom_number"] != ""
-                    and request.POST["bom_number"] != old_bom_number
-                ) or (
-                    request.POST["upc_number"] != ""
-                    and request.POST["upc_number"] != old_upc_number
+                if (request.POST["bom_number"] != "" and request.POST["bom_number"] != old_bom_number) or (
+                    request.POST["upc_number"] != "" and request.POST["upc_number"] != old_upc_number
                 ):
                     # Beverage analysts should not get this email.
                     if item.job.workflow.name != "Beverage":
@@ -1088,17 +963,13 @@ def ajax_item_save(request, item_id, save_type):
 
             # Log any notes that may have been added about why changes occurred.
             if "production_edit_notes" in request.POST:
-                logchanges = (
-                    logchanges + " Notes: " + request.POST["production_edit_notes"]
-                )
+                logchanges = logchanges + " Notes: " + request.POST["production_edit_notes"]
             item.do_production_edit(logchanges)
 
             if item.job.workflow.name == "Beverage":
                 # Process changes to the two beverage item trackers for labels and fiber.
                 if request.POST["label_tracker"]:
-                    new_label_tracker = ItemTrackerType.objects.get(
-                        id=request.POST["label_tracker"]
-                    )
+                    new_label_tracker = ItemTrackerType.objects.get(id=request.POST["label_tracker"])
                     if old_label_tracker:  # Edit an existing tracker
                         if old_label_tracker.type != new_label_tracker:
                             old_label_tracker.type = new_label_tracker
@@ -1112,9 +983,7 @@ def ajax_item_save(request, item_id, save_type):
                         new_tracker.edited_by = threadlocals.get_current_user()
                         new_tracker.save()
                 if request.POST["fiber_tracker"]:
-                    new_fiber_tracker = ItemTrackerType.objects.get(
-                        id=request.POST["fiber_tracker"]
-                    )
+                    new_fiber_tracker = ItemTrackerType.objects.get(id=request.POST["fiber_tracker"])
                     if old_fiber_tracker:  # Edit an existing tracker
                         if old_fiber_tracker.type != new_fiber_tracker:
                             old_fiber_tracker.type = new_fiber_tracker
@@ -1132,17 +1001,13 @@ def ajax_item_save(request, item_id, save_type):
                     print(old_nutrition_facts)
                     if not old_nutrition_facts:
                         new_tracker = ItemTracker(item=item)
-                        new_tracker.type = ItemTrackerType.objects.get(
-                            id=31, name="Nutrition Facts"
-                        )
+                        new_tracker.type = ItemTrackerType.objects.get(id=31, name="Nutrition Facts")
                         new_tracker.addition_date = date.today()
                         new_tracker.edited_by = threadlocals.get_current_user()
                         new_tracker.save()
                 else:  # Delete the old tracker
                     try:
-                        old_tracker = ItemTracker.objects.get(
-                            item=item, type__name="Nutrition Facts"
-                        )
+                        old_tracker = ItemTracker.objects.get(item=item, type__name="Nutrition Facts")
                         old_tracker.delete()
                     except Exception:
                         pass
@@ -1205,9 +1070,7 @@ def ajax_item_save(request, item_id, save_type):
     # End if itemform.is_valid()
     else:
         for error in itemform.errors:
-            return HttpResponse(
-                JSMessage("Warning! Invalid value for field: " + error, is_error=True)
-            )
+            return HttpResponse(JSMessage("Warning! Invalid value for field: " + error, is_error=True))
 
 
 def do_item_make_bev_die(request, job_num, item_num):
@@ -1231,7 +1094,8 @@ def do_item_import_qad(request, job_num, item_id):
 
 
 def do_copy_qad_data(request, job_num, item_id):
-    """From a 'master' item (one that has child 'steps_with' items), copy
+    """
+    From a 'master' item (one that has child 'steps_with' items), copy
     9 digit number, 9 digit number date, upc number and scc number to those
     child records.
     """
@@ -1250,7 +1114,8 @@ def do_copy_qad_data(request, job_num, item_id):
 
 
 def do_copy_fsb_production_template(request, job_num, item_id):
-    """Copy the FSB Production template from the templates directory into the
+    """
+    Copy the FSB Production template from the templates directory into the
     item subfolder in Final Files.
     """
     try:
@@ -1266,11 +1131,7 @@ def do_copy_fsb_production_template(request, job_num, item_id):
                 )
             )
     except Exception:
-        return HttpResponse(
-            JSMessage(
-                "Error occurred. Template may not exist or may not be named correctly."
-            )
-        )
+        return HttpResponse(JSMessage("Error occurred. Template may not exist or may not be named correctly."))
 
 
 def do_copy_misregistration_pdf(request, job_num, item_id):
@@ -1294,13 +1155,12 @@ def do_copy_misregistration_pdf(request, job_num, item_id):
 
         return HttpResponse(JSMessage("Success!"))
     except Exception:
-        return HttpResponse(
-            JSMessage("Error occurred copying the misregistration form.")
-        )
+        return HttpResponse(JSMessage("Error occurred copying the misregistration form."))
 
 
 def do_copy_nx_plates(request, item_id):
-    """Copy an item's tiffs to a remote server so that NX plates can be made.
+    """
+    Copy an item's tiffs to a remote server so that NX plates can be made.
     This version uploads the tiffs as a zip file to sidestep a problem we had
     trying to create folders on the remote server. They always showed up as
     hidden folders for some reason we couldn't figure out.
@@ -1339,9 +1199,9 @@ def do_copy_nx_plates(request, item_id):
         if matchplate_flag and itemcolors:
             for this_color in itemcolors:
                 # Find old versions of this itemcolor that used this nine digit number in the plate code. Exclude the current item.
-                old_itemcolors = ItemColor.objects.filter(
-                    color=this_color.color, plate_code__icontains=item.fsb_nine_digit
-                ).exclude(item=item)
+                old_itemcolors = ItemColor.objects.filter(color=this_color.color, plate_code__icontains=item.fsb_nine_digit).exclude(
+                    item=item
+                )
                 if old_itemcolors:
                     # If there's more than one old item color then record that for the notification email.
                     if len(old_itemcolors) > 1:
@@ -1356,9 +1216,7 @@ def do_copy_nx_plates(request, item_id):
                     else:
                         old_itemcolor = old_itemcolors[0]
                         # Gather the tiffs for this item.
-                        old_tiffs = fs_api.list_item_tiffs(
-                            old_itemcolor.item.job.id, old_itemcolor.item.num_in_job
-                        )
+                        old_tiffs = fs_api.list_item_tiffs(old_itemcolor.item.job.id, old_itemcolor.item.num_in_job)
                         # Check the tiff names to find this color.
                         for old_tiff in old_tiffs:
                             if old_itemcolor.color in old_tiff["file_name"]:
@@ -1372,9 +1230,7 @@ def do_copy_nx_plates(request, item_id):
         # Add each of the tiffs to the remote zip file.
         for tiff in tiffs_to_zip:
             # This creates a zip file which unzips correctly (1 folder w/ tiffs inside)
-            zipped_tiff_file.write(
-                tiff["file_path"], tiff["file_name"], zipfile.ZIP_DEFLATED
-            )
+            zipped_tiff_file.write(tiff["file_path"], tiff["file_name"], zipfile.ZIP_DEFLATED)
         # Close the remote zip file.
         zipped_tiff_file.close()
 
@@ -1394,16 +1250,12 @@ def do_copy_nx_plates(request, item_id):
             "duplicate_tiffs": duplicate_tiffs,
         }
         mail_send_to = []
-        group_members = User.objects.filter(
-            groups__name="EmailNXPlates", is_active=True
-        )
+        group_members = User.objects.filter(groups__name="EmailNXPlates", is_active=True)
         for user in group_members:
             mail_send_to.append(user.email)
 
         if len(mail_send_to) > 0 and len(tiffs_to_zip) > 0:
-            general_funcs.send_info_mail(
-                mail_subject, mail_body.render(econtext), mail_send_to
-            )
+            general_funcs.send_info_mail(mail_subject, mail_body.render(econtext), mail_send_to)
 
         return HttpResponse(JSMessage("Success!"))
 
@@ -1412,7 +1264,8 @@ def do_copy_nx_plates(request, item_id):
 
 
 def do_copy_master_template(request, job_num, item_id):
-    """Copy the mastern template from the templates directory into the
+    """
+    Copy the mastern template from the templates directory into the
     item subfolder in 1_bit_tiffs.
     """
     try:
@@ -1428,11 +1281,7 @@ def do_copy_master_template(request, job_num, item_id):
                 )
             )
     except Exception:
-        return HttpResponse(
-            JSMessage(
-                "Error occurred. Template may not exist or may not be named correctly."
-            )
-        )
+        return HttpResponse(JSMessage("Error occurred. Template may not exist or may not be named correctly."))
 
 
 def do_make_fsb_art_rectangle(request, job_num, item_id):
@@ -1450,11 +1299,7 @@ def do_make_fsb_art_rectangle(request, job_num, item_id):
                 )
             )
     except Exception:
-        return HttpResponse(
-            JSMessage(
-                "Error occurred. Perhaps the dimensions for this item are not there."
-            )
-        )
+        return HttpResponse(JSMessage("Error occurred. Perhaps the dimensions for this item are not there."))
 
 
 def do_item_tiff_to_pdf(request, job_num, item_num):
@@ -1474,13 +1319,9 @@ def get_item_proof(request, job_num, item_num, quality="l", log_id=None):
 
     if workflow == "Beverage":
         # Beverage links low res proofs.
-        filepath = fs_api.get_item_proof(
-            job_num, item_num, quality, proof_log_id=log_id
-        )
+        filepath = fs_api.get_item_proof(job_num, item_num, quality, proof_log_id=log_id)
     else:
-        filepaths_array = fs_api.get_item_proof(
-            job_num, item_num, quality=None, proof_log_id=log_id, return_first=False
-        )
+        filepaths_array = fs_api.get_item_proof(job_num, item_num, quality=None, proof_log_id=log_id, return_first=False)
 
         """
             This blurb will go get all of the filepaths in the proofs folder for an item of a job.
@@ -1506,23 +1347,16 @@ def get_item_proof(request, job_num, item_num, quality="l", log_id=None):
         # date to the back of the PDF name.
         log = JobLog.objects.get(id=log_id)
         response["Content-Disposition"] = (
-            "attachment; filename="
-            + job_num
-            + "-"
-            + item_num
-            + "_proof_"
-            + str(log.event_time.date())
-            + ".pdf"
+            "attachment; filename=" + job_num + "-" + item_num + "_proof_" + str(log.event_time.date()) + ".pdf"
         )
     else:
-        response["Content-Disposition"] = (
-            "attachment; filename=" + job_num + "-" + item_num + "_proof.pdf"
-        )
+        response["Content-Disposition"] = "attachment; filename=" + job_num + "-" + item_num + "_proof.pdf"
     return response
 
 
 def get_stepped_item_proof(request, job_num, item_num, quality="h", log_id=None):
-    """Return a given item's stepped proof pdf.
+    """
+    Return a given item's stepped proof pdf.
     This function just called get item proof with quality=h
     """
     response = get_item_proof(request, job_num, item_num, quality)
@@ -1557,9 +1391,7 @@ def get_item_preview_art(request, job_num, item_num):
             data = f.read()
 
         response = HttpResponse(data, content_type="application/pdf")
-        response["Content-Disposition"] = (
-            "attachment; filename=" + job_num + "-" + item_num + "_preview.pdf"
-        )
+        response["Content-Disposition"] = "attachment; filename=" + job_num + "-" + item_num + "_preview.pdf"
         return response
     except Exception:
         return HttpResponse("No preview artwork available.")
@@ -1591,9 +1423,7 @@ def get_item_approval_scan(request, job_num, item_num):
             data = f.read()
 
         response = HttpResponse(data, content_type="application/pdf")
-        response["Content-Disposition"] = (
-            "attachment; filename=" + job_num + "-" + item_num + "_approval.pdf"
-        )
+        response["Content-Disposition"] = "attachment; filename=" + job_num + "-" + item_num + "_approval.pdf"
         return response
     except Exception:
         return HttpResponse("No approval scan available.")
@@ -1616,9 +1446,7 @@ def item_tiff_download_list(request, item_id):
         "item": item,
         "item_tiffs": item_tiffs,
     }
-    return render(
-        request, "workflow/item/ajax/subview_tiff_download.html", context=pagevars
-    )
+    return render(request, "workflow/item/ajax/subview_tiff_download.html", context=pagevars)
 
 
 def get_single_tiff(request, item_id, filename):
@@ -1650,9 +1478,7 @@ def get_zipfile_tiff(request, item_id):
     # Set the response up to return the zip with the correct mime type.
     response = HttpResponse(zip_contents, content_type="application/zip")
     # Headers change the file name and how the browser handles the download.
-    response["Content-Disposition"] = (
-        'attachment; filename="' + send_name + ".zip" + '"'
-    )
+    response["Content-Disposition"] = 'attachment; filename="' + send_name + ".zip" + '"'
     return response
 
 
@@ -1665,20 +1491,14 @@ def item_billing_detail(request, item_id):
         "item": item,
         "view": "billing",
     }
-    return render(
-        request, "workflow/item/ajax/subview_billing_detail.html", context=pagevars
-    )
+    return render(request, "workflow/item/ajax/subview_billing_detail.html", context=pagevars)
 
 
 class InternalItemForm(ModelForm):
     """HUB only item data. Exemptions, etc..."""
 
-    overdue_exempt_reason = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "3"}), required=False
-    )
-    file_out_exempt_reason = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "3"}), required=False
-    )
+    overdue_exempt_reason = forms.CharField(widget=forms.Textarea(attrs={"rows": "3"}), required=False)
+    file_out_exempt_reason = forms.CharField(widget=forms.Textarea(attrs={"rows": "3"}), required=False)
 
     class Meta:
         model = Item
@@ -1706,9 +1526,7 @@ def item_internal_detail(request, item_id):
         # End if itemform.is_valid()
         else:
             for error in form.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         form = InternalItemForm(instance=item)
         pagevars = {
@@ -1717,9 +1535,7 @@ def item_internal_detail(request, item_id):
             "form": form,
             "view": "internal",
         }
-        return render(
-            request, "workflow/item/ajax/subview_internal_detail.html", context=pagevars
-        )
+        return render(request, "workflow/item/ajax/subview_internal_detail.html", context=pagevars)
 
 
 @csrf_exempt
@@ -1741,9 +1557,7 @@ def item_ink_data(request, item_id):
     for item_color in totalItemColors:
         try:
             # get the inks coverage per color to 2 decimal places
-            decimal = 100 * (
-                float(item_color.coverage_sqin) / float(item_spec.total_print_area)
-            )
+            decimal = 100 * (float(item_color.coverage_sqin) / float(item_spec.total_print_area))
             percentage = "%.2f" % round(decimal, 2)
             # set the ink coverage per color and add it to the total ink coverage
             item_color.percentage = float(percentage)
@@ -1780,9 +1594,7 @@ def item_jdf_detail(request, item_id):
     """Display item JDF details in the bottom pane."""
     item = Item.objects.get(id=item_id)
     form = ItemFormJDF(instance=item)
-    jdf_errors = JobLog.objects.filter(item=item, type=JOBLOG_TYPE_JDF_ERROR).order_by(
-        "-event_time"
-    )
+    jdf_errors = JobLog.objects.filter(item=item, type=JOBLOG_TYPE_JDF_ERROR).order_by("-event_time")
 
     pagevars = {
         "job": item.job,
@@ -1791,17 +1603,13 @@ def item_jdf_detail(request, item_id):
         "view": "jdf",
         "jdf_errors": jdf_errors,
     }
-    return render(
-        request, "workflow/item/ajax/subview_jdf_detail.html", context=pagevars
-    )
+    return render(request, "workflow/item/ajax/subview_jdf_detail.html", context=pagevars)
 
 
 class AddItemColorForm(ModelForm):
     """Form used to add colors to an item manually"""
 
-    definition = forms.ModelChoiceField(
-        queryset=ColorDefinition.objects.filter(coating="C").order_by("name")
-    )
+    definition = forms.ModelChoiceField(queryset=ColorDefinition.objects.filter(coating="C").order_by("name"))
     sequence = forms.ChoiceField(choices=SEQ_CHOICES)
     num_plates = forms.ChoiceField(choices=PLATE_QTY_CHOICES)
     screened = forms.BooleanField(required=False)
@@ -1881,9 +1689,7 @@ def add_itemcolor(request, item_id):
             return HttpResponse(JSMessage("Edited."))
         else:
             for error in form.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         if item.job.workflow.name == "Carton":
             form = AddItemColorFormCart()
@@ -1893,9 +1699,7 @@ def add_itemcolor(request, item_id):
             "item": item,
             "form": form,
         }
-        return render(
-            request, "workflow/item/ajax/add_itemcolor.html", context=pagevars
-        )
+        return render(request, "workflow/item/ajax/add_itemcolor.html", context=pagevars)
 
 
 class ItemColorForm(ModelForm):
@@ -1919,12 +1723,8 @@ class ItemColorForm(ModelForm):
                 queryset=ColorDefinition.objects.filter(coating="C").order_by("name"),
                 initial=self.instance.definition.id,
             )
-            self.fields["sequence"] = forms.ChoiceField(
-                choices=SEQ_CHOICES, initial=self.instance.sequence
-            )
-            self.fields["num_plates"] = forms.ChoiceField(
-                choices=PLATE_QTY_CHOICES, initial=self.instance.num_plates
-            )
+            self.fields["sequence"] = forms.ChoiceField(choices=SEQ_CHOICES, initial=self.instance.sequence)
+            self.fields["num_plates"] = forms.ChoiceField(choices=PLATE_QTY_CHOICES, initial=self.instance.num_plates)
 
 
 class ItemColorFormFSB(ModelForm):
@@ -2017,9 +1817,7 @@ def change_itemcolor(request, color_id):
             return HttpResponse(JSMessage("Edited."))
         else:
             for error in form.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
 
     else:
         if workflow == "Foodservice":
@@ -2037,9 +1835,7 @@ def change_itemcolor(request, color_id):
             "form": form,
         }
 
-        return render(
-            request, "workflow/item/ajax/change_itemcolor.html", context=pagevars
-        )
+        return render(request, "workflow/item/ajax/change_itemcolor.html", context=pagevars)
 
 
 def delete_itemcolor(request, color_id):
@@ -2066,17 +1862,13 @@ class ChargeForm(ModelForm):
         super(ChargeForm, self).__init__(*args, **kwargs)
         # we pass in workflow here to filter charges so we dont add beverage to foodservice and visa versa
         if workflow is not None:
-            self.fields["description"].queryset = ChargeType.objects.filter(
-                workflow=workflow, active=True
-            ).order_by("-category", "type")
+            self.fields["description"].queryset = ChargeType.objects.filter(workflow=workflow, active=True).order_by("-category", "type")
 
     class Meta:
         model = Charge
         fields = "__all__"
 
-    comments = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": "3"}), required=False
-    )
+    comments = forms.CharField(widget=forms.Textarea(attrs={"rows": "3"}), required=False)
 
 
 @csrf_exempt
@@ -2085,26 +1877,18 @@ def edit_billing(request, charge_id):
     current_data = Charge.objects.get(id=charge_id)
     if request.POST:  # If edit form was submitted.
         # pass in workflow to filter the charges we can add to this item
-        chargeform = ChargeForm(
-            request.POST, instance=current_data, workflow=current_data.item.job.workflow
-        )
+        chargeform = ChargeForm(request.POST, instance=current_data, workflow=current_data.item.job.workflow)
         if chargeform.is_valid():
             chargeform.save()
             return HttpResponse(JSMessage("Edited."))
         else:
             for error in chargeform.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:  # If edit form was requested.
         # pass in workflow to filter the charges we can add to this item
-        chargeform = ChargeForm(
-            instance=current_data, workflow=current_data.item.job.workflow
-        )
+        chargeform = ChargeForm(instance=current_data, workflow=current_data.item.job.workflow)
         permission = Permission.objects.get(codename="in_artist_pulldown")
-        artists = User.objects.filter(
-            is_active=True, groups__in=permission.group_set.all()
-        ).order_by("username")
+        artists = User.objects.filter(is_active=True, groups__in=permission.group_set.all()).order_by("username")
         current_artist = threadlocals.get_current_user()
         pagevars = {
             "chargeform": chargeform,
@@ -2112,9 +1896,7 @@ def edit_billing(request, charge_id):
             "artists": artists,
             "current_artist": current_artist,
         }
-        return render(
-            request, "workflow/item/ajax/item_edit_charge.html", context=pagevars
-        )
+        return render(request, "workflow/item/ajax/item_edit_charge.html", context=pagevars)
 
 
 def delete_billing(request, charge_id):
@@ -2138,23 +1920,17 @@ def add_item_charge(request, item_id):
             return HttpResponse(JSMessage("Added."))
         else:
             for error in chargeform.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         item = Item.objects.get(id=item_id)
         # pass in workflow to filter the charges we can add to this item
         chargeform = ChargeForm(workflow=item.job.workflow)
         permission = Permission.objects.get(codename="in_artist_pulldown")
-        artists = User.objects.filter(
-            is_active=True, groups__in=permission.group_set.all()
-        ).order_by("username")
+        artists = User.objects.filter(is_active=True, groups__in=permission.group_set.all()).order_by("username")
         current_artist = threadlocals.get_current_user()
 
         # This overrides the options for charge description, filtering by workflow.
-        charge_options = ChargeType.objects.filter(
-            workflow=item.job.workflow, active=True
-        ).order_by("-category", "type")
+        charge_options = ChargeType.objects.filter(workflow=item.job.workflow, active=True).order_by("-category", "type")
 
         pagevars = {
             "item": item,
@@ -2165,9 +1941,7 @@ def add_item_charge(request, item_id):
             "current_artist": current_artist,
         }
 
-        return render(
-            request, "workflow/item/ajax/item_add_charge.html", context=pagevars
-        )
+        return render(request, "workflow/item/ajax/item_add_charge.html", context=pagevars)
 
 
 class RevisionForm(ModelForm):
@@ -2210,7 +1984,8 @@ class RevisionForm(ModelForm):
 
 
 class RevisionFormBev(ModelForm):
-    """Form for entering a revision for an item. Beverage also needs to
+    """
+    Form for entering a revision for an item. Beverage also needs to
     add in the type of revision to calculate the cost.
     """
 
@@ -2266,7 +2041,8 @@ class RevisionFormBev(ModelForm):
 
 @csrf_exempt
 def enter_revision(request, item_id, rev_id=None):
-    """Form and AJAX save for entering a revision to 1 or multiple items. If a
+    """
+    Form and AJAX save for entering a revision to 1 or multiple items. If a
     rev_id is passed then we're editing an existing revision.
     """
     item = Item.objects.get(id=item_id)
@@ -2321,9 +2097,7 @@ def enter_revision(request, item_id, rev_id=None):
                     return HttpResponse(JSMessage("Revision Entered."))
             else:
                 for error in revisionform.errors:
-                    return HttpResponse(
-                        JSMessage("Invalid value for field: " + error, is_error=True)
-                    )
+                    return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
         # Handle Foodservice and Container revisions.
         else:
             revisionform = RevisionForm(request.POST, instance=revision)
@@ -2373,9 +2147,7 @@ def enter_revision(request, item_id, rev_id=None):
                         return HttpResponse(JSMessage("Revision Entered."))
             else:
                 for error in revisionform.errors:
-                    return HttpResponse(
-                        JSMessage("Invalid value for field: " + error, is_error=True)
-                    )
+                    return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         """
         Form to enter a revision for an item.
@@ -2395,9 +2167,7 @@ def enter_revision(request, item_id, rev_id=None):
             "form": "test",
         }
 
-        return render(
-            request, "workflow/item/ajax/item_add_revision.html", context=pagevars
-        )
+        return render(request, "workflow/item/ajax/item_add_revision.html", context=pagevars)
 
 
 def delete_revision(request, rev_id):
@@ -2417,11 +2187,7 @@ def charge_lookup(request, charge_description, item_id, rush_days):
     num_colors = item.itemcolor_set.all().count()
     charge_lookup = ChargeType.objects.get(id=charge_description)
 
-    charge_info = {
-        "actual_charge": charge_lookup.actual_charge(
-            num_colors, item.quality, int(rush_days), item
-        )
-    }
+    charge_info = {"actual_charge": charge_lookup.actual_charge(num_colors, item.quality, int(rush_days), item)}
 
     # Encode the dictionary and return it for sending.
     # TODO: clean this up to use JSMessage class
@@ -2454,9 +2220,7 @@ def item_thumbnail(request, item_id, width=155, generate_thumb=False):
     item_num = item.num_in_job
     if generate_thumb:
         fs_api.make_thumbnail_item_finalfile(job_num, item_num, width=int(width))
-    thumb_path = fs_api.get_thumbnail_item_finalfile(
-        job_num, item_num, width=int(width)
-    )
+    thumb_path = fs_api.get_thumbnail_item_finalfile(job_num, item_num, width=int(width))
     if thumb_path:
         with open(thumb_path, "rb") as f:
             data = f.read()
@@ -2477,6 +2241,4 @@ def transfer_files_to_concord(request, item_id):
         item.transfer_files_to_concord()
         return HttpResponse(JSMessage("Saved."))
     except Exception as ex:
-        return HttpResponse(
-            JSMessage("An Error has occurred: " + str(ex), is_error=True)
-        )
+        return HttpResponse(JSMessage("An Error has occurred: " + str(ex), is_error=True))

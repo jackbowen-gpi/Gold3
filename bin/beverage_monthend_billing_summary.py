@@ -39,9 +39,7 @@ month_name = end_date.strftime("%B")
 # This would indicate the handoff between GOLD and the invoice# generating system.
 # Make sure all pending invoices to be entered into QAD are complete before
 # running this report.
-invoices = BevInvoice.objects.filter(
-    qad_entry_date__month=month_num, qad_entry_date__year=year_num
-)
+invoices = BevInvoice.objects.filter(qad_entry_date__month=month_num, qad_entry_date__year=year_num)
 print("Invoices", invoices.count())
 
 billable_charges = Charge.objects.filter(bev_invoice__in=invoices)
@@ -73,58 +71,32 @@ docSheet1.cell(row=1, column=19).value = "Total Amount"
 
 for i in range(len(billable_charges)):
     # Increment rows, write charge data.
-    docSheet1.cell(row=i + 2, column=1).value = billable_charges[
-        i
-    ].bev_invoice.creation_date.strftime("%m/%d/%y")
+    docSheet1.cell(row=i + 2, column=1).value = billable_charges[i].bev_invoice.creation_date.strftime("%m/%d/%y")
     docSheet1.cell(row=i + 2, column=2).value = billable_charges[i].item.job.id
-    docSheet1.cell(row=i + 2, column=3).value = str(
-        billable_charges[i].item.printlocation.plant.name
-    )
-    docSheet1.cell(row=i + 2, column=4).value = str(
-        billable_charges[i].item.job.po_number
-    )
-    docSheet1.cell(row=i + 2, column=5).value = str(
-        billable_charges[i].item.bev_nomenclature()
-    )
-    docSheet1.cell(row=i + 2, column=6).value = str(
-        billable_charges[i].item.description
-    )
+    docSheet1.cell(row=i + 2, column=3).value = str(billable_charges[i].item.printlocation.plant.name)
+    docSheet1.cell(row=i + 2, column=4).value = str(billable_charges[i].item.job.po_number)
+    docSheet1.cell(row=i + 2, column=5).value = str(billable_charges[i].item.bev_nomenclature())
+    docSheet1.cell(row=i + 2, column=6).value = str(billable_charges[i].item.description)
     #    print("Got to: %s" % billable_charges[i].item.job.id)
-    docSheet1.cell(row=i + 2, column=7).value = str(
-        billable_charges[i].item.job.customer_name
-    )
-    docSheet1.cell(row=i + 2, column=8).value = str(
-        billable_charges[i].item.job.brand_name
-    )
-    docSheet1.cell(row=i + 2, column=9).value = billable_charges[
-        i
-    ].item.job.creation_date.strftime("%m/%d/%y")
+    docSheet1.cell(row=i + 2, column=7).value = str(billable_charges[i].item.job.customer_name)
+    docSheet1.cell(row=i + 2, column=8).value = str(billable_charges[i].item.job.brand_name)
+    docSheet1.cell(row=i + 2, column=9).value = billable_charges[i].item.job.creation_date.strftime("%m/%d/%y")
     try:
-        docSheet1.cell(row=i + 2, column=10).value = (
-            billable_charges[i].item.final_file_date().strftime("%m/%d/%y")
-        )
+        docSheet1.cell(row=i + 2, column=10).value = billable_charges[i].item.final_file_date().strftime("%m/%d/%y")
     except Exception:
         pass
-    docSheet1.cell(row=i + 2, column=11).value = billable_charges[
-        i
-    ].bev_invoice.invoice_number
+    docSheet1.cell(row=i + 2, column=11).value = billable_charges[i].bev_invoice.invoice_number
     try:
-        docSheet1.cell(row=i + 2, column=12).value = str(
-            billable_charges[i].item.job.temp_platepackage.platemaker.name
-        )
+        docSheet1.cell(row=i + 2, column=12).value = str(billable_charges[i].item.job.temp_platepackage.platemaker.name)
     except AttributeError:
         # Handle NoneType errors.
         pass
     if billable_charges[i].description.type == "Revision (Evergreen Absorbs)":
         docSheet1.cell(row=i + 2, column=13).value = "AMO"
     else:
-        docSheet1.cell(row=i + 2, column=13).value = str(
-            billable_charges[i].item.job.bill_to_type
-        )
+        docSheet1.cell(row=i + 2, column=13).value = str(billable_charges[i].item.job.bill_to_type)
 
-    docSheet1.cell(row=i + 2, column=14).value = str(
-        billable_charges[i].item.job.business_type
-    )
+    docSheet1.cell(row=i + 2, column=14).value = str(billable_charges[i].item.job.business_type)
     docSheet1.cell(row=i + 2, column=15).value = str(billable_charges[i].description)
     if billable_charges[i].description.type == "Revision (Evergreen Absorbs)":
         docSheet1.cell(row=i + 2, column=16).value = 0

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-"""Simple Tornado-based webserver that serves TIFFs for platemaking.
+"""
+Simple Tornado-based webserver that serves TIFFs for platemaking.
 
 This module provides small handlers used to download single TIFF files or a
 ZIP archive of all TIFFs for an Item.
@@ -10,9 +11,7 @@ import sys
 
 sys.path.insert(
     0,
-    os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    ),
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
 )
 os.environ["DJANGO_SETTINGS_MODULE"] = "gchub_db.settings"
 from django.conf import settings
@@ -32,7 +31,8 @@ from gchub_db.includes import fs_api
 
 
 class SingleTiffDownloader(tornado.web.RequestHandler):
-    """Handles requests for single tiff files.
+    """
+    Handles requests for single tiff files.
 
     Minimal docstring added to satisfy docstring checks. The handler returns
     a 404 HTTP error when the item or tiff is not found.
@@ -49,9 +49,7 @@ class SingleTiffDownloader(tornado.web.RequestHandler):
 
         tiff_file = urllib.parse.unquote(tiff_file)
         try:
-            filepath = fs_api.get_item_tiff_path(
-                item.job.id, item.num_in_job, tiff_file
-            )
+            filepath = fs_api.get_item_tiff_path(item.job.id, item.num_in_job, tiff_file)
         except fs_api.NoResultsFound:
             error_msg = "SingleTiffDownloader: Couldn't find tiff: %s" % tiff_file
             # Intentional masking: don't expose fs_api internals to the client.
@@ -61,9 +59,7 @@ class SingleTiffDownloader(tornado.web.RequestHandler):
             data = f.read()
 
         self.set_header("Content-Type", "image/tiff")
-        self.set_header(
-            "Content-Disposition", 'attachment; filename="' + str(tiff_file) + '"'
-        )
+        self.set_header("Content-Disposition", 'attachment; filename="' + str(tiff_file) + '"')
         self.write(data)
 
 
@@ -91,9 +87,7 @@ class ItemZipTiffDownloader(tornado.web.RequestHandler):
         zip_contents = fs_api.get_zip_all_tiffs(item.job.id, item.num_in_job)
 
         self.set_header("Content-Type", "application/zip")
-        self.set_header(
-            "Content-Disposition", 'attachment; filename="' + send_name + ".zip" + '"'
-        )
+        self.set_header("Content-Disposition", 'attachment; filename="' + send_name + ".zip" + '"')
         self.write(zip_contents)
 
 

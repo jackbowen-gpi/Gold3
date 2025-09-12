@@ -1,3 +1,7 @@
+"""
+Module src\resolver_debug.py
+"""
+
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")

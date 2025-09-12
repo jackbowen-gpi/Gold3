@@ -1,4 +1,5 @@
-"""Stabilize ship_to_state choices to prevent repeated autodetector churn.
+"""
+Stabilize ship_to_state choices to prevent repeated autodetector churn.
 
 This migration sets a consistent tuple literal for the `ship_to_state` field
 choices so future `makemigrations` calls won't keep generating trivial

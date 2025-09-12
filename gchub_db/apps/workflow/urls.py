@@ -1,4 +1,5 @@
-"""The urls.py file handles URL dispatching for the workflow module. Requests
+"""
+The urls.py file handles URL dispatching for the workflow module. Requests
 that begin with /workflow are sent here. The major models get their own
 URL matching sections below, which are combined into urlpatterns at the end
 of the file for matching.
@@ -154,9 +155,7 @@ urlpatterns += [
         extended_job_edit,
         name="extended_job_edit",
     ),
-    url(
-        r"^job/(?P<job_id>\d+)/carton_invoice/$", carton_invoice, name="carton_invoice"
-    ),
+    url(r"^job/(?P<job_id>\d+)/carton_invoice/$", carton_invoice, name="carton_invoice"),
     url(
         r"^job/(?P<job_id>\d+)/find_related/$",
         JobFindRelated.as_view(),
@@ -174,14 +173,10 @@ urlpatterns += [
         shipping_manager,
         name="shipping_manager",
     ),
-    url(
-        r"^job/(?P<job_id>\d+)/db_doc_upload/$", db_doc_upload, name="job_db_doc_upload"
-    ),
+    url(r"^job/(?P<job_id>\d+)/db_doc_upload/$", db_doc_upload, name="job_db_doc_upload"),
     url(
         r"^db_doc_upload_complete/$",
-        TemplateView.as_view(
-            template_name="workflow/job/job_detail/popups/db_doc_upload_complete.html"
-        ),
+        TemplateView.as_view(template_name="workflow/job/job_detail/popups/db_doc_upload_complete.html"),
         name="jb_db_doc_upload_complete",
     ),
     url(
@@ -501,9 +496,7 @@ urlpatterns += [
         r"^charge/charge_lookup/(?P<charge_description>\d+)/(?P<item_id>\d+)/(?P<rush_days>\d+)/$",
         charge_lookup,
     ),
-    url(
-        r"^item/(?P<item_id>\d+)/transfer_files_to_concord/$", transfer_files_to_concord
-    ),
+    url(r"^item/(?P<item_id>\d+)/transfer_files_to_concord/$", transfer_files_to_concord),
 ]
 
 """
@@ -589,9 +582,7 @@ urlpatterns += [
         name="inkcov_report",
     ),
     url(r"^reports/fsb_inkcov/$", FSB_InkCovReport.as_view(), name="fsb_inkcov_report"),
-    url(
-        r"^reports/fedex_shipments/$", FedexShipments.as_view(), name="fedex_shipments"
-    ),
+    url(r"^reports/fedex_shipments/$", FedexShipments.as_view(), name="fedex_shipments"),
     url(
         r"^reports/fedex_shipments/download/(?P<start_date>[\d\-]+)/(?P<end_date>[\d\-]+)/$",
         get_fedex_shipment_pdf,
@@ -628,9 +619,7 @@ from gchub_db.apps.workflow.views.itemcatalog_views import (
 urlpatterns += [
     url(r"^itemcatalog/$", itemcatalog_home, name="itemcatalog_home"),
     url(r"^itemcatalog/new/$", new_itemcatalog, name="new_itemcatalog"),
-    url(
-        r"^itemcatalog/browse/$", BrowseItemCatalog.as_view(), name="browse_itemcatalog"
-    ),
+    url(r"^itemcatalog/browse/$", BrowseItemCatalog.as_view(), name="browse_itemcatalog"),
     url(r"^itemcatalog/search/$", catalog_search, name="catalog_search"),
     url(r"^itemcatalog/specs/search/$", spec_search, name="spec_search"),
     url(r"^itemcatalog/stepspecs/search/$", step_search, name="step_search"),
@@ -773,9 +762,7 @@ urlpatterns += [
     ),
     url(
         r"^add_code_complete/$",
-        TemplateView.as_view(
-            template_name="workflow/misc/beverage/add_code_complete.html"
-        ),
+        TemplateView.as_view(template_name="workflow/misc/beverage/add_code_complete.html"),
         name="add_code_complete",
     ),
     url(r"^beverage/endcode/add/$", add_endcode, name="add_endcode"),
@@ -792,9 +779,7 @@ urlpatterns += [
     url(r"^file/gen_doc_upload/$", gen_doc_upload, name="misc_gen_doc_upload"),
     url(
         r"^gen_doc_upload_complete/$",
-        TemplateView.as_view(
-            template_name="workflow/misc/popups/gen_doc_upload_complete.html"
-        ),
+        TemplateView.as_view(template_name="workflow/misc/popups/gen_doc_upload_complete.html"),
         name="misc_gen_doc_upload_complete",
     ),
 ]

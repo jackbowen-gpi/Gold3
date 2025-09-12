@@ -38,7 +38,8 @@ DEBUG = False
 
 
 def _get_conn_cursor():
-    """In pyodbc, all SQL operations happen through the cursor. Get connected
+    """
+    In pyodbc, all SQL operations happen through the cursor. Get connected
     and return the cursor for use in a query.
     """
     # Check if QAD is disabled for development
@@ -57,13 +58,16 @@ def get_server_version():
 
     cursor = _get_conn_cursor()[0]
     cursor.execute(
-        "SELECT 'SQL Server ' + CONVERT(varchar(100),SERVERPROPERTY('productversion')) + ' - ' + CONVERT(varchar(100),SERVERPROPERTY('productlevel')) + ' - ' + CONVERT(varchar(100),SERVERPROPERTY('edition'))"
+        "SELECT 'SQL Server ' + CONVERT(varchar(100),SERVERPROPERTY('productversion')) + "
+        "' - ' + CONVERT(varchar(100),SERVERPROPERTY('productlevel')) + "
+        "' - ' + CONVERT(varchar(100),SERVERPROPERTY('edition'))"
     )
     return cursor.fetchone()[0]
 
 
 def _get_new_records():
-    """Query for retrieving new records. Returns a cursor object, from which you
+    """
+    Query for retrieving new records. Returns a cursor object, from which you
     may iterate through.
     """
     cursor = _get_conn_cursor()[0]
@@ -80,9 +84,7 @@ def _get_new_records():
 def get_nine_digit_data(nine_digit):
     """Return data for the given nine-digit number from QAD>"""
     cursor = _get_conn_cursor()[0]
-    cursor.execute(
-        "SELECT UPC, SCC FROM ProductSpecs where Part='%s'" % str(nine_digit)
-    )
+    cursor.execute("SELECT UPC, SCC FROM ProductSpecs where Part='%s'" % str(nine_digit))
 
     if DEBUG:
         # Show a list of columns + their data types.
@@ -98,7 +100,8 @@ def get_nine_digit_data(nine_digit):
 
 
 def get_specsheet_description(nine_digit):
-    """Return the spec sheet description for the given nine-digit number from QAD.
+    """
+    Return the spec sheet description for the given nine-digit number from QAD.
     The description is made up of three lines stored across multiple tables.
     """
     # Collect the three lines in a list of strings.
@@ -108,18 +111,13 @@ def get_specsheet_description(nine_digit):
         cursor = _get_conn_cursor()[0]
 
         # Lines 1 and 2
-        cursor.execute(
-            "SELECT Description, Description2 FROM ProductSpecs where Part='%s'"
-            % str(nine_digit)
-        )
+        cursor.execute("SELECT Description, Description2 FROM ProductSpecs where Part='%s'" % str(nine_digit))
         data_first_attmpt = cursor.fetchone()
         description_list.append(data_first_attmpt[0])
         description_list.append(data_first_attmpt[1])
 
         # Line 3
-        cursor.execute(
-            "SELECT cd_cmmt##1 FROM cd_det WHERE cd_ref = '%s'" % str(nine_digit)
-        )
+        cursor.execute("SELECT cd_cmmt##1 FROM cd_det WHERE cd_ref = '%s'" % str(nine_digit))
         data_second_attmpt = cursor.fetchone()
         description_list.append(data_second_attmpt[0])
 
@@ -130,7 +128,8 @@ def get_specsheet_description(nine_digit):
 
 
 def get_email_data(nine_digit):
-    """Returns some additional data that sales would like included in their nine
+    """
+    Returns some additional data that sales would like included in their nine
     digit notification email.
     """
     # Check if QAD is disabled for development
@@ -201,7 +200,8 @@ def get_email_data(nine_digit):
 
 
 def encode_cursor_fields(cursor, ejob):
-    """Re-encodes all of the data to UTF8 to prevent problems when saving to
+    """
+    Re-encodes all of the data to UTF8 to prevent problems when saving to
     Postgres.
     """
     # Go through the list of columns
@@ -240,7 +240,8 @@ def import_new_records():
 
 
 def update_casepacks():
-    """Checks QAD casepacks and updates GOLD casepacks accordingly. Does not yet
+    """
+    Checks QAD casepacks and updates GOLD casepacks accordingly. Does not yet
     check for removed casepacks.
     """
     print("Updating QAD Casepacks.")

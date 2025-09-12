@@ -1,4 +1,5 @@
-"""Generic objects that may be placed on a canvas, with collision detection
+"""
+Generic objects that may be placed on a canvas, with collision detection
 support.
 """
 
@@ -11,7 +12,8 @@ from includes.reportlib.elements.generic import (
 
 class CollidableElement(GenericElement):
     def __init__(self, name, bottom_left_x, bottom_left_y, width, height, **kwargs):
-        """Instantiates a collidable element. Make sure to call this __init__
+        """
+        Instantiates a collidable element. Make sure to call this __init__
         method from sub-classes.
 
         draw_element: (bool) Toggle to draw object to canvas.
@@ -73,7 +75,8 @@ class CollidableTextElement(TextElement, CollidableElement):
         size=12,
         **kwargs,
     ):
-        """bottom_left_x: (float) X coordinate for object's bottom left point.
+        """
+        bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         label_text: (str) Text to be displayed on the element.
         font: (str) A valid registered font.
@@ -107,7 +110,8 @@ class CollidableSVGGraphicElement(SVGGraphicElement, CollidableElement):
         available_area_y,
         **kwargs,
     ):
-        """bottom_left_x: (float) X coordinate for object's bottom left point.
+        """
+        bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
         label_text: (str) Text to be displayed on the element.
         file_name: (str) Path to the SVG file.

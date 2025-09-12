@@ -1,4 +1,8 @@
 # bin/hello_world.py
+r"""
+Module bin\hello_world.py
+"""
+
 import sys
 import os
 

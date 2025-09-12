@@ -46,7 +46,8 @@ INVALID_DIR = os.path.join(settings.INK_COVERAGE_DIR, "invalid")
 
 
 def move_file_to_invalid(xmfile_fullpath, error_msg, job):
-    """Moves an XML file to the invalid directory and routes the error message
+    """
+    Moves an XML file to the invalid directory and routes the error message
 
     to the joblog and Growl.
     """
@@ -134,9 +135,7 @@ for xmfile in coverage_list:
                 # get the itemcolors for the job and if it matches 4695-C send sana an email
                 # so she can try and pair the extra ink that was ordered and use it up
                 # before it goes bad
-                specific_itemcolor = ItemColor.objects.filter(
-                    item=item, definition__name="4695", definition__coating="C"
-                )
+                specific_itemcolor = ItemColor.objects.filter(item=item, definition__name="4695", definition__coating="C")
                 # If the LAB values are within a certain range as well then the ink can be used
                 LAB = False
                 itemcolors = ItemColor.objects.filter(item=item)
@@ -146,23 +145,15 @@ for xmfile in coverage_list:
                         cdefB = itemcolor.definition.lab_b
                         cdefL = itemcolor.definition.lab_l
                         # check if they are an int or a float and then compare
-                        if (
-                            isinstance(cdefL, float) or isinstance(cdefL, int)
-                        ) and 15.64 < cdefL < 35.66:
-                            if (
-                                isinstance(cdefA, float) or isinstance(cdefA, int)
-                            ) and 7.70 < cdefA < 27.72:
-                                if (
-                                    isinstance(cdefB, float) or isinstance(cdefB, int)
-                                ) and 3.74 < cdefB < 23.76:
+                        if (isinstance(cdefL, float) or isinstance(cdefL, int)) and 15.64 < cdefL < 35.66:
+                            if (isinstance(cdefA, float) or isinstance(cdefA, int)) and 7.70 < cdefA < 27.72:
+                                if (isinstance(cdefB, float) or isinstance(cdefB, int)) and 3.74 < cdefB < 23.76:
                                     LAB = True
                     except Exception:
                         pass
                 if specific_itemcolor or LAB:
                     mail_send_to = []
-                    group_members = User.objects.filter(
-                        groups__name="EmailGCHubManager", is_active=True
-                    )
+                    group_members = User.objects.filter(groups__name="EmailGCHubManager", is_active=True)
                     for user in group_members:
                         mail_send_to.append(user.email)
                     mail_from = "Gold - Clemson Support <%s>" % settings.EMAIL_SUPPORT
@@ -185,10 +176,7 @@ for xmfile in coverage_list:
                     msg.send()
 
         except IndexError:
-            error_msg = (
-                "An ink coverage was sent for %s-%s, but no such item exists in GOLD."
-                % (job.id, item_num)
-            )
+            error_msg = "An ink coverage was sent for %s-%s, but no such item exists in GOLD." % (job.id, item_num)
             move_file_to_invalid(xmfile_fullpath, error_msg, job)
             continue
 

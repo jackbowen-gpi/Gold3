@@ -10,9 +10,7 @@ from gchub_db.apps.workflow.models import ItemColor
 def color_home(request):
     """Standard Color Mgt. Data - basic info"""
     data = {}
-    colors = ItemColor.objects.filter(
-        item__job__workflow__name="Foodservice", delta_e__isnull=False
-    )
+    colors = ItemColor.objects.filter(item__job__workflow__name="Foodservice", delta_e__isnull=False)
 
     # Run aggregate methods on color data.
     agg_colors = colors.aggregate(

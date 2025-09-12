@@ -29,7 +29,8 @@ class Contact(AddressValidationModel):
         return self.get_full_name()
 
     def get_zip_code(self):
-        """Needed in order to bridge some differences between the Contact and
+        """
+        Needed in order to bridge some differences between the Contact and
         JobAddress models.
         """
         return self.zip_code
@@ -45,7 +46,8 @@ class Contact(AddressValidationModel):
     name = property(get_full_name)
 
     def get_job_title(self):
-        """Needed in order to bridge some differences between the Contact and
+        """
+        Needed in order to bridge some differences between the Contact and
         JobAddress models.
         """
         return self.job_title

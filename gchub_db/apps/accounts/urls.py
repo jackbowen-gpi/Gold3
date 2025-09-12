@@ -4,12 +4,12 @@ from django.utils.module_loading import import_string
 
 
 def lazy_view(dotted_path):
-    """Return a callable that imports and calls the real view on demand.
+    """
+    Return a callable that imports and calls the real view on demand.
 
     This avoids importing the view module at URLConf import time which can
     trigger database access or AppRegistry lookups during startup.
     """
-
     module_name, func_name = dotted_path.rsplit(".", 1)
 
     def _view(request, *args, **kwargs):
@@ -40,9 +40,7 @@ def lazy_view(dotted_path):
                     candidate = os.path.normpath(candidate)
                     if os.path.exists(candidate):
                         loader_name = module_name + "_file"
-                        spec2 = importlib.util.spec_from_file_location(
-                            loader_name, candidate
-                        )
+                        spec2 = importlib.util.spec_from_file_location(loader_name, candidate)
                         mod2 = importlib.util.module_from_spec(spec2)
                         spec2.loader.exec_module(mod2)
                         view = getattr(mod2, func_name)
@@ -106,6 +104,15 @@ urlpatterns = [
         r"^admin/send-alert/$",
         lazy_view("gchub_db.apps.accounts.admin_views.send_alert_view"),
         name="admin_send_alert",
+    ),
+    # Provide a compatibility mapping that accepts GET for logout links used in
+    # legacy templates. This overrides the default auth.urls mapping which may
+    # enforce POST-only behavior in some configurations. It must appear before
+    # the include so the custom GET-capable view takes precedence.
+    url(
+        r"^accounts/logout/$",
+        lazy_view("gchub_db.apps.accounts.views.logout_get"),
+        name="logout",
     ),
     url(r"^accounts/", include("django.contrib.auth.urls")),
 ]

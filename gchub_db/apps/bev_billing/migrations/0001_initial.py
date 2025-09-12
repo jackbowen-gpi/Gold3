@@ -33,27 +33,19 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "creation_date",
-                    models.DateTimeField(
-                        auto_now_add=True, verbose_name=b"Date Created"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name=b"Date Created"),
                 ),
                 (
                     "qad_entry_date",
-                    models.DateField(
-                        blank=True, null=True, verbose_name=b"QAD Entry Date"
-                    ),
+                    models.DateField(blank=True, null=True, verbose_name=b"QAD Entry Date"),
                 ),
                 (
                     "invoice_entry_date",
-                    models.DateField(
-                        blank=True, null=True, verbose_name=b"Invoice Date"
-                    ),
+                    models.DateField(blank=True, null=True, verbose_name=b"Invoice Date"),
                 ),
                 (
                     "pdf_sent_date",
-                    models.DateField(
-                        blank=True, null=True, verbose_name=b"PDF Send Date"
-                    ),
+                    models.DateField(blank=True, null=True, verbose_name=b"PDF Send Date"),
                 ),
                 (
                     "invoice_entry_user",

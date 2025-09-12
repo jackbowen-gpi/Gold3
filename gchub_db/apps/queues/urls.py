@@ -1,0 +1,2 @@
+# Queues URL stubs
+urlpatterns = []

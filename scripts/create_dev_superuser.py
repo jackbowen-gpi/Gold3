@@ -10,9 +10,7 @@ django.setup()
 from django.contrib.auth import get_user_model
 
 # Small script timeout helper: set SCRIPT_TIMEOUT_SECONDS in env to override.
-SCRIPT_TIMEOUT_SECONDS = int(
-    os.environ.get("SCRIPT_TIMEOUT_SECONDS", "300")
-)  # default 5 minutes
+SCRIPT_TIMEOUT_SECONDS = int(os.environ.get("SCRIPT_TIMEOUT_SECONDS", "300"))  # default 5 minutes
 
 
 def _exit_proc():
@@ -31,9 +29,7 @@ email = "devadmin@example.local"
 password = "pass123"
 user = User.objects.filter(username=username).first()
 if not user:
-    user = User.objects.create_superuser(
-        username=username, email=email, password=password
-    )
+    user = User.objects.create_superuser(username=username, email=email, password=password)
     user.first_name = "dev"
     user.last_name = "admin"
     user.save()

@@ -16,7 +16,6 @@ django.setup()
 
 def test_notification_preferences():
     """Test the new notification preferences functionality."""
-
     print("🔔 Testing Notification Preferences")
     print("=" * 50)
 

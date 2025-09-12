@@ -74,12 +74,8 @@ class HourByPlantForm(forms.Form):
         year_choices.append((year, year))
 
     # Fields
-    month = forms.ChoiceField(
-        choices=month_choices, initial=general_funcs._utcnow_naive().date().month
-    )
-    year = forms.ChoiceField(
-        choices=year_choices, initial=general_funcs._utcnow_naive().date().year
-    )
+    month = forms.ChoiceField(choices=month_choices, initial=general_funcs._utcnow_naive().date().month)
+    year = forms.ChoiceField(choices=year_choices, initial=general_funcs._utcnow_naive().date().year)
     plant = forms.ModelChoiceField(queryset=Plant.objects.all().order_by("name"))
 
 
@@ -104,9 +100,7 @@ def hoursbyplant(request):
             # Exclude the timesheets not associated with the selected plant.
             for sheet in timesheets:
                 try:
-                    items = Item.objects.filter(
-                        job=sheet.job, printlocation__plant__name=plant
-                    )
+                    items = Item.objects.filter(job=sheet.job, printlocation__plant__name=plant)
                 except Exception:
                     items = None
                 if items:
@@ -118,9 +112,7 @@ def hoursbyplant(request):
     else:
         form = HourByPlantForm()
         hours = None
-        welcome_message = (
-            "Set the plant and month then hit the green refresh arrow to see data."
-        )
+        welcome_message = "Set the plant and month then hit the green refresh arrow to see data."
 
     pagevars = {
         "page_title": "Hours by Plant Report",
@@ -143,10 +135,7 @@ def sick(request):
     clemson_employee_list = []
     for user in active_list:
         try:
-            if (
-                user.has_perms(["accounts.clemson_employee"])
-                and user.username != "James_Baxter"
-            ):
+            if user.has_perms(["accounts.clemson_employee"]) and user.username != "James_Baxter":
                 clemson_employee_list.append(user)
         except Exception:
             # if profile/perms lookup fails for a user, skip them
@@ -157,7 +146,8 @@ def sick(request):
 
 @login_required
 def stalecharges(request):
-    """Page for totaling up un-invoiced charges by sales person and print group.
+    """
+    Page for totaling up un-invoiced charges by sales person and print group.
     We don't load the page with default data so the page will load quickly and
     the user can select the year before they incur the longer page load. Most
     of the logic is handled by stalecharges_by_date().
@@ -187,7 +177,9 @@ def stalecharges(request):
     # Show a blank page without data at first.
     else:
         staleform = StaleChargesForm()
-        welcome_message = "Set the start and end dates then hit the green refresh arrow to see data. Be patient, it can take 30 seconds or more."
+        welcome_message = (
+            "Set the start and end dates then hit the green refresh arrow to see data. " "Be patient, it can take 30 seconds or more."
+        )
         data = None
         date_from_url = None
         date_to_url = None
@@ -204,9 +196,7 @@ def stalecharges(request):
     return render(request, "manager_tools/stalecharges.html", context=pagevars)
 
 
-def stalecharges_excel(
-    request, year_from, month_from, day_from, year_to, month_to, day_to
-):
+def stalecharges_excel(request, year_from, month_from, day_from, year_to, month_to, day_to):
     """Download raw metrics data as an excel spreadsheet."""
     # Set the time span.
     date_from = date(int(year_from), int(month_from), int(day_from))
@@ -245,9 +235,7 @@ def stalecharges_excel(
             docSheet1.cell(row=row + 1, column=1).value = "No sales person"
         # Write a row for each print group
         for print_group in sales_person[1]:
-            docSheet1.cell(row=row + 1, column=2).value = print_group[
-                0
-            ]  # Print group name
+            docSheet1.cell(row=row + 1, column=2).value = print_group[0]  # Print group name
             docSheet1.cell(row=row + 1, column=3).value = print_group[1]  # Total
             # Move to the next row
             row += 1
@@ -260,16 +248,15 @@ def stalecharges_excel(
         workBookDocument.save(tmp.name)
         output = BytesIO(tmp.read())
     response = HttpResponse(content=output, content_type="application/ms-excel")
-    response["Content-Disposition"] = (
-        'attachment; filename="stale_charges_%s.xlsx"' % year_to
-    )
+    response["Content-Disposition"] = 'attachment; filename="stale_charges_%s.xlsx"' % year_to
     # This cookie triggers the "on successful download" from jquery which triggers the modal closing
     response.set_cookie(key="fileDownload", value="true", path="/")
     return response
 
 
 def stalecharges_by_date(date_from, date_to):
-    """Totals charges that haven't been invoiced for a given time span and then breaks
+    """
+    Totals charges that haven't been invoiced for a given time span and then breaks
     them out by sales person and print group.
     """
     items = Item.objects.filter(
@@ -390,10 +377,7 @@ def vacation(request):
     active_list = User.objects.filter(is_active=True).order_by("last_name")
     clemson_employee_list = []
     for user in active_list:
-        if (
-            user.has_perms(["accounts.clemson_employee"])
-            and user.username != "James_Baxter"
-        ):
+        if user.has_perms(["accounts.clemson_employee"]) and user.username != "James_Baxter":
             clemson_employee_list.append(user)
 
     pagevars = {
@@ -419,7 +403,8 @@ class QCForm(forms.Form):
 
 @login_required
 def qc(request):
-    """QC manager's report. Details errors per employee for the current year.
+    """
+    QC manager's report. Details errors per employee for the current year.
     User can also select a previous year.
     """
     # Default to this year.
@@ -449,16 +434,10 @@ def qc(request):
 
     # Iterate through the users and gather data.
     for user in users:
-        errors = QCWhoops.objects.filter(
-            qc_response__qcdoc__job__artist=user, reported_date__year=year
-        )
+        errors = QCWhoops.objects.filter(qc_response__qcdoc__job__artist=user, reported_date__year=year)
         num_errors = errors.count()
-        num_unresolved = errors.filter(
-            resolution_date__isnull=True, is_valid=True
-        ).count()
-        num_resolved = errors.filter(
-            resolution_date__isnull=False, is_valid=True
-        ).count()
+        num_unresolved = errors.filter(resolution_date__isnull=True, is_valid=True).count()
+        num_resolved = errors.filter(resolution_date__isnull=False, is_valid=True).count()
         num_invalid = errors.filter(is_valid=False).count()
         # Pack this user's data up into a dictionary.
         dict = {
@@ -507,7 +486,8 @@ class StaleChargesForm(forms.Form):
 
 
 class TurnTimeForm(forms.Form):
-    """Form used to display the turn time manager tool for a given year and
+    """
+    Form used to display the turn time manager tool for a given year and
     workflow. We only let the user go back to 2018 because there was a bug in
     the data before then so it's not valid.
     """
@@ -555,7 +535,8 @@ class CostAvoidanceForm(forms.Form):
 
 @login_required
 def turntimes_by_artist(request, month, year, workflow):
-    """Breaks turn time averages out by artist for a given month and workflow.
+    """
+    Breaks turn time averages out by artist for a given month and workflow.
 
     Returns a list of dictionaries. Each dictionary is an artist and the keys
     are "name" and "turn_time" which is the average turn time for the artist
@@ -564,9 +545,7 @@ def turntimes_by_artist(request, month, year, workflow):
     # Convert the month and year to a number if they aren't one already.
     month_nums = range(1, 12)
     if month not in month_nums:
-        month_name_to_num = {
-            name: num for num, name in enumerate(calendar.month_name) if num
-        }
+        month_name_to_num = {name: num for num, name in enumerate(calendar.month_name) if num}
         month = month_name_to_num[month]
     year = int(year)
 
@@ -621,16 +600,9 @@ def turntimes_by_artist(request, month, year, workflow):
             # Get the item
             item = log.item
             # Get the first proof out event for that item
-            proof_joblog = (
-                JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT)
-                .order_by("event_time")
-                .first()
-            )
+            proof_joblog = JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT).order_by("event_time").first()
             # Make sure this items first proof out event was this month.
-            if (
-                proof_joblog.event_time.year == year
-                and proof_joblog.event_time.month == month
-            ):
+            if proof_joblog.event_time.year == year and proof_joblog.event_time.month == month:
                 items.append(item)
 
         # Keep a list of the timespans between our start and finish events.
@@ -649,13 +621,7 @@ def turntimes_by_artist(request, month, year, workflow):
                     # Assignment date
                     assignment_date = item.assignment_date
                     # First proof date
-                    proof_joblog = (
-                        JobLog.objects.filter(
-                            item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT
-                        )
-                        .order_by("event_time")
-                        .first()
-                    )
+                    proof_joblog = JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT).order_by("event_time").first()
                     proof_date = proof_joblog.event_time.date()
                 except Exception:
                     pass
@@ -679,13 +645,7 @@ def turntimes_by_artist(request, month, year, workflow):
                     # Preflight date
                     preflight_date = item.preflight_date
                     # First proof date
-                    proof_joblog = (
-                        JobLog.objects.filter(
-                            item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT
-                        )
-                        .order_by("event_time")
-                        .first()
-                    )
+                    proof_joblog = JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT).order_by("event_time").first()
                     proof_date = proof_joblog.event_time.date()
                 except Exception:
                     pass
@@ -739,7 +699,8 @@ def turntimes_by_artist(request, month, year, workflow):
 
 @login_required
 def turntimes_by_item(request, month, year, workflow, artist_id):
-    """Lists an artists turntimes by item for a given month and workflow.
+    """
+    Lists an artists turntimes by item for a given month and workflow.
 
     Returns a list of dictionaries. Each dictionary is an item and the keys
     are "name" and "turn_time".
@@ -777,16 +738,9 @@ def turntimes_by_item(request, month, year, workflow, artist_id):
         # Get the item
         item = log.item
         # Get the first proof out event for that item
-        proof_joblog = (
-            JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT)
-            .order_by("event_time")
-            .first()
-        )
+        proof_joblog = JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT).order_by("event_time").first()
         # Make sure this items first proof out event was this month.
-        if (
-            proof_joblog.event_time.year == year
-            and proof_joblog.event_time.month == month
-        ):
+        if proof_joblog.event_time.year == year and proof_joblog.event_time.month == month:
             items.append(item)
 
     # Different workflows measure turn times from different events.
@@ -802,11 +756,7 @@ def turntimes_by_item(request, month, year, workflow, artist_id):
                 # Assignment date
                 assignment_date = item.assignment_date
                 # First proof date
-                proof_joblog = (
-                    JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT)
-                    .order_by("event_time")
-                    .first()
-                )
+                proof_joblog = JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT).order_by("event_time").first()
                 proof_date = proof_joblog.event_time.date()
             except Exception:
                 pass
@@ -835,11 +785,7 @@ def turntimes_by_item(request, month, year, workflow, artist_id):
                 # Preflight date
                 preflight_date = item.preflight_date
                 # First proof date
-                proof_joblog = (
-                    JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT)
-                    .order_by("event_time")
-                    .first()
-                )
+                proof_joblog = JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT).order_by("event_time").first()
                 proof_date = proof_joblog.event_time.date()
             except Exception:
                 pass
@@ -894,22 +840,18 @@ def billing_by_month(month, year):
 
     workflow = "Foodservice"
     # Get billable charge qset for workflow.
-    billable_charges = billing_funcs.get_billable_data(
-        target_year, target_month, workflow
-    )["charges"]
+    billable_charges = billing_funcs.get_billable_data(target_year, target_month, workflow)["charges"]
     # Use this qset if the charges have already been marked as invoiced, and the
     # spreadsheet needs to be recreated.
     # billable_charges = billing_funcs.get_  invoiced    _data(year_num, month_num, workflow)['charges']
     qty = billable_charges.count()
     # Gather Foodservice cost avoidance items
-    items = Item.objects.filter(
-        workflow__name="Foodservice", job__type="BillableSales", is_deleted=False
-    )
+    items = Item.objects.filter(workflow__name="Foodservice", job__type="BillableSales", is_deleted=False)
 
     # Gather invoiced charges for cost avoidance items
-    invoiced_charges = Charge.objects.filter(
-        item__in=items, invoice_date__year=target_year, invoice_date__month=target_month
-    ).order_by("invoice_date")
+    invoiced_charges = Charge.objects.filter(item__in=items, invoice_date__year=target_year, invoice_date__month=target_month).order_by(
+        "invoice_date"
+    )
 
     # Total the charges
     total = 0
@@ -929,7 +871,8 @@ def billing_by_month(month, year):
 
 
 def costavoidance_by_month(month, year):
-    """Calculates the total charges for all the jobs marked as "cost avoidance" for
+    """
+    Calculates the total charges for all the jobs marked as "cost avoidance" for
     a given month. Keys off a charge's invoice date and that doesn't get filled
     in until we run month end billing. So, if the current month is zero then
     billing probably hasn't been run yet.
@@ -944,14 +887,12 @@ def costavoidance_by_month(month, year):
         target_year = year
 
     # Gather Foodservice cost avoidance items
-    items = Item.objects.filter(
-        workflow__name="Foodservice", job__type="CostAvoidance", is_deleted=False
-    )
+    items = Item.objects.filter(workflow__name="Foodservice", job__type="CostAvoidance", is_deleted=False)
 
     # Gather invoiced charges for cost avoidance items
-    invoiced_charges = Charge.objects.filter(
-        item__in=items, invoice_date__year=target_year, invoice_date__month=target_month
-    ).order_by("invoice_date")
+    invoiced_charges = Charge.objects.filter(item__in=items, invoice_date__year=target_year, invoice_date__month=target_month).order_by(
+        "invoice_date"
+    )
 
     # Total the charges
     total = 0
@@ -968,7 +909,8 @@ def costavoidance_by_month(month, year):
 
 
 def turntimes_by_month(month, year, workflow):
-    """Calculates average turn time in days. Foodservice is measured printlocation
+    """
+    Calculates average turn time in days. Foodservice is measured printlocation
     assignment date to first proof date. Beverage and Carton are from first
     preflight date to first proof date.
 
@@ -1011,16 +953,9 @@ def turntimes_by_month(month, year, workflow):
         # Get the item
         item = log.item
         # Get the first proof out event for that item
-        proof_joblog = (
-            JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT)
-            .order_by("event_time")
-            .first()
-        )
+        proof_joblog = JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT).order_by("event_time").first()
         # Make sure this items first proof out event was this month.
-        if (
-            proof_joblog.event_time.year == year
-            and proof_joblog.event_time.month == month
-        ):
+        if proof_joblog.event_time.year == year and proof_joblog.event_time.month == month:
             items.append(item)
 
     # Keep a list of the timespans between our start and finish
@@ -1039,11 +974,7 @@ def turntimes_by_month(month, year, workflow):
                 # Assignment date
                 assignment_date = item.assignment_date
                 # First proof date
-                proof_joblog = (
-                    JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT)
-                    .order_by("event_time")
-                    .first()
-                )
+                proof_joblog = JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT).order_by("event_time").first()
                 proof_date = proof_joblog.event_time.date()
             except Exception:
                 pass
@@ -1066,11 +997,7 @@ def turntimes_by_month(month, year, workflow):
                 # Preflight date.
                 preflight_date = item.preflight_date
                 # First proof date
-                proof_joblog = (
-                    JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT)
-                    .order_by("event_time")
-                    .first()
-                )
+                proof_joblog = JobLog.objects.filter(item=item, type=JOBLOG_TYPE_ITEM_PROOFED_OUT).order_by("event_time").first()
                 proof_date = proof_joblog.event_time.date()
             except Exception:
                 pass
@@ -1101,7 +1028,8 @@ def turntimes_by_month(month, year, workflow):
 
 @login_required
 def turntime(request):
-    """Turn time manager's report. We don't load the page with default data
+    """
+    Turn time manager's report. We don't load the page with default data
     so the page will load quickly and the user can select their workflow and
     year before they incur the longer page load.
     """
@@ -1143,7 +1071,9 @@ def turntime(request):
             }
         )
         turn_data = None
-        welcome_message = "Set the workflow and year then hit the green refresh arrow to see data. Be patient, it can take 30 seconds or more."
+        welcome_message = (
+            "Set the workflow and year then hit the green refresh arrow to see data. " "Be patient, it can take 30 seconds or more."
+        )
 
     # Pass the current year for some display stuff.
     current_year = date.today().year
@@ -1162,7 +1092,8 @@ def turntime(request):
 
 
 def loading_complexity_average(job):
-    """Used by artist_loading() to calculate how long it should take an artist to
+    """
+    Used by artist_loading() to calculate how long it should take an artist to
     work on a given job based on how many items it has.
     """
     complexity_average = 0
@@ -1175,9 +1106,7 @@ def loading_complexity_average(job):
 
     # If we have all the info we need, proceed.
     if job.type and job_complexity:
-        job_average_hours = get_item_average_hours(
-            job_complexity.category, job.type, job.artist
-        )
+        job_average_hours = get_item_average_hours(job_complexity.category, job.type, job.artist)
         # Count the items
         items = Item.objects.filter(job=job)
         # Find the average for this complexity.
@@ -1319,9 +1248,9 @@ def artist_loading(request):
     """
     Revisions due. Identiacal logic to search_views.job_todo_list().
     """
-    revisions = Revision.objects.filter(
-        due_date__range=(day1, day8), complete_date__isnull=True
-    ).exclude(item__job__status__in=["Hold", "Cancelled"])
+    revisions = Revision.objects.filter(due_date__range=(day1, day8), complete_date__isnull=True).exclude(
+        item__job__status__in=["Hold", "Cancelled"]
+    )
 
     revisions_due_1 = []
     revisions_due_2 = []
@@ -1372,9 +1301,7 @@ def artist_loading(request):
         .query
     )
     jobs_needing_file_out = (
-        Job.objects.filter(id__in=items_to_file_out)
-        .exclude(status__in=("Hold", "Cancelled", "Complete"))
-        .order_by("-id")
+        Job.objects.filter(id__in=items_to_file_out).exclude(status__in=("Hold", "Cancelled", "Complete")).order_by("-id")
     )
     jobs_needing_file_out_day1 = []
     jobs_needing_file_out_day2 = []
@@ -1441,9 +1368,7 @@ def artist_loading(request):
         # Append the data to this artist's list.
         artist_daily_data.append("%s of %s" % (round(day1_loading, 2), hours_per_day))
         running_total += day1_loading
-        artist_timespan_data.append(
-            "%s of %s" % (round(running_total, 2), hours_per_day)
-        )
+        artist_timespan_data.append("%s of %s" % (round(running_total, 2), hours_per_day))
 
         # Day 2
         day2_loading = 0
@@ -1462,9 +1387,7 @@ def artist_loading(request):
         # Append the data to this artist's list.
         artist_daily_data.append("%s of %s" % (round(day2_loading, 2), hours_per_day))
         running_total += day2_loading
-        artist_timespan_data.append(
-            "%s of %s" % (round(running_total, 2), hours_per_day * 2)
-        )
+        artist_timespan_data.append("%s of %s" % (round(running_total, 2), hours_per_day * 2))
 
         # Day 3
         day3_loading = 0
@@ -1483,9 +1406,7 @@ def artist_loading(request):
         # Append the data to this artist's list.
         artist_daily_data.append("%s of %s" % (round(day3_loading, 2), hours_per_day))
         running_total += day3_loading
-        artist_timespan_data.append(
-            "%s of %s" % (round(running_total, 2), hours_per_day * 3)
-        )
+        artist_timespan_data.append("%s of %s" % (round(running_total, 2), hours_per_day * 3))
 
         # Day 4
         day4_loading = 0
@@ -1504,9 +1425,7 @@ def artist_loading(request):
         # Append the data to this artist's list.
         artist_daily_data.append("%s of %s" % (round(day4_loading, 2), hours_per_day))
         running_total += day4_loading
-        artist_timespan_data.append(
-            "%s of %s" % (round(running_total, 2), hours_per_day * 4)
-        )
+        artist_timespan_data.append("%s of %s" % (round(running_total, 2), hours_per_day * 4))
 
         # Day 5
         day5_loading = 0
@@ -1525,9 +1444,7 @@ def artist_loading(request):
         # Append the data to this artist's list.
         artist_daily_data.append("%s of %s" % (round(day5_loading, 2), hours_per_day))
         running_total += day5_loading
-        artist_timespan_data.append(
-            "%s of %s" % (round(running_total, 2), hours_per_day * 5)
-        )
+        artist_timespan_data.append("%s of %s" % (round(running_total, 2), hours_per_day * 5))
 
         # Day 6
         day6_loading = 0
@@ -1546,9 +1463,7 @@ def artist_loading(request):
         # Append the data to this artist's list.
         artist_daily_data.append("%s of %s" % (round(day6_loading, 2), hours_per_day))
         running_total += day6_loading
-        artist_timespan_data.append(
-            "%s of %s" % (round(running_total, 2), hours_per_day * 6)
-        )
+        artist_timespan_data.append("%s of %s" % (round(running_total, 2), hours_per_day * 6))
 
         # Day 7
         day7_loading = 0
@@ -1567,9 +1482,7 @@ def artist_loading(request):
         # Append the data to this artist's list.
         artist_daily_data.append("%s of %s" % (round(day7_loading, 2), hours_per_day))
         running_total += day7_loading
-        artist_timespan_data.append(
-            "%s of %s" % (round(running_total, 2), hours_per_day * 7)
-        )
+        artist_timespan_data.append("%s of %s" % (round(running_total, 2), hours_per_day * 7))
 
         # Day 8
         day8_loading = 0
@@ -1588,9 +1501,7 @@ def artist_loading(request):
         # Append the data to this artist's list.
         artist_daily_data.append("%s of %s" % (round(day8_loading, 2), hours_per_day))
         running_total += day8_loading
-        artist_timespan_data.append(
-            "%s of %s" % (round(running_total, 2), hours_per_day * 8)
-        )
+        artist_timespan_data.append("%s of %s" % (round(running_total, 2), hours_per_day * 8))
 
         # Append this artits data to the master data list.
         daily_data.append(artist_daily_data)
@@ -1707,7 +1618,8 @@ def costavoidance(request):
 
 @login_required
 def jobcategory_all(request):
-    """Displays the average amount of time artists put into a given type of job
+    """
+    Displays the average amount of time artists put into a given type of job
     based on time sheet data. All the data is displayed at once.
     """
     # Each element in this list will be a row in the table.
@@ -1742,7 +1654,8 @@ def jobcategory_all(request):
 
 @login_required
 def jobcategory_artists(request, supplied_category, supplied_type):
-    """This is a supplemental report for jobcategory_all that breaks things down
+    """
+    This is a supplemental report for jobcategory_all that breaks things down
     by artist.
     """
     # Gather up all Clemson employees.
@@ -1809,17 +1722,15 @@ def jobcategory_artists(request, supplied_category, supplied_type):
 
 
 def overview(request):
-    """Overview Manager's Tool.
+    """
+    Overview Manager's Tool.
     Gather information about employee's
     vacation usage, sick days, performance data, etc...
     """
     active_list = User.objects.filter(is_active=True).order_by("last_name")
     clemson_employee_list = []
     for user in active_list:
-        if (
-            user.has_perms(["accounts.clemson_employee"])
-            and user.username != "James_Baxter"
-        ):
+        if user.has_perms(["accounts.clemson_employee"]) and user.username != "James_Baxter":
             clemson_employee_list.append(user)
 
     totalPercentage = group_percentage()
@@ -1868,7 +1779,8 @@ class MaterialsForm(forms.Form):
 
 @login_required
 def timesheets(request):
-    """Timesheet Manager's Tool.
+    """
+    Timesheet Manager's Tool.
     This is the default view that lists the employees and how many hours they
     spent on each type of activity this month. User can also select a different
     month and year.
@@ -1938,7 +1850,8 @@ def timesheets(request):
 
 
 def timesheets_by_date_span(start_date, end_date):
-    """Generates the data for the monthly and weekly tables in the time sheets
+    """
+    Generates the data for the monthly and weekly tables in the time sheets
     report. Could be used to get data for any span of time.
     """
     # Gather active Clemson employees.
@@ -1978,9 +1891,7 @@ def timesheets_by_date_span(start_date, end_date):
         for category in categories:
             hours_total = 0
             # Gather all the timesheet entries for the user in this category.
-            entries = TimeSheet.objects.filter(
-                artist=user, date__gte=start_date, date__lte=end_date, category=category
-            )
+            entries = TimeSheet.objects.filter(artist=user, date__gte=start_date, date__lte=end_date, category=category)
             # Total up the hours.
             for entry in entries:
                 hours_total += entry.hours
@@ -2037,9 +1948,7 @@ def timesheets_billable_hours(month, year):
         billable_hours = 0
 
         # Gather all the timesheet entries for the user during the month.
-        entries = TimeSheet.objects.filter(
-            artist=user, date__month=month, date__year=year
-        ).exclude(category__name__in=excluded_activities)
+        entries = TimeSheet.objects.filter(artist=user, date__month=month, date__year=year).exclude(category__name__in=excluded_activities)
 
         # Total up all the hours.
         for entry in entries:
@@ -2068,7 +1977,8 @@ def timesheets_billable_hours(month, year):
 
 @login_required
 def materials(request):
-    """Materials Manager Tool.
+    """
+    Materials Manager Tool.
     This view is used to show supplies and consumables usage by month. Currently
     just tracks how many proofs we print in a month.
     """
@@ -2090,11 +2000,7 @@ def materials(request):
     trackers = ProofTracker.objects.filter(creation_date__year=year)
 
     # Get all the proofers recorded by trackers in the designated year.
-    proofers = (
-        ProofTracker.objects.filter(creation_date__year=year)
-        .values_list("proofer", flat=True)
-        .distinct()
-    )
+    proofers = ProofTracker.objects.filter(creation_date__year=year).values_list("proofer", flat=True).distinct()
 
     # Header for the data table.
     headers = ["Month"]
@@ -2137,7 +2043,8 @@ def materials(request):
 
 
 def get_list_of_weeks(month, year):
-    """Returns a month as a list of weeks and days in that month. Used mostly
+    """
+    Returns a month as a list of weeks and days in that month. Used mostly
     to generate weekly reports
     """
     # Set the week to start on Sunday
@@ -2159,17 +2066,17 @@ def get_list_of_weeks(month, year):
 
 
 def get_items_total(user, date_from, date_to):
-    """Used to count the number of items assigned to a given user during a period
+    """
+    Used to count the number of items assigned to a given user during a period
     of time.
     """
-    total = Item.objects.filter(
-        creation_date__range=(date_from, date_to), job__artist=user
-    ).count()
+    total = Item.objects.filter(creation_date__range=(date_from, date_to), job__artist=user).count()
     return total
 
 
 def get_amount_charged(user, date_from, date_to):
-    """Used to count the number of errors for a given user during a period of
+    """
+    Used to count the number of errors for a given user during a period of
     time.
     """
     preAug2015_charges = (
@@ -2181,9 +2088,7 @@ def get_amount_charged(user, date_from, date_to):
         .exclude(item__job__id=99999)
         .exclude(artist=user)
     )
-    preAug2015_charges = preAug2015_charges.exclude(
-        description__type="Plates"
-    ).aggregate(Sum("amount"))
+    preAug2015_charges = preAug2015_charges.exclude(description__type="Plates").aggregate(Sum("amount"))
     if preAug2015_charges["amount__sum"] is None:
         preAug2015_charges["amount__sum"] = 0
 
@@ -2192,15 +2097,11 @@ def get_amount_charged(user, date_from, date_to):
         item__job__is_deleted=False,
         artist=user,
     ).exclude(item__job__id=99999)
-    postAug2015_charges = postAug2015_charges.exclude(
-        description__type="Plates"
-    ).aggregate(Sum("amount"))
+    postAug2015_charges = postAug2015_charges.exclude(description__type="Plates").aggregate(Sum("amount"))
     if postAug2015_charges["amount__sum"] is None:
         postAug2015_charges["amount__sum"] = 0
 
-    total_charges = (
-        preAug2015_charges["amount__sum"] + postAug2015_charges["amount__sum"]
-    )
+    total_charges = preAug2015_charges["amount__sum"] + postAug2015_charges["amount__sum"]
     if total_charges:
         amt_charged = total_charges
     else:
@@ -2210,12 +2111,11 @@ def get_amount_charged(user, date_from, date_to):
 
 
 def get_qc_reviews_total(user, date_from, date_to):
-    """Used to count the number of QC reviews for a given user during a period of
+    """
+    Used to count the number of QC reviews for a given user during a period of
     time.
     """
-    num_qc_reviews = QCResponseDoc.objects.filter(
-        reviewer=user, parent__isnull=False, review_date__range=(date_from, date_to)
-    )
+    num_qc_reviews = QCResponseDoc.objects.filter(reviewer=user, parent__isnull=False, review_date__range=(date_from, date_to))
 
     # get all qc review items from a responseDOC and add them up
     total_num_qcs_reviews = 0
@@ -2226,7 +2126,8 @@ def get_qc_reviews_total(user, date_from, date_to):
 
 
 def get_proof_out_total(user, date_from, date_to):
-    """Used to count the number of items proofed by a given user during a period of
+    """
+    Used to count the number of items proofed by a given user during a period of
     time.
     """
     proof_out_logs = JobLog.objects.filter(
@@ -2238,7 +2139,8 @@ def get_proof_out_total(user, date_from, date_to):
 
 
 def get_preflight_total(user, date_from, date_to):
-    """Used to count the number of items preflighted by a given user during a
+    """
+    Used to count the number of items preflighted by a given user during a
     period of time.
     """
     preflight_logs = JobLog.objects.filter(
@@ -2250,7 +2152,8 @@ def get_preflight_total(user, date_from, date_to):
 
 
 def get_revisions_proofed_total(user, date_from, date_to):
-    """Used to count the number of revisions proofed out by a given user during a
+    """
+    Used to count the number of revisions proofed out by a given user during a
     period of time.
     """
     revision_logs = JobLog.objects.filter(
@@ -2278,7 +2181,8 @@ def get_revisions_proofed_total(user, date_from, date_to):
 
 
 def get_final_file_total(user, date_from, date_to):
-    """Used to count the number of final files by a given user during a period of
+    """
+    Used to count the number of final files by a given user during a period of
     time.
     """
     final_file_logs = JobLog.objects.filter(
@@ -2290,7 +2194,8 @@ def get_final_file_total(user, date_from, date_to):
 
 
 def metrics_data(date_from, date_to):
-    """Gathers metrics data for artists over a given time period. Returns it as a
+    """
+    Gathers metrics data for artists over a given time period. Returns it as a
     list of dictionaries. Each dictionary will contain the user's data. We use
     dictionaries so that we can easily call out just the data we need.
     """
@@ -2393,9 +2298,7 @@ def metrics_excel(
         workBookDocument.save(tmp.name)
         output = BytesIO(tmp.read())
     response = HttpResponse(content=output, content_type="application/ms-excel")
-    response["Content-Disposition"] = (
-        'attachment; filename="artist_metrics_%s.xlsx"' % filename
-    )
+    response["Content-Disposition"] = 'attachment; filename="artist_metrics_%s.xlsx"' % filename
     return response
 
 
@@ -2427,9 +2330,7 @@ def metrics_pdf(
     # Create the HttpResponse object with the appropriate file name.
     response = HttpResponse(content_type="application/pdf")
     filename = date_to.strftime("%m_%d_%Y")
-    response["Content-Disposition"] = (
-        "attachment; filename=artist_metrics_%s.pdf" % filename
-    )
+    response["Content-Disposition"] = "attachment; filename=artist_metrics_%s.pdf" % filename
 
     # Set up the document.
     pagesize = landscape(letter)
@@ -2569,7 +2470,8 @@ class MetricsForm(forms.Form):
 
 
 def metrics_form(request):
-    """Used to gather employee metrics for the artists and then format it for
+    """
+    Used to gather employee metrics for the artists and then format it for
     display as tables and charts.
     """
     # Process a submitted form.
@@ -2598,16 +2500,10 @@ def metrics_form(request):
             for data in user_data:
                 items_table_data.append([data["name"], data["num_items"]])
                 charges_table_data.append([data["name"], data["amt_charged"]])
-                qc_reviews_table_data.append(
-                    [data["name"], data["total_num_qcs_reviews"]]
-                )
+                qc_reviews_table_data.append([data["name"], data["total_num_qcs_reviews"]])
                 items_proofed_table_data.append([data["name"], data["num_proof_outs"]])
-                items_preflighted_table_data.append(
-                    [data["name"], data["num_preflights"]]
-                )
-                revisions_proofed_table_data.append(
-                    [data["name"], data["num_revisions_proofed"]]
-                )
+                items_preflighted_table_data.append([data["name"], data["num_preflights"]])
+                revisions_proofed_table_data.append([data["name"], data["num_revisions_proofed"]])
                 final_filed_table_data.append([data["name"], data["num_final_file"]])
 
             # Send the data to the results page.
@@ -2625,9 +2521,7 @@ def metrics_form(request):
                 "date_to": date_to,
             }
 
-            return render(
-                request, "manager_tools/metrics_results.html", context=pagevars
-            )
+            return render(request, "manager_tools/metrics_results.html", context=pagevars)
 
     # Display an empty form.
     else:
@@ -2662,17 +2556,11 @@ def group_percentage():
             # Foodservice jobs need to finish beofre the due date.
             if i.job.workflow.name == "Foodservice":
                 # Proofed on or after job due date, and added before due date.
-                if (
-                    proof.date() >= i.job.due_date
-                    and i.creation_date.date() < i.job.due_date
-                ):
+                if proof.date() >= i.job.due_date and i.creation_date.date() < i.job.due_date:
                     overdue.append(i)
             else:
                 # Proofed after job due date, and added before due date.
-                if (
-                    proof.date() > i.job.due_date
-                    and i.creation_date.date() < i.job.due_date
-                ):
+                if proof.date() > i.job.due_date and i.creation_date.date() < i.job.due_date:
                     overdue.append(i)
 
     try:
@@ -2684,18 +2572,14 @@ def group_percentage():
 def error_percentage():
     """Used to calculate the current year to date percentage of errors committed on assigned jobs"""
     Item = ContentType.objects.get(app_label="workflow", model="item").model_class()
-    Error = ContentType.objects.get(
-        app_label="error_tracking", model="error"
-    ).model_class()
+    Error = ContentType.objects.get(app_label="error_tracking", model="error").model_class()
     year_num = date.today().year
 
     num_items_assigned = Item.objects.filter(creation_date__year=year_num).count()
     num_errors = Error.objects.filter(reported_date__year=year_num).count()
 
     try:
-        return (
-            1.0 - (float(num_items_assigned - num_errors) / num_items_assigned)
-        ) * 100.0
+        return (1.0 - (float(num_items_assigned - num_errors) / num_items_assigned)) * 100.0
     except Exception:
         return 0.0
 
@@ -2736,9 +2620,7 @@ def artworktracking(request):
             last_day_of_month = calendar.monthrange(year, month)[1]
             start_date = date(year=year, month=month, day=1)
             end_date = date(year=year, month=month, day=last_day_of_month)
-            totals_by_salesperson, totals_by_type = artwork_tracking_by_date(
-                start_date, end_date
-            )
+            totals_by_salesperson, totals_by_type = artwork_tracking_by_date(start_date, end_date)
 
             welcome_message = None
 
@@ -2747,9 +2629,7 @@ def artworktracking(request):
         form = ArtTrackingForm()
         totals_by_salesperson = None
         totals_by_type = None
-        welcome_message = (
-            "Set the month and year then hit the green refresh arrow to see data."
-        )
+        welcome_message = "Set the month and year then hit the green refresh arrow to see data."
 
     pagevars = {
         "page_title": "Artwork Tracking Report",
@@ -2840,9 +2720,7 @@ def artwork_excel(request, month, year, spreadsheetType):
     last_day_of_month = calendar.monthrange(year, month)[1]
     start_date = date(year=year, month=month, day=1)
     end_date = date(year=year, month=month, day=last_day_of_month)
-    totals_by_salesperson, totals_by_type = artwork_tracking_by_date(
-        start_date, end_date
-    )
+    totals_by_salesperson, totals_by_type = artwork_tracking_by_date(start_date, end_date)
 
     # Setup the Worksheet
     workBookDocument = openpyxl.Workbook()
@@ -2899,9 +2777,7 @@ def artwork_excel(request, month, year, spreadsheetType):
         workBookDocument.save(tmp.name)
         output = BytesIO(tmp.read())
     response = HttpResponse(content=output, content_type="application/ms-excel")
-    response["Content-Disposition"] = (
-        'attachment; filename="Artwork_Tracking_%s_%s.xlsx"' % (month, year)
-    )
+    response["Content-Disposition"] = 'attachment; filename="Artwork_Tracking_%s_%s.xlsx"' % (month, year)
     # This cookie triggers the "on successful download" from jquery which triggers the modal closing
     response.set_cookie(key="fileDownload", value="true", path="/")
     return response

@@ -15,19 +15,13 @@ class ItemModelBasicTests(TestCase):
     def setUp(self):
         """Set up basic test data."""
         # Create test user
-        self.test_user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
-        )
+        self.test_user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass123")
 
         # Create test site
-        self.test_site = Site.objects.create(
-            domain="test.example.com", name="Test Site"
-        )
+        self.test_site = Site.objects.create(domain="test.example.com", name="Test Site")
 
         # Create test item catalog
-        self.test_item_catalog = ItemCatalog.objects.create(
-            size="Test Size 12oz", workflow=self.test_site
-        )
+        self.test_item_catalog = ItemCatalog.objects.create(size="Test Size 12oz", workflow=self.test_site)
 
         # Create test job
         self.test_job = Job.objects.create(

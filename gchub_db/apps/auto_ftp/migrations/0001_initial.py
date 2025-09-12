@@ -25,21 +25,15 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "destination",
-                    models.IntegerField(
-                        choices=[(6, b"Fusion_Flexo"), (11, b"Cyber_Graphics")]
-                    ),
+                    models.IntegerField(choices=[(6, b"Fusion_Flexo"), (11, b"Cyber_Graphics")]),
                 ),
                 (
                     "date_queued",
-                    models.DateTimeField(
-                        auto_now_add=True, verbose_name=b"Date Queued"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name=b"Date Queued"),
                 ),
                 (
                     "date_processed",
-                    models.DateTimeField(
-                        blank=True, null=True, verbose_name=b"Date Processed"
-                    ),
+                    models.DateTimeField(blank=True, null=True, verbose_name=b"Date Processed"),
                 ),
             ],
             options={

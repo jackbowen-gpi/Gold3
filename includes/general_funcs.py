@@ -11,7 +11,8 @@ from django.utils import timezone
 
 
 def paginate_get_request(request):
-    """Accepts a request object, grabs the GET keys and returns the proper
+    """
+    Accepts a request object, grabs the GET keys and returns the proper
     GET querystring to retain persistence across different pages.
     """
     extra_link = []
@@ -65,7 +66,8 @@ def get_user_workflow_access(request):
 
 
 def filter_query_same_perms(request, qset):
-    """Takes a request object and a queryset, returns a queryset of users with same permissions as
+    """
+    Takes a request object and a queryset, returns a queryset of users with same permissions as
     the requesting user.
     """
     qset_1 = User.objects.none()
@@ -107,7 +109,8 @@ def filter_query_same_perms(request, qset):
 
 
 def set_cookie(response, key, value, expire=None):
-    """Simplifies cookie expiration time setting.
+    """
+    Simplifies cookie expiration time setting.
 
     response: (HttpResponse)
     key: (string)
@@ -128,7 +131,8 @@ def set_cookie(response, key, value, expire=None):
 
 
 def _utcnow_naive():
-    """Return a naive UTC datetime in a conservative way.
+    """
+    Return a naive UTC datetime in a conservative way.
 
     Prefer Django's timezone.now() when available (aware), convert to UTC and
     drop tzinfo to preserve legacy naive-UTC semantics. Fall back to
@@ -143,7 +147,8 @@ def _utcnow_naive():
 
 
 def send_info_mail(subject, body, recipients, fail_silently=True):
-    """This is a very light wrapper for send_mail which can be used to quickly
+    """
+    This is a very light wrapper for send_mail which can be used to quickly
     enable fail_silently and a few other things for all emails.
 
     This function is more aimed at general, informative messages rather than

@@ -1,4 +1,5 @@
-"""Package initializer for gchub_db.apps.
+"""
+Package initializer for gchub_db.apps.
 
 This file extends the package search path to include the repository's
 top-level `apps_top` directory (legacy 'apps' location). That lets

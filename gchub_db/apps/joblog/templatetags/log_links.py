@@ -12,7 +12,8 @@ register = template.Library()
 
 @register.filter
 def log_proof_link(log, link_text=""):
-    """Generates the necessary HTML to render a PDF proof link. If the
+    """
+    Generates the necessary HTML to render a PDF proof link. If the
     proof can't be found, make the link show an error message.
     """
     try:
@@ -20,9 +21,7 @@ def log_proof_link(log, link_text=""):
             # Beverage links low res proofs.
             fs_api.get_item_proof(log.item.job.id, log.item.num_in_job, "l", log.id)
         else:
-            fs_api.get_item_proof(
-                log.item.job.id, log.item.num_in_job, quality=None, proof_log_id=log.id
-            )
+            fs_api.get_item_proof(log.item.job.id, log.item.num_in_job, quality=None, proof_log_id=log.id)
 
         return mark_safe(
             """

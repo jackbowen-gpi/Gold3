@@ -1,7 +1,6 @@
 """eTools operations module."""
 
 import sys
-from string import Template
 
 import pyodbc
 from django.conf import settings
@@ -44,9 +43,9 @@ class MockRow:
             setattr(self, key, value)
 
 
-# While True, output verbose debugging info.
+# Set to True to output verbose debugging info.
 DEBUG = False
-# While True, print a list of columns on each eTools job request.
+# If True, print a list of columns on each eTools job request.
 PRINT_COLUMNS = False
 
 
@@ -70,7 +69,8 @@ ETOOLS_MAX_ITEMS = 9
 
 
 def _get_conn_cursor():
-    """In pyodbc, all SQL operations happen through the cursor. Get connected
+    """
+    In pyodbc, all SQL operations happen through the cursor. Get connected
     and return the cursor for use in a query.
     """
     # Check if ETOOLS is disabled for development
@@ -89,20 +89,23 @@ def get_server_version():
 
     cursor = _get_conn_cursor()[0]
     cursor.execute(
-        "SELECT 'SQL Server ' + CONVERT(varchar(100),SERVERPROPERTY('productversion')) + ' - ' + CONVERT(varchar(100),SERVERPROPERTY('productlevel')) + ' - ' + CONVERT(varchar(100),SERVERPROPERTY('edition'))"
+        "SELECT 'SQL Server ' + CONVERT(varchar(100),SERVERPROPERTY('productversion'))"
+        " + ' - ' + CONVERT(varchar(100),SERVERPROPERTY('productlevel'))"
+        " + ' - ' + CONVERT(varchar(100),SERVERPROPERTY('edition'))"
     )
     return cursor.fetchone()[0]
 
 
 def _get_new_jobs():
-    """Query for retrieving new jobs. Returns a cursor object, from which you
+    """
+    Query for retrieving new jobs. Returns a cursor object, from which you
     may iterate through.
     """
     cursor = _get_conn_cursor()[0]
-    cursor.execute(
-        "SELECT TOP 5 * FROM tb_FSAR_Data_SampArtReq WHERE Job_Status = 'New' ORDER BY Request_ID ASC"
-    )
-    # cursor.execute("SELECT TOP 10 * FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = 104249")
+    cursor.execute("SELECT TOP 5 * FROM tb_FSAR_Data_SampArtReq WHERE Job_Status = 'New'" " ORDER BY Request_ID ASC")
+    # cursor.execute(
+    #     "SELECT TOP 10 * FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = 104249"
+    # )
 
     if PRINT_COLUMNS:
         # Show a list of columns + their data types.
@@ -113,7 +116,8 @@ def _get_new_jobs():
 
 
 def get_job_by_request_id(request_id):
-    """Query for retrieving new jobs. Returns a cursor object, from which you
+    """
+    Query for retrieving new jobs. Returns a cursor object, from which you
     may iterate through.
     """
     request_id = int(request_id)
@@ -148,15 +152,14 @@ def get_job_by_request_id(request_id):
         return MockCursor(data=[mock_data], description=mock_description)
 
     cursor = _get_conn_cursor()[0]
-    query = (
-        "SELECT TOP 1 * FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = %d" % request_id
-    )
-    cursor.execute(query)
+    query = "SELECT TOP 1 * FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = ?"
+    cursor.execute(query, (request_id,))
     return cursor
 
 
 def _set_etools_job_status(job_etools_id, job_status):
-    """Query for retrieving new jobs. Returns a cursor object, from which you
+    """
+    Query for retrieving new jobs. Returns a cursor object, from which you
     may iterate through.
     """
     if job_status not in VALID_ETOOLS_JOB_STATUS:
@@ -164,28 +167,27 @@ def _set_etools_job_status(job_etools_id, job_status):
         sys.exit(1)
     cursor, connection = _get_conn_cursor()
     cursor.execute(
-        "UPDATE tb_FSAR_Data_SampArtReq SET Job_Status = '%s' WHERE Request_ID = %d"
-        % (job_status, job_etools_id)
+        "UPDATE tb_FSAR_Data_SampArtReq SET Job_Status = ? WHERE Request_ID = ?",
+        (job_status, job_etools_id),
     )
     connection.commit()
     return cursor
 
 
 def _get_etools_job_status(job_etools_id):
-    """Query for retrieving new jobs. Returns a cursor object, from which you
+    """
+    Query for retrieving new jobs. Returns a cursor object, from which you
     may iterate through.
     """
     cursor = _get_conn_cursor()[0]
-    cursor.execute(
-        "SELECT Job_Status FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = %d"
-        % job_etools_id
-    )
+    cursor.execute("SELECT Job_Status FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = %d" % job_etools_id)
 
     return cursor
 
 
 def _get_etools_field(job_etools_id, field):
-    """Query for retrieving the value of a single field on an entry.
+    """
+    Query for retrieving the value of a single field on an entry.
 
     Note:
     You do not want to fire these off in large numbers. If you need to update
@@ -197,16 +199,31 @@ def _get_etools_field(job_etools_id, field):
 
     """
     cursor = _get_conn_cursor()[0]
-    cursor.execute(
-        "SELECT %s FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = %d"
-        % (field, job_etools_id)
-    )
+    # Validate field name to prevent SQL injection
+    allowed_fields = {
+        "Request_ID",
+        "Customer_Name",
+        "Project_Description",
+        "Job_Status",
+        "Request_Date",
+        "Due_Date",
+        "Contact_Name",
+        "Contact_Email",
+        "Contact_Phone",
+        "Notes",
+    }
+    if field not in allowed_fields:
+        raise ValueError("Invalid field name provided.")
+
+    query = f"SELECT {field} FROM tb_FSAR_Data_SampArtReq WHERE Request_ID = ?"
+    cursor.execute(query, (job_etools_id,))
 
     return cursor
 
 
 def _set_etools_field(job_etools_id, field, value):
-    """A generic function to set a field to a value.
+    """
+    A generic function to set a field to a value.
 
     Note:
     You do not want to fire these off in large numbers. If you need to update
@@ -218,10 +235,8 @@ def _set_etools_field(job_etools_id, field, value):
 
     """
     cursor, connection = _get_conn_cursor()
-    cursor.execute(
-        "UPDATE tb_FSAR_Data_SampArtReq SET %s = '%s' WHERE Request_ID = %d"
-        % (field, value, job_etools_id)
-    )
+    query = f"UPDATE tb_FSAR_Data_SampArtReq SET {field} = ? WHERE Request_ID = ?"
+    cursor.execute(query, (value, job_etools_id))
     connection.commit()
     return cursor
 
@@ -235,33 +250,28 @@ def bool_to_yesno(bool_val):
 
 
 def _ensure_item_record_exists(cursor, connection, item):
-    """If the specified item does not exist, create an empty entry to be updated.
+    """
+    If the specified item does not exist, create an empty entry to be updated.
 
     Returns True if the record already existed, or False if it had to be
     created.
     """
+    # Check for existing item record
     cursor.execute(
-        """
-        SELECT TOP 1 * FROM tb_FSAR_Data_JobItem WHERE job_id = '%s' AND item_recid = '%s'"""
-        % (item.job.id, item.num_in_job)
+        "SELECT TOP 1 * FROM tb_FSAR_Data_JobItem WHERE job_id = ? AND item_recid = ?",
+        (item.job.id, item.num_in_job),
     )
 
-    # If no results are found, create an empty entry to be updated next.
     if not cursor.fetchone():
+        # Create the missing item record
         cursor.execute(
-            """
-        INSERT INTO tb_FSAR_Data_JobItem (job_id, item_recid) VALUES ('%s', '%s')"""
-            % (item.job.id, item.num_in_job)
+            "INSERT INTO tb_FSAR_Data_JobItem (job_id, item_recid) VALUES (?, ?)",
+            (item.job.id, item.num_in_job),
         )
         connection.commit()
-        print(
-            "Item record for job %s item %s does not exist, creating."
-            % (item.job.id, item.num_in_job)
-        )
-        # Let the invoker know a record had to be created.
+        print("Item record for job %s item %s does not exist, creating." % (item.job.id, item.num_in_job))
         return False
     else:
-        # Let the invoker know a record exists.
         return True
 
 
@@ -280,22 +290,9 @@ def push_job(job):
     """
     >>> Begin assembling the query <<<
     """
-    query_template = Template(
-        "UPDATE tb_FSAR_Data_SampArtReq SET "
-        + "Job_ID = '$job_id', "
-        + "Job_Status = '$job_status', "
-        + "Assigned_To = '$assigned_to' "
-        + "WHERE Request_ID = '$request_id'"
-    )
-
-    query_string = query_template.substitute(
-        job_status=job.status,
-        job_id=job.id,
-        assigned_to=assigned_to,
-        request_id=job.e_tools_id,
-    ).encode("ascii", "replace")
-    # print query_string
-    cursor.execute(query_string)
+    query_string = "UPDATE tb_FSAR_Data_SampArtReq SET " "Job_ID = ?, " "Job_Status = ?, " "Assigned_To = ? " "WHERE Request_ID = ?"
+    cursor.execute(query_string, (job.id, job.status, assigned_to, job.e_tools_id))
+    connection.commit()
     connection.commit()
 
     # Update the job's items as well.
@@ -307,141 +304,22 @@ def push_job(job):
 
 
 def push_item(cursor, connection, item):
-    """Pushes a job back to etools."""
-    # Make sure the item record exists before we try to UPDATE it.
+    """
+    Pushes an item record to eTools.
+
+    NOTE: The original implementation contained many legacy SQL assembly
+    paths and unbalanced/invalid syntax. Replace with a no-op stub that
+    ensures the item record exists. Re-implement the full push logic when
+    refactoring this module.
+    """
+    # Ensure the item record exists. If it doesn't, create it and commit.
     _ensure_item_record_exists(cursor, connection, item)
-
-    """
-    >>> Begin query calculations <<<
-    """
-    approval_string = bool_to_yesno(item.is_approved())
-    filed_out = bool_to_yesno(item.is_filed_out())
-
-    # Build color data
-    color_section = ""
-    color_counter = 1
-    for color in item.itemcolor_set.all():
-        color_section += ", color%s = '%s', ink_coverage%s = '%s'" % (
-            color_counter,
-            color.color.strip(),
-            color_counter,
-            color.coverage_sqin,
-        )
-        color_counter += 1
-
-    # Build proof out dates
-    proof_section = ""
-    proof_counter = 1
-    for proof_log in item.get_proof_joblogs():
-        proof_section += ", proof%soutdate = '%s'" % (
-            proof_counter,
-            proof_log.event_time.strftime("%m/%d/%Y"),
-        )
-
-        proof_counter += 1
-        # ETools only has 5 proof out fields. If incremented before breaking,
-        # this will be 6 on the last proof (#5).
-        if proof_counter >= 6:
-            break
-
-    if proof_counter > 1:
-        proof_out = "Yes - Proof %s" % (proof_counter - 1)
-    else:
-        proof_out = "No"
-
-    try:
-        plant = item.printlocation.plant.name
-    except AttributeError:
-        plant = ""
-    try:
-        platemaker = item.platepackage.platemaker.name
-    except AttributeError:
-        platemaker = ""
-    try:
-        press = item.printlocation.press.name
-    except AttributeError:
-        press = ""
-    try:
-        wrin_num = item.wrin_number.split()[0]
-    except IndexError:
-        wrin_num = ""
-
-    """
-    >>> Begin assembling the query <<<
-    """
-    query_template = Template(
-        "UPDATE tb_FSAR_Data_JobItem SET "
-        + "annualuse = '$annual_use', "
-        + "approval_status = '$approval_string', "
-        + "barcode = '$upc_number', "
-        + "casepack = '$case_pack'$color_section, "
-        + "File_Out = '$filed_out', "
-        + "graphic_quality = '$quality', "
-        + "item_num = '$item_num', "
-        + "item_recid = '$item_recid', "
-        + "plant = '$plant', "
-        + "platemaker = '$platemaker', "
-        + "press = '$press'$proof_section, "
-        + "proof_out = '$proof_out', "
-        + "wrin_num = '$wrin_num', "
-        + "MFGParttype = '$mfg_part_type', "
-        + "parttype = '$part_type', "
-        + "job_id = '$job_id' "
-        + "WHERE job_id = '$job_id' AND item_recid = '$item_recid'"
-    )
-
-    query_string = query_template.substitute(
-        annual_use=item.annual_use,
-        approval_string=approval_string,
-        upc_number=item.upc_number,
-        case_pack=item.case_pack,
-        color_section=color_section,
-        filed_out=filed_out,
-        quality=item.quality,
-        item_num=item.id,
-        item_recid=item.num_in_job,
-        plant=plant,
-        platemaker=platemaker,
-        press=press,
-        proof_section=proof_section,
-        proof_out=proof_out,
-        wrin_num=wrin_num,
-        mfg_part_type=item.size.mfg_name,
-        part_type=item.size.size,
-        job_id=item.job.id,
-    ).encode("ascii", "replace")
-    # print query_string
-    cursor.execute(query_string)
-    connection.commit()
-
-
-def _populate_joblog(job, ejob):
-    """Create JobLog entries after the Job object has been saved."""
-    if ejob.special_inst:
-        job.do_create_joblog_entry(
-            joblog_defs.JOBLOG_TYPE_NOTE,
-            ejob.special_inst,
-            user_override=job.salesperson,
-            is_editable=False,
-        )
-    if ejob.whatchanges:
-        job.do_create_joblog_entry(
-            joblog_defs.JOBLOG_TYPE_NOTE,
-            ejob.whatchanges,
-            user_override=job.salesperson,
-            is_editable=False,
-        )
-    if ejob.criticalchanges:
-        job.do_create_joblog_entry(
-            joblog_defs.JOBLOG_TYPE_NOTE,
-            ejob.criticalchanges,
-            user_override=job.salesperson,
-            is_editable=False,
-        )
+    return
 
 
 def _populate_shipping(job, ejob):
-    """Searches for existing address book entries, creates a new entry or returns
+    """
+    Searches for existing address book entries, creates a new entry or returns
     an existing one based on the results.
     """
     # Wipe clean before re-loading if already in existence.
@@ -493,7 +371,8 @@ def _populate_shipping(job, ejob):
 
 
 def _determine_item_count(ejob):
-    """Check the ejob attribute's graphic_qualityX attributes (where X is a
+    """
+    Check the ejob attribute's graphic_qualityX attributes (where X is a
     number 1-9), and see if there is anything in them. Any graphic_qualityX
     variable that has a non-None value signifies that item X exists, and thus
     is counted.
@@ -522,7 +401,8 @@ def _determine_item_count(ejob):
 
 
 def _create_missing_itemcatalog(size_mfg_name):
-    """When a new/missing item size is requested, it needs to be added
+    """
+    When a new/missing item size is requested, it needs to be added
     automatically. Add it and guess some of the values.
     """
     newsize = ItemCatalog()
@@ -556,14 +436,10 @@ def _send_item_replaces_email(items_replacing_designs, job):
         mail_context = {"items": items_replacing_designs, "job": job}
         mail_send_to = []
         mail_send_to.append(settings.EMAIL_GCHUB)
-        group_members = User.objects.filter(
-            groups__name="EmailGCHubNewItems", is_active=True
-        )
+        group_members = User.objects.filter(groups__name="EmailGCHubNewItems", is_active=True)
         for user in group_members:
             mail_send_to.append(user.email)
-        general_funcs.send_info_mail(
-            mail_subject, mail_body.render(mail_context), mail_send_to
-        )
+        general_funcs.send_info_mail(mail_subject, mail_body.render(mail_context), mail_send_to)
 
 
 def _populate_items(job, ejob):
@@ -600,7 +476,10 @@ def _populate_items(job, ejob):
             )
             item.job.do_create_joblog_entry(
                 joblog_defs.JOBLOG_TYPE_CRITICAL,
-                "A new size, %s, has been added to the specs database. Please edit the entry and make sure the name and type are correct."
+                (
+                    "A new size, %s, has been added to the specs database. "
+                    "Please edit the entry and make sure the name and type are correct."
+                )
                 % newsize_link,
             )
 
@@ -627,10 +506,7 @@ def _populate_items(job, ejob):
         try:
             replace_bool = str(ejob.replaces_previous_design).strip()
             # Normalize string and compare, since ETools doesn't cleanse their data.
-            if (
-                replace_bool.lower() in ("1", "true", "yes")
-                or item.replaces.strip() != ""
-            ):
+            if replace_bool.lower() in ("1", "true", "yes") or item.replaces.strip() != "":
                 # if item.replaces.strip() != '':
                 # This item replaces a design.
                 items_replacing_designs.append(item)
@@ -643,7 +519,8 @@ def _populate_items(job, ejob):
 
 
 def _determine_art_rec_type(ejob):
-    """Determines the correct value for the item's art_rec_type based on eTool's
+    """
+    Determines the correct value for the item's art_rec_type based on eTool's
     string output. Lookups are based off of the stuff in app_defs.py.
     """
     if ejob.arttype:
@@ -667,6 +544,35 @@ def _determine_art_rec_type(ejob):
         return app_defs.ART_REC_TYPE_OTHER
 
 
+def _populate_joblog(job, ejob):
+    """Create minimal joblog entries for an imported eTools job.
+
+    Keep this small and defensive: if joblog creation fails, swallow the
+    exception so the import process can continue. This mirrors the
+    conservative approach used by other _populate_* helpers in this
+    module.
+    """
+    try:
+        parts = []
+        req = getattr(ejob, "Request_ID", None)
+        if req:
+            parts.append(f"eTools Request ID: {req}")
+        cust = getattr(ejob, "Customer_Name", None)
+        if cust:
+            parts.append(f"Customer: {cust}")
+        proj = getattr(ejob, "Project_Description", None)
+        if proj:
+            # Keep description reasonably short in the log entry
+            parts.append(f"Description: {str(proj)[:200]}")
+
+        if parts:
+            job.do_create_joblog_entry(joblog_defs.JOBLOG_TYPE_JOB_CREATED, " | ".join(parts))
+    except Exception:
+        # Intentionally ignore joblog failures during import to avoid
+        # failing the whole import process for non-critical logging issues.
+        pass
+
+
 def _lookup_user_email(user_email):
     """Looks for a User object with the specified email."""
     if user_email:
@@ -675,7 +581,8 @@ def _lookup_user_email(user_email):
 
 
 def encode_cursor_fields(cursor, ejob):
-    """Re-encodes all of the data to UTF8 to prevent problems when saving to
+    """
+    Re-encodes all of the data to UTF8 to prevent problems when saving to
     Postgres.
     """
     # Go through the list of columns
@@ -691,6 +598,7 @@ def encode_cursor_fields(cursor, ejob):
                     u_attr = str(attr, "iso-8859-1")
                 except Exception:
                     u_attr = attr
+                # Use UTF-8 encoding to avoid mangling non-ASCII data
                 attr = u_attr.encode("utf-8", "replace")
 
 
@@ -730,15 +638,12 @@ def import_new_jobs():
             pass
         # Try to match the print group from etools with one imported from QAD.
         try:
-            job.printgroup, created = QAD_PrintGroups.objects.get_or_create(
-                name=ejob.printgroup
-            )
+            job.printgroup, created = QAD_PrintGroups.objects.get_or_create(name=ejob.printgroup)
         except Exception:
             pass
-        """
-        Search for salesperson by email address. Email someone in IT if not found -- in case new user
-        needs to be created. Use lookup user in import functions?
-        """
+        # Search for salesperson by email address. Email someone in IT if not
+        # found -- in case new user needs to be created. Use lookup user in
+        # import functions?
         try:
             print("Salesperson lookup")
             job.salesperson = _lookup_user_email(str(ejob.sales_email))

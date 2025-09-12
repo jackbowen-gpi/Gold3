@@ -1,0 +1,91 @@
+from django import template
+
+register = template.Library()
+
+
+class IfNotEqualNode(template.Node):
+    def __init__(self, var1, var2, nodelist):
+        self.var1 = template.Variable(var1)
+        self.var2 = template.Variable(var2)
+        # nodelist may be a tuple when an else branch is present:
+        # (nodelist_true, nodelist_false)
+        if isinstance(nodelist, tuple):
+            self.nodelist_true, self.nodelist_false = nodelist
+        else:
+            self.nodelist_true = nodelist
+            self.nodelist_false = None
+
+    def render(self, context):
+        try:
+            v1 = self.var1.resolve(context)
+        except template.VariableDoesNotExist:
+            v1 = None
+        try:
+            v2 = self.var2.resolve(context)
+        except template.VariableDoesNotExist:
+            v2 = None
+        if v1 != v2:
+            return self.nodelist_true.render(context)
+        if self.nodelist_false is not None:
+            return self.nodelist_false.render(context)
+        return ""
+
+
+@register.tag(name="ifnotequal")
+def do_ifnotequal(parser, token):
+    bits = token.split_contents()
+    if len(bits) != 3:
+        raise template.TemplateSyntaxError("'ifnotequal' tag requires two arguments")
+    var1, var2 = bits[1], bits[2]
+    # Support optional else branch
+    nodelist_true = parser.parse(("else", "endifnotequal"))
+    token = parser.next_token()
+    if token.contents == "else":
+        nodelist_false = parser.parse(("endifnotequal",))
+        parser.delete_first_token()  # consume 'endifnotequal'
+        return IfNotEqualNode(var1, var2, (nodelist_true, nodelist_false))
+    # token was 'endifnotequal'
+    return IfNotEqualNode(var1, var2, nodelist_true)
+
+
+class IfEqualNode(template.Node):
+    def __init__(self, var1, var2, nodelist):
+        self.var1 = template.Variable(var1)
+        self.var2 = template.Variable(var2)
+        if isinstance(nodelist, tuple):
+            self.nodelist_true, self.nodelist_false = nodelist
+        else:
+            self.nodelist_true = nodelist
+            self.nodelist_false = None
+
+    def render(self, context):
+        try:
+            v1 = self.var1.resolve(context)
+        except template.VariableDoesNotExist:
+            v1 = None
+        try:
+            v2 = self.var2.resolve(context)
+        except template.VariableDoesNotExist:
+            v2 = None
+        if v1 == v2:
+            return self.nodelist_true.render(context)
+        if self.nodelist_false is not None:
+            return self.nodelist_false.render(context)
+        return ""
+
+
+@register.tag(name="ifequal")
+def do_ifequal(parser, token):
+    bits = token.split_contents()
+    if len(bits) != 3:
+        raise template.TemplateSyntaxError("'ifequal' tag requires two arguments")
+    var1, var2 = bits[1], bits[2]
+    # Support optional else branch
+    nodelist_true = parser.parse(("else", "endifequal"))
+    token = parser.next_token()
+    if token.contents == "else":
+        nodelist_false = parser.parse(("endifequal",))
+        parser.delete_first_token()  # consume 'endifequal'
+        return IfEqualNode(var1, var2, (nodelist_true, nodelist_false))
+    # token was 'endifequal'
+    return IfEqualNode(var1, var2, nodelist_true)

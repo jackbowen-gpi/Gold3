@@ -48,9 +48,7 @@ for product in bev_items:
     docSheet1.cell(row=row_no + 1, column=1).value = product.size
     col_no = 1
     for plant in evergreen_plants:
-        num_items = item_set.filter(
-            size=product, job__temp_printlocation__plant=plant
-        ).count()
+        num_items = item_set.filter(size=product, job__temp_printlocation__plant=plant).count()
         docSheet1.cell(row=row_no + 1, column=col_no + 1).value = num_items
         col_no += 1
     row_no += 1

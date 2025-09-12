@@ -53,15 +53,11 @@ class Migration(migrations.Migration):
                 ("comments", models.TextField(blank=True, max_length=500)),
                 (
                     "date_needed",
-                    models.DateField(
-                        blank=True, null=True, verbose_name=b"Date Needed"
-                    ),
+                    models.DateField(blank=True, null=True, verbose_name=b"Date Needed"),
                 ),
                 (
                     "creation_date",
-                    models.DateField(
-                        blank=True, null=True, verbose_name=b"Date Created"
-                    ),
+                    models.DateField(blank=True, null=True, verbose_name=b"Date Created"),
                 ),
                 ("request_complete", models.BooleanField(default=False)),
                 ("job_number", models.IntegerField(blank=True, null=True)),
@@ -89,8 +85,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="drawdownitem",
             name="print_location",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="workflow.PrintLocation"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="workflow.PrintLocation"),
         ),
     ]

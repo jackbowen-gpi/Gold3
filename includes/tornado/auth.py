@@ -14,7 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Implementations of various third-party authentication schemes.
+"""
+Implementations of various third-party authentication schemes.
 
 All the classes in this file are class Mixins designed to be used with
 web.py RequestHandler classes. The primary methods for each service are
@@ -61,7 +62,8 @@ from . import escape, httpclient
 
 
 class OpenIdMixin(object):
-    """Abstract implementation of OpenID and Attribute Exchange.
+    """
+    Abstract implementation of OpenID and Attribute Exchange.
 
     See GoogleMixin below for example implementations.
     """
@@ -69,7 +71,8 @@ class OpenIdMixin(object):
     def authenticate_redirect(
         self, callback_uri=None, ax_attrs=["name", "email", "language", "username"]
     ):
-        """Returns the authentication URL for this service.
+        """
+        Returns the authentication URL for this service.
 
         After authentication, the service will redirect back to the given
         callback URI.
@@ -84,7 +87,8 @@ class OpenIdMixin(object):
         self.redirect(self._OPENID_ENDPOINT + "?" + urllib.parse.urlencode(args))
 
     def get_authenticated_user(self, callback):
-        """Fetches the authenticated user data upon redirect.
+        """
+        Fetches the authenticated user data upon redirect.
 
         This method should be called by the handler that receives the
         redirect from the authenticate_redirect() or authorize_redirect()
@@ -207,13 +211,15 @@ class OpenIdMixin(object):
 
 
 class OAuthMixin(object):
-    """Abstract implementation of OAuth.
+    """
+    Abstract implementation of OAuth.
 
     See TwitterMixin and FriendFeedMixin below for example implementations.
     """
 
     def authorize_redirect(self, callback_uri=None):
-        """Redirects the user to obtain OAuth authorization for this service.
+        """
+        Redirects the user to obtain OAuth authorization for this service.
 
         Twitter and FriendFeed both require that you register a Callback
         URL with your application. You should call this method to log the
@@ -236,7 +242,8 @@ class OAuthMixin(object):
         )
 
     def get_authenticated_user(self, callback):
-        """Gets the OAuth authorized user and access token on callback.
+        """
+        Gets the OAuth authorized user and access token on callback.
 
         This method should be called from the handler for your registered
         OAuth Callback URL to complete the registration process. We call
@@ -327,7 +334,8 @@ class OAuthMixin(object):
         callback(user)
 
     def _oauth_request_parameters(self, url, access_token, parameters={}, method="GET"):
-        """Returns the OAuth parameters as a dict for the given request.
+        """
+        Returns the OAuth parameters as a dict for the given request.
 
         parameters should include all POST arguments and query string arguments
         that will be sent with the request.
@@ -350,7 +358,8 @@ class OAuthMixin(object):
 
 
 class TwitterMixin(OAuthMixin):
-    """Twitter OAuth authentication.
+    """
+    Twitter OAuth authentication.
 
     To authenticate with Twitter, register your application with
     Twitter at http://twitter.com/apps. Then copy your Consumer Key and
@@ -393,7 +402,8 @@ class TwitterMixin(OAuthMixin):
     _OAUTH_NO_CALLBACKS = True
 
     def authenticate_redirect(self):
-        """Just like authorize_redirect(), but auto-redirects if authorized.
+        """
+        Just like authorize_redirect(), but auto-redirects if authorized.
 
         This is generally the right interface to use if you are using
         Twitter for single-sign on.
@@ -409,7 +419,8 @@ class TwitterMixin(OAuthMixin):
     def twitter_request(
         self, path, callback, access_token=None, post_args=None, **args
     ):
-        """Fetches the given API path, e.g., "/statuses/user_timeline/btaylor"
+        """
+        Fetches the given API path, e.g., "/statuses/user_timeline/btaylor"
 
         The path should not include the format (we automatically append
         ".json" and parse the JSON output).
@@ -503,7 +514,8 @@ class TwitterMixin(OAuthMixin):
 
 
 class FriendFeedMixin(OAuthMixin):
-    """FriendFeed OAuth authentication.
+    """
+    FriendFeed OAuth authentication.
 
     To authenticate with FriendFeed, register your application with
     FriendFeed at http://friendfeed.com/api/applications. Then
@@ -546,7 +558,8 @@ class FriendFeedMixin(OAuthMixin):
     def friendfeed_request(
         self, path, callback, access_token=None, post_args=None, **args
     ):
-        """Fetches the given relative API path, e.g., "/bret/friends"
+        """
+        Fetches the given relative API path, e.g., "/bret/friends"
 
         If the request is a POST, post_args should be provided. Query
         string arguments should be given as keyword arguments.
@@ -638,7 +651,8 @@ class FriendFeedMixin(OAuthMixin):
 
 
 class GoogleMixin(OpenIdMixin, OAuthMixin):
-    """Google Open ID / OAuth authentication.
+    """
+    Google Open ID / OAuth authentication.
 
     No application registration is necessary to use Google for authentication
     or to access Google resources on behalf of a user. To authenticate with
@@ -672,7 +686,8 @@ class GoogleMixin(OpenIdMixin, OAuthMixin):
         callback_uri=None,
         ax_attrs=["name", "email", "language", "username"],
     ):
-        """Authenticates and authorizes for the given Google resource.
+        """
+        Authenticates and authorizes for the given Google resource.
 
         Some of the available resources are:
 
@@ -724,7 +739,8 @@ class GoogleMixin(OpenIdMixin, OAuthMixin):
 
 
 class FacebookMixin(object):
-    """Facebook Connect authentication.
+    """
+    Facebook Connect authentication.
 
     To authenticate with Facebook, register your application with
     Facebook at http://www.facebook.com/developers/apps.php. Then
@@ -786,7 +802,8 @@ class FacebookMixin(object):
     def authorize_redirect(
         self, extended_permissions, callback_uri=None, cancel_uri=None
     ):
-        """Redirects to an authorization request for the given FB resource.
+        """
+        Redirects to an authorization request for the given FB resource.
 
         The available resource names are listed at
         http://wiki.developers.facebook.com/index.php/Extended_permission.
@@ -805,7 +822,8 @@ class FacebookMixin(object):
         self.authenticate_redirect(callback_uri, cancel_uri, extended_permissions)
 
     def get_authenticated_user(self, callback):
-        """Fetches the authenticated Facebook user.
+        """
+        Fetches the authenticated Facebook user.
 
         The authenticated user includes the special Facebook attributes
         'session_key' and 'facebook_uid' in addition to the standard
@@ -823,7 +841,8 @@ class FacebookMixin(object):
         )
 
     def facebook_request(self, method, callback, **args):
-        """Makes a Facebook API REST request.
+        """
+        Makes a Facebook API REST request.
 
         We automatically include the Facebook API key and signature, but
         it is the callers responsibility to include 'session_key' and any
@@ -914,7 +933,8 @@ class FacebookMixin(object):
 
 
 def _oauth_signature(consumer_token, method, url, parameters={}, token=None):
-    """Calculates the HMAC-SHA1 OAuth signature for the given request.
+    """
+    Calculates the HMAC-SHA1 OAuth signature for the given request.
 
     See http://oauth.net/core/1.0/#signing_process
     """

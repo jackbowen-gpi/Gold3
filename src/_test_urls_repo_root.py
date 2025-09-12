@@ -1,4 +1,5 @@
-"""Repo-root minimal URLConf kept for reference but renamed to avoid
+"""
+Repo-root minimal URLConf kept for reference but renamed to avoid
 conflicts with package-level `gchub_db.test_urls` during unittest discovery.
 """
 

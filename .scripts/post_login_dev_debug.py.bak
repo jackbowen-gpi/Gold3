@@ -1,0 +1,20 @@
+import requests
+import os
+import datetime
+
+url = "http://127.0.0.1:8000/accounts/login/"
+username = os.environ.get("DEV_ADMIN_USER", "dev_admin")
+password = os.environ.get("DEV_ADMIN_PASSWORD", "devpass")
+with requests.Session() as s:
+    r = s.get(url)
+    csrf = s.cookies.get("csrftoken") or None
+    data = {"username": username, "password": password}
+    if csrf:
+        data["csrfmiddlewaretoken"] = csrf
+    r2 = s.post(url, data=data, allow_redirects=False)
+    print("ts", datetime.datetime.now().isoformat())
+    print("post status", r2.status_code)
+    print("headers:", dict(r2.headers))
+    print("response body (first 12000 chars):")
+    print(r2.text[:12000])
+    print("sessionid in cookies after post:", s.cookies.get("sessionid"))

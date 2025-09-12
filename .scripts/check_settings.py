@@ -1,3 +1,7 @@
+r"""
+Module .scripts\check_settings.py
+"""
+
 import os
 import sys
 

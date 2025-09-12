@@ -51,9 +51,7 @@ def generate_monthly_billing_report_xlsx(month, year):
     workflow = "Foodservice"
 
     # Get billable charge qset for workflow.
-    billable_charges = billing_funcs.get_billable_data(year_num, month_num, workflow)[
-        "charges"
-    ]
+    billable_charges = billing_funcs.get_billable_data(year_num, month_num, workflow)["charges"]
     # Use this qset if the charges have already been marked as invoiced, and the
     # spreadsheet needs to be recreated.
     # billable_charges = billing_funcs.get_invoiced_data(year_num, month_num, workflow)['charges']
@@ -142,13 +140,11 @@ def generate_monthly_billing_report_xlsx(month, year):
                 item__printlocation__press__name="FSB",
             )
         elif plant == "Avante-QAD":
-            charge_set = billable_charges.filter(
+            charge_set = billable_charges.filter(item__job__name__startswith="Letica - QAD/Avante")
+        else:
+            charge_set = billable_charges.filter(item__printlocation__plant__name=plant).exclude(
                 item__job__name__startswith="Letica - QAD/Avante"
             )
-        else:
-            charge_set = billable_charges.filter(
-                item__printlocation__plant__name=plant
-            ).exclude(item__job__name__startswith="Letica - QAD/Avante")
 
         if len(charge_set) == 0:
             continue
@@ -181,36 +177,24 @@ def generate_monthly_billing_report_xlsx(month, year):
         for i in range(len(charge_set)):
             # Increment rows, write charge data.
             # docSheet1.write(row, column, value)creation_date
-            docSheet1.cell(row=i + 2, column=1).value = charge_set[
-                i
-            ].creation_date.strftime("%m/%d/%y")
+            docSheet1.cell(row=i + 2, column=1).value = charge_set[i].creation_date.strftime("%m/%d/%y")
             try:
-                docSheet1.cell(row=i + 2, column=2).value = str(
-                    charge_set[i].item.job.salesperson.username
-                )
+                docSheet1.cell(row=i + 2, column=2).value = str(charge_set[i].item.job.salesperson.username)
             except Exception:
                 pass
             docSheet1.cell(row=i + 2, column=3).value = str(charge_set[i].item.job.id)
-            docSheet1.cell(row=i + 2, column=4).value = str(
-                charge_set[i].item.job.name.encode("utf8", "replace")
-            )
+            docSheet1.cell(row=i + 2, column=4).value = str(charge_set[i].item.job.name.encode("utf8", "replace"))
             docSheet1.cell(row=i + 2, column=5).value = str(charge_set[i].item.size)
 
-            docSheet1.cell(row=i + 2, column=6).value = (
-                charge_set[i].item.final_file_date().strftime("%m/%d/%y")
-            )
+            docSheet1.cell(row=i + 2, column=6).value = charge_set[i].item.final_file_date().strftime("%m/%d/%y")
             docSheet1.cell(row=i + 2, column=7).value = str(charge_set[i].description)
             docSheet1.cell(row=i + 2, column=8).value = str(charge_set[i].rush_days)
             try:
-                docSheet1.cell(row=i + 2, column=9).value = str(
-                    charge_set[i].item.printlocation.plant.name
-                )
+                docSheet1.cell(row=i + 2, column=9).value = str(charge_set[i].item.printlocation.plant.name)
             except AttributeError:
                 docSheet1.cell(row=i + 2, column=9).value = "----"
             try:
-                docSheet1.cell(row=i + 2, column=10).value = str(
-                    charge_set[i].item.printlocation.press.name
-                )
+                docSheet1.cell(row=i + 2, column=10).value = str(charge_set[i].item.printlocation.press.name)
             except AttributeError:
                 docSheet1.cell(row=i + 2, column=10).value = "----"
             docSheet1.cell(row=i + 2, column=11).value = charge_set[i].amount
@@ -308,9 +292,7 @@ def get_invoiced_data(year_num, month_num, workflow, plates=False):
         )
 
     if not plates:
-        invoiced_charges = invoiced_charges.exclude(
-            description__type__in=("Plates", "Films")
-        )
+        invoiced_charges = invoiced_charges.exclude(description__type__in=("Plates", "Films"))
 
     # Set invoiced charges to 0 if there are none, rather than returning None
     if invoiced_charges:
@@ -338,9 +320,7 @@ def get_billable_timeframe(startDate, endDate, workflow, plant=None, plates=Fals
 
         #                            year               month                day
         fsb_cycle_end = date(int(dateEndArr[2]), int(dateEndArr[0]), int(dateEndArr[1]))
-        fsb_cycle_start = date(
-            int(dateStartArr[2]), int(dateStartArr[0]), int(dateStartArr[1])
-        )
+        fsb_cycle_start = date(int(dateStartArr[2]), int(dateStartArr[0]), int(dateStartArr[1]))
         # Charges for items with file out during month (charges to invoice at end of month)
         # Returns items with a File Out action between the specificed date range.
         """
@@ -438,9 +418,7 @@ def get_billable_timeframe(startDate, endDate, workflow, plant=None, plates=Fals
             )
         )
         if not plates:
-            billable_charges = billable_charges.exclude(
-                description__type__in=("Plates", "Films")
-            )
+            billable_charges = billable_charges.exclude(description__type__in=("Plates", "Films"))
 
         # Total of all charges unbillable that were applied in the last 90 days.
         bev_potential_start = bev_cycle_end + timedelta(days=-90)
@@ -491,9 +469,7 @@ def get_billable_timeframe(startDate, endDate, workflow, plant=None, plates=Fals
     if billable_charges:
         # Filter further if a plant name is passed.
         if plant:
-            billable_charges = billable_charges.filter(
-                item__printlocation__plant__name=plant
-            )
+            billable_charges = billable_charges.filter(item__printlocation__plant__name=plant)
         billable_total = billable_charges.aggregate(total=Sum("amount"))["total"]
     else:
         billable_total = 0
@@ -602,9 +578,7 @@ def get_billable_data(year_num, month_num, workflow, plant=None, plates=False):
             )
         )
         if not plates:
-            billable_charges = billable_charges.exclude(
-                description__type__in=("Plates", "Films")
-            )
+            billable_charges = billable_charges.exclude(description__type__in=("Plates", "Films"))
 
         # Total of all charges unbillable that were applied in the last 90 days.
         bev_potential_start = bev_cycle_end + timedelta(days=-90)
@@ -655,9 +629,7 @@ def get_billable_data(year_num, month_num, workflow, plant=None, plates=False):
     if billable_charges:
         # Filter further if a plant name is passed.
         if plant:
-            billable_charges = billable_charges.filter(
-                item__printlocation__plant__name=plant
-            )
+            billable_charges = billable_charges.filter(item__printlocation__plant__name=plant)
         billable_total = billable_charges.aggregate(total=Sum("amount"))["total"]
     else:
         billable_total = 0
@@ -670,7 +642,8 @@ def get_billable_data(year_num, month_num, workflow, plant=None, plates=False):
 
 
 def get_billing_activity(year_num, month_num, workflow):
-    """Return a total of billing activity (charges billed during this month.)
+    """
+    Return a total of billing activity (charges billed during this month.)
     This is a measure of workload, not invoicable amounts.
     """
     monthly_charges = Charge.objects.filter(
@@ -680,15 +653,11 @@ def get_billing_activity(year_num, month_num, workflow):
     ).exclude(description__type__in=("Plates", "Films"))
 
     if workflow == "Beverage":
-        monthly_charges = monthly_charges.filter(
-            item__job__prepress_supplier__in=("OPT", "Optihue")
-        )
+        monthly_charges = monthly_charges.filter(item__job__prepress_supplier__in=("OPT", "Optihue"))
 
     billing_activity = {}
     if monthly_charges:
-        billing_activity["total"] = monthly_charges.aggregate(total=Sum("amount"))[
-            "total"
-        ]
+        billing_activity["total"] = monthly_charges.aggregate(total=Sum("amount"))["total"]
         billing_activity["charges"] = monthly_charges
     else:
         billing_activity["total"] = 0
@@ -704,7 +673,8 @@ def monthly_report(
     activity=True,
     budget=True,
 ):
-    """Returns dictionary of budget reporting information for given month and year.
+    """
+    Returns dictionary of budget reporting information for given month and year.
     In order to facilitate speedier reports, make each portion of the monthly
     optional by assigning True/False to each category. This should greatly reduce
     the number of queries per call.
@@ -717,12 +687,8 @@ def monthly_report(
 
     if invoiced:
         # Get amount invoiced for the month for each workflow.
-        fsb_monthly_invoiced = get_invoiced_data(year_num, month_num, "Foodservice")[
-            "total"
-        ]
-        bev_monthly_invoiced = get_invoiced_data(year_num, month_num, "Beverage")[
-            "total"
-        ]
+        fsb_monthly_invoiced = get_invoiced_data(year_num, month_num, "Foodservice")["total"]
+        bev_monthly_invoiced = get_invoiced_data(year_num, month_num, "Beverage")["total"]
         # con_monthly_invoiced = get_invoiced_data(year_num, month_num, "Container")['total']
         # Total of 3 workflows.
         hub_monthly_invoiced = fsb_monthly_invoiced + bev_monthly_invoiced
@@ -761,9 +727,7 @@ def monthly_report(
         # Retrieve billing activity for month by workflow.
         fsb_activity = get_billing_activity(year_num, month_num, "Foodservice")
         fsb_monthly_billing = fsb_activity["total"]
-        bev_monthly_billing = get_billing_activity(year_num, month_num, "Beverage")[
-            "total"
-        ]
+        bev_monthly_billing = get_billing_activity(year_num, month_num, "Beverage")["total"]
         # con_monthly_billing = get_billing_activity(year_num, month_num, "Container")['total']
         # Total of 3 workflows.
         hub_monthly_billing = fsb_monthly_billing + bev_monthly_billing
@@ -775,17 +739,13 @@ def monthly_report(
     if budget:
         # Get budgets for month by workflow.
         try:
-            fsb_monthly_budget_grab = Budget.objects.get(
-                year=year_num, workflow__name="Foodservice"
-            )
+            fsb_monthly_budget_grab = Budget.objects.get(year=year_num, workflow__name="Foodservice")
             fsb_monthly_budget = getattr(fsb_monthly_budget_grab, monthname)
         except Budget.DoesNotExist:
             fsb_monthly_budget = 0
 
         try:
-            bev_monthly_budget_grab = Budget.objects.get(
-                year=year_num, workflow__name="Beverage"
-            )
+            bev_monthly_budget_grab = Budget.objects.get(year=year_num, workflow__name="Beverage")
             bev_monthly_budget = getattr(bev_monthly_budget_grab, monthname)
         except Budget.DoesNotExist:
             bev_monthly_budget = 0
@@ -803,16 +763,12 @@ def monthly_report(
         if type == "monthly":
             # Calculate budget progress as a percentage.
             if fsb_monthly_budget > 0:
-                fsb_budget_prog = (
-                    (fsb_monthly_invoiced + fsb_billable_total) / fsb_monthly_budget
-                ) * 100
+                fsb_budget_prog = ((fsb_monthly_invoiced + fsb_billable_total) / fsb_monthly_budget) * 100
             else:
                 fsb_budget_prog = 0
 
             if bev_monthly_budget > 0:
-                bev_budget_prog = (
-                    (bev_monthly_invoiced + bev_billable_total) / bev_monthly_budget
-                ) * 100
+                bev_budget_prog = ((bev_monthly_invoiced + bev_billable_total) / bev_monthly_budget) * 100
             else:
                 bev_budget_prog = 0
 
@@ -824,9 +780,7 @@ def monthly_report(
             """
 
             if hub_monthly_budget > 0:
-                hub_budget_prog = (
-                    (hub_monthly_invoiced + hub_billable_total) / hub_monthly_budget
-                ) * 100
+                hub_budget_prog = ((hub_monthly_invoiced + hub_billable_total) / hub_monthly_budget) * 100
             else:
                 hub_budget_prog = 0
         else:

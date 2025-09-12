@@ -12,9 +12,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="sbo",
             name="behavior_type",
-            field=models.CharField(
-                choices=[("at_risk", "At Risk"), ("safe", "Safe")], max_length=7
-            ),
+            field=models.CharField(choices=[("at_risk", "At Risk"), ("safe", "Safe")], max_length=7),
         ),
         migrations.AlterField(
             model_name="sbo",

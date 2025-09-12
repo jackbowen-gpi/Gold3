@@ -12,9 +12,7 @@ from gchub_db.apps.xml_io.jdf_reader import JDFReader
 
 root_path = os.path.join(settings.MAIN_PATH, "apps", "xml_io", "tests", "jdfs")
 
-jdf_list = next(
-    os.walk(os.path.join(settings.MAIN_PATH, "apps", "xml_io", "tests", "jdfs"))
-)[2]
+jdf_list = next(os.walk(os.path.join(settings.MAIN_PATH, "apps", "xml_io", "tests", "jdfs")))[2]
 jdf_list = [jdf for jdf in jdf_list if jdf not in [".DS_Store"]]
 
 for jdf in jdf_list:

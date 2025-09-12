@@ -1,3 +1,7 @@
+"""
+Module gchub_db\apps\\joblog\\models.py
+"""
+
 from datetime import date, timedelta
 
 from django.conf import settings
@@ -37,9 +41,7 @@ from gchub_db.middleware import threadlocals
 class JobLog(models.Model):
     """Represents a logged event for a job."""
 
-    job = models.ForeignKey(
-        "workflow.Job", on_delete=models.CASCADE, related_name="job_set"
-    )
+    job = models.ForeignKey("workflow.Job", on_delete=models.CASCADE, related_name="job_set")
     item = models.ForeignKey(
         "workflow.Item",
         on_delete=models.CASCADE,
@@ -47,25 +49,22 @@ class JobLog(models.Model):
         blank=True,
         null=True,
     )
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True, blank=True, editable=False
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, editable=False)
     type = models.IntegerField(choices=JOBLOG_TYPES)
     log_text = models.TextField()
     is_editable = models.BooleanField(default=True)
     event_time = models.DateTimeField("Date", auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        """Ensure event_time is timezone-aware to avoid runtime warnings when
+        """
+        Ensure event_time is timezone-aware to avoid runtime warnings when
         tests or seed data provide naive datetimes.
         """
         try:
             from django.utils import timezone
 
             if self.event_time and timezone.is_naive(self.event_time):
-                self.event_time = timezone.make_aware(
-                    self.event_time, timezone.get_current_timezone()
-                )
+                self.event_time = timezone.make_aware(self.event_time, timezone.get_current_timezone())
         except Exception:
             # best-effort: if timezone helpers not available, ignore
             pass
@@ -80,9 +79,7 @@ class JobLog(models.Model):
         retval = "page_white.png"
         if self.type == JOBLOG_TYPE_JOB_SAVED or self.type == JOBLOG_TYPE_ITEM_SAVED:
             retval = "disk.png"
-        elif (
-            self.type == JOBLOG_TYPE_JOB_CREATED or self.type == JOBLOG_TYPE_ITEM_ADDED
-        ):
+        elif self.type == JOBLOG_TYPE_JOB_CREATED or self.type == JOBLOG_TYPE_ITEM_ADDED:
             retval = "add.png"
         elif self.type == JOBLOG_TYPE_ITEM_DELETED:
             retval = "delete.png"
@@ -96,11 +93,7 @@ class JobLog(models.Model):
             retval = "comments.png"
         elif self.type == JOBLOG_TYPE_JDF:
             retval = "lightning_go.png"
-        elif (
-            self.type == JOBLOG_TYPE_JDF_ERROR
-            or self.type == JOBLOG_TYPE_ERROR
-            or self.type == JOBLOG_TYPE_ITEM_REJECTED
-        ):
+        elif self.type == JOBLOG_TYPE_JDF_ERROR or self.type == JOBLOG_TYPE_ERROR or self.type == JOBLOG_TYPE_ITEM_REJECTED:
             retval = "error.png"
         elif self.type == JOBLOG_TYPE_ITEM_REVISION:
             retval = "note_edit.png"
@@ -129,7 +122,8 @@ class JobLog(models.Model):
         return "%s (%s)" % (self.job.name, self.get_type_display())
 
     def is_log_text_truncated(self, truncate_words=200):
-        """Checks the log text to see if it would be truncated, given a limit
+        """
+        Checks the log text to see if it would be truncated, given a limit
         of truncate_words words.
         """
         split_comment = self.log_text.split()
@@ -143,10 +137,7 @@ class JobLog(models.Model):
         today = date.today()
         cutoff_date = today + timedelta(days=-30)
 
-        if (
-            cutoff_date < self.event_time.date()
-            and threadlocals.get_current_user() == self.user
-        ):
+        if cutoff_date < self.event_time.date() and threadlocals.get_current_user() == self.user:
             return True
         else:
             return False

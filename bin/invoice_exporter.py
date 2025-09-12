@@ -61,17 +61,11 @@ for plant in plant_list:
     for i in range(len(plant_invoices)):
         # docSheet1.write(row, column, value)
         docSheet1.cell(row=i + 2, column=1).value = str(plant_invoices[i].item.job)
-        docSheet1.cell(row=i + 2, column=2).value = (
-            str(plant_invoices[i].item.num_in_job)
-            + "-  "
-            + str(invoice_items[i].item.size)
-        )
+        docSheet1.cell(row=i + 2, column=2).value = str(plant_invoices[i].item.num_in_job) + "-  " + str(invoice_items[i].item.size)
         docSheet1.cell(row=i + 2, column=3).value = str(plant_invoices[i].description)
         docSheet1.cell(row=i + 2, column=4).value = plant_invoices[i].amount
         docSheet1.cell(row=i + 2, column=5).value = plant_invoices[i].creation_date
-        docSheet1.cell(row=i + 2, column=6).value = str(
-            plant_invoices[i].item.job.salesperson
-        )
+        docSheet1.cell(row=i + 2, column=6).value = str(plant_invoices[i].item.job.salesperson)
 
 # Save XLS document
 workBookDocument.save("invoicetest.xls")

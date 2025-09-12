@@ -1,0 +1,133 @@
+PYTHON: C:\Dev\Gold3\.venv\Scripts\python.exe
+ROOT: C:\Dev\Gold3
+DJANGO_SETTINGS_MODULE= gchub_db.test_settings
+Django version: 5.2.6
+django.setup() succeeded
+
+Scanning apps in C:\Dev\Gold3\gchub_db\apps
+
+---- APP: accounts ----
+OK import gchub_db.apps.accounts.urls
+OK import gchub_db.apps.accounts.models
+
+---- APP: address ----
+OK import gchub_db.apps.address.urls
+OK import gchub_db.apps.address.models
+
+---- APP: admin_log ----
+ERROR importing gchub_db.apps.admin_log.urls
+OK import gchub_db.apps.admin_log.models
+
+---- APP: archives ----
+OK import gchub_db.apps.archives.urls
+OK import gchub_db.apps.archives.models
+
+---- APP: art_req ----
+ERROR importing gchub_db.apps.art_req.urls
+OK import gchub_db.apps.art_req.models
+
+---- APP: auto_corrugated ----
+OK import gchub_db.apps.auto_corrugated.urls
+OK import gchub_db.apps.auto_corrugated.models
+
+---- APP: auto_ftp ----
+ERROR importing gchub_db.apps.auto_ftp.urls
+OK import gchub_db.apps.auto_ftp.models
+
+---- APP: bev_billing ----
+OK import gchub_db.apps.bev_billing.urls
+OK import gchub_db.apps.bev_billing.models
+
+---- APP: budget ----
+OK import gchub_db.apps.budget.urls
+OK import gchub_db.apps.budget.models
+
+---- APP: calendar ----
+OK import gchub_db.apps.calendar.urls
+OK import gchub_db.apps.calendar.models
+
+---- APP: carton_billing ----
+OK import gchub_db.apps.carton_billing.urls
+OK import gchub_db.apps.carton_billing.models
+
+---- APP: catscanner ----
+OK import gchub_db.apps.catscanner.urls
+ERROR importing gchub_db.apps.catscanner.models
+
+---- APP: color_mgt ----
+OK import gchub_db.apps.color_mgt.urls
+OK import gchub_db.apps.color_mgt.models
+
+---- APP: django_su ----
+OK import gchub_db.apps.django_su.urls
+OK import gchub_db.apps.django_su.models
+
+---- APP: draw_down ----
+OK import gchub_db.apps.draw_down.urls
+OK import gchub_db.apps.draw_down.models
+
+---- APP: error_tracking ----
+OK import gchub_db.apps.error_tracking.urls
+OK import gchub_db.apps.error_tracking.models
+
+---- APP: fedexsys ----
+OK import gchub_db.apps.fedexsys.urls
+OK import gchub_db.apps.fedexsys.models
+
+---- APP: item_catalog ----
+OK import gchub_db.apps.item_catalog.urls
+OK import gchub_db.apps.item_catalog.models
+
+---- APP: joblog ----
+OK import gchub_db.apps.joblog.urls
+OK import gchub_db.apps.joblog.models
+
+---- APP: legacy_support ----
+ERROR importing gchub_db.apps.legacy_support.urls
+ERROR importing gchub_db.apps.legacy_support.models
+
+---- APP: manager_tools ----
+OK import gchub_db.apps.manager_tools.urls
+ERROR importing gchub_db.apps.manager_tools.models
+
+---- APP: news ----
+OK import gchub_db.apps.news.urls
+OK import gchub_db.apps.news.models
+
+---- APP: qad_data ----
+OK import gchub_db.apps.qad_data.urls
+OK import gchub_db.apps.qad_data.models
+
+---- APP: qc ----
+OK import gchub_db.apps.qc.urls
+OK import gchub_db.apps.qc.models
+
+---- APP: queues ----
+ERROR importing gchub_db.apps.queues.urls
+OK import gchub_db.apps.queues.models
+
+---- APP: sbo ----
+OK import gchub_db.apps.sbo.urls
+OK import gchub_db.apps.sbo.models
+
+---- APP: software ----
+ERROR importing gchub_db.apps.software.urls
+OK import gchub_db.apps.software.models
+
+---- APP: timesheet ----
+OK import gchub_db.apps.timesheet.urls
+OK import gchub_db.apps.timesheet.models
+
+---- APP: video_player ----
+OK import gchub_db.apps.video_player.urls
+ERROR importing gchub_db.apps.video_player.models
+
+---- APP: workflow ----
+ERROR importing gchub_db.apps.workflow.urls
+OK import gchub_db.apps.workflow.models
+
+---- APP: xml_io ----
+OK import gchub_db.apps.xml_io.urls
+ERROR importing gchub_db.apps.xml_io.models
+
+Diagnostic complete

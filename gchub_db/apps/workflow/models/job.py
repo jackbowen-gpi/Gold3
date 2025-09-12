@@ -1,3 +1,7 @@
+"""
+Module gchub_db\apps\\workflow\\models\\job.py
+"""
+
 import datetime as _dt
 import os
 from datetime import date, timedelta
@@ -45,6 +49,7 @@ from gchub_db.apps.workflow.models.general import (
     Revision,
     SalesServiceRep,
 )
+from gchub_db.apps.workflow.models.item import Item
 from gchub_db.includes import fs_api, general_funcs
 from gchub_db.middleware import threadlocals
 
@@ -53,7 +58,8 @@ if TYPE_CHECKING:
 
 
 class Job(models.Model):
-    """The main unit of workflow, represents an individual job with associated
+    """
+    The main unit of workflow, represents an individual job with associated
     items.
     """
 
@@ -104,9 +110,7 @@ class Job(models.Model):
         verbose_name="Sales Rep.",
     )
     business_type = models.CharField(max_length=50, blank=True, choices=BUSINESS_TYPES)
-    prepress_supplier = models.CharField(
-        "Prepress Sup.", max_length=50, blank=True, choices=PREPRESS_SUPPLIERS
-    )
+    prepress_supplier = models.CharField("Prepress Sup.", max_length=50, blank=True, choices=PREPRESS_SUPPLIERS)
     archive_disc = models.CharField(max_length=12, blank=True)
     last_modified = models.DateTimeField("Date Last Modified", auto_now=True)
     last_modified_by = models.ForeignKey(
@@ -126,12 +130,8 @@ class Job(models.Model):
     customer_po_number = models.CharField("Customer PO#", max_length=100, blank=True)
     # The following 2 fields are used so that items in Beverage/Container
     # can inherit the settings from the job.
-    temp_printlocation = models.ForeignKey(
-        PrintLocation, on_delete=models.CASCADE, blank=True, null=True
-    )
-    temp_platepackage = models.ForeignKey(
-        PlatePackage, on_delete=models.CASCADE, blank=True, null=True
-    )
+    temp_printlocation = models.ForeignKey(PrintLocation, on_delete=models.CASCADE, blank=True, null=True)
+    temp_platepackage = models.ForeignKey(PlatePackage, on_delete=models.CASCADE, blank=True, null=True)
     # This is only used for importing. If the value is yes, charges should be
     # marked as invoiced.
     temp_invoiced = models.CharField(max_length=50, blank=True)
@@ -152,18 +152,10 @@ class Job(models.Model):
     # Temp. PO number for Evergreen's Olmsted Falls plant until they get
     # setup on SAP and use the normal PO numbers...
     olmsted_po_number = models.CharField(max_length=100, blank=True, verbose_name="PO#")
-    purchase_request_number = models.CharField(
-        max_length=100, blank=True, verbose_name="EVG Purchase Request Number"
-    )
-    use_new_bev_nomenclature = models.BooleanField(
-        default=True, verbose_name="New Nomenclature"
-    )
-    todo_list_mode = models.IntegerField(
-        choices=TODO_LIST_MODE_TYPES, default=TODO_LIST_MODE_DEFAULT
-    )
-    printgroup = models.ForeignKey(
-        QAD_PrintGroups, on_delete=models.CASCADE, blank=True, null=True
-    )
+    purchase_request_number = models.CharField(max_length=100, blank=True, verbose_name="EVG Purchase Request Number")
+    use_new_bev_nomenclature = models.BooleanField(default=True, verbose_name="New Nomenclature")
+    todo_list_mode = models.IntegerField(choices=TODO_LIST_MODE_TYPES, default=TODO_LIST_MODE_DEFAULT)
+    printgroup = models.ForeignKey(QAD_PrintGroups, on_delete=models.CASCADE, blank=True, null=True)
     user_keywords = models.CharField(max_length=500, blank=True)
     generated_keywords = models.TextField(max_length=20000, blank=True)
 
@@ -200,7 +192,8 @@ class Job(models.Model):
             return str(self.id) + " " + self.name
 
     def delete(self, using=None, keep_parents=False):
-        """Deleting Job objects causes a chain of deletions for all objects
+        """
+        Deleting Job objects causes a chain of deletions for all objects
         with Foreignkey fields pointing to Job. This results in a lot of data
         loss. Set an is_deleted flag on the Job instead and filter out all
         "deleted" Job objects as needed.
@@ -210,7 +203,8 @@ class Job(models.Model):
         return super(Job, self).save()
 
     def delete_folder(self):
-        """Deletes the job's folder and everything in it.
+        """
+        Deletes the job's folder and everything in it.
 
         WARNING: Deletions are un-recoverable, be careful with this!
         """
@@ -224,7 +218,8 @@ class Job(models.Model):
             print("! Error removing job folder.")
 
     def delete_carton_items_subfolders(self):
-        """Carton items have specific supfolders that need to be deleted in certain
+        """
+        Carton items have specific supfolders that need to be deleted in certain
         cases. Usually when the job has been archived.
 
         WARNING: Deletions are un-recoverable, be careful with this!
@@ -245,7 +240,8 @@ class Job(models.Model):
         fs_api.unlock_job_folder(self.id)
 
     def reset_folder(self):
-        """Tell the file server to reset the permissions of everything in the job
+        """
+        Tell the file server to reset the permissions of everything in the job
         folder.
         """
         print("Resetting the job folder permissions for %s" % self.id)
@@ -253,9 +249,7 @@ class Job(models.Model):
         try:
             # Set up the path to the hotfolder.
             hotfolder = "gold_scripts/jobfolder_permissions/"
-            path_to_hotfolder = os.path.join(
-                settings.PRODUCTION_DIR, hotfolder, str(self.id).zfill(5) + ".txt"
-            )
+            path_to_hotfolder = os.path.join(settings.PRODUCTION_DIR, hotfolder, str(self.id).zfill(5) + ".txt")
             # Write a text file to the hotfolder with the symlink path.
             file = open(path_to_hotfolder, "w+")
             file.write(str(self.id).zfill(5))
@@ -277,7 +271,8 @@ class Job(models.Model):
             return False
 
     def sales_initials(self):
-        """Return the initials of the analyst for a Beverage job
+        """
+        Return the initials of the analyst for a Beverage job
         for display in the todo list.
         """
         try:
@@ -295,20 +290,9 @@ class Job(models.Model):
         # Re-encode the job names to replace strange characters with a '?' so
         # they'll still display on the todo list.
         if self.workflow.name == "Beverage":
-            jobname = (
-                str(self.id)
-                + " "
-                + self.name.encode("ascii", "replace").decode("ISO-8859-1")
-                + " ["
-                + self.brand_name
-                + "]"
-            )
+            jobname = str(self.id) + " " + self.name.encode("ascii", "replace").decode("ISO-8859-1") + " [" + self.brand_name + "]"
         else:
-            jobname = (
-                str(self.id)
-                + " "
-                + self.name.encode("ascii", "replace").decode("ISO-8859-1")
-            )
+            jobname = str(self.id) + " " + self.name.encode("ascii", "replace").decode("ISO-8859-1")
         # Begin HTML work.
         if str(jobname).endswith(" KD"):
             html = '<a href="/workflow/job/%s/" class="kd_todo">' % str(self.id)
@@ -326,9 +310,10 @@ class Job(models.Model):
                     str(self.id),
                     self.workflow.name.lower(),
                 )
-        html += (
-            '<img src="%s" width="10px" height="10px" style="vertical-align: text-center" alt="%s" /> %s </a>'
-            % (self.get_icon_url(), str(self.workflow.id), jobname)
+        html += '<img src="%s" width="10px" height="10px" style="vertical-align: text-center" alt="%s" /> %s </a>' % (
+            self.get_icon_url(),
+            str(self.workflow.id),
+            jobname,
         )
         html += '(%s) - <span class="smtext">(%s)' % (self.items_in_job(), self.artist)
 
@@ -343,12 +328,8 @@ class Job(models.Model):
                     job_complexity = JobComplexity.objects.get(job=self)
 
                     # Use the get_item_average_hours() function to calculate average.
-                    artist_averages = get_item_average_hours(
-                        job_complexity.category, self.type, self.artist
-                    )
-                    all_artists_averages = get_item_average_hours(
-                        job_complexity.category, self.type
-                    )
+                    artist_averages = get_item_average_hours(job_complexity.category, self.type, self.artist)
+                    all_artists_averages = get_item_average_hours(job_complexity.category, self.type)
                     # Count the items
                     items = Item.objects.filter(job=self)
                     # get_item_average_hours() returns averages for each complexity.
@@ -374,7 +355,8 @@ class Job(models.Model):
         return html
 
     def avg_fileout_time(self):
-        """Returns and average of how long it should take an artist to final file
+        """
+        Returns and average of how long it should take an artist to final file
         a job. This is just how long we estimate it takes to final file an item
         times the number of items in the job. Used in the to-do list manager
         view.
@@ -383,9 +365,7 @@ class Job(models.Model):
         estimated_time = 0.5
 
         # Only count items with nine digit numbers.
-        num_of_items = Item.objects.filter(
-            job=self, fsb_nine_digit__isnull=False
-        ).count()
+        num_of_items = Item.objects.filter(job=self, fsb_nine_digit__isnull=False).count()
 
         return estimated_time * num_of_items
 
@@ -399,7 +379,8 @@ class Job(models.Model):
         self.save()
 
     def generate_keywords(self):
-        """Generate a text blob of possible keywords that describe this job.
+        """
+        Generate a text blob of possible keywords that describe this job.
         Will be used to search jobs that may be related, but not named the same.
 
         THIS DOES NOT SAVE. HANDLED IN SAVE SIGNAL!!
@@ -453,7 +434,8 @@ class Job(models.Model):
         self.generated_keywords = keywords
 
     def growl_at_artist(self, *args, **kwargs):
-        """Growls at the Job's artist. Arguments are the same as
+        """
+        Growls at the Job's artist. Arguments are the same as
         user.profile.growl_at()
         """
         if self.artist:
@@ -476,7 +458,8 @@ class Job(models.Model):
         return complete
 
     def check_sap_carton(self):
-        """Returns true only if a carton job meets all the criteria for an SAP
+        """
+        Returns true only if a carton job meets all the criteria for an SAP
         entry. If any of the criteria are failed it returns false.
         - It must be 'prepress' carton type.
         - It can't be a "Carton Proof Dupes"
@@ -491,11 +474,7 @@ class Job(models.Model):
             return False
 
         # Make sure it's not a "Carton Proof Dupes" job.
-        if (
-            "carton" in self.name.lower()
-            and "proof" in self.name.lower()
-            and "dupe" in self.name.lower()
-        ):
+        if "carton" in self.name.lower() and "proof" in self.name.lower() and "dupe" in self.name.lower():
             return False
 
         # Check that all items are approved.
@@ -506,7 +485,8 @@ class Job(models.Model):
         return True
 
     def do_sap_notification(self):
-        """Email the front desk to enter the job into SAP and create a carton
+        """
+        Email the front desk to enter the job into SAP and create a carton
         billing entry.
         """
         # Create entry.
@@ -523,9 +503,7 @@ class Job(models.Model):
             mail_send_to.append(user.email)
         mail_body = loader.get_template("emails/carton_sap.txt")
         mail_context = {"job": self}
-        general_funcs.send_info_mail(
-            mail_subject, mail_body.render(mail_context), mail_send_to
-        )
+        general_funcs.send_info_mail(mail_subject, mail_body.render(mail_context), mail_send_to)
 
     def all_items_approved(self):
         """Returns True if all items for the job are approved (or canceled)."""
@@ -543,7 +521,8 @@ class Job(models.Model):
         return complete
 
     def _get_workflow_subfolder(self, force_archive=False):
-        """Determines which sub-folder under the workflow's main folder the job's
+        """
+        Determines which sub-folder under the workflow's main folder the job's
         symlink resides under. This is either 'Active' or 'Archive'.
         """
         if not self.is_completed_archived() and not force_archive:
@@ -579,7 +558,8 @@ class Job(models.Model):
         self.create_folder_symlink()
 
     def create_creative_folder_symlink(self):
-        """Triggers the file server to create the symbolic link that resides in the
+        """
+        Triggers the file server to create the symbolic link that resides in the
         creative design folder of the resources folder. This is done by placing a text file in the
         appropriate hot folder on the file server. The name of the text file
         is the job number and the contents of the file will be the path to the
@@ -597,9 +577,7 @@ class Job(models.Model):
         new_symlink = "%s %s" % (self.id, stripped_job_name)
 
         # Create the path to the new symlink.
-        symlink_path = os.path.join(
-            "Resources", "Design Bank", "Creative Design Work Jobs", new_symlink
-        )
+        symlink_path = os.path.join("Resources", "Design Bank", "Creative Design Work Jobs", new_symlink)
         # Format path for Windows
         symlink_path = symlink_path.replace("/", "\\")
 
@@ -629,7 +607,8 @@ class Job(models.Model):
         return symlink_path
 
     def create_folder_symlink(self, force_archive=False):
-        """Triggers the file server to create the symbolic link that resides in the
+        """
+        Triggers the file server to create the symbolic link that resides in the
         user-visible shares. This is done by placing a text file in the
         appropriate hot folder on the file server. The name of the text file
         is the job number and the contents of the file will be the path to the
@@ -713,7 +692,8 @@ class Job(models.Model):
     #         return symlink_name
 
     def delete_folder_symlink(self):
-        """Deletes the junction point that resides in Active/Archive. I know the
+        """
+        Deletes the junction point that resides in Active/Archive. I know the
         function says symlink but it's actually a junction point. They used to
         be symlinks long ago.
         """
@@ -745,7 +725,8 @@ class Job(models.Model):
         return jpoint_path
 
     def recalc_item_numbers(self):
-        """After an item is deleted, all Items in the job may need to have their
+        """
+        After an item is deleted, all Items in the job may need to have their
         num_in_job updated.
         """
         items = self.get_item_qset().order_by("id")
@@ -757,7 +738,8 @@ class Job(models.Model):
             inum_counter += 1
 
     def replaces_etools_design(self):
-        """Checks the eTools database to see if this job replaced a previous
+        """
+        Checks the eTools database to see if this job replaced a previous
         design. If so it returns true.
         """
         from gchub_db.apps.workflow import etools
@@ -775,10 +757,7 @@ class Job(models.Model):
                 key_name = column[0]
                 edict[key_name] = getattr(ejob, key_name, None)
 
-            if (
-                edict["replaces_previous_design"]
-                or edict["replaces_previous_design_name"]
-            ):
+            if edict["replaces_previous_design"] or edict["replaces_previous_design_name"]:
                 return True
             else:
                 return False
@@ -840,13 +819,12 @@ class Job(models.Model):
                 Q(is_active=True) | Q(id=self.salesperson.id),
             )
         else:
-            qset = qset.filter(
-                Q(groups__in=permission.group_set.all()), Q(is_active=True)
-            )
+            qset = qset.filter(Q(groups__in=permission.group_set.all()), Q(is_active=True))
         return qset
 
     def get_icon_url(self):
-        """Returns the appropriate icon for the workflow type.
+        """
+        Returns the appropriate icon for the workflow type.
         This will predominately be used on the ToDo list page.
         """
         retval = "page_black.png"
@@ -877,16 +855,12 @@ class Job(models.Model):
 
             mail_body = loader.get_template("emails/on_do_artist_assignment.txt")
             mail_context = {"job": self}
-            general_funcs.send_info_mail(
-                mail_subject, mail_body.render(mail_context), mail_send_to
-            )
+            general_funcs.send_info_mail(mail_subject, mail_body.render(mail_context), mail_send_to)
         except Exception:
             # Fail if no email reciepients.
             pass
 
-    def do_create_joblog_entry(
-        self, logtype, logtext, date_override=None, user_override=None, is_editable=True
-    ):
+    def do_create_joblog_entry(self, logtype, logtext, date_override=None, user_override=None, is_editable=True):
         """Abstraction for creating joblog entries for jobs."""
         new_log = JobLog()
         # Reference to the job.
@@ -916,9 +890,7 @@ class Job(models.Model):
         # Allow overriding of the log date.
         if date_override:
             # Convert date objects to datetimes at midnight, then ensure timezone-aware.
-            if isinstance(date_override, date) and not isinstance(
-                date_override, _dt.datetime
-            ):
+            if isinstance(date_override, date) and not isinstance(date_override, _dt.datetime):
                 # Create a datetime at midnight for the given date and make it timezone-aware
                 date_override = timezone.make_aware(
                     _dt.datetime.combine(date_override, _dt.time.min),
@@ -926,9 +898,7 @@ class Job(models.Model):
                 )
             elif timezone.is_naive(date_override):
                 # If a datetime was provided but is naive, make it timezone-aware
-                date_override = timezone.make_aware(
-                    date_override, timezone.get_current_timezone()
-                )
+                date_override = timezone.make_aware(date_override, timezone.get_current_timezone())
             new_log.event_time = date_override
             # Have to save again because of the auto_now_add on event_time.
             new_log.save()
@@ -1038,13 +1008,7 @@ class Job(models.Model):
     def revision_earliest_due_date(self):
         """Return the date of the revision due earliest."""
         try:
-            return (
-                Revision.objects.filter(
-                    item__job__id=self.id, complete_date__isnull=True
-                )
-                .order_by("due_date")[0]
-                .due_date
-            )
+            return Revision.objects.filter(item__job__id=self.id, complete_date__isnull=True).order_by("due_date")[0].due_date
         except Exception:
             return None
 
@@ -1094,18 +1058,14 @@ class Job(models.Model):
                             check_due2 = 1
 
         # Check revisions last, they should override anything else.
-        if (
-            Revision.objects.filter(
-                item__job__id=self.id, complete_date__isnull=True
-            ).count()
-            > 0
-        ):
+        if Revision.objects.filter(item__job__id=self.id, complete_date__isnull=True).count() > 0:
             status = "Revisions"
 
         return status
 
     def bev_job_lock(self):
-        """Lock entire job if all items have been locked.
+        """
+        Lock entire job if all items have been locked.
         Will be used to prevent new items from being entered (multiple POs).
         """
         if self.workflow.name == "Beverage" and self.item_set.all():
@@ -1123,7 +1083,8 @@ class Job(models.Model):
             return False
 
     def final_file_due_date(self):
-        """Foodservice Only. Look at all items in the job, return the date of the
+        """
+        Foodservice Only. Look at all items in the job, return the date of the
         one due soonest.
         """
         dates = []
@@ -1184,19 +1145,19 @@ class Job(models.Model):
         return jobtotal
 
     def job_billable_charges_exist(self):
-        """Return True if any of the charges associated with this job
+        """
+        Return True if any of the charges associated with this job
         have not been invoiced.
         """
-        billable_charges = Charge.objects.filter(
-            item__job=self, bev_invoice__isnull=True, item__is_deleted=False
-        )
+        billable_charges = Charge.objects.filter(item__job=self, bev_invoice__isnull=True, item__is_deleted=False)
         if billable_charges:
             return True
         else:
             return False
 
     def save(self, *args, **kwargs):
-        """Overriding the Job's standard save() so we can do some tracking for the
+        """
+        Overriding the Job's standard save() so we can do some tracking for the
         JobLog.
         """
         current_user = threadlocals.get_current_user()
@@ -1224,7 +1185,8 @@ class Job(models.Model):
         return self.item_set.all()[int(item_num) - 1]
 
     def ftp_item_tiffs_to_platemaker(self, item_num_list, platemaker):
-        """Adds the specified items to the fusion flexo ftp queue.
+        """
+        Adds the specified items to the fusion flexo ftp queue.
 
         item_num_list: (list of ints) Item numbers to be uploaded.
 
@@ -1244,12 +1206,11 @@ class Job(models.Model):
 
     def get_finalized_qcs(self):
         """Returns a QuerySet of finalized parent QCResponseDoc objects."""
-        return self.qcresponsedoc_set.filter(
-            review_date__isnull=False, parent__isnull=True
-        )
+        return self.qcresponsedoc_set.filter(review_date__isnull=False, parent__isnull=True)
 
     def get_customer_name(self):
-        """Get the name of the customer from GPS Connect using
+        """
+        Get the name of the customer from GPS Connect using
         job.customer_identifier.
         """
         data = gps_connect._get_customer_data(self.customer_identifier)
@@ -1261,7 +1222,8 @@ class Job(models.Model):
             return "Name not found"
 
     def get_customer_data(self):
-        """Get a dictionary of customer data from GPS Connect using
+        """
+        Get a dictionary of customer data from GPS Connect using
         job.customer_identifier.
         """
         data = gps_connect._get_customer_data(self.customer_identifier)
@@ -1286,15 +1248,14 @@ class Job(models.Model):
         return True
 
     def has_promo_items(self):
-        """This functions checks to see specific ItemTrackers (Promos) that are related to this job and if there
+        """
+        This functions checks to see specific ItemTrackers (Promos) that are related to this job and if there
         are some, displays a warning for the artists so that extra QC measure can be done.
         """
         message = None
         trackerTypes = ["Ink Jet Code", "Labels"]
         items = Item.objects.filter(job_id=self.id)
-        trackers = ItemTracker.objects.filter(
-            removed_by=None, item__in=items, type__name__in=trackerTypes
-        ).order_by("item__num_in_job")
+        trackers = ItemTracker.objects.filter(removed_by=None, item__in=items, type__name__in=trackerTypes).order_by("item__num_in_job")
         if trackers:
             # counter keeps track of the , we need
             counter = 0
@@ -1316,7 +1277,8 @@ class Job(models.Model):
         return message
 
     def has_bottom_print(self):
-        """Checks if the job has KFC items which require bottom print and adds
+        """
+        Checks if the job has KFC items which require bottom print and adds
         a warning to the job info if so.
         """
         message = None
@@ -1378,21 +1340,13 @@ def job_post_save(sender, instance, created, *args, **kwargs):
         # determine which users to notify; be defensive if workflow/name not present
         growled_users = []
         try:
-            wname = getattr(instance, "workflow", None) and getattr(
-                instance.workflow, "name", None
-            )
+            wname = getattr(instance, "workflow", None) and getattr(instance.workflow, "name", None)
             if wname == "Beverage":
-                growled_users = UserProfile.objects.filter(
-                    growl_hear_new_beverage_jobs=True
-                )
+                growled_users = UserProfile.objects.filter(growl_hear_new_beverage_jobs=True)
             elif wname == "Foodservice":
-                growled_users = UserProfile.objects.filter(
-                    growl_hear_new_foodservice_jobs=True
-                )
+                growled_users = UserProfile.objects.filter(growl_hear_new_foodservice_jobs=True)
             elif wname == "Carton":
-                growled_users = UserProfile.objects.filter(
-                    growl_hear_new_carton_jobs=True
-                )
+                growled_users = UserProfile.objects.filter(growl_hear_new_carton_jobs=True)
         except Exception:
             growled_users = []
 
@@ -1400,8 +1354,7 @@ def job_post_save(sender, instance, created, *args, **kwargs):
             try:
                 user.growl_at(
                     "New %s Job" % (getattr(instance.workflow, "name", "Job"),),
-                    "A new job, %s %s, has been entered."
-                    % (getattr(instance, "id", "?"), getattr(instance, "name", "?")),
+                    "A new job, %s %s, has been entered." % (getattr(instance, "id", "?"), getattr(instance, "name", "?")),
                 )
             except Exception:
                 # ensure notification failures don't break saves
