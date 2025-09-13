@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, jb ]
+    branches: [main, jb]
   pull_request:
-    branches: [ main, jb ]
+    branches: [main, jb]
 
 jobs:
   test:
@@ -23,7 +23,7 @@ jobs:
           --health-interval=5s --health-timeout=5s --health-retries=20
     strategy:
       matrix:
-        python-version: ['3.11']
+        python-version: ["3.11"]
 
     steps:
       - uses: actions/checkout@v4
@@ -56,6 +56,17 @@ jobs:
         # should still be caught by the later test steps.
         run: |
           python -m ruff check --select E711,E712,E721,B904,D100,D103,D205 . || true
+
+      - name: Run security scan (bandit)
+        run: |
+          pip install bandit
+          bandit -r . -f json -o bandit-report.json || true
+          bandit -r . --exit-zero
+
+      - name: Check for vulnerable dependencies (safety)
+        run: |
+          pip install safety
+          safety check || true
 
       - name: Configure test Postgres env
         run: |
@@ -98,4 +109,12 @@ jobs:
           TEST_PG_HOST: ${{ env.TEST_PG_HOST }}
           TEST_PG_PORT: ${{ env.TEST_PG_PORT }}
         run: |
-          pytest -q --maxfail=1
+          pytest --cov=. --cov-report=html --cov-report=term-missing --cov-report=xml
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false

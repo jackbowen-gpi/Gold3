@@ -1,0 +1,46 @@
+# Development Dependencies
+# ========================
+# These are tools used for development, testing, and code quality
+# They are not required for the application to run in production
+
+# Code Quality & Linting
+# ----------------------
+ruff>=0.12.0          # Fast Python linter and formatter
+mypy>=1.17.0          # Static type checker
+pre-commit>=3.8.0     # Framework for managing pre-commit hooks
+
+# Testing
+# -------
+pytest>=8.4.0        # Testing framework
+pytest-django>=4.11.0 # Django testing utilities
+pytest-cov>=4.1.0    # Coverage reporting for pytest
+pytest-xdist>=3.5.0  # Run tests in parallel
+coverage>=7.10.0     # Code coverage measurement
+
+# Security
+# --------
+bandit>=1.8.0        # Security linter for Python
+safety>=3.0.0        # Check for vulnerable dependencies
+
+# Development Tools
+# -----------------
+black>=24.10.0       # Code formatter (keeping for compatibility)
+isort>=5.13.0        # Import sorter
+django-debug-toolbar>=4.4.6  # Already in main requirements, but ensuring dev version
+
+# Documentation (optional)
+# ------------------------
+# sphinx>=7.0.0        # Documentation generator
+# sphinx-rtd-theme>=2.0.0  # Read the Docs theme for Sphinx
+
+# Additional Development Tools
+# ----------------------------
+pip-tools>=7.0.0     # For managing requirements files
+tox>=4.0.0          # Testing automation
+virtualenv>=20.32.0 # Virtual environment management
+
+# IDE Support
+# -----------
+python-lsp-server>=1.11.0  # Python Language Server for IDEs
+pylsp-mypy>=0.6.0   # MyPy plugin for Python LSP
+# pylsp-ruff>=2.0.0   # Ruff plugin for Python LSP (not available)
