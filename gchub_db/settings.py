@@ -1,13 +1,21 @@
 """Project package settings (moved from repo root settings.py)"""
 
 import os
-import sys
 import pprint
+import sys
 
-# Import common settings
-# Import all common settings
-from config.settings_common import *  # noqa: F403
-from config.settings_common import DEBUG  # noqa: F401
+# Import the main settings configuration
+from config.settings import DEBUG  # type: ignore[assignment]
+
+# Handle INTERNAL_IPS type conflict
+try:
+    # If INTERNAL_IPS is imported as tuple, convert to list
+    if "INTERNAL_IPS" in globals() and isinstance(globals()["INTERNAL_IPS"], tuple):
+        INTERNAL_IPS = list(globals()["INTERNAL_IPS"])  # type: ignore[assignment]
+    else:
+        INTERNAL_IPS = []
+except Exception:
+    INTERNAL_IPS = []
 
 # Path to this package directory
 MAIN_PATH = os.path.abspath(os.path.split(__file__)[0])
@@ -30,142 +38,6 @@ LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/accounts/login/"
 
 STATIC_URL = "/static/"
-
-MIDDLEWARE = (
-    # Ensure dev auto-login runs early in the middleware chain when debugging.
-    *(("gchub_db.middleware.dev_auto_login.DevAutoLoginMiddleware",) if DEBUG else ()),
-    # In DEBUG, remove Permissions-Policy / Feature-Policy to avoid blocking
-    # legacy vendor scripts that register `unload` handlers (prototype/YUI/etc.).
-    *(("gchub_db.middleware.remove_permissions_policy.RemovePermissionsPolicyHeaderMiddleware",) if DEBUG else ()),
-    # Django Debug Toolbar middleware - only in DEBUG mode
-    *(("debug_toolbar.middleware.DebugToolbarMiddleware",) if DEBUG else ()),
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    #'django.middleware.doc.XViewMiddleware',
-    "gchub_db.middleware.threadlocals.ThreadLocals",
-    "gchub_db.middleware.maintenance_mode.middleware.MaintenanceModeMiddleware",
-)
-
-INSTALLED_APPS = (
-    "maintenance_mode",
-    "django.contrib.admindocs",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.sites",
-    "django.contrib.messages",
-    "gchub_db.apps.django_su",
-    "django.contrib.admin",
-    "django.contrib.humanize",
-    "django.contrib.staticfiles",
-    "formtools",
-    "django_extensions",
-    # Django Debug Toolbar - only in DEBUG mode
-    *(("debug_toolbar",) if DEBUG else ()),
-    "django_celery_beat",
-    "gchub_db.apps.accounts",
-    "gchub_db.apps.legacy_support",
-    "gchub_db.apps.admin_log",
-    "gchub_db.apps.archives",
-    "gchub_db.apps.bev_billing",
-    "gchub_db.apps.budget",
-    "gchub_db.apps.joblog",
-    "gchub_db.apps.workflow",
-    "gchub_db.apps.item_catalog",
-    "gchub_db.apps.address",
-    "gchub_db.apps.color_mgt",
-    "gchub_db.apps.error_tracking",
-    "gchub_db.apps.calendar",
-    "gchub_db.apps.xml_io",
-    "gchub_db.apps.queues",
-    "gchub_db.apps.auto_ftp",
-    "gchub_db.apps.fedexsys",
-    "gchub_db.apps.qad_data",
-    "gchub_db.apps.software",
-    "gchub_db.apps.news",
-    "gchub_db.apps.qc",
-    "gchub_db.apps.auto_corrugated",
-    "gchub_db.apps.manager_tools",
-    "gchub_db.apps.draw_down",
-    "gchub_db.apps.video_player",
-    "gchub_db.apps.timesheet",
-    "gchub_db.apps.art_req",
-    "gchub_db.apps.sbo",
-    "gchub_db.apps.carton_billing",
-    "gchub_db.apps.catscanner",
-)
-
-# Logging configuration mirrored from root settings copy
-
-try:
-    from rich.logging import RichHandler  # type: ignore
-
-    RICH_AVAILABLE = True
-except Exception:
-    RichHandler = None
-    RICH_AVAILABLE = False
-
-LOG_DIR = os.path.join(MAIN_PATH, "logs")
-try:
-    os.makedirs(LOG_DIR, exist_ok=True)
-except Exception:
-    pass
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        },
-        "simple": {"format": "%(levelname)s %(message)s"},
-    },
-    "handlers": {
-        "console": {
-            "class": ("logging.StreamHandler" if not RICH_AVAILABLE else "rich.logging.RichHandler"),
-            "formatter": "verbose",
-        },
-        "file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOG_DIR, "gchub.log"),
-            "maxBytes": 10485760,
-            "backupCount": 5,
-            "formatter": "verbose",
-        },
-        "db_file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOG_DIR, "db_queries.log"),
-            "maxBytes": 10485760,
-            "backupCount": 5,
-            "formatter": "verbose",
-        },
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "django.db.backends": {
-            "handlers": ["db_file"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-        "gchub_db": {
-            "handlers": ["console", "file"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-    },
-    "root": {
-        "handlers": ["console", "file"],
-        "level": "INFO",
-    },
-}
 
 # Templates configuration
 TEMPLATES = [
@@ -221,10 +93,43 @@ if DEBUG:
         "localhost",
     ]
 
+    # Additional Debug Toolbar settings
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+    }
+
 try:
-    from config.local_settings import *  # noqa: F403
+    # Import specific variables from local_settings to avoid type conflicts
+    from config.local_settings import (
+        ALLOWED_HOSTS,
+        AUTO_FTP_ENABLED,
+        DJANGO_SERVE_MEDIA,
+        EMAIL_BACKEND,
+        EMAIL_HOST,
+        ETOOLS_ENABLED,
+        FS_ACCESS_ENABLED,
+        FS_SERVER_HOST,
+        QAD_ENABLED,
+        ROOT_URLCONF,
+        STATIC_ROOT,
+        WEBSERVER_HOST,
+        YUI_URL,
+    )
 except ImportError:
-    pass
+    # Define defaults if local_settings doesn't exist
+    DJANGO_SERVE_MEDIA = True
+    YUI_URL = "/media/yui/"
+    EMAIL_HOST = "apache1.na.graphicpkg.pri"
+    WEBSERVER_HOST = "http://apache1.na.graphicpkg.pri"
+    FS_SERVER_HOST = "gcmaster.na.graphicpkg.pri"
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+    ROOT_URLCONF = "gchub_db.urls"
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    ETOOLS_ENABLED = False
+    QAD_ENABLED = False
+    AUTO_FTP_ENABLED = False
+    FS_ACCESS_ENABLED = False
+    STATIC_ROOT = None
 
 # DEBUG: Print DATABASES config at runtime
 if (

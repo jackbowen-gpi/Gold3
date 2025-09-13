@@ -1,0 +1,8 @@
+volumes:
+  pgdata:
+    # Persistent Postgres data
+    driver: local
+  grafana-storage:
+    driver: local
+  wiki_data:
+    driver: local

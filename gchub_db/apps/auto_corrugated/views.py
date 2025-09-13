@@ -1,41 +1,49 @@
 """Auto-Corrugated Views"""
 
-import os
 import io
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic.list import ListView
+import os
+import threading
+import time
+
 from django import forms
+from django.contrib.auth.models import User
 from django.forms import (
-    ModelForm,
-    ModelChoiceField,
-    ChoiceField,
-    IntegerField,
-    TextInput,
     BooleanField,
     CharField,
+    ChoiceField,
+    IntegerField,
+    ModelChoiceField,
+    ModelForm,
+    TextInput,
 )
 from django.forms.formsets import formset_factory
-from gchub_db.middleware import threadlocals
-from gchub_db.includes.gold_json import JSMessage
-from gchub_db.includes.form_utils import JSONErrorForm
-from gchub_db.includes import general_funcs, fs_api
-from gchub_db.apps.auto_corrugated.models import (
-    GeneratedBox,
-    BoxItem,
-    BoxItemSpec,
-    GeneratedLabel,
-)
-from gchub_db.apps.joblog.models import JobLog
-from gchub_db.apps.joblog.app_defs import JOBLOG_TYPE_NOTE
-from gchub_db.apps.workflow.models import Plant, PlatePackage, Job
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.list import ListView
+
 from gchub_db.apps.auto_corrugated.elements.fsb_elements import (
     barcodeFileExists,
     triggerBarcodeCreation,
 )
-import threading
-import time
+from gchub_db.apps.auto_corrugated.models import (
+    BoxItem,
+    BoxItemSpec,
+    GeneratedBox,
+    GeneratedLabel,
+)
+from gchub_db.apps.joblog.app_defs import JOBLOG_TYPE_NOTE
+from gchub_db.apps.joblog.models import JobLog
+from gchub_db.apps.workflow.models import Job, Plant, PlatePackage
+from gchub_db.includes import fs_api, general_funcs
+
+# Update these imports to the correct paths if the modules have moved, or ensure the files exist in the specified locations.
+# Example fallback if the modules are in a different location:
+# from gchub_db.form_utils import JSONErrorForm
+# from gchub_db.gold_json import JSMessage
+from includes.form_utils import JSONErrorForm
+from includes.gold_json import JSMessage
+from middleware import threadlocals
 
 CASE_COLOR_CHOICE = (
     ("-----------", "-----------"),
@@ -255,6 +263,7 @@ def pdf_generation_form_edit(request, box_id):
     return pdf_generation_form(request, box_id, edit=True)
 
 
+@csrf_exempt
 def json_get_boxitem_specs(request):
     """
     This view returns an options list for prototype.js to replace the
@@ -294,6 +303,7 @@ def json_get_boxitem_specs(request):
     return HttpResponse(retval)
 
 
+@csrf_exempt
 def json_get_boxitem_dimensions(request):
     """
     This view returns output appropriate for use in prototype.js's

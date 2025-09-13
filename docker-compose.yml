@@ -98,8 +98,6 @@ services:
   flower:
     build: .
     command: sh -c "celery -A gchub_db flower --port=5555"
-    ports:
-      - "5555:5555"
     env_file:
       - .env
     volumes:
@@ -115,6 +113,8 @@ services:
     depends_on:
       - redis
       - celery
+    ports:
+      - "5555:5555"
 
   prometheus:
     image: prom/prometheus:latest
@@ -136,9 +136,42 @@ services:
     ports:
       - "9100:9100"
 
+  wiki:
+    image: mediawiki:1.39
+    ports:
+      - "8080:80"
+    volumes:
+      - wiki_data:/var/www/data
+      - ./wiki/LocalSettings.php:/var/www/html/LocalSettings.php
+      - ./scripts/setup_wiki_db.sh:/usr/local/bin/setup_wiki_db.sh
+    environment:
+      MEDIAWIKI_DB_TYPE: postgres
+      MEDIAWIKI_DB_HOST: db
+      MEDIAWIKI_DB_PORT: 5432
+      MEDIAWIKI_DB_USER: wiki_user
+      MEDIAWIKI_DB_PASSWORD: wiki_password
+      MEDIAWIKI_DB_NAME: wiki_db
+      POSTGRES_USER: gchub
+      POSTGRES_PASSWORD: gchub
+      POSTGRES_DB: gchub_dev
+    command: >
+      sh -c "
+        echo 'Setting up MediaWiki database...' &&
+        sleep 15 &&
+        PGPASSWORD=gchub psql -h db -U gchub -d gchub_dev -c \"CREATE USER IF NOT EXISTS wiki_user WITH PASSWORD 'wiki_password';\" &&
+        PGPASSWORD=gchub psql -h db -U gchub -d gchub_dev -c \"CREATE DATABASE IF NOT EXISTS wiki_db OWNER wiki_user;\" &&
+        PGPASSWORD=gchub psql -h db -U gchub -d gchub_dev -c \"GRANT ALL PRIVILEGES ON DATABASE wiki_db TO wiki_user;\" &&
+        echo 'Database setup complete. Starting MediaWiki...' &&
+        apache2-foreground
+      "
+    depends_on:
+      - db
+
 volumes:
   pgdata:
     # Persistent Postgres data
     driver: local
   grafana-storage:
+    driver: local
+  wiki_data:
     driver: local

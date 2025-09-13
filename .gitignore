@@ -50,6 +50,12 @@ backup_before_masking_*.sql
 .DS_Store
 Thumbs.db
 
+# Sensitive files - NEVER commit these!
+config/secrets.py
+.env
+.env.local
+.env.*.local
+
 # History
 .history/
 

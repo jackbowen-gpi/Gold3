@@ -13,6 +13,25 @@ MAIN_PATH = os.path.abspath(os.path.split(__file__)[0])
 sys.path.insert(0, os.path.join(MAIN_PATH, "includes"))
 sys.path.insert(0, os.path.join(MAIN_PATH, "middleware"))
 
+# Try to load secrets configuration
+try:
+    from .secrets import (
+        DATABASE_CREDENTIALS,
+        FEDEX_CREDENTIALS,
+        FTP_CREDENTIALS,
+        ODBC_CREDENTIALS,
+        SECRET_KEY,
+    )
+
+    print("Loaded secrets from config/secrets.py")
+except ImportError:
+    print("Warning: config/secrets.py not found. Using fallback values.")
+    SECRET_KEY = "jks@9EklalsSlE+29-!kldf~lkd(lkjlkfd$lk.ASd/f#42jlk8$&*89ao"
+    DATABASE_CREDENTIALS = {}
+    FTP_CREDENTIALS = {}
+    ODBC_CREDENTIALS = {}
+    FEDEX_CREDENTIALS = {}
+
 # Much slower when True, populates debugging variables. Sucks memory.
 # Enable DEBUG for local development so dev-only helpers can run. Override
 # this in production via `local_settings.py` if needed.
@@ -78,7 +97,7 @@ LOGOUT_REDIRECT_URL = "/accounts/login/?next=/"
 
 # Any IP address in this list is able to see on-page debugging info.
 # Anyone in this list is also exempt from maintenance mode.
-INTERNAL_IPS = ("127.0.0.1",)
+INTERNAL_IPS = ["127.0.0.1"]
 
 # IP:Port for the webserver
 WEBSERVER_HOST = "http://172.23.8.16"
@@ -99,7 +118,9 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",  # Add 'postgresql_psycopg2'
         "NAME": "thundercuddles",  # Or path to database file if using sqlite3.
         "USER": "thundercuddles",  # Not used with sqlite3.
-        "PASSWORD": "332088",  # Not used with sqlite3.
+        "PASSWORD": DATABASE_CREDENTIALS.get("PRODUCTION", {}).get("PASSWORD", "332088")
+        if "DATABASE_CREDENTIALS" in globals()
+        else "332088",  # Not used with sqlite3.
         "HOST": "172.23.8.73",  # Set to empty string for localhost. Not used w/sqlite3.
         "PORT": "5432",  # Set to empty string for default. Not used with sqlite3.
     }
@@ -116,7 +137,9 @@ DATABASES_RAW_PROD = {
     "ENGINE": "django.db.backends.postgresql_psycopg2",
     "NAME": "thundercuddles",
     "USER": "thundercuddles",
-    "PASSWORD": "332088",
+    "PASSWORD": DATABASE_CREDENTIALS.get("PRODUCTION", {}).get("PASSWORD", "332088")
+    if "DATABASE_CREDENTIALS" in globals()
+    else "332088",
     "HOST": "172.23.8.73",
     "PORT": "5432",
 }
@@ -133,7 +156,9 @@ DATABASES_RAW_DEV = {
         "DEV_DB_PASSWORD", os.environ.get("POSTGRES_PASSWORD", "gchub")
     ),
     "HOST": os.environ.get("DEV_DB_HOST", "127.0.0.1"),
-    "PORT": "5438",  # Always use port 5438 for gold3-db-1 container
+    "PORT": os.environ.get(
+        "DEV_DB_PORT", "5438"
+    ),  # Read from environment, default to 5438
 }
 
 # Apply the selected profile. Keep the final DATABASES dict shape the same.
@@ -190,9 +215,21 @@ FS_SERVER_PORT = 8000
 
 # The ODBC DSN to the eTools MS SQL database. This must exist on the server's
 # iODBC System DSN list to work.
-ETOOLS_ODBC_DSN = "DSN=etoolsnew;UID=clemson-gs;PWD=havaba11"
-QAD_ODBC_DSN = "DSN=datawarehouse2014;UID=fsbuser;PWD=fsbIT2008"
-FSCORRUGATED_ODBC_DSN = "DSN=fscorrugated;UID=fs;PWD=fsacid"
+ETOOLS_ODBC_DSN = (
+    f"DSN={ODBC_CREDENTIALS.get('ETOOLS', {}).get('DSN', 'etoolsnew')};UID={ODBC_CREDENTIALS.get('ETOOLS', {}).get('UID', 'clemson-gs')};PWD={ODBC_CREDENTIALS.get('ETOOLS', {}).get('PWD', 'havaba11')}"
+    if "ODBC_CREDENTIALS" in globals()
+    else "DSN=etoolsnew;UID=clemson-gs;PWD=havaba11"
+)
+QAD_ODBC_DSN = (
+    f"DSN={ODBC_CREDENTIALS.get('QAD', {}).get('DSN', 'datawarehouse2014')};UID={ODBC_CREDENTIALS.get('QAD', {}).get('UID', 'fsbuser')};PWD={ODBC_CREDENTIALS.get('QAD', {}).get('PWD', 'fsbIT2008')}"
+    if "ODBC_CREDENTIALS" in globals()
+    else "DSN=datawarehouse2014;UID=fsbuser;PWD=fsbIT2008"
+)
+FSCORRUGATED_ODBC_DSN = (
+    f"DSN={ODBC_CREDENTIALS.get('FSCORRUGATED', {}).get('DSN', 'fscorrugated')};UID={ODBC_CREDENTIALS.get('FSCORRUGATED', {}).get('UID', 'fs')};PWD={ODBC_CREDENTIALS.get('FSCORRUGATED', {}).get('PWD', 'fsacid')}"
+    if "ODBC_CREDENTIALS" in globals()
+    else "DSN=fscorrugated;UID=fs;PWD=fsacid"
+)
 
 # Path to the directory containing all of the workflow directories.
 # By default, this is /Volumes.
@@ -240,39 +277,93 @@ JMF_GATEWAY_PATH = "/JDFP/JMF/"
 JDF_ROOT = os.path.join(PRODUCTION_DIR, "jdf_queue/")
 
 # Fusion Flexo FTP information
-FUSION_FLEXO_FTP_HOST = "exchange.graphicpkg.com"
-FUSION_FLEXO_FTP_USERNAME = "fusionflexo"
-FUSION_FLEXO_FTP_PASSWORD = "y;_1NNH7"
+FUSION_FLEXO_FTP_HOST = (
+    FTP_CREDENTIALS.get("FUSION_FLEXO", {}).get("HOST", "exchange.graphicpkg.com")
+    if "FTP_CREDENTIALS" in globals()
+    else "exchange.graphicpkg.com"
+)
+FUSION_FLEXO_FTP_USERNAME = (
+    FTP_CREDENTIALS.get("FUSION_FLEXO", {}).get("USERNAME", "fusionflexo")
+    if "FTP_CREDENTIALS" in globals()
+    else "fusionflexo"
+)
+FUSION_FLEXO_FTP_PASSWORD = (
+    FTP_CREDENTIALS.get("FUSION_FLEXO", {}).get("PASSWORD", "y;_1NNH7")
+    if "FTP_CREDENTIALS" in globals()
+    else "y;_1NNH7"
+)
 
 FUSION_FLEXO_FTP = {
-    "HOST": "exchange.graphicpkg.com",
-    "USERNAME": "fusionflexo",
-    "PASSWORD": "y;_1NNH7",
-    "ROOT_DIR": "togpi",
+    "HOST": FTP_CREDENTIALS.get("FUSION_FLEXO", {}).get(
+        "HOST", "exchange.graphicpkg.com"
+    )
+    if "FTP_CREDENTIALS" in globals()
+    else "exchange.graphicpkg.com",
+    "USERNAME": FTP_CREDENTIALS.get("FUSION_FLEXO", {}).get("USERNAME", "fusionflexo")
+    if "FTP_CREDENTIALS" in globals()
+    else "fusionflexo",
+    "PASSWORD": FTP_CREDENTIALS.get("FUSION_FLEXO", {}).get("PASSWORD", "y;_1NNH7")
+    if "FTP_CREDENTIALS" in globals()
+    else "y;_1NNH7",
+    "ROOT_DIR": FTP_CREDENTIALS.get("FUSION_FLEXO", {}).get("ROOT_DIR", "togpi")
+    if "FTP_CREDENTIALS" in globals()
+    else "togpi",
 }
 
 # Cyber Graphics FTP information
 CYBER_GRAPHICS_FTP = {
-    "HOST": "exchange.graphicpkg.com",
-    "USERNAME": "cybergraphics",
-    "PASSWORD": "TdF`vx97",
-    "ROOT_DIR": "togpi",
+    "HOST": FTP_CREDENTIALS.get("CYBER_GRAPHICS", {}).get(
+        "HOST", "exchange.graphicpkg.com"
+    )
+    if "FTP_CREDENTIALS" in globals()
+    else "exchange.graphicpkg.com",
+    "USERNAME": FTP_CREDENTIALS.get("CYBER_GRAPHICS", {}).get(
+        "USERNAME", "cybergraphics"
+    )
+    if "FTP_CREDENTIALS" in globals()
+    else "cybergraphics",
+    "PASSWORD": FTP_CREDENTIALS.get("CYBER_GRAPHICS", {}).get("PASSWORD", "TdF`vx97")
+    if "FTP_CREDENTIALS" in globals()
+    else "TdF`vx97",
+    "ROOT_DIR": FTP_CREDENTIALS.get("CYBER_GRAPHICS", {}).get("ROOT_DIR", "togpi")
+    if "FTP_CREDENTIALS" in globals()
+    else "togpi",
 }
 
 # Southern Graphic FTP information
 SOUTHERN_GRAPHIC_FTP = {
-    "HOST": "exchange.graphicpkg.com",
-    "USERNAME": "southerngraphic",
-    "PASSWORD": ".;AA8iyM",
-    "ROOT_DIR": "togpi",
+    "HOST": FTP_CREDENTIALS.get("SOUTHERN_GRAPHIC", {}).get(
+        "HOST", "exchange.graphicpkg.com"
+    )
+    if "FTP_CREDENTIALS" in globals()
+    else "exchange.graphicpkg.com",
+    "USERNAME": FTP_CREDENTIALS.get("SOUTHERN_GRAPHIC", {}).get(
+        "USERNAME", "southerngraphic"
+    )
+    if "FTP_CREDENTIALS" in globals()
+    else "southerngraphic",
+    "PASSWORD": FTP_CREDENTIALS.get("SOUTHERN_GRAPHIC", {}).get("PASSWORD", ".;AA8iyM")
+    if "FTP_CREDENTIALS" in globals()
+    else ".;AA8iyM",
+    "ROOT_DIR": FTP_CREDENTIALS.get("SOUTHERN_GRAPHIC", {}).get("ROOT_DIR", "togpi")
+    if "FTP_CREDENTIALS" in globals()
+    else "togpi",
 }
 
 # Phototype FTP information
 PHOTOTYPE_FTP = {
-    "HOST": "exchange.graphicpkg.com",
-    "USERNAME": "phototype",
-    "PASSWORD": ";3{dKqQe",
-    "ROOT_DIR": "togpi",
+    "HOST": FTP_CREDENTIALS.get("PHOTOTYPE", {}).get("HOST", "exchange.graphicpkg.com")
+    if "FTP_CREDENTIALS" in globals()
+    else "exchange.graphicpkg.com",
+    "USERNAME": FTP_CREDENTIALS.get("PHOTOTYPE", {}).get("USERNAME", "phototype")
+    if "FTP_CREDENTIALS" in globals()
+    else "phototype",
+    "PASSWORD": FTP_CREDENTIALS.get("PHOTOTYPE", {}).get("PASSWORD", ";3{dKqQe")
+    if "FTP_CREDENTIALS" in globals()
+    else ";3{dKqQe",
+    "ROOT_DIR": FTP_CREDENTIALS.get("PHOTOTYPE", {}).get("ROOT_DIR", "togpi")
+    if "FTP_CREDENTIALS" in globals()
+    else "togpi",
 }
 
 TIFF_FTP = {
@@ -316,7 +407,11 @@ YUI_URL = "http://172.23.8.16/media/yui/"
 # Examples: "http://foo.com/media/", "/media/".
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = "jks@9EklalsSlE+29-!kldf~lkd(lkjlkfd$lk.ASd/f#42jlk8$&*89ao"
+SECRET_KEY = (
+    SECRET_KEY
+    if "SECRET_KEY" in globals()
+    else "jks@9EklalsSlE+29-!kldf~lkd(lkjlkfd$lk.ASd/f#42jlk8$&*89ao"
+)
 
 # The model to be used to hold extended user profile information.
 # AUTH_PROFILE_MODULE = 'accounts.UserProfile'
@@ -457,19 +552,59 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 -- Fedex - Account Specifics
 """
 # Testing
-FEDEX_TEST_ACCOUNT_NUM = "510087780"
-FEDEX_TEST_METER_NUM = "118501898"
-FEDEX_TEST_PASSWORD = "vuyQ28rEV4Ah6aw7F5dAMwMv3"
-FEDEX_TEST_KEY = "ZyNQQFdcxUATOx9L"
+FEDEX_TEST_ACCOUNT_NUM = (
+    FEDEX_CREDENTIALS.get("TEST", {}).get("ACCOUNT_NUM", "510087780")
+    if "FEDEX_CREDENTIALS" in globals()
+    else "510087780"
+)
+FEDEX_TEST_METER_NUM = (
+    FEDEX_CREDENTIALS.get("TEST", {}).get("METER_NUM", "118501898")
+    if "FEDEX_CREDENTIALS" in globals()
+    else "118501898"
+)
+FEDEX_TEST_PASSWORD = (
+    FEDEX_CREDENTIALS.get("TEST", {}).get("PASSWORD", "vuyQ28rEV4Ah6aw7F5dAMwMv3")
+    if "FEDEX_CREDENTIALS" in globals()
+    else "vuyQ28rEV4Ah6aw7F5dAMwMv3"
+)
+FEDEX_TEST_KEY = (
+    FEDEX_CREDENTIALS.get("TEST", {}).get("KEY", "ZyNQQFdcxUATOx9L")
+    if "FEDEX_CREDENTIALS" in globals()
+    else "ZyNQQFdcxUATOx9L"
+)
 
 # Production
-FEDEX_DOMAIN = "gateway.fedex.com"
-FEDEX_ACCOUNT_NUM = "248430818"
-FEDEX_METER_NUM = "1301709"
+FEDEX_DOMAIN = (
+    FEDEX_CREDENTIALS.get("PRODUCTION", {}).get("DOMAIN", "gateway.fedex.com")
+    if "FEDEX_CREDENTIALS" in globals()
+    else "gateway.fedex.com"
+)
+FEDEX_ACCOUNT_NUM = (
+    FEDEX_CREDENTIALS.get("PRODUCTION", {}).get("ACCOUNT_NUM", "248430818")
+    if "FEDEX_CREDENTIALS" in globals()
+    else "248430818"
+)
+FEDEX_METER_NUM = (
+    FEDEX_CREDENTIALS.get("PRODUCTION", {}).get("METER_NUM", "1301709")
+    if "FEDEX_CREDENTIALS" in globals()
+    else "1301709"
+)
 # New FedEx SOAP API meter num.
-FEDEX_METER_NUM2 = "101397836"
-FEDEX_PASSWORD = "7A3Q73u6ygBlVKRUkyAEd9qL7"
-FEDEX_KEY = "txCf12dOfHg99RCt"
+FEDEX_METER_NUM2 = (
+    FEDEX_CREDENTIALS.get("PRODUCTION", {}).get("METER_NUM2", "101397836")
+    if "FEDEX_CREDENTIALS" in globals()
+    else "101397836"
+)
+FEDEX_PASSWORD = (
+    FEDEX_CREDENTIALS.get("PRODUCTION", {}).get("PASSWORD", "7A3Q73u6ygBlVKRUkyAEd9qL7")
+    if "FEDEX_CREDENTIALS" in globals()
+    else "7A3Q73u6ygBlVKRUkyAEd9qL7"
+)
+FEDEX_KEY = (
+    FEDEX_CREDENTIALS.get("PRODUCTION", {}).get("KEY", "txCf12dOfHg99RCt")
+    if "FEDEX_CREDENTIALS" in globals()
+    else "txCf12dOfHg99RCt"
+)
 
 """
 -- Fedex - GCHUB Constants
