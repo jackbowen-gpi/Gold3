@@ -37,6 +37,8 @@ MIDDLEWARE = (
     # In DEBUG, remove Permissions-Policy / Feature-Policy to avoid blocking
     # legacy vendor scripts that register `unload` handlers (prototype/YUI/etc.).
     *(("gchub_db.middleware.remove_permissions_policy.RemovePermissionsPolicyHeaderMiddleware",) if DEBUG else ()),
+    # Django Debug Toolbar middleware - only in DEBUG mode
+    *(("debug_toolbar.middleware.DebugToolbarMiddleware",) if DEBUG else ()),
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -61,6 +63,8 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "formtools",
     "django_extensions",
+    # Django Debug Toolbar - only in DEBUG mode
+    *(("debug_toolbar",) if DEBUG else ()),
     "django_celery_beat",
     "gchub_db.apps.accounts",
     "gchub_db.apps.legacy_support",
@@ -208,6 +212,14 @@ CSRF_COOKIE_SAMESITE = "Lax"
 if DEBUG:
     CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000", "http://localhost:8000"]
     CSRF_COOKIE_SECURE = False
+
+# Django Debug Toolbar configuration
+# Only enable in DEBUG mode for security
+if DEBUG:
+    INTERNAL_IPS = [
+        "127.0.0.1",
+        "localhost",
+    ]
 
 try:
     from config.local_settings import *  # noqa: F403

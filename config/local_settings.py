@@ -57,6 +57,25 @@ if "MIDDLEWARE" not in globals():
 # Append our middleware at the end so Django's default error handling still runs.
 MIDDLEWARE.append("gchub_db.middleware.pretty_exception.PrettyExceptionMiddleware")
 
+# Add Django Debug Toolbar middleware for development
+if DEBUG:
+    try:
+        MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+    except Exception:
+        # Don't fail startup if debug toolbar middleware can't be added
+        pass
+
+# Configure INTERNAL_IPS for Django Debug Toolbar in Docker environment
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+    "172.19.0.1",  # Docker network gateway
+    "172.19.0.0/16",  # Allow entire Docker network subnet
+    "192.168.0.0/16",  # Allow common local network ranges
+    "10.0.0.0/8",  # Allow common local network ranges
+    "0.0.0.0/0",  # Allow all IPs (for development)
+]
+
 # Ensure the development-only middleware that strips Permissions-Policy/Feature-Policy
 # headers is active when running locally with DEBUG=True. Put it early in the
 # chain so it can modify response headers from other middleware/views.

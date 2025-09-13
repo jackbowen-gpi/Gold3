@@ -44,6 +44,14 @@ Django==5.2.6
 # Last updated: 2024, actively maintained
 django-extensions==4.1
 
+# Django Debug Toolbar: Configurable set of panels for debugging Django applications
+# Purpose: Provides debugging information and performance metrics in development
+# Could be removed: Yes, for production - development tool only
+# Security: Only enable in DEBUG mode, never in production
+# Last updated: 2024, actively maintained
+# Alternative: Django's built-in debug views
+django-debug-toolbar==4.4.6
+
 # Django Form Tools: Enhanced form tools for Django
 # Purpose: Provides wizard forms and form preview functionality
 # Could be removed: Depends on usage, could be replaced with custom forms

@@ -190,6 +190,77 @@ if getattr(settings, "DEBUG", False):
         # best-effort: don't break imports if something goes wrong
         pass
 
+    # Django Debug Toolbar URLs - only in DEBUG mode
+    try:
+        import debug_toolbar
+
+        urlpatterns.insert(0, url(r"^__debug__/", include(debug_toolbar.urls)))
+    except ImportError:
+        # debug_toolbar not installed, skip
+        pass
+    except Exception:
+        # If include fails, try manual URL patterns
+        try:
+            urlpatterns.insert(
+                0,
+                url(
+                    r"^__debug__/render_panel/$",
+                    debug_toolbar.views.render_panel,
+                    name="render_panel",
+                ),
+            )
+            urlpatterns.insert(
+                0,
+                url(
+                    r"^__debug__/sql_select/$",
+                    debug_toolbar.panels.sql.views.sql_select,
+                    name="sql_select",
+                ),
+            )
+            urlpatterns.insert(
+                0,
+                url(
+                    r"^__debug__/sql_explain/$",
+                    debug_toolbar.panels.sql.views.sql_explain,
+                    name="sql_explain",
+                ),
+            )
+            urlpatterns.insert(
+                0,
+                url(
+                    r"^__debug__/sql_profile/$",
+                    debug_toolbar.panels.sql.views.sql_profile,
+                    name="sql_profile",
+                ),
+            )
+            urlpatterns.insert(
+                0,
+                url(
+                    r"^__debug__/template_source/$",
+                    debug_toolbar.panels.templates.views.template_source,
+                    name="template_source",
+                ),
+            )
+            urlpatterns.insert(
+                0,
+                url(
+                    r"^__debug__/history_sidebar/$",
+                    debug_toolbar.panels.history.views.history_sidebar,
+                    name="history_sidebar",
+                ),
+            )
+            urlpatterns.insert(
+                0,
+                url(
+                    r"^__debug__/history_refresh/$",
+                    debug_toolbar.panels.history.views.history_refresh,
+                    name="history_refresh",
+                ),
+            )
+        except Exception:
+            # best-effort: skip if manual patterns fail
+            pass
+
 # Add a URL pattern for testing the standard.html template
 urlpatterns.append(
     url(r"^test-standard/$", test_standard_template, name="test_standard")
