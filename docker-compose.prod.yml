@@ -1,0 +1,210 @@
+version: '3.8'
+
+services:
+  # Load Balancer
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - static_volume:/var/www/gold3/static:ro
+    depends_on:
+      - web
+    networks:
+      - gold3_network
+
+  # Django Web Application (Scaled to 3 instances)
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    command: gunicorn gchub_db.wsgi:application --bind 0.0.0.0:8000 --workers 4 --threads 2
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    environment:
+      - DEBUG=False
+      - DJANGO_SETTINGS_MODULE=gchub_db.settings
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DEV_DB_HOST=db
+      - DEV_DB_PORT=5432
+      - DEV_DB_NAME=${DB_NAME}
+      - DEV_DB_USER=${DB_USER}
+      - DEV_DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    networks:
+      - gold3_network
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+
+  # PostgreSQL Database
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - gold3_network
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  # Redis Cache & Message Broker
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - gold3_network
+    deploy:
+      replicas: 1
+
+  # Celery Workers (Background Tasks)
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    command: celery -A gchub_db worker --loglevel=info --concurrency=4
+    environment:
+      - DJANGO_SETTINGS_MODULE=gchub_db.settings
+      - DEV_DB_HOST=db
+      - DEV_DB_PORT=5432
+      - DEV_DB_NAME=${DB_NAME}
+      - DEV_DB_USER=${DB_USER}
+      - DEV_DB_PASSWORD=${DB_PASSWORD}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    networks:
+      - gold3_network
+    deploy:
+      replicas: 3
+
+  # Celery Beat (Scheduled Tasks)
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    command: celery -A gchub_db beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    environment:
+      - DJANGO_SETTINGS_MODULE=gchub_db.settings
+      - DEV_DB_HOST=db
+      - DEV_DB_PORT=5432
+      - DEV_DB_NAME=${DB_NAME}
+      - DEV_DB_USER=${DB_USER}
+      - DEV_DB_PASSWORD=${DB_PASSWORD}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    networks:
+      - gold3_network
+    deploy:
+      replicas: 1
+
+  # Flower (Celery Monitoring)
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    command: celery -A gchub_db flower --port=5555
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    networks:
+      - gold3_network
+
+  # Prometheus (Metrics Collection)
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - gold3_network
+
+  # Grafana (Monitoring Dashboards)
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    networks:
+      - gold3_network
+
+  # Node Exporter (System Metrics)
+  node_exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - gold3_network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  static_volume:
+    driver: local
+  media_volume:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  gold3_network:
+    driver: overlay

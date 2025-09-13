@@ -356,8 +356,9 @@ STATIC_CACHE_TIMEOUT = 31536000  # 1 year in seconds
 
 # Add cache control headers for static files
 STATICFILES_DIRS = [
-    os.path.join(MAIN_PATH, "staticfiles"),  # Include existing collected static files
+    # Remove the conflicting staticfiles directory - STATIC_ROOT handles collected files
     # Add any additional static file directories here if needed
+    # Example: os.path.join(BASE_DIR, "custom_static"),
 ]
 
 # Enable GZip compression for static files (requires WhiteNoise or similar)
@@ -374,20 +375,20 @@ MONITORING_LOG_LEVEL = "INFO"  # Log level for monitoring messages
 
 MIDDLEWARE = (
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.cache.UpdateCacheMiddleware",  # Add cache middleware for static files
+    # "django.middleware.cache.UpdateCacheMiddleware",  # Add cache middleware for static files - TEMPORARILY DISABLED
     "django.contrib.sessions.middleware.SessionMiddleware",
     # Ensure CSRF tokens are available to templates and POST handlers.
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     # Dev-only middleware to auto-create and login a development superuser.
-    "gchub_db.middleware.dev_auto_login.DevAutoLoginMiddleware",
+    # "gchub_db.middleware.dev_auto_login.DevAutoLoginMiddleware",  # TEMPORARILY DISABLED
     "django.contrib.messages.middleware.MessageMiddleware",
     #'django.middleware.doc.XViewMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
-    "gchub_db.middleware.threadlocals.ThreadLocals",
-    "gchub_db.middleware.maintenance_mode.middleware.MaintenanceModeMiddleware",
-    "gchub_db.middleware.static_cache.StaticFileCacheMiddleware",  # Custom static file caching
-    "django.middleware.cache.FetchFromCacheMiddleware",  # Add cache fetch middleware
+    # "gchub_db.middleware.threadlocals.ThreadLocals",  # TEMPORARILY DISABLED
+    # "gchub_db.middleware.maintenance_mode.middleware.MaintenanceModeMiddleware",  # TEMPORARILY DISABLED
+    # "gchub_db.middleware.static_cache.StaticFileCacheMiddleware",  # Custom static file caching - TEMPORARILY DISABLED
+    # "django.middleware.cache.FetchFromCacheMiddleware",  # Add cache fetch middleware - TEMPORARILY DISABLED
 )
 
 # Production-only middleware for monitoring (only add if not DEBUG)

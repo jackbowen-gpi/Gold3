@@ -101,8 +101,8 @@ if not globals().get("urlpatterns"):
         urlpatterns = [
             # ensure the workflow app is available under the expected prefix
             url(r"^workflow/", _include("gchub_db.apps.workflow.urls")),
-            # job search explicit mapping
-            url(r"^job/search/$", _fallback_job_search, name="job_search"),
+            # job search - let workflow app handle it
+            # url(r"^job/search/$", _fallback_job_search, name="job_search"),
             url(r"^job/search/", _include("gchub_db.apps.workflow.urls")),
             # Note: do not provide an explicit fallback for list_reports here;
             # the real workflow app should register the named view under
@@ -166,7 +166,8 @@ try:
                 def _fallback_job_search(request):
                     return HttpResponse("job_search fallback")
 
-                urlpatterns.insert(0, url(r"^job/search/$", _fallback_job_search, name="job_search"))
+                # Removed fallback - let workflow app handle job search
+                # urlpatterns.insert(0, url(r"^job/search/$", _fallback_job_search, name="job_search"))
             except Exception:
                 # best-effort: ignore failures in fallback job_search setup
                 pass

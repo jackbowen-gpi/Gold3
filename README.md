@@ -124,7 +124,548 @@ graph TB
     E --> L[Email Mock]
 ```
 
-### **Security Architecture**
+---
+
+## 🐳 **Docker Container Architecture**
+
+### **Complete Container Ecosystem**
+
+```mermaid
+graph TB
+    subgraph "🌐 External Services"
+        EXT_DB[(Production PostgreSQL<br/>Port: 5438)]
+        EXT_FTP[FTP Servers<br/>Fusion/Cyber/Southern/Phototype]
+        EXT_EMAIL[SMTP Server<br/>172.23.8.16]
+        EXT_ODBC[ODBC Systems<br/>ETOOLS/QAD/FSCorrugated]
+    end
+
+    subgraph "🐳 Docker Network (gold3_default)"
+        subgraph "📊 Monitoring Stack"
+            PROMETHEUS[Prometheus<br/>Port: 9090<br/>Metrics Collection]
+            GRAFANA[Grafana<br/>Port: 3000<br/>Dashboards & Visualization]
+            NODE_EXPORTER[Node Exporter<br/>Port: 9100<br/>System Metrics]
+        end
+
+        subgraph "⚡ Task Processing"
+            REDIS[(Redis 7<br/>Port: 6379<br/>Message Broker)]
+            CELERY[Celery Worker<br/>Task Processing]
+            CELERY_BEAT[Celery Beat<br/>Scheduled Tasks]
+            FLOWER[Flower<br/>Port: 5555<br/>Task Monitoring]
+        end
+
+        subgraph "🖥️ Application Layer"
+            WEB[Django Web App<br/>Port: 8000<br/>Main Application]
+            NOTIFICATION_DAEMON[Notification Daemon<br/>Port: 5341<br/>Desktop Notifications]
+        end
+
+        subgraph "💾 Data Layer"
+            DB[(PostgreSQL 15<br/>Container Port: 5432<br/>Host Port: 5438<br/>Application Database)]
+        end
+    end
+
+    %% Data Flow Connections
+    WEB --> DB
+    WEB --> REDIS
+    WEB --> NOTIFICATION_DAEMON
+
+    CELERY --> REDIS
+    CELERY_BEAT --> REDIS
+    FLOWER --> REDIS
+
+    CELERY --> DB
+    CELERY_BEAT --> DB
+
+    PROMETHEUS --> NODE_EXPORTER
+    GRAFANA --> PROMETHEUS
+
+    %% External Connections
+    WEB -.-> EXT_DB
+    WEB -.-> EXT_FTP
+    WEB -.-> EXT_EMAIL
+    WEB -.-> EXT_ODBC
+
+    CELERY -.-> EXT_FTP
+    CELERY -.-> EXT_EMAIL
+
+    %% Styling
+    classDef external fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef monitoring fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef processing fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef application fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef data fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+
+    class EXT_DB,EXT_FTP,EXT_EMAIL,EXT_ODBC external
+    class PROMETHEUS,GRAFANA,NODE_EXPORTER monitoring
+    class REDIS,CELERY,CELERY_BEAT,FLOWER processing
+    class WEB,NOTIFICATION_DAEMON application
+    class DB data
+```
+
+### **Container Dependencies & Startup Order**
+
+```mermaid
+graph TD
+    A[Start Docker Network] --> B[PostgreSQL Database]
+    B --> C[Redis Cache/Message Broker]
+    C --> D[Django Web Application]
+    D --> E[Notification Daemon]
+    D --> F[Celery Worker]
+    D --> G[Celery Beat Scheduler]
+    F --> H[Flower Monitoring]
+    D --> I[Prometheus Metrics]
+    I --> J[Grafana Dashboards]
+    I --> K[Node Exporter]
+
+    %% Styling
+    classDef database fill:#fce4ec,stroke:#880e4f
+    classDef cache fill:#fff3e0,stroke:#e65100
+    classDef web fill:#e8f5e8,stroke:#1b5e20
+    classDef worker fill:#e1f5fe,stroke:#01579b
+    classDef monitoring fill:#f3e5f5,stroke:#4a148c
+
+    class B database
+    class C cache
+    class D,E web
+    class F,G worker
+    class H,I,J,K monitoring
+```
+
+### **Network Architecture & Port Mapping**
+
+| Container | Internal Port | External Port | Purpose | Dependencies |
+|-----------|---------------|---------------|---------|--------------|
+| **Django Web** | 8000 | 8000 | Main web application | PostgreSQL, Redis |
+| **PostgreSQL** | 5432 | 5438 | Database server | None |
+| **Redis** | 6379 | 6379 | Cache & message broker | None |
+| **Notification Daemon** | 5341 | 5341 | Desktop notifications | PostgreSQL |
+| **Celery Worker** | - | - | Background tasks | Redis, PostgreSQL |
+| **Celery Beat** | - | - | Scheduled tasks | Redis, PostgreSQL |
+| **Flower** | 5555 | 5555 | Task monitoring UI | Redis |
+| **Prometheus** | 9090 | 9090 | Metrics collection | Node Exporter |
+| **Grafana** | 3000 | 3000 | Monitoring dashboards | Prometheus |
+| **Node Exporter** | 9100 | 9100 | System metrics | None |
+
+### **Data Flow Architecture**
+
+```mermaid
+graph TD
+    subgraph "User Interaction"
+        USER[👤 User] --> WEB[Django Web App]
+        WEB --> TEMPLATE[HTML Templates]
+        WEB --> STATIC[Static Files]
+    end
+
+    subgraph "Application Logic"
+        WEB --> VIEWS[Django Views]
+        VIEWS --> MODELS[Django Models]
+        VIEWS --> FORMS[Django Forms]
+    end
+
+    subgraph "Data Layer"
+        MODELS --> DB[(PostgreSQL<br/>Application Data)]
+        MODELS --> CACHE[(Redis<br/>Session Cache)]
+    end
+
+    subgraph "Background Processing"
+        VIEWS --> CELERY_QUEUE[Celery Task Queue]
+        CELERY_QUEUE --> REDIS_BROKER[(Redis<br/>Message Broker)]
+        REDIS_BROKER --> CELERY_WORKER[Celery Worker]
+        CELERY_WORKER --> DB
+        CELERY_WORKER --> EXTERNAL[External Systems<br/>FTP, Email, ODBC]
+    end
+
+    subgraph "Monitoring"
+        PROMETHEUS --> METRICS[Application Metrics]
+        METRICS --> GRAFANA[Visualization<br/>Dashboards]
+    end
+
+    %% Styling
+    classDef user fill:#e8f5e8,stroke:#1b5e20
+    classDef app fill:#e1f5fe,stroke:#01579b
+    classDef data fill:#fce4ec,stroke:#880e4f
+    classDef worker fill:#fff3e0,stroke:#e65100
+    classDef monitor fill:#f3e5f5,stroke:#4a148c
+
+    class USER user
+    class WEB,VIEWS,MODELS,FORMS app
+    class DB,CACHE data
+    class CELERY_QUEUE,CELERY_WORKER worker
+    class PROMETHEUS,GRAFANA monitor
+```
+
+---
+
+## 🚀 **Production Deployment Strategy**
+
+### **Production Architecture Overview**
+
+```mermaid
+graph TB
+    subgraph "🌐 Load Balancer (nginx/haproxy)"
+        LB[Load Balancer<br/>SSL Termination<br/>Port: 443/80]
+    end
+
+    subgraph "🐳 Application Servers (Docker Swarm/K8s)"
+        WEB1[Django App #1<br/>Container]
+        WEB2[Django App #2<br/>Container]
+        WEB3[Django App #3<br/>Container]
+    end
+
+    subgraph "⚡ Background Workers"
+        CELERY1[Celery Worker #1]
+        CELERY2[Celery Worker #2]
+        CELERY3[Celery Worker #3]
+    end
+
+    subgraph "💾 Database Cluster"
+        PG_MASTER[(PostgreSQL Master<br/>Read/Write)]
+        PG_REPLICA1[(PostgreSQL Replica #1<br/>Read-Only)]
+        PG_REPLICA2[(PostgreSQL Replica #2<br/>Read-Only)]
+    end
+
+    subgraph "🔄 Caching & Queue"
+        REDIS_MASTER[(Redis Master<br/>Cache & Queue)]
+        REDIS_REPLICA[(Redis Replica<br/>Failover)]
+    end
+
+    subgraph "📊 Monitoring & Logging"
+        PROMETHEUS[Prometheus<br/>Metrics]
+        GRAFANA[Grafana<br/>Dashboards]
+        ELASTICSEARCH[(Elasticsearch<br/>Log Storage)]
+        KIBANA[Kibana<br/>Log Analysis]
+    end
+
+    subgraph "💽 Storage"
+        MINIO[MinIO S3<br/>File Storage]
+        NFS[NFS Server<br/>Shared Storage]
+    end
+
+    %% Traffic Flow
+    LB --> WEB1
+    LB --> WEB2
+    LB --> WEB3
+
+    WEB1 --> PG_MASTER
+    WEB2 --> PG_MASTER
+    WEB3 --> PG_MASTER
+
+    WEB1 --> REDIS_MASTER
+    WEB2 --> REDIS_MASTER
+    WEB3 --> REDIS_MASTER
+
+    CELERY1 --> REDIS_MASTER
+    CELERY2 --> REDIS_MASTER
+    CELERY3 --> REDIS_MASTER
+
+    CELERY1 --> PG_REPLICA1
+    CELERY2 --> PG_REPLICA1
+    CELERY3 --> PG_REPLICA2
+
+    PG_MASTER -.-> PG_REPLICA1
+    PG_MASTER -.-> PG_REPLICA2
+
+    REDIS_MASTER -.-> REDIS_REPLICA
+
+    PROMETHEUS --> WEB1
+    PROMETHEUS --> WEB2
+    PROMETHEUS --> WEB3
+    PROMETHEUS --> PG_MASTER
+    PROMETHEUS --> REDIS_MASTER
+
+    GRAFANA --> PROMETHEUS
+
+    ELASTICSEARCH --> WEB1
+    ELASTICSEARCH --> WEB2
+    ELASTICSEARCH --> WEB3
+
+    KIBANA --> ELASTICSEARCH
+
+    WEB1 --> MINIO
+    WEB2 --> MINIO
+    WEB3 --> MINIO
+
+    CELERY1 --> NFS
+    CELERY2 --> NFS
+    CELERY3 --> NFS
+
+    %% Styling
+    classDef loadbalancer fill:#e8f5e8,stroke:#1b5e20,stroke-width:3px
+    classDef web fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef worker fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef database fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef cache fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef monitoring fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef storage fill:#fff8e1,stroke:#f57f17,stroke-width:2px
+
+    class LB loadbalancer
+    class WEB1,WEB2,WEB3 web
+    class CELERY1,CELERY2,CELERY3 worker
+    class PG_MASTER,PG_REPLICA1,PG_REPLICA2 database
+    class REDIS_MASTER,REDIS_REPLICA cache
+    class PROMETHEUS,GRAFANA,ELASTICSEARCH,KIBANA monitoring
+    class MINIO,NFS storage
+```
+
+### **Deployment Environments**
+
+| Environment | Purpose | Infrastructure | Scaling |
+|-------------|---------|----------------|---------|
+| **Development** | Feature development | Local Docker | Single container |
+| **Staging** | Pre-production testing | Docker Compose | Multi-container stack |
+| **Production** | Live application | Docker Swarm/K8s | Load balanced cluster |
+
+### **Production Deployment Steps**
+
+#### **1. Infrastructure Preparation**
+```bash
+# Create production network
+docker network create --driver overlay gold3_prod
+
+# Initialize Docker Swarm (if using Swarm)
+docker swarm init
+
+# Or deploy to Kubernetes cluster
+kubectl create namespace gold3-production
+```
+
+#### **2. Database Setup**
+```bash
+# Deploy PostgreSQL with replication
+docker stack deploy -c docker-compose.prod.db.yml gold3-db
+
+# Wait for database to be ready
+docker stack services gold3-db
+
+# Run initial migrations
+docker run --rm --network gold3_prod \
+  -e DEV_DB_HOST=postgres_master \
+  -e DEV_DB_PORT=5432 \
+  gold3:latest python manage.py migrate
+```
+
+#### **3. Redis & Caching Setup**
+```bash
+# Deploy Redis cluster
+docker stack deploy -c docker-compose.prod.redis.yml gold3-cache
+
+# Verify Redis connectivity
+docker run --rm --network gold3_prod \
+  redis:7 redis-cli -h redis_master ping
+```
+
+#### **4. Application Deployment**
+```bash
+# Build production images
+docker build -t gold3:latest -f Dockerfile.prod .
+
+# Deploy application stack
+docker stack deploy -c docker-compose.prod.yml gold3-app
+
+# Verify deployment
+docker stack services gold3-app
+```
+
+#### **5. Load Balancer Configuration**
+```nginx
+# nginx.conf for production
+upstream gold3_backend {
+    server app1:8000;
+    server app2:8000;
+    server app3:8000;
+}
+
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://gold3_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location /static/ {
+        alias /var/www/gold3/static/;
+        expires 1y;
+    }
+
+    location /media/ {
+        alias /var/www/gold3/media/;
+        expires 30d;
+    }
+}
+```
+
+#### **6. Monitoring Setup**
+```bash
+# Deploy monitoring stack
+docker stack deploy -c docker-compose.monitoring.yml gold3-monitoring
+
+# Configure Grafana dashboards
+# - Application performance
+# - Database metrics
+# - System resources
+# - Error rates and alerts
+```
+
+### **Production Configuration**
+
+#### **Environment Variables**
+```bash
+# Production environment file (.env.prod)
+DEBUG=False
+SECRET_KEY=your-production-secret-key
+ALLOWED_HOSTS=your-domain.com,www.your-domain.com
+
+# Database
+DEV_DB_HOST=postgres_master
+DEV_DB_PORT=5432
+DEV_DB_NAME=gchub_prod
+DEV_DB_USER=gchub_prod
+DEV_DB_PASSWORD=secure-production-password
+
+# Redis
+REDIS_URL=redis://redis_master:6379/0
+
+# Email
+EMAIL_HOST=production-smtp.your-domain.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+
+# External Systems
+ETOOLS_ODBC_DSN=production-etools-dsn
+QAD_ODBC_DSN=production-qad-dsn
+```
+
+#### **Security Hardening**
+```yaml
+# docker-compose.prod.yml security additions
+services:
+  web:
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    environment:
+      - SECURE_SSL_REDIRECT=True
+      - SECURE_HSTS_SECONDS=31536000
+      - SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+      - SECURE_HSTS_PRELOAD=True
+```
+
+### **Scaling Strategy**
+
+#### **Horizontal Scaling**
+```bash
+# Scale web application
+docker service scale gold3-app_web=5
+
+# Scale Celery workers
+docker service scale gold3-app_celery=8
+
+# Scale database read replicas
+docker service scale gold3-db_postgres_replica=3
+```
+
+#### **Auto-scaling Configuration**
+```yaml
+# Kubernetes HPA for web application
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: gold3-web-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: gold3-web
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+```
+
+### **Backup & Recovery**
+
+#### **Database Backup Strategy**
+```bash
+# Daily automated backup
+0 2 * * * docker exec gold3-db_postgres_1 pg_dump -U gchub_prod gchub_prod > /backup/daily_$(date +\%Y\%m\%d).sql
+
+# Weekly full backup with WAL files
+0 3 * * 0 docker exec gold3-db_postgres_1 pg_basebackup -U replicator -D /backup/weekly_$(date +\%Y\%m\%d) --wal-method=stream
+```
+
+#### **Disaster Recovery**
+```bash
+# Restore from backup
+docker exec -i gold3-db_postgres_1 psql -U gchub_prod gchub_prod < /backup/daily_20241201.sql
+
+# Failover to replica
+docker service update --replicas 0 gold3-db_postgres_master
+docker service update --replicas 1 gold3-db_postgres_replica
+```
+
+### **Performance Optimization**
+
+#### **Database Optimization**
+- Connection pooling with PgBouncer
+- Query optimization and indexing
+- Read replicas for heavy queries
+- Database partitioning for large tables
+
+#### **Application Optimization**
+- Django caching with Redis
+- Static file serving with CDN
+- Gzip compression
+- Database query optimization
+
+#### **Infrastructure Optimization**
+- Load balancer sticky sessions
+- Redis clustering for high availability
+- Monitoring and alerting
+- Log aggregation with ELK stack
+
+### **Monitoring & Observability**
+
+#### **Key Metrics to Monitor**
+- Application response time
+- Database connection pool usage
+- Celery queue length
+- Error rates and exceptions
+- System resource utilization
+- External service availability
+
+#### **Alerting Rules**
+```yaml
+# Prometheus alerting rules
+groups:
+- name: gold3_alerts
+  rules:
+  - alert: HighErrorRate
+    expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High error rate detected"
+
+  - alert: DatabaseDown
+    expr: up{job="postgres"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Database is down"
+```
+
+This production deployment strategy ensures high availability, scalability, and maintainability of the GOLD3 application in enterprise environments.
 
 - **🔐 CSRF Protection**: 100% coverage across 60+ JavaScript files
 - **🛡️ Authentication**: Secure user management with permissions

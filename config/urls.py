@@ -72,8 +72,9 @@ except Exception:
     pass
 
 # Default Page fallback
-urlpatterns.append(url(r"^job/search/$", _fallback_job_search, name="job_search"))
-urlpatterns.append(url(r"^reports/list/$", _fallback_list_reports, name="list_reports"))
+# Removed fallbacks - let workflow app handle these URLs
+# urlpatterns.append(url(r"^job/search/$", _fallback_job_search, name="job_search"))
+# urlpatterns.append(url(r"^reports/list/$", _fallback_list_reports, name="list_reports"))
 
 
 # Include various app URLConfs. Wrap each include in try/except so a single
@@ -101,9 +102,6 @@ def _try_include(regex, mod_str, namespace=None, app_name=None):
         return
 
 
-_try_include(
-    r"^job/search/", "gchub_db.apps.workflow.urls", "workflow_job_search", "workflow"
-)
 _try_include(r"^job/", "gchub_db.apps.workflow.urls", "workflow_job", "workflow")
 _try_include(r"^address/", "gchub_db.apps.address.urls")
 _try_include(r"^bev_billing/", "gchub_db.apps.bev_billing.urls")
