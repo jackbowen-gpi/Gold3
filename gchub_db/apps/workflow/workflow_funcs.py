@@ -1,7 +1,63 @@
 """Functions used throughout the workflow app."""
 
+from django.core.cache import cache
+import hashlib
+import json
+
 
 def recalc_bev_nomenclature(
+    size,
+    bev_itemcolorcode,
+    printlocation,
+    platepackage,
+    bev_alt_code,
+    bev_center_code,
+    bev_liquid_code,
+    prepress_supplier,
+):
+    """
+    Separating this out so both the model and Javascript can access.
+    Need to be able to calculate without attachment to an existing item
+    Build the Evergreen nomenclature from size/color, center code, & end code.
+    """
+    # Create a cache key from all the parameters
+    cache_key_data = {
+        "size_id": size.id if size else None,
+        "bev_itemcolorcode_id": bev_itemcolorcode.id if bev_itemcolorcode else None,
+        "printlocation_id": printlocation.id if printlocation else None,
+        "platepackage_id": platepackage.id if platepackage else None,
+        "bev_alt_code": bev_alt_code,
+        "bev_center_code_id": bev_center_code.id if bev_center_code else None,
+        "bev_liquid_code_id": bev_liquid_code.id if bev_liquid_code else None,
+        "prepress_supplier": prepress_supplier,
+    }
+
+    # Create a hash of the parameters for the cache key
+    cache_key = "bev_nomenclature_" + hashlib.md5(json.dumps(cache_key_data, sort_keys=True).encode()).hexdigest()
+
+    # Try to get from cache first
+    cached_result = cache.get(cache_key)
+    if cached_result is not None:
+        return cached_result
+
+    # Calculate the result
+    result = _calc_bev_nomenclature(
+        size,
+        bev_itemcolorcode,
+        printlocation,
+        platepackage,
+        bev_alt_code,
+        bev_center_code,
+        bev_liquid_code,
+        prepress_supplier,
+    )
+
+    # Cache the result for 1 hour
+    cache.set(cache_key, result, 3600)
+    return result
+
+
+def _calc_bev_nomenclature(
     size,
     bev_itemcolorcode,
     printlocation,

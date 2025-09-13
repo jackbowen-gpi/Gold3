@@ -25,15 +25,9 @@ def create_excel_report():
     critical_font = Font(color="DC143C", bold=True)
 
     # Color fills
-    header_fill = PatternFill(
-        start_color="2E8B57", end_color="2E8B57", fill_type="solid"
-    )
-    warning_fill = PatternFill(
-        start_color="FFF8DC", end_color="FFF8DC", fill_type="solid"
-    )
-    critical_fill = PatternFill(
-        start_color="FFB6C1", end_color="FFB6C1", fill_type="solid"
-    )
+    header_fill = PatternFill(start_color="2E8B57", end_color="2E8B57", fill_type="solid")
+    warning_fill = PatternFill(start_color="FFF8DC", end_color="FFF8DC", fill_type="solid")
+    critical_fill = PatternFill(start_color="FFB6C1", end_color="FFB6C1", fill_type="solid")
 
     # Border styles
     thin_border = Border(
@@ -230,9 +224,7 @@ def create_excel_report():
     }
 
     df_coverage = pd.DataFrame(coverage_data)
-    df_coverage.to_excel(
-        writer, sheet_name="Coverage Analysis", index=False, startrow=1
-    )
+    df_coverage.to_excel(writer, sheet_name="Coverage Analysis", index=False, startrow=1)
 
     worksheet = writer.sheets["Coverage Analysis"]
 

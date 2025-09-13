@@ -1,3 +1,4 @@
+# ruff: noqa
 #!/usr/bin/env python
 #
 # Copyright 2009 Facebook
@@ -206,13 +207,9 @@ class IOLoop(object):
                         # Happens when the client closes the connection
                         pass
                     else:
-                        logging.error(
-                            "Exception in I/O handler for fd %d", fd, exc_info=True
-                        )
+                        logging.error("Exception in I/O handler for fd %d", fd, exc_info=True)
                 except Exception:
-                    logging.error(
-                        "Exception in I/O handler for fd %d", fd, exc_info=True
-                    )
+                    logging.error("Exception in I/O handler for fd %d", fd, exc_info=True)
         # reset the stopped flag so another start/stop pair can be issued
         self._stopped = False
 
@@ -418,9 +415,7 @@ class _Select(object):
         self.error_fds.discard(fd)
 
     def poll(self, timeout):
-        readable, writeable, errors = select.select(
-            self.read_fds, self.write_fds, self.error_fds, timeout
-        )
+        readable, writeable, errors = select.select(self.read_fds, self.write_fds, self.error_fds, timeout)
         events = {}
         for fd in readable:
             events[fd] = events.get(fd, 0) | IOLoop.READ

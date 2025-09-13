@@ -2,6 +2,7 @@
 
 import os  # Operating System level things (files, dirs, etc)
 import os.path
+import warnings
 
 DJANGO_SERVE_MEDIA = True
 DEBUG = True
@@ -67,8 +68,8 @@ if DEBUG:
                 MIDDLEWARE.insert(0, dev_mw)
         else:
             # If it's a tuple, convert safely to keep ordering
-            if dev_mw not in tuple(MIDDLEWARE):
-                MIDDLEWARE = (dev_mw,) + tuple(MIDDLEWARE)
+            if dev_mw not in tuple(MIDDLEWARE):  # type: ignore[unreachable]
+                MIDDLEWARE = (dev_mw,) + tuple(MIDDLEWARE)  # type: ignore[unreachable]
     except Exception:
         # Don't fail startup for a non-critical dev convenience change
         pass
@@ -105,7 +106,6 @@ LOGGING = {
 }
 
 # Filter noisy SyntaxWarning messages from third-party libraries during dev runs
-import warnings
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module=r"gntp\..*")
 warnings.filterwarnings("ignore", category=SyntaxWarning, module=r"colormath\..*")
@@ -179,6 +179,7 @@ FS_ACCESS_ENABLED = False
 
 # Default static files destination for local development.
 # Collectstatic needs STATIC_ROOT set to a filesystem path. Use an env override
-# if provided; otherwise write to /app/staticfiles inside the container.
-import os
-STATIC_ROOT = os.environ.get("STATIC_ROOT", "/app/staticfiles")
+# if provided; otherwise write to a local staticfiles directory for Windows development.
+STATIC_ROOT = os.environ.get(
+    "STATIC_ROOT", os.path.join(os.path.dirname(__file__), "..", "staticfiles")
+)

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from gchub_db.apps.queues.models import *
+from gchub_db.apps.queues.models import ColorKeyQueue, TiffToPDF
 
 
 class ColorKeyQueueAdmin(admin.ModelAdmin):

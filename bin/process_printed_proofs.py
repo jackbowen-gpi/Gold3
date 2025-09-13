@@ -38,7 +38,8 @@ for file in next(os.walk(xml_file_path))[2]:
         if show_your_work:
             print("Working on %s..." % file)
 
-        # Check the files modification date. The dates stored within the XML are too inconsistent.
+        # Check the files modification date. The dates stored within the XML
+        # are too inconsistent.
         try:
             print_date_string = time.ctime(os.path.getmtime(os.path.join(xml_file_path, file)))
             print_date = datetime.strptime(print_date_string, "%a %b %d %H:%M:%S %Y")

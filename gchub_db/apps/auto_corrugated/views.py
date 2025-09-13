@@ -48,18 +48,10 @@ class GeneratedBoxForm(ModelForm, JSONErrorForm):
     #    dummy_data = BooleanField()
 
     # We want this to be empty when the page is first loaded.
-    six_digit_num = IntegerField(
-        widget=TextInput(attrs={"maxlength": "6", "size": "6"})
-    )
-    replaced_6digit = IntegerField(
-        required=False, widget=TextInput(attrs={"maxlength": "6", "size": "6"})
-    )
-    nine_digit_num = IntegerField(
-        widget=TextInput(attrs={"maxlength": "9", "size": "9"})
-    )
-    fourteen_digit_num = IntegerField(
-        widget=TextInput(attrs={"maxlength": "14", "size": "14"})
-    )
+    six_digit_num = IntegerField(widget=TextInput(attrs={"maxlength": "6", "size": "6"}))
+    replaced_6digit = IntegerField(required=False, widget=TextInput(attrs={"maxlength": "6", "size": "6"}))
+    nine_digit_num = IntegerField(widget=TextInput(attrs={"maxlength": "9", "size": "9"}))
+    fourteen_digit_num = IntegerField(widget=TextInput(attrs={"maxlength": "14", "size": "14"}))
 
     case_color = ChoiceField(choices=CASE_COLOR_CHOICE)
 
@@ -95,9 +87,7 @@ class GeneratedBoxForm(ModelForm, JSONErrorForm):
     def __init__(self, *args, **kwargs):
         """Populate some of the fields."""
         super(GeneratedBoxForm, self).__init__(*args, **kwargs)
-        default_platemaker = PlatePackage.objects.get(
-            platetype="Corrugate", platemaker__name="Shelbyville"
-        )
+        default_platemaker = PlatePackage.objects.get(platetype="Corrugate", platemaker__name="Shelbyville")
         self.fields["platepackage"] = ModelChoiceField(
             queryset=PlatePackage.objects.filter(platetype="Corrugate"),
             empty_label="None/Outsourced",
@@ -146,13 +136,9 @@ class GeneratedBoxForm(ModelForm, JSONErrorForm):
         if data == 0:
             pass
         elif data > 99999999999999:
-            raise forms.ValidationError(
-                "The fourteen digit (SCC) number has more than 14 digits!"
-            )
+            raise forms.ValidationError("The fourteen digit (SCC) number has more than 14 digits!")
         elif data < 10000000000000:
-            raise forms.ValidationError(
-                "The fourteen digit (SCC) number is not long enough!"
-            )
+            raise forms.ValidationError("The fourteen digit (SCC) number is not long enough!")
         return data
 
 
@@ -195,9 +181,7 @@ def pdf_generation_form(request, box_id=None, edit=False, download_pdf=False):
                 "box_id": box_id,
             }
 
-            return render(
-                request, "auto_corrugated/pdf_generation_form2.html", context=pagevars
-            )
+            return render(request, "auto_corrugated/pdf_generation_form2.html", context=pagevars)
 
     if request.POST:
         # If pdf_typeis 1 or 3 this is a blank label so we need to populate certain values with the dummy values
@@ -214,17 +198,13 @@ def pdf_generation_form(request, box_id=None, edit=False, download_pdf=False):
         form = GeneratedBoxForm(request.POST)
         if form.is_valid():
             #            dumb_data = form.cleaned_data['dummy_data']
-            if (
-                len(form.cleaned_data["text_line_1"]) > 22
-                or len(form.cleaned_data["text_line_2"]) > 22
-            ):
+            if len(form.cleaned_data["text_line_1"]) > 22 or len(form.cleaned_data["text_line_2"]) > 22:
                 msg = "Text lines can't be more than 22 characters."
                 form._errors["Too long"] = form.error_class([msg])
                 return form.serialize_errors()
             # kenton must now have a plate number
             elif form.cleaned_data["plant"].name == "Kenton" and (
-                form.cleaned_data["plate_number"] is None
-                or form.cleaned_data["plate_number"] == ""
+                form.cleaned_data["plate_number"] is None or form.cleaned_data["plate_number"] == ""
             ):
                 msg = "Kenton must have a plate number."
                 form._errors["Plate Number Error"] = form.error_class([msg])
@@ -234,21 +214,15 @@ def pdf_generation_form(request, box_id=None, edit=False, download_pdf=False):
             form.save()
             if download_pdf:
                 box_pdf = io.BytesIO()
-                form.instance.generate_box_pdf(
-                    box_pdf, "reportlab", False, threadlocals.get_current_user()
-                )
+                form.instance.generate_box_pdf(box_pdf, "reportlab", False, threadlocals.get_current_user())
 
                 # Prepare a simple HTTP response with the StringIO object as an attachment.
-                response = HttpResponse(
-                    box_pdf.getvalue(), content_type="application/pdf"
-                )
+                response = HttpResponse(box_pdf.getvalue(), content_type="application/pdf")
                 # This is the filename the server will suggest to the browser.
                 filename = "fsb_box_%s.pdf" % form.instance.nine_digit_num
                 # The attachment header will make sure the browser doesn't try to
                 # render the binary/ascii data.
-                response["Content-Disposition"] = (
-                    'attachment; filename="' + filename + '"'
-                )
+                response["Content-Disposition"] = 'attachment; filename="' + filename + '"'
                 # Bombs away.
                 return response
             else:
@@ -273,9 +247,7 @@ def pdf_generation_form(request, box_id=None, edit=False, download_pdf=False):
         "box_id": box_id,
     }
 
-    return render(
-        request, "auto_corrugated/pdf_generation_form2.html", context=pagevars
-    )
+    return render(request, "auto_corrugated/pdf_generation_form2.html", context=pagevars)
 
 
 def pdf_generation_form_edit(request, box_id):
@@ -507,9 +479,7 @@ def label_search_form(request):
             "form": GeneratedLabelSearchForm(),
         }
 
-        return render(
-            request, "auto_corrugated/label_search_form.html", context=pagevars
-        )
+        return render(request, "auto_corrugated/label_search_form.html", context=pagevars)
 
 
 def check_and_create_barcode(box, argArr, type="box_pdf"):
@@ -544,9 +514,7 @@ def check_and_create_barcode(box, argArr, type="box_pdf"):
         return False
     else:
         if type == "box_pdf":
-            box.generate_box_pdf(
-                argArr[0], argArr[1], argArr[2], threadlocals.get_current_user()
-            )
+            box.generate_box_pdf(argArr[0], argArr[1], argArr[2], threadlocals.get_current_user())
         else:
             # Here box = lable
             box.generate_label_pdf(argArr[0], box.id)
@@ -566,9 +534,7 @@ def generate_box(request, box_id, method, save_to_job=False):
             # Check and make sure that the barcode files exist for a production ready job and Generate
             # the PDF and save at the given path (inside job folder)
             if barcodeFileExists(box.id, "box_pdf"):
-                box.generate_box_pdf(
-                    fullpath, method, save_to_job, threadlocals.get_current_user()
-                )
+                box.generate_box_pdf(fullpath, method, save_to_job, threadlocals.get_current_user())
             else:
                 # if the barcode files do no exist then kick off the automation engine workflow to make them and
                 # wait before trying to create the job. This is threaded which should not lock the client for the user.
@@ -601,9 +567,7 @@ def generate_box(request, box_id, method, save_to_job=False):
                 # return response
         else:
             # if we use reportlab to generate the barcodes then proceeed with Preview PDF generation normally.
-            box.generate_box_pdf(
-                box_pdf, method, save_to_job, threadlocals.get_current_user()
-            )
+            box.generate_box_pdf(box_pdf, method, save_to_job, threadlocals.get_current_user())
         # Prepare a simple HTTP response with the StringIO object as an attachment.
         response = HttpResponse(box_pdf.getvalue(), content_type="application/pdf")
         # This is the filename the server will suggest to the browser.
@@ -640,9 +604,7 @@ def approve_box(request, box_id, type="Approved"):
 
     # No need for filename (let method handle that. Set Save to Job as True.)
     # in approvals we do not need to wait for the function so we put it on its own thread.
-    thread1 = threading.Thread(
-        target=check_and_create_barcode, args=[box, [None, "automationEngine", True]]
-    )
+    thread1 = threading.Thread(target=check_and_create_barcode, args=[box, [None, "automationEngine", True]])
     thread1.start()
 
     if type == "Approved":
@@ -700,9 +662,7 @@ def view_box_data(request, box_id):
                 for fileform in fileformset.cleaned_data:
                     # Check if there's a file in this field.
                     if fileform:
-                        destination = open(
-                            os.path.join(path, fileform["file"].name), "wb+"
-                        )
+                        destination = open(os.path.join(path, fileform["file"].name), "wb+")
                         # Write the file to the job folder.
                         for chunk in fileform["file"]:
                             destination.write(chunk)
@@ -788,12 +748,8 @@ def generate_label(request, label_id):
 
 class GeneratedLabelForm(ModelForm):
     # We want this to be empty when the page is first loaded.
-    nine_digit_num = IntegerField(
-        widget=TextInput(attrs={"maxlength": "9", "size": "9"})
-    )
-    fourteen_digit_num = IntegerField(
-        widget=TextInput(attrs={"maxlength": "14", "size": "14"})
-    )
+    nine_digit_num = IntegerField(widget=TextInput(attrs={"maxlength": "9", "size": "9"}))
+    fourteen_digit_num = IntegerField(widget=TextInput(attrs={"maxlength": "14", "size": "14"}))
     pdf_type = IntegerField(initial=2)
 
     class Meta:
@@ -819,13 +775,9 @@ class GeneratedLabelForm(ModelForm):
         """Check that the fourteen_digit_num field has the correct number of digits."""
         data = self.cleaned_data["fourteen_digit_num"]
         if data > 99999999999999:
-            raise forms.ValidationError(
-                "The fourteen digit (SCC) number has more than 14 digits!"
-            )
+            raise forms.ValidationError("The fourteen digit (SCC) number has more than 14 digits!")
         elif data < 10000000000000:
-            raise forms.ValidationError(
-                "The fourteen digit (SCC) number is not long enough!"
-            )
+            raise forms.ValidationError("The fourteen digit (SCC) number is not long enough!")
         return data
 
 
@@ -840,9 +792,7 @@ def pdf_label_generation_form(request):
             # form.instance.generate_label_pdf(label_pdf, form.instance.id)
 
             # Prepare a simple HTTP response with the StringIO object as an attachment.
-            response = HttpResponse(
-                label_pdf.getvalue(), content_type="application/pdf"
-            )
+            response = HttpResponse(label_pdf.getvalue(), content_type="application/pdf")
             # This is the filename the server will suggest to the browser.
             filename = "fsb_label_%s.pdf" % form.instance.nine_digit_num
             # The attachment header will make sure the browser doesn't try to
@@ -862,9 +812,7 @@ def pdf_label_generation_form(request):
         "type": "Label",
     }
 
-    return render(
-        request, "auto_corrugated/pdf_generation_form2.html", context=pagevars
-    )
+    return render(request, "auto_corrugated/pdf_generation_form2.html", context=pagevars)
 
 
 def help(request):

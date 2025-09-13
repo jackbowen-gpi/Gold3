@@ -111,18 +111,13 @@ def get_specsheet_description(nine_digit):
         cursor = _get_conn_cursor()[0]
 
         # Lines 1 and 2
-        cursor.execute(
-            "SELECT Description, Description2 FROM ProductSpecs where Part='%s'"
-            % str(nine_digit)
-        )
+        cursor.execute("SELECT Description, Description2 FROM ProductSpecs where Part='%s'" % str(nine_digit))
         data_first_attmpt = cursor.fetchone()
         description_list.append(data_first_attmpt[0])
         description_list.append(data_first_attmpt[1])
 
         # Line 3
-        cursor.execute(
-            "SELECT cd_cmmt##1 FROM cd_det WHERE cd_ref = '%s'" % str(nine_digit)
-        )
+        cursor.execute("SELECT cd_cmmt##1 FROM cd_det WHERE cd_ref = '%s'" % str(nine_digit))
         data_second_attmpt = cursor.fetchone()
         description_list.append(data_second_attmpt[0])
 

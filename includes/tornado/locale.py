@@ -253,9 +253,7 @@ class Locale(object):
             message_dict = self.translations.get("unknown", {})
         return message_dict.get(message, message)
 
-    def format_date(
-        self, date, gmt_offset=0, relative=True, shorter=False, full_format=False
-    ):
+    def format_date(self, date, gmt_offset=0, relative=True, shorter=False, full_format=False):
         """
         Formats the given date (which should be GMT).
 
@@ -286,15 +284,11 @@ class Locale(object):
         if not full_format:
             if relative and days == 0:
                 if seconds < 50:
-                    return _("1 second ago", "%(seconds)d seconds ago", seconds) % {
-                        "seconds": seconds
-                    }
+                    return _("1 second ago", "%(seconds)d seconds ago", seconds) % {"seconds": seconds}
 
                 if seconds < 50 * 60:
                     minutes = round(seconds / 60.0)
-                    return _("1 minute ago", "%(minutes)d minutes ago", minutes) % {
-                        "minutes": minutes
-                    }
+                    return _("1 minute ago", "%(minutes)d minutes ago", minutes) % {"minutes": minutes}
 
                 hours = round(seconds / (60.0 * 60))
                 return _("1 hour ago", "%(hours)d hours ago", hours) % {"hours": hours}
@@ -306,18 +300,10 @@ class Locale(object):
             elif days < 5:
                 format = _("%(weekday)s") if shorter else _("%(weekday)s at %(time)s")
             elif days < 334:  # 11mo, since confusing for same month last year
-                format = (
-                    _("%(month_name)s %(day)s")
-                    if shorter
-                    else _("%(month_name)s %(day)s at %(time)s")
-                )
+                format = _("%(month_name)s %(day)s") if shorter else _("%(month_name)s %(day)s at %(time)s")
 
         if format is None:
-            format = (
-                _("%(month_name)s %(day)s, %(year)s")
-                if shorter
-                else _("%(month_name)s %(day)s, %(year)s at %(time)s")
-            )
+            format = _("%(month_name)s %(day)s, %(year)s") if shorter else _("%(month_name)s %(day)s, %(year)s at %(time)s")
 
         tfhour_clock = self.code not in ("en", "en_US", "zh_CN")
         if tfhour_clock:

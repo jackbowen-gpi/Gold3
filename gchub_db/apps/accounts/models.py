@@ -384,9 +384,9 @@ class UserProfile(models.Model):
         if preAug2015_charges["amount__sum"] is None:
             preAug2015_charges["amount__sum"] = 0
 
-        postAug2015_charges = Charge.objects.filter(creation_date__year=year_num, item__job__is_deleted=False, artist=self.user).exclude(
-            item__job__id=99999
-        )
+        postAug2015_charges = Charge.objects.filter(
+            creation_date__year=year_num, item__job__is_deleted=False, artist=self.user
+        ).exclude(item__job__id=99999)
         postAug2015_charges = postAug2015_charges.exclude(description__type="Plates").aggregate(Sum("amount"))
         if postAug2015_charges["amount__sum"] is None:
             postAug2015_charges["amount__sum"] = 0

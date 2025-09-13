@@ -13,7 +13,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 
-from gchub_db.apps.workflow.models import Job, Item
+from gchub_db.apps.workflow.models import Item, Job
 
 """
 !!! Make sure wherever this script is run that the job storage directory is

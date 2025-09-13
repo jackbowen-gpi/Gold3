@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """
-Create a sample PeriodicTask (django-celery-beat) for `bin.tasks.bin_test` and trigger it once.
+Create a sample PeriodicTask (django-celery-beat) for `bin.tasks.bin_test`
+and trigger it once.
 
 Usage (inside project):
   python scripts/create_periodic_task.py

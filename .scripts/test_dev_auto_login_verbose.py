@@ -64,7 +64,9 @@ try:
 
     user = getattr(req, "user", None)
     if user and getattr(user, "is_authenticated", False):
-        log_message(f"DEV ADMIN logged in: username={getattr(user,'username',None)} " f"is_superuser={getattr(user,'is_superuser',None)}")
+        log_message(
+            f"DEV ADMIN logged in: username={getattr(user, 'username', None)} is_superuser={getattr(user, 'is_superuser', None)}"
+        )
     else:
         log_message("DEV ADMIN NOT logged in; user repr: " + repr(user))
 

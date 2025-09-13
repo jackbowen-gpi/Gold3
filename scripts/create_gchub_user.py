@@ -45,7 +45,7 @@ def main():
         user.is_superuser = True
         user.groups.add(group)
         user.save()
-        print(f"group_created={group_created} user_created={user_created} " f"username={user.username} email={user.email}")
+        print(f"group_created={group_created} user_created={user_created} username={user.username} email={user.email}")
 
 
 if __name__ == "__main__":

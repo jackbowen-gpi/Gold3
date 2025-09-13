@@ -15,14 +15,10 @@ try:
     import importlib.util
 
     repo_root = os.path.dirname(os.path.dirname(__file__))
-    inner_path = os.path.join(
-        repo_root, "gchub_db", "includes", "windows_notifications.py"
-    )
+    inner_path = os.path.join(repo_root, "gchub_db", "includes", "windows_notifications.py")
 
     if os.path.exists(inner_path):
-        spec = importlib.util.spec_from_file_location(
-            "gchub_db.inner_windows_notifications", inner_path
-        )
+        spec = importlib.util.spec_from_file_location("gchub_db.inner_windows_notifications", inner_path)
         _mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(_mod)  # type: ignore
 
@@ -36,16 +32,12 @@ except Exception:
     NOTIFICATIONS_AVAILABLE = False
     import logging
 
-    logging.warning(
-        "Windows notifications implementation not available; using console fallback"
-    )
+    logging.warning("Windows notifications implementation not available; using console fallback")
 
     class WindowsNotificationManager:
         """Minimal fallback notification manager that prints to console."""
 
-        def send_notification(
-            self, title, message, duration=10, icon_path=None, threaded=False
-        ):
+        def send_notification(self, title, message, duration=10, icon_path=None, threaded=False):
             print(f"NOTIFICATION (fallback): {title} - {message}")
             return False
 

@@ -22,6 +22,7 @@ from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.urls import reverse
 from django.views.generic.list import ListView
+from django.views.decorators.cache import cache_page
 from gchub_db.apps.art_req.models import AdditionalInfo, ArtReq
 from gchub_db.apps.color_mgt.models import ColorDefinition
 from gchub_db.apps.joblog.app_defs import (
@@ -145,9 +146,9 @@ class JobForm(ModelForm, JSONErrorForm):
             self.grouped_sales_users = User.objects.filter(groups__in=SALES_PERMISSION.group_set.all()).order_by("username")
             self.grouped_csr_users = User.objects.filter(groups__in=CSR_PERMISSION.group_set.all()).order_by("username")
             self.grouped_pcss_users = User.objects.filter(groups__in=PCSS_PERMISSION.group_set.all()).order_by("username")
-            self.grouped_graphic_specialist_users = User.objects.filter(groups__in=GRAPHIC_SPECIALIST_PERMISSION.group_set.all()).order_by(
-                "username"
-            )
+            self.grouped_graphic_specialist_users = User.objects.filter(
+                groups__in=GRAPHIC_SPECIALIST_PERMISSION.group_set.all()
+            ).order_by("username")
 
             grouped_artist_users = self.instance.filter_user_association(self.grouped_artist_users, "Artist")
             self.fields["artist"] = forms.ModelChoiceField(queryset=grouped_artist_users, required=False)
@@ -310,7 +311,9 @@ class ItemFormBEV(ItemForm):
         Also, update some of the choice field querysets.
         """
         super(ItemFormBEV, self).__init__(*args, **kwargs)
-        if job.temp_printlocation and (job.temp_printlocation.plant.name in ("Plant City") or job.temp_printlocation.press.name in ("BHS")):
+        if job.temp_printlocation and (
+            job.temp_printlocation.plant.name in ("Plant City") or job.temp_printlocation.press.name in ("BHS")
+        ):
             self.fields["bev_alt_code"] = forms.CharField(widget=forms.TextInput(attrs={"size": "20"}), required=True)
         else:
             if job.use_new_bev_nomenclature:
@@ -417,6 +420,7 @@ class ItemFormBEV(ItemForm):
 
 
 @login_required
+@cache_page(300)  # Cache for 5 minutes
 def job_detail(request, job_id):
     """Display an individual job entry's master display."""
     # Check to see if requesting user has access to this job.
@@ -646,6 +650,8 @@ class JobFindPrintgroup(ListView):
         return context
 
 
+@login_required
+@cache_page(600)  # Cache for 10 minutes
 def job_specsheet_data(request, job_id):
     """Display all spec sheet related data for given job."""
     job = Job.objects.get(id=job_id)
@@ -1349,7 +1355,9 @@ class NewCartJobForm(ModelForm, JSONErrorForm):
             carton_qs = User.objects.filter(groups__in=CARTON_PERMISSION.group_set.all())
             grouped_sales_qs = User.objects.filter(groups__in=SALES_PERMISSION.group_set.all()).order_by("username").distinct()
             csr_qs = User.objects.filter(is_active=True, groups__in=CARTON_CSR_PERMISSION.group_set.all()).order_by("username")
-            graphic_qs = User.objects.filter(is_active=True, groups__in=GRAPHIC_SPECIALIST_PERMISSION.group_set.all()).order_by("username")
+            graphic_qs = User.objects.filter(is_active=True, groups__in=GRAPHIC_SPECIALIST_PERMISSION.group_set.all()).order_by(
+                "username"
+            )
         except Exception:
             pcss_qs = User.objects.none()
             carton_qs = User.objects.none()

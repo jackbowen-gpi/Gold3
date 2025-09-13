@@ -1,3 +1,4 @@
+# ruff: noqa
 #!/usr/bin/env python
 #
 # Copyright 2009 Facebook
@@ -43,10 +44,7 @@ except Exception:
             _json_decode = lambda s: simplejson.loads(_unicode(s))
             _json_encode = lambda v: simplejson.dumps(v)
         except ImportError:
-            raise Exception(
-                "A JSON parser is required, e.g., simplejson at "
-                "http://pypi.python.org/pypi/simplejson/"
-            )
+            raise Exception("A JSON parser is required, e.g., simplejson at http://pypi.python.org/pypi/simplejson/")
 
 
 def xhtml_escape(value):

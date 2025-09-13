@@ -1,7 +1,6 @@
 """JobLog Views"""
 
 from django import forms
-from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.db.models import Q
 from django.forms import ModelForm
@@ -55,15 +54,11 @@ def joblog_filtered(request, job_id, filter_type="default"):
     job = Job.objects.get(id=job_id)
 
     if filter_type == "jdf":
-        joblog_recent = JobLog.objects.filter(
-            Q(type=JOBLOG_TYPE_JDF) | Q(type=JOBLOG_TYPE_JDF_ERROR)
-        )
+        joblog_recent = JobLog.objects.filter(Q(type=JOBLOG_TYPE_JDF) | Q(type=JOBLOG_TYPE_JDF_ERROR))
     elif filter_type == "comments":
         joblog_recent = JobLog.objects.filter(type=JOBLOG_TYPE_NOTE)
     elif filter_type == "production":
-        joblog_recent = JobLog.objects.filter(
-            Q(type=JOBLOG_TYPE_PRODUCTION_EDITED) | Q(type=JOBLOG_TYPE_ITEM_REJECTED)
-        )
+        joblog_recent = JobLog.objects.filter(Q(type=JOBLOG_TYPE_PRODUCTION_EDITED) | Q(type=JOBLOG_TYPE_ITEM_REJECTED))
     elif filter_type == "timeline":
         joblog_recent = JobLog.objects.filter(
             Q(type=JOBLOG_TYPE_ITEM_REVISION)
@@ -135,14 +130,10 @@ def joblog_add_note(request, job_id):
             note.type = JOBLOG_TYPE_NOTE
             note.log_text = noteform.cleaned_data["log_text"]
             note.save()
-            return HttpResponseRedirect(
-                reverse("joblog_filtered_default", args=[job_id])
-            )
+            return HttpResponseRedirect(reverse("joblog_filtered_default", args=[job_id]))
         else:
             for error in noteform.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         noteform = AddNoteForm()
 
@@ -167,14 +158,10 @@ def joblog_edit_note(request, log_id):
             note = noteform
             note.log_text = noteform.cleaned_data["log_text"]
             note.save()
-            return HttpResponseRedirect(
-                reverse("joblog_filtered_default", args=[job.id])
-            )
+            return HttpResponseRedirect(reverse("joblog_filtered_default", args=[job.id]))
         else:
             for error in noteform.errors:
-                return HttpResponse(
-                    JSMessage("Invalid value for field: " + error, is_error=True)
-                )
+                return HttpResponse(JSMessage("Invalid value for field: " + error, is_error=True))
     else:
         noteform = AddNoteForm(instance=log)
 
@@ -226,19 +213,13 @@ def joblog_delete_log(request, log_id):
                 plate_order.delete()
 
                 # finally get the template for notifications that new plates were ordered and the old ones deleted
-                mail_body = loader.get_template(
-                    "emails/deleted_plate_order_resubmit.txt"
-                )
+                mail_body = loader.get_template("emails/deleted_plate_order_resubmit.txt")
             else:
                 # if the new plates have already been created then get the template for the notification that a new order will be created
-                mail_body = loader.get_template(
-                    "emails/completed_plate_order_resubmit.txt"
-                )
+                mail_body = loader.get_template("emails/completed_plate_order_resubmit.txt")
 
             # find the right email group and send notification mail to them
-            mail_subject = (
-                "GOLD Plate Reorder Confirmation: %s" % log.item.bev_nomenclature()
-            )
+            mail_subject = "GOLD Plate Reorder Confirmation: %s" % log.item.bev_nomenclature()
             econtext = {"job_number": log.job, "plate_order_item": log.item}
 
             mail_send_to = []
@@ -247,9 +228,7 @@ def joblog_delete_log(request, log_id):
                     mail_send_to.append(contact.email)
 
             if len(mail_send_to) > 0:
-                general_funcs.send_info_mail(
-                    mail_subject, mail_body.render(econtext), mail_send_to
-                )
+                general_funcs.send_info_mail(mail_subject, mail_body.render(econtext), mail_send_to)
 
         # If a file out is deleted then we need to delete the forecast (log type 25) for the item and email a bunch of people,
         try:
@@ -257,9 +236,7 @@ def joblog_delete_log(request, log_id):
             # log of what we are doing, 3 - change the old forecast so they happen in that order.
 
             # Get the forecase for the current item.
-            forecast = JobLog.objects.get(
-                item=log.item, job=log.job, type=JOBLOG_TYPE_ITEM_FORECAST
-            )
+            forecast = JobLog.objects.get(item=log.item, job=log.job, type=JOBLOG_TYPE_ITEM_FORECAST)
 
             # If the code gets here then we have the forecast for the current item then create a new joblog
             # mentioning that we have gotten the old forcast and removed it because the item was un-final-filed.
@@ -268,12 +245,7 @@ def joblog_delete_log(request, log_id):
             delete_forecast.item = log.item
             delete_forecast.type = JOBLOG_TYPE_NOTE
             delete_forecast.user = request.user
-            delete_forecast.log_text = (
-                "Removed Forecast for item: "
-                + str(log.item.num_in_job)
-                + " - "
-                + str(log.item)
-            )
+            delete_forecast.log_text = "Removed Forecast for item: " + str(log.item.num_in_job) + " - " + str(log.item)
             delete_forecast.save()
 
             # If the code gets here then we have successfully made a note that we are deleting the old forcast. We
@@ -290,7 +262,6 @@ def joblog_delete_log(request, log_id):
             mail_body = loader.get_template("emails/delete_file_out.txt")
             # find the right email group and send notification mail to them
             mail_subject = "Action Required: Item Approval/Final File Canceled"
-            mail_from = "Gold - Clemson Support <%s>" % settings.EMAIL_SUPPORT
             econtext = {
                 "item": log.item,
                 "itemnum": log.item.num_in_job,
@@ -299,9 +270,7 @@ def joblog_delete_log(request, log_id):
 
             mail_send_to = []
             # add Donna
-            group_members = User.objects.filter(
-                groups__name="EmailGCHubNewItems", is_active=True
-            )
+            group_members = User.objects.filter(groups__name="EmailGCHubNewItems", is_active=True)
             for user in group_members:
                 mail_send_to.append(user.email)
 
@@ -312,33 +281,23 @@ def joblog_delete_log(request, log_id):
                 mail_send_to.append(log.job.csr.email)
             # add plant people
             if log.item.printlocation == "Kenton":
-                group_members = User.objects.filter(
-                    groups__name="EmailKenton", is_active=True
-                )
+                group_members = User.objects.filter(groups__name="EmailKenton", is_active=True)
                 for user in group_members:
                     mail_send_to.append(user.email)
             if log.item.printlocation == "Visalia":
-                group_members = User.objects.filter(
-                    groups__name="EmailVisalia", is_active=True
-                )
+                group_members = User.objects.filter(groups__name="EmailVisalia", is_active=True)
                 for user in group_members:
                     mail_send_to.append(user.email)
             if log.item.printlocation == "Shelbyville":
-                group_members = User.objects.filter(
-                    groups__name="EmailShelbyville", is_active=True
-                )
+                group_members = User.objects.filter(groups__name="EmailShelbyville", is_active=True)
                 for user in group_members:
                     mail_send_to.append(user.email)
             if log.item.printlocation == "Clarksville":
-                group_members = User.objects.filter(
-                    groups__name="EmailClarksville", is_active=True
-                )
+                group_members = User.objects.filter(groups__name="EmailClarksville", is_active=True)
                 for user in group_members:
                     mail_send_to.append(user.email)
             if log.item.printlocation == "Pittston":
-                group_members = User.objects.filter(
-                    groups__name="EmailPittston", is_active=True
-                )
+                group_members = User.objects.filter(groups__name="EmailPittston", is_active=True)
                 for user in group_members:
                     mail_send_to.append(user.email)
             # add demand planners
@@ -351,9 +310,7 @@ def joblog_delete_log(request, log_id):
                     mail_send_to.append(contact.email)
 
             if len(mail_send_to) > 0:
-                general_funcs.send_info_mail(
-                    mail_subject, mail_body.render(econtext), mail_send_to
-                )
+                general_funcs.send_info_mail(mail_subject, mail_body.render(econtext), mail_send_to)
 
     # Create new log about the deletion of the given log.
     delete_log = JobLog()
@@ -361,15 +318,7 @@ def joblog_delete_log(request, log_id):
     delete_log.item = log.item
     delete_log.type = JOBLOG_TYPE_JOBLOG_DELETED
     delete_log.user = request.user
-    delete_log.log_text = (
-        "Job log entry deleted: "
-        + log.log_text
-        + ". "
-        + str(log.event_time)
-        + " - "
-        + str(log.user)
-        + "."
-    )
+    delete_log.log_text = "Job log entry deleted: " + log.log_text + ". " + str(log.event_time) + " - " + str(log.user) + "."
     delete_log.save()
     # Delete the job log.
     log.delete()

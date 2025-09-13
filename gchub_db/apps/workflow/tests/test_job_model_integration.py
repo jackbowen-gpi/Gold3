@@ -49,7 +49,7 @@ class JobModelIntegrationTests(TestCase, JobTestMixin):
         all_jobs = []
         for site in sites:
             for i in range(jobs_per_site):
-                job = self.create_test_job(name=f"Site {site.id} Job {i+1}", workflow=site)
+                job = self.create_test_job(name=f"Site {site.id} Job {i + 1}", workflow=site)
                 all_jobs.append(job)
 
         # Verify relationships are correct
@@ -105,9 +105,9 @@ class JobModelIntegrationTests(TestCase, JobTestMixin):
         for i in range(10):
             jobs_data.append(
                 {
-                    "name": f"Bulk Job {i+1}",
+                    "name": f"Bulk Job {i + 1}",
                     "workflow": self.site,
-                    "brand_name": f"Brand {i+1}",
+                    "brand_name": f"Brand {i + 1}",
                     "status": "Active" if i % 2 == 0 else "Pending",
                 }
             )
@@ -216,7 +216,7 @@ class JobModelIntegrationTests(TestCase, JobTestMixin):
         base_date = timezone.now() - timedelta(days=5)
 
         for i in range(5):
-            job = self.create_test_job(name=f"Job {i+1}", creation_date=base_date + timedelta(days=i))
+            job = self.create_test_job(name=f"Job {i + 1}", creation_date=base_date + timedelta(days=i))
             jobs.append(job)
 
         # Test ordering by creation date
@@ -345,9 +345,9 @@ class JobModelTransactionTests(TransactionTestCase, JobTestMixin):
             jobs = []
             for i in range(5):
                 job_data = {
-                    "name": f"Transaction Job {i+1}",
+                    "name": f"Transaction Job {i + 1}",
                     "workflow": site,
-                    "brand_name": f"Brand {i+1}",
+                    "brand_name": f"Brand {i + 1}",
                 }
                 jobs.append(Job(**job_data))
 

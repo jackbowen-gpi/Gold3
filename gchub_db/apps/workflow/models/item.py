@@ -258,6 +258,15 @@ class Item(models.Model):
             ("can_file_out_item", "Can FileOut Item"),
             ("can_edit_item_production", "Can Edit Item Production"),
         )
+        indexes = [
+            models.Index(fields=["is_deleted", "item_status"]),
+            models.Index(fields=["job"]),
+            models.Index(fields=["creation_date"]),
+            models.Index(fields=["last_modified"]),
+            models.Index(fields=["preflight_date"]),
+            models.Index(fields=["electronic_proof_date"]),
+            models.Index(fields=["file_delivery_date"]),
+        ]
 
     def __str__(self):
         return self.get_item_designation()
@@ -2863,7 +2872,14 @@ class Item(models.Model):
         else:
             plate_type = None
         jdfticket = (
-            "SR " + str(plate_maker) + " - " + str(plate_type) + "_" + str(self.size.get_product_substrate_display()) + "_" + str(press)
+            "SR "
+            + str(plate_maker)
+            + " - "
+            + str(plate_type)
+            + "_"
+            + str(self.size.get_product_substrate_display())
+            + "_"
+            + str(press)
         )
         return jdfticket
 
@@ -3010,15 +3026,15 @@ class Item(models.Model):
                         msg.content_subtype = "html"
                         msg.send()
                 else:
-                    print("Can't generate plant review because one already" " exists or there's no print location.")
+                    print("Can't generate plant review because one already exists or there's no print location.")
 
                 current_demand_reviews = self.itemreview_set.filter(review_catagory="demand")
                 if not current_demand_reviews and self.printlocation:
                     self.itemreview_set.create(review_catagory="demand")
                 else:
-                    print("Can't generate demand review because one already" " exists or there's no print location.")
+                    print("Can't generate demand review because one already exists or there's no print location.")
             else:
-                print("Can't generate reviews due to plant, print location," " or press change.")
+                print("Can't generate reviews due to plant, print location, or press change.")
 
     def legacy_distortion_check(self):
         """

@@ -29,14 +29,10 @@ class TestWorkflowIntegration(TransactionTestCase):
         )
 
         # Create test site
-        self.site = Site.objects.create(
-            domain="integration.example.com", name="Integration Test Site"
-        )
+        self.site = Site.objects.create(domain="integration.example.com", name="Integration Test Site")
 
         # Create test item catalog
-        self.catalog = ItemCatalog.objects.create(
-            size="Integration Size 12oz", workflow=self.site
-        )
+        self.catalog = ItemCatalog.objects.create(size="Integration Size 12oz", workflow=self.site)
 
     @pytest.mark.integration
     def test_complete_workflow_creation(self):
@@ -81,15 +77,11 @@ class TestWorkflowIntegration(TransactionTestCase):
         )
 
         # Create multiple items
-        items_data = [
-            {"item_type": "Carton", "po_number": f"PO{i:03d}"} for i in range(1, 11)
-        ]  # Create 10 items
+        items_data = [{"item_type": "Carton", "po_number": f"PO{i:03d}"} for i in range(1, 11)]  # Create 10 items
 
         items = []
         for data in items_data:
-            item = Item.objects.create(
-                workflow=self.site, job=job, size=self.catalog, **data
-            )
+            item = Item.objects.create(workflow=self.site, job=job, size=self.catalog, **data)
             items.append(item)
 
         # Verify bulk creation
@@ -115,14 +107,10 @@ class TestDatabaseIntegration(TransactionTestCase):
         )
 
         # Create test site
-        self.site = Site.objects.create(
-            domain="db_integration.example.com", name="Database Integration Test Site"
-        )
+        self.site = Site.objects.create(domain="db_integration.example.com", name="Database Integration Test Site")
 
         # Create test item catalog
-        self.catalog = ItemCatalog.objects.create(
-            size="DB Integration Size 12oz", workflow=self.site
-        )
+        self.catalog = ItemCatalog.objects.create(size="DB Integration Size 12oz", workflow=self.site)
 
     @pytest.mark.integration
     def test_database_constraints(self):

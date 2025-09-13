@@ -36,13 +36,7 @@ MIDDLEWARE = (
     *(("gchub_db.middleware.dev_auto_login.DevAutoLoginMiddleware",) if DEBUG else ()),
     # In DEBUG, remove Permissions-Policy / Feature-Policy to avoid blocking
     # legacy vendor scripts that register `unload` handlers (prototype/YUI/etc.).
-    *(
-        (
-            "gchub_db.middleware.remove_permissions_policy.RemovePermissionsPolicyHeaderMiddleware",
-        )
-        if DEBUG
-        else ()
-    ),
+    *(("gchub_db.middleware.remove_permissions_policy.RemovePermissionsPolicyHeaderMiddleware",) if DEBUG else ()),
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -128,11 +122,7 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "class": (
-                "logging.StreamHandler"
-                if not RICH_AVAILABLE
-                else "rich.logging.RichHandler"
-            ),
+            "class": ("logging.StreamHandler" if not RICH_AVAILABLE else "rich.logging.RichHandler"),
             "formatter": "verbose",
         },
         "file": {
@@ -142,11 +132,23 @@ LOGGING = {
             "backupCount": 5,
             "formatter": "verbose",
         },
+        "db_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOG_DIR, "db_queries.log"),
+            "maxBytes": 10485760,
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
     },
     "loggers": {
         "django": {
             "handlers": ["console", "file"],
             "level": "INFO",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["db_file"],
+            "level": "DEBUG",
             "propagate": False,
         },
         "gchub_db": {
@@ -213,8 +215,6 @@ except ImportError:
     pass
 
 # DEBUG: Print DATABASES config at runtime
-import os
-
 if (
     not os.environ.get("PYTEST_CURRENT_TEST")
     and not os.environ.get("DJANGO_SETTINGS_MODULE", "").endswith("test_settings")

@@ -105,16 +105,16 @@ def send_alert_view(request):
         return redirect("/admin/")
 
     template_messages = {
-        "server_maintenance": ("Server Maintenance: The system will be down for maintenance from X to Y. " "Please save your work."),
-        "urgent_update": ("Urgent System Update: Please save your work and refresh your browser " "within the next 10 minutes."),
-        "production_alert": ("Production Alert: High priority jobs need immediate attention. " "Please check your queue."),
-        "deadline_reminder": ("Deadline Reminder: Multiple jobs are due today. Please check your queue " "and prioritize accordingly."),
-        "system_slowdown": ("System Performance: The system may be running slower than usual. " "We are investigating the issue."),
-        "new_feature": ("New Feature: A new feature has been added to the system. " "Check the workflow section for updates!"),
-        "training_session": ("Training Session: Join us for training on new system features. " "Details in your email."),
-        "holiday_schedule": ("Holiday Schedule: Please note changed hours for the upcoming holiday. " "Check the calendar for details."),
-        "backup_reminder": ("Backup Reminder: Please ensure all important work is saved. " "System backup starting soon."),
-        "security_alert": ("Security Alert: Please verify your account security settings and " "update your password if needed."),
+        "server_maintenance": ("Server Maintenance: The system will be down for maintenance from X to Y. Please save your work."),
+        "urgent_update": ("Urgent System Update: Please save your work and refresh your browser within the next 10 minutes."),
+        "production_alert": ("Production Alert: High priority jobs need immediate attention. Please check your queue."),
+        "deadline_reminder": ("Deadline Reminder: Multiple jobs are due today. Please check your queue and prioritize accordingly."),
+        "system_slowdown": ("System Performance: The system may be running slower than usual. We are investigating the issue."),
+        "new_feature": ("New Feature: A new feature has been added to the system. Check the workflow section for updates!"),
+        "training_session": ("Training Session: Join us for training on new system features. Details in your email."),
+        "holiday_schedule": ("Holiday Schedule: Please note changed hours for the upcoming holiday. Check the calendar for details."),
+        "backup_reminder": ("Backup Reminder: Please ensure all important work is saved. System backup starting soon."),
+        "security_alert": ("Security Alert: Please verify your account security settings and update your password if needed."),
     }
 
     if request.method == "POST":
@@ -178,10 +178,10 @@ def send_alert_view(request):
 
             # Show success message
             if success_count > 0:
-                success_msg = f"Alert sent successfully to {success_count} user(s) in " f"{mode_text}."
+                success_msg = f"Alert sent successfully to {success_count} user(s) in {mode_text}."
                 messages.success(request, success_msg)
             if error_count > 0:
-                error_msg = f"Failed to send to {error_count} user(s). " "They may not be on this machine."
+                error_msg = f"Failed to send to {error_count} user(s). They may not be on this machine."
                 messages.warning(request, error_msg)
 
             return redirect(request.path)

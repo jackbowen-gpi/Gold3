@@ -178,7 +178,7 @@ def stalecharges(request):
     else:
         staleform = StaleChargesForm()
         welcome_message = (
-            "Set the start and end dates then hit the green refresh arrow to see data. " "Be patient, it can take 30 seconds or more."
+            "Set the start and end dates then hit the green refresh arrow to see data. Be patient, it can take 30 seconds or more."
         )
         data = None
         date_from_url = None
@@ -849,9 +849,9 @@ def billing_by_month(month, year):
     items = Item.objects.filter(workflow__name="Foodservice", job__type="BillableSales", is_deleted=False)
 
     # Gather invoiced charges for cost avoidance items
-    invoiced_charges = Charge.objects.filter(item__in=items, invoice_date__year=target_year, invoice_date__month=target_month).order_by(
-        "invoice_date"
-    )
+    invoiced_charges = Charge.objects.filter(
+        item__in=items, invoice_date__year=target_year, invoice_date__month=target_month
+    ).order_by("invoice_date")
 
     # Total the charges
     total = 0
@@ -890,9 +890,9 @@ def costavoidance_by_month(month, year):
     items = Item.objects.filter(workflow__name="Foodservice", job__type="CostAvoidance", is_deleted=False)
 
     # Gather invoiced charges for cost avoidance items
-    invoiced_charges = Charge.objects.filter(item__in=items, invoice_date__year=target_year, invoice_date__month=target_month).order_by(
-        "invoice_date"
-    )
+    invoiced_charges = Charge.objects.filter(
+        item__in=items, invoice_date__year=target_year, invoice_date__month=target_month
+    ).order_by("invoice_date")
 
     # Total the charges
     total = 0
@@ -1072,7 +1072,7 @@ def turntime(request):
         )
         turn_data = None
         welcome_message = (
-            "Set the workflow and year then hit the green refresh arrow to see data. " "Be patient, it can take 30 seconds or more."
+            "Set the workflow and year then hit the green refresh arrow to see data. Be patient, it can take 30 seconds or more."
         )
 
     # Pass the current year for some display stuff.
@@ -1948,7 +1948,9 @@ def timesheets_billable_hours(month, year):
         billable_hours = 0
 
         # Gather all the timesheet entries for the user during the month.
-        entries = TimeSheet.objects.filter(artist=user, date__month=month, date__year=year).exclude(category__name__in=excluded_activities)
+        entries = TimeSheet.objects.filter(artist=user, date__month=month, date__year=year).exclude(
+            category__name__in=excluded_activities
+        )
 
         # Total up all the hours.
         for entry in entries:

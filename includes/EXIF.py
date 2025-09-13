@@ -764,9 +764,7 @@ class EXIF_header:
                 for j in range(count):
                     if field_type in (5, 10):
                         # a ratio
-                        value_j = Ratio(
-                            self.s2n(offset, 4, signed), self.s2n(offset + 4, 4, signed)
-                        )
+                        value_j = Ratio(self.s2n(offset, 4, signed), self.s2n(offset + 4, 4, signed))
                     else:
                         value_j = self.s2n(offset, typelen, signed)
                     values.append(value_j)
@@ -792,14 +790,9 @@ class EXIF_header:
                             printable += tag_entry[1].get(i, repr(i))
             else:
                 tag_name = "Tag 0x%04X" % tag
-            self.tags[ifd_name + " " + tag_name] = IFD_Tag(
-                printable, tag, field_type, values, field_offset, count * typelen
-            )
+            self.tags[ifd_name + " " + tag_name] = IFD_Tag(printable, tag, field_type, values, field_offset, count * typelen)
             if self.debug:
-                print(
-                    "    %s: %s"
-                    % (tag_name, repr(self.tags[ifd_name + " " + tag_name]))
-                )
+                print("    %s: %s" % (tag_name, repr(self.tags[ifd_name + " " + tag_name])))
 
     # extract uncompressed TIFF thumbnail (like pulling teeth)
     # we take advantage of the pre-existing layout in the thumbnail IFD as
@@ -866,21 +859,15 @@ class EXIF_header:
         if make == "NIKON":
             if note.values[0:5] == [78, 105, 107, 111, 110]:  # "Nikon"
                 # older model
-                self.dump_IFD(
-                    note.field_offset + 8, "MakerNote", dict=MAKERNOTE_NIKON_OLDER_TAGS
-                )
+                self.dump_IFD(note.field_offset + 8, "MakerNote", dict=MAKERNOTE_NIKON_OLDER_TAGS)
             else:
                 # newer model (E99x or D1)
-                self.dump_IFD(
-                    note.field_offset, "MakerNote", dict=MAKERNOTE_NIKON_NEWER_TAGS
-                )
+                self.dump_IFD(note.field_offset, "MakerNote", dict=MAKERNOTE_NIKON_NEWER_TAGS)
             return
 
         # Olympus
         if make[:7] == "OLYMPUS":
-            self.dump_IFD(
-                note.field_offset + 8, "MakerNote", dict=MAKERNOTE_OLYMPUS_TAGS
-            )
+            self.dump_IFD(note.field_offset + 8, "MakerNote", dict=MAKERNOTE_OLYMPUS_TAGS)
             return
 
         # Casio
@@ -988,13 +975,8 @@ def process_file(file, debug=0):
             intr_off = hdr.tags.get("EXIF SubIFD InteroperabilityOffset")
             if intr_off:
                 if debug:
-                    print(
-                        " EXIF Interoperability SubSubIFD at offset %d:"
-                        % intr_off.values[0]
-                    )
-                hdr.dump_IFD(
-                    intr_off.values[0], "EXIF Interoperability", dict=INTR_TAGS
-                )
+                    print(" EXIF Interoperability SubSubIFD at offset %d:" % intr_off.values[0])
+                hdr.dump_IFD(intr_off.values[0], "EXIF Interoperability", dict=INTR_TAGS)
         # GPS IFD
         gps_off = hdr.tags.get(IFD_name + " GPSInfo")
         if gps_off:
@@ -1057,10 +1039,7 @@ if __name__ == "__main__":
         for i in x:
             if i in ("JPEGThumbnail", "TIFFThumbnail"):
                 continue
-            print(
-                "   %s (%s): %s"
-                % (i, FIELD_TYPES[data[i].field_type][2], data[i].printable)
-            )
+            print("   %s (%s): %s" % (i, FIELD_TYPES[data[i].field_type][2], data[i].printable))
         if "JPEGThumbnail" in data:
             print("File has JPEG thumbnail")
         print()

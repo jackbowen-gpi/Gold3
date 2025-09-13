@@ -24,11 +24,7 @@ from gchub_db.includes.widgets import GCH_SelectDateWidget
 
 # These are cached once when the server is started to avoid future queries.
 ARTIST_PERMISSION = Permission.objects.get(codename="in_artist_pulldown")
-CLEMSON_ARTIST = (
-    User.objects.filter(groups__in=ARTIST_PERMISSION.group_set.all())
-    .order_by("username")
-    .filter(is_active=True)
-)
+CLEMSON_ARTIST = User.objects.filter(groups__in=ARTIST_PERMISSION.group_set.all()).order_by("username").filter(is_active=True)
 
 # Making a queryset for the PrintLocation
 # This will only show the Plant + Press combinations used for Ink Drawdowns
@@ -141,9 +137,7 @@ class DrawDownItemForm(ModelForm):
         self.fields["substrate"].widget.attrs["size"] = 11
 
 
-class DrawDownItemHomeFormSet(
-    modelformset_factory(DrawDownItem, form=DrawDownItemForm, extra=1)
-):
+class DrawDownItemHomeFormSet(modelformset_factory(DrawDownItem, form=DrawDownItemForm, extra=1)):
     def clean(self):
         super(DrawDownItemHomeFormSet, self).clean()
 
@@ -153,9 +147,7 @@ class DrawDownItemHomeFormSet(
                 form.add_error("substrate", "substrate is a required field")
 
 
-class DrawDownItemEditFormSet(
-    modelformset_factory(DrawDownItem, form=DrawDownItemForm, extra=0)
-):
+class DrawDownItemEditFormSet(modelformset_factory(DrawDownItem, form=DrawDownItemForm, extra=0)):
     def clean(self):
         super(DrawDownItemEditFormSet, self).clean()
 
@@ -203,7 +195,6 @@ def home(request, job_id=None):
                 try:
                     # this checks for bad forms, if it is not valid but has the number_copies field then it
                     # just needs some data entered
-                    num_copies = ddiform.cleaned_data["number_copies"]
                     flag = False
                 except Exception:
                     # If the whole number_copies field is missing, this is a blank form
@@ -212,7 +203,6 @@ def home(request, job_id=None):
             drawdown = ddform.save()
             for ddiform in ddiformSet:
                 try:
-                    num_copies = ddiform.cleaned_data["number_copies"]
                     drawdownitem = ddiform.save()
                     drawdownitem.draw_down_request = drawdown
                     drawdownitem.save()
@@ -262,25 +252,16 @@ def home(request, job_id=None):
                 jobfolder = fs_api.get_job_folder(jobnum)
                 folder = os.path.join(jobfolder, fs_api.JOBDIR["3_preview_art"])
 
-                fileArray = []
                 for drawdownItem in drawdownItems:
                     if drawdownItem.artwork and drawdownItem.item_number:
                         try:
                             itemnum = drawdownItem.item_number
                             pattern = re.compile(r"ap_(.*)_(%s)[.](pdf)$" % itemnum)
                             file = fs_api._generic_item_file_search(folder, pattern)
-                            file2 = os.path.join(
-                                folder, "testPreviewArt" + str(itemnum)
-                            )
+                            file2 = os.path.join(folder, "testPreviewArt" + str(itemnum))
                             removeFileArray.append(file2)
                             os.system("convert " + file + " " + file2 + ".jpg")
-                            os.system(
-                                "convert "
-                                + file2
-                                + ".jpg -format JPG -quality 30 "
-                                + file2
-                                + ".pdf"
-                            )
+                            os.system("convert " + file2 + ".jpg -format JPG -quality 30 " + file2 + ".pdf")
                             os.system("rm " + file2 + ".jpg")
 
                             # ATTACH THE ARTWORK IF THERE IS ANY
@@ -316,9 +297,7 @@ def home(request, job_id=None):
 
                 return HttpResponse(JSMessage("Saved/Email Sent."))
             else:
-                return HttpResponse(
-                    JSMessage("Error has occurred sending the drawdown")
-                )
+                return HttpResponse(JSMessage("Error has occurred sending the drawdown"))
         else:
             errorSet = ""
             for error in ddform.errors:
@@ -326,9 +305,7 @@ def home(request, job_id=None):
             for error in ddiformSet.errors:
                 for key, value in list(error.items()):
                     errorSet += " - " + str(key)
-            return HttpResponse(
-                JSMessage("Invalid value for field(s):" + errorSet, is_error=True)
-            )
+            return HttpResponse(JSMessage("Invalid value for field(s):" + errorSet, is_error=True))
     else:
         user = request.user
         date_plus3 = date.today() + timedelta(days=3)
@@ -352,9 +329,7 @@ def home(request, job_id=None):
             }
 
         drawdownReqForm = DrawDownRequestForm(initial=drawDownObj)
-        drawdownItemForm = DrawDownItemHomeFormSet(
-            queryset=DrawDownItem.objects.none(), prefix="Drawdown"
-        )
+        drawdownItemForm = DrawDownItemHomeFormSet(queryset=DrawDownItem.objects.none(), prefix="Drawdown")
 
         pagevars = {
             "page_title": "Add New Drawdown Request",
@@ -392,7 +367,6 @@ def show_legacy(request):
 def edit_drawdown(request, contact_id):
     """Saves edited Drawdown Request data."""
     current_data = DrawDownRequest.objects.get(id=contact_id)
-    current_items = DrawDownItem.objects.filter(draw_down_request=current_data.id)
 
     if request.method == "POST":  # save form
         ddform = DrawDownRequestForm(request.POST, instance=current_data)
@@ -415,14 +389,10 @@ def edit_drawdown(request, contact_id):
             for error in ddiformSet.errors:
                 for key, value in list(error.items()):
                     errorSet += " - " + str(key)
-            return HttpResponse(
-                JSMessage("Invalid value for field(s):" + errorSet, is_error=True)
-            )
+            return HttpResponse(JSMessage("Invalid value for field(s):" + errorSet, is_error=True))
     else:  # present form
         drawdownReqForm = DrawDownRequestForm(instance=current_data)
-        drawdownItemForm = DrawDownItemEditFormSet(
-            queryset=DrawDownItem.objects.filter(draw_down_request=current_data.id)
-        )
+        drawdownItemForm = DrawDownItemEditFormSet(queryset=DrawDownItem.objects.filter(draw_down_request=current_data.id))
         pagevars = {
             "page_title": "Edit Drawdown Request",
             "drawdownReqform": drawdownReqForm,
@@ -541,9 +511,7 @@ def drawdown_search_results(request, form=None):
         s_draw_date_in_end = form.cleaned_data.get("date_in_end", None)
         if s_draw_date_in_end:
             if s_draw_date_in_start:
-                qset = qset.filter(
-                    creation_date__range=(s_draw_date_in_start, s_draw_date_in_end)
-                )
+                qset = qset.filter(creation_date__range=(s_draw_date_in_start, s_draw_date_in_end))
         elif s_draw_date_in_start:
             qset = qset.filter(creation_date=s_draw_date_in_start)
 

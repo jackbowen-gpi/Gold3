@@ -68,9 +68,7 @@ class OpenIdMixin(object):
     See GoogleMixin below for example implementations.
     """
 
-    def authenticate_redirect(
-        self, callback_uri=None, ax_attrs=["name", "email", "language", "username"]
-    ):
+    def authenticate_redirect(self, callback_uri=None, ax_attrs=["name", "email", "language", "username"]):
         """
         Returns the authentication URL for this service.
 
@@ -151,19 +149,14 @@ class OpenIdMixin(object):
 
     def _on_authentication_verified(self, callback, response):
         if response.error or "is_valid:true" not in response.body:
-            logging.warning(
-                "Invalid OpenID response: %s", response.error or response.body
-            )
+            logging.warning("Invalid OpenID response: %s", response.error or response.body)
             callback(None)
             return
 
         # Make sure we got back at least an email from attribute exchange
         ax_ns = None
         for name, values in self.request.arguments.items():
-            if (
-                name.startswith("openid.ns.")
-                and values[-1] == "http://openid.net/srv/ax/1.0"
-            ):
+            if name.startswith("openid.ns.") and values[-1] == "http://openid.net/srv/ax/1.0":
                 ax_ns = name[10:]
                 break
 
@@ -236,9 +229,7 @@ class OAuthMixin(object):
         http = httpclient.AsyncHTTPClient()
         http.fetch(
             self._oauth_request_token_url(),
-            self.async_callback(
-                self._on_request_token, self._OAUTH_AUTHORIZE_URL, callback_uri
-            ),
+            self.async_callback(self._on_request_token, self._OAUTH_AUTHORIZE_URL, callback_uri),
         )
 
     def get_authenticated_user(self, callback):
@@ -292,9 +283,7 @@ class OAuthMixin(object):
         self.set_cookie("_oauth_request_token", data)
         args = dict(oauth_token=request_token["key"])
         if callback_uri:
-            args["oauth_callback"] = urllib.parse.urljoin(
-                self.request.full_url(), callback_uri
-            )
+            args["oauth_callback"] = urllib.parse.urljoin(self.request.full_url(), callback_uri)
         self.redirect(authorize_url + "?" + urllib.parse.urlencode(args))
 
     def _oauth_access_token_url(self, request_token):
@@ -411,14 +400,10 @@ class TwitterMixin(OAuthMixin):
         http = httpclient.AsyncHTTPClient()
         http.fetch(
             self._oauth_request_token_url(),
-            self.async_callback(
-                self._on_request_token, self._OAUTH_AUTHENTICATE_URL, None
-            ),
+            self.async_callback(self._on_request_token, self._OAUTH_AUTHENTICATE_URL, None),
         )
 
-    def twitter_request(
-        self, path, callback, access_token=None, post_args=None, **args
-    ):
+    def twitter_request(self, path, callback, access_token=None, post_args=None, **args):
         """
         Fetches the given API path, e.g., "/statuses/user_timeline/btaylor"
 
@@ -464,9 +449,7 @@ class TwitterMixin(OAuthMixin):
             all_args.update(args)
             all_args.update(post_args or {})
             method = "POST" if post_args is not None else "GET"
-            oauth = self._oauth_request_parameters(
-                url, access_token, all_args, method=method
-            )
+            oauth = self._oauth_request_parameters(url, access_token, all_args, method=method)
             args.update(oauth)
         if args:
             url += "?" + urllib.parse.urlencode(args)
@@ -484,9 +467,7 @@ class TwitterMixin(OAuthMixin):
 
     def _on_twitter_request(self, callback, response):
         if response.error:
-            logging.warning(
-                "Error response %s fetching %s", response.error, response.request.url
-            )
+            logging.warning("Error response %s fetching %s", response.error, response.request.url)
             callback(None)
             return
         callback(escape.json_decode(response.body))
@@ -555,9 +536,7 @@ class FriendFeedMixin(OAuthMixin):
     _OAUTH_AUTHORIZE_URL = "https://friendfeed.com/account/oauth/authorize"
     _OAUTH_NO_CALLBACKS = True
 
-    def friendfeed_request(
-        self, path, callback, access_token=None, post_args=None, **args
-    ):
+    def friendfeed_request(self, path, callback, access_token=None, post_args=None, **args):
         """
         Fetches the given relative API path, e.g., "/bret/friends"
 
@@ -600,9 +579,7 @@ class FriendFeedMixin(OAuthMixin):
             all_args.update(args)
             all_args.update(post_args or {})
             method = "POST" if post_args is not None else "GET"
-            oauth = self._oauth_request_parameters(
-                url, access_token, all_args, method=method
-            )
+            oauth = self._oauth_request_parameters(url, access_token, all_args, method=method)
             args.update(oauth)
         if args:
             url += "?" + urllib.parse.urlencode(args)
@@ -620,9 +597,7 @@ class FriendFeedMixin(OAuthMixin):
 
     def _on_friendfeed_request(self, callback, response):
         if response.error:
-            logging.warning(
-                "Error response %s fetching %s", response.error, response.request.url
-            )
+            logging.warning("Error response %s fetching %s", response.error, response.request.url)
             callback(None)
             return
         callback(escape.json_decode(response.body))
@@ -699,9 +674,7 @@ class GoogleMixin(OpenIdMixin, OAuthMixin):
         URLs with a space.
         """
         callback_uri = callback_uri or self.request.path
-        args = self._openid_args(
-            callback_uri, ax_attrs=ax_attrs, oauth_scope=oauth_scope
-        )
+        args = self._openid_args(callback_uri, ax_attrs=ax_attrs, oauth_scope=oauth_scope)
         self.redirect(self._OPENID_ENDPOINT + "?" + urllib.parse.urlencode(args))
 
     def get_authenticated_user(self, callback):
@@ -709,10 +682,7 @@ class GoogleMixin(OpenIdMixin, OAuthMixin):
         # Look to see if we are doing combined OpenID/OAuth
         oauth_ns = ""
         for name, values in self.request.arguments.items():
-            if (
-                name.startswith("openid.ns.")
-                and values[-1] == "http://specs.openid.net/extensions/oauth/1.0"
-            ):
+            if name.startswith("openid.ns.") and values[-1] == "http://specs.openid.net/extensions/oauth/1.0":
                 oauth_ns = name[10:]
                 break
         token = self.get_argument("openid." + oauth_ns + ".request_token", "")
@@ -773,9 +743,7 @@ class FacebookMixin(object):
 
     """
 
-    def authenticate_redirect(
-        self, callback_uri=None, cancel_uri=None, extended_permissions=None
-    ):
+    def authenticate_redirect(self, callback_uri=None, cancel_uri=None, extended_permissions=None):
         """Authenticates/installs this app for the current user."""
         self.require_setting("facebook_api_key", "Facebook Connect")
         callback_uri = callback_uri or self.request.path
@@ -788,20 +756,14 @@ class FacebookMixin(object):
             "return_session": "true",
         }
         if cancel_uri:
-            args["cancel_url"] = urllib.parse.urljoin(
-                self.request.full_url(), cancel_uri
-            )
+            args["cancel_url"] = urllib.parse.urljoin(self.request.full_url(), cancel_uri)
         if extended_permissions:
             if isinstance(extended_permissions, str):
                 extended_permissions = [extended_permissions]
             args["req_perms"] = ",".join(extended_permissions)
-        self.redirect(
-            "http://www.facebook.com/login.php?" + urllib.parse.urlencode(args)
-        )
+        self.redirect("http://www.facebook.com/login.php?" + urllib.parse.urlencode(args))
 
-    def authorize_redirect(
-        self, extended_permissions, callback_uri=None, cancel_uri=None
-    ):
+    def authorize_redirect(self, extended_permissions, callback_uri=None, cancel_uri=None):
         """
         Redirects to an authorization request for the given FB resource.
 
@@ -836,8 +798,7 @@ class FacebookMixin(object):
             callback=self.async_callback(self._on_get_user_info, callback, session),
             session_key=session["session_key"],
             uids=session["uid"],
-            fields="uid,first_name,last_name,name,locale,pic_square,"
-            "profile_url,username",
+            fields="uid,first_name,last_name,name,locale,pic_square,profile_url,username",
         )
 
     def facebook_request(self, method, callback, **args):
@@ -917,9 +878,7 @@ class FacebookMixin(object):
             callback(None)
             return
         if isinstance(json, dict) and json.get("error_code"):
-            logging.warning(
-                "Facebook error: %d: %r", json["error_code"], json.get("error_msg")
-            )
+            logging.warning("Facebook error: %d: %r", json["error_code"], json.get("error_msg"))
             callback(None)
             return
         callback(json)
@@ -945,11 +904,7 @@ def _oauth_signature(consumer_token, method, url, parameters={}, token=None):
     base_elems = []
     base_elems.append(method.upper())
     base_elems.append(normalized_url)
-    base_elems.append(
-        "&".join(
-            "%s=%s" % (k, _oauth_escape(str(v))) for k, v in sorted(parameters.items())
-        )
-    )
+    base_elems.append("&".join("%s=%s" % (k, _oauth_escape(str(v))) for k, v in sorted(parameters.items())))
     base_string = "&".join(_oauth_escape(e) for e in base_elems)
 
     key_elems = [consumer_token["secret"]]

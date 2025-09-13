@@ -1,3 +1,4 @@
+# ruff: noqa
 #!/usr/bin/env python
 #
 # Copyright 2009 Facebook
@@ -112,9 +113,7 @@ class RequestHandler(object):
         self._auto_finish = True
         self._transforms = transforms or []
         self.ui = _O((n, self._ui_method(m)) for n, m in application.ui_methods.items())
-        self.ui["modules"] = _O(
-            (n, self._ui_module(n, m)) for n, m in application.ui_modules.items()
-        )
+        self.ui["modules"] = _O((n, self._ui_module(n, m)) for n, m in application.ui_modules.items())
         self.clear()
         # Check since connection is not available in WSGI
         if hasattr(self.request, "connection"):
@@ -244,9 +243,7 @@ class RequestHandler(object):
             return self.cookies[name].value
         return default
 
-    def set_cookie(
-        self, name, value, domain=None, expires=None, path="/", expires_days=None
-    ):
+    def set_cookie(self, name, value, domain=None, expires=None, path="/", expires_days=None):
         """Sets the given cookie name/value with the given options."""
         name = _utf8(name)
         value = _utf8(value)
@@ -265,23 +262,17 @@ class RequestHandler(object):
             try:
                 from django.utils import timezone
 
-                expires = timezone.now().astimezone(
-                    datetime.timezone.utc
-                ) + datetime.timedelta(days=expires_days)
+                expires = timezone.now().astimezone(datetime.timezone.utc) + datetime.timedelta(days=expires_days)
             except Exception:
                 # Fallback to naive utcnow if django timezone is unavailable
                 expires = _utcnow_naive() + datetime.timedelta(days=expires_days)
         if expires:
             # If expires is an aware datetime, convert to UTC timestamp
             if hasattr(expires, "tzinfo") and expires.tzinfo is not None:
-                timestamp = calendar.timegm(
-                    expires.astimezone(datetime.timezone.utc).utctimetuple()
-                )
+                timestamp = calendar.timegm(expires.astimezone(datetime.timezone.utc).utctimetuple())
             else:
                 timestamp = calendar.timegm(expires.utctimetuple())
-            new_cookie[name]["expires"] = email.utils.formatdate(
-                timestamp, localtime=False, usegmt=True
-            )
+            new_cookie[name]["expires"] = email.utils.formatdate(timestamp, localtime=False, usegmt=True)
         if path:
             new_cookie[name]["path"] = path
 
@@ -290,9 +281,7 @@ class RequestHandler(object):
         try:
             from django.utils import timezone
 
-            expires = timezone.now().astimezone(
-                datetime.timezone.utc
-            ) - datetime.timedelta(days=365)
+            expires = timezone.now().astimezone(datetime.timezone.utc) - datetime.timedelta(days=365)
         except Exception:
             expires = _utcnow_naive() - datetime.timedelta(days=365)
         self.set_cookie(name, value="", path=path, expires=expires, domain=domain)
@@ -326,9 +315,7 @@ class RequestHandler(object):
         parts = value.split("|")
         if len(parts) != 3:
             return None
-        if not _time_independent_equals(
-            parts[2], self._cookie_signature(parts[0], parts[1])
-        ):
+        if not _time_independent_equals(parts[2], self._cookie_signature(parts[0], parts[1])):
             logging.warning("Invalid cookie signature %r", value)
             return None
         timestamp = int(parts[1])
@@ -342,9 +329,7 @@ class RequestHandler(object):
 
     def _cookie_signature(self, *parts):
         self.require_setting("cookie_secret", "secure cookies")
-        hash = hmac.new(
-            self.application.settings["cookie_secret"], digestmod=hashlib.sha1
-        )
+        hash = hmac.new(self.application.settings["cookie_secret"], digestmod=hashlib.sha1)
         for part in parts:
             hash.update(part)
         return hash.hexdigest()
@@ -414,20 +399,11 @@ class RequestHandler(object):
                     paths.add(self.static_url(path))
                 else:
                     paths.add(path)
-            js = "".join(
-                '<script src="'
-                + escape.xhtml_escape(p)
-                + '" type="text/javascript"></script>'
-                for p in paths
-            )
+            js = "".join('<script src="' + escape.xhtml_escape(p) + '" type="text/javascript"></script>' for p in paths)
             sloc = html.rindex("</body>")
             html = html[:sloc] + js + "\n" + html[sloc:]
         if js_embed:
-            js = (
-                '<script type="text/javascript">\n//<![CDATA[\n'
-                + "\n".join(js_embed)
-                + "\n//]]>\n</script>"
-            )
+            js = '<script type="text/javascript">\n//<![CDATA[\n' + "\n".join(js_embed) + "\n//]]>\n</script>"
             sloc = html.rindex("</body>")
             html = html[:sloc] + js + "\n" + html[sloc:]
         if css_files:
@@ -437,11 +413,7 @@ class RequestHandler(object):
                     paths.add(self.static_url(path))
                 else:
                     paths.add(path)
-            css = "".join(
-                '<link href="' + escape.xhtml_escape(p) + '" '
-                'type="text/css" rel="stylesheet"/>'
-                for p in paths
-            )
+            css = "".join('<link href="' + escape.xhtml_escape(p) + '" type="text/css" rel="stylesheet"/>' for p in paths)
             hloc = html.index("</head>")
             html = html[:hloc] + css + "\n" + html[hloc:]
         if css_embed:
@@ -498,9 +470,7 @@ class RequestHandler(object):
         if not self._headers_written:
             self._headers_written = True
             for transform in self._transforms:
-                self._headers, chunk = transform.transform_first_chunk(
-                    self._headers, chunk, include_footers
-                )
+                self._headers, chunk = transform.transform_first_chunk(self._headers, chunk, include_footers)
             headers = self._generate_headers()
         else:
             for transform in self._transforms:
@@ -571,14 +541,10 @@ class RequestHandler(object):
         If this error was caused by an uncaught exception, the
         exception object can be found in kwargs e.g. kwargs['exception']
         """
-        return (
-            "<html><title>%(code)d: %(message)s</title>"
-            "<body>%(code)d: %(message)s</body></html>"
-            % {
-                "code": status_code,
-                "message": http.client.responses[status_code],
-            }
-        )
+        return "<html><title>%(code)d: %(message)s</title><body>%(code)d: %(message)s</body></html>" % {
+            "code": status_code,
+            "message": http.client.responses[status_code],
+        }
 
     @property
     def locale(self):
@@ -710,11 +676,7 @@ class RequestHandler(object):
 
         See check_xsrf_cookie() above for more information.
         """
-        return (
-            '<input type="hidden" name="_xsrf" value="'
-            + escape.xhtml_escape(self.xsrf_token)
-            + '"/>'
-        )
+        return '<input type="hidden" name="_xsrf" value="' + escape.xhtml_escape(self.xsrf_token) + '"/>'
 
     def static_url(self, path):
         """
@@ -746,11 +708,7 @@ class RequestHandler(object):
             except Exception:
                 logging.error("Could not open static file %r", path)
                 hashes[path] = None
-        base = (
-            self.request.protocol + "://" + self.request.host
-            if getattr(self, "include_host", False)
-            else ""
-        )
+        base = self.request.protocol + "://" + self.request.host if getattr(self, "include_host", False) else ""
         if hashes.get(path):
             return base + "/static/" + path + "?v=" + hashes[path][:5]
         else:
@@ -781,10 +739,7 @@ class RequestHandler(object):
     def require_setting(self, name, feature="this feature"):
         """Raises an exception if the given app setting is not defined."""
         if not self.application.settings.get(name):
-            raise Exception(
-                "You must define the '%s' setting in your "
-                "application to use %s" % (name, feature)
-            )
+            raise Exception("You must define the '%s' setting in your application to use %s" % (name, feature))
 
     def reverse_url(self, name, *args):
         return self.application.reverse_url(name, *args)
@@ -797,9 +752,7 @@ class RequestHandler(object):
                 raise HTTPError(405)
             # If XSRF cookies are turned on, reject form submissions without
             # the proper cookie
-            if self.request.method == "POST" and self.application.settings.get(
-                "xsrf_cookies"
-            ):
+            if self.request.method == "POST" and self.application.settings.get("xsrf_cookies"):
                 self.check_xsrf_cookie()
             self.prepare()
             if not self._finished:
@@ -810,13 +763,7 @@ class RequestHandler(object):
             self._handle_request_exception(e)
 
     def _generate_headers(self):
-        lines = [
-            self.request.version
-            + " "
-            + str(self._status_code)
-            + " "
-            + http.client.responses[self._status_code]
-        ]
+        lines = [self.request.version + " " + str(self._status_code) + " " + http.client.responses[self._status_code]]
         lines.extend(["%s: %s" % (n, v) for n, v in self._headers.items()])
         for cookie_dict in getattr(self, "_new_cookies", []):
             for cookie in list(cookie_dict.values()):
@@ -831,19 +778,10 @@ class RequestHandler(object):
         else:
             log_method = logging.error
         request_time = 1000.0 * self.request.request_time()
-        log_method(
-            "%d %s %.2fms", self._status_code, self._request_summary(), request_time
-        )
+        log_method("%d %s %.2fms", self._status_code, self._request_summary(), request_time)
 
     def _request_summary(self):
-        return (
-            self.request.method
-            + " "
-            + self.request.uri
-            + " ("
-            + self.request.remote_ip
-            + ")"
-        )
+        return self.request.method + " " + self.request.uri + " (" + self.request.remote_ip + ")"
 
     def _handle_request_exception(self, e):
         if isinstance(e, HTTPError):
@@ -999,9 +937,7 @@ class Application(object):
     and we will serve /favicon.ico and /robots.txt from the same directory.
     """
 
-    def __init__(
-        self, handlers=None, default_host="", transforms=None, wsgi=False, **settings
-    ):
+    def __init__(self, handlers=None, default_host="", transforms=None, wsgi=False, **settings):
         if transforms is None:
             self.transforms = []
             if settings.get("gzip"):
@@ -1082,11 +1018,7 @@ class Application(object):
                 self._load_ui_methods(m)
         else:
             for name, fn in methods.items():
-                if (
-                    not name.startswith("_")
-                    and callable(fn)
-                    and name[0].lower() == name[0]
-                ):
+                if not name.startswith("_") and callable(fn) and name[0].lower() == name[0]:
                     self.ui_methods[name] = fn
 
     def _load_ui_modules(self, modules):
@@ -1333,9 +1265,7 @@ class GZipContentEncoding(OutputTransform):
     MIN_LENGTH = 5
 
     def __init__(self, request):
-        self._gzipping = request.supports_http_1_1() and "gzip" in request.headers.get(
-            "Accept-Encoding", ""
-        )
+        self._gzipping = request.supports_http_1_1() and "gzip" in request.headers.get("Accept-Encoding", "")
 
     def transform_first_chunk(self, headers, chunk, finishing):
         if self._gzipping:

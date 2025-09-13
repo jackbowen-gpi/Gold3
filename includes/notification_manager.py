@@ -10,9 +10,7 @@ import os
 import requests
 
 
-NOTIFICATION_DAEMON_URL = os.environ.get(
-    "NOTIFICATION_DAEMON_URL", "http://127.0.0.1:5341/notify"
-)
+NOTIFICATION_DAEMON_URL = os.environ.get("NOTIFICATION_DAEMON_URL", "http://127.0.0.1:5341/notify")
 
 
 def send_user_notification(
@@ -63,9 +61,7 @@ def send_user_notification(
         if resp.status_code == 200:
             return True
         else:
-            logging.warning(
-                f"Notification daemon returned status {resp.status_code}: {resp.text}"
-            )
+            logging.warning(f"Notification daemon returned status {resp.status_code}: {resp.text}")
             return False
     except Exception as e:
         logging.warning(f"Could not send notification to daemon: {e}")
@@ -109,7 +105,5 @@ def bulk_notify_users(
             logging.error(f"Failed to notify user {user.username}: {e}")
             continue
 
-    logging.info(
-        f"Windows notifications sent to {success_count}/{users_queryset.count()} users"
-    )
+    logging.info(f"Windows notifications sent to {success_count}/{users_queryset.count()} users")
     return success_count

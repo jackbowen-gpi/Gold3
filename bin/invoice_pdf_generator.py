@@ -125,7 +125,7 @@ for job_id in job_set:
     c.drawCentredString(
         4.25 * inch,
         0.25 * inch,
-        "P: 864.633.6000  F: 864.653.5168    155 Old Greenville Hwy, Suite 103, " "Clemson, SC, 29631",
+        "P: 864.633.6000  F: 864.653.5168    155 Old Greenville Hwy, Suite 103, Clemson, SC, 29631",
     )
 
     # Close and save the PDF

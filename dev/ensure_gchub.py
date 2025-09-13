@@ -19,7 +19,7 @@ try:
     from psycopg2 import sql
 except Exception:
     print(
-        "psycopg2 is required. Install in the venv: " "python -m pip install psycopg2-binary",
+        "psycopg2 is required. Install in the venv: python -m pip install psycopg2-binary",
         file=sys.stderr,
     )
     raise
@@ -59,7 +59,7 @@ def connect_superuser(timeout_seconds: int = 60) -> psycopg2.extensions.connecti
         except Exception as exc:
             last_exc = exc
             print(
-                (f"Attempt {attempt}: Postgres not ready ({exc!r}) - " f"retrying in {RETRY_SECONDS}s..."),
+                (f"Attempt {attempt}: Postgres not ready ({exc!r}) - retrying in {RETRY_SECONDS}s..."),
                 file=sys.stderr,
             )
             time.sleep(RETRY_SECONDS)
@@ -132,7 +132,7 @@ def ensure_role_and_db() -> int:
             )
             cur_db.execute(sql.SQL("GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO {};").format(sql.Identifier(TARGET_USER)))
             cur_db.execute(
-                sql.SQL("ALTER DEFAULT PRIVILEGES IN SCHEMA public " "GRANT ALL ON TABLES TO {};").format(sql.Identifier(TARGET_USER))
+                sql.SQL("ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO {};").format(sql.Identifier(TARGET_USER))
             )
             cur_db.close()
             conn_db.close()

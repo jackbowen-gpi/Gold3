@@ -42,9 +42,7 @@ def convert_svg_to_color(object, color=CMYKColor(0, 0, 0, 1.0)):
 # Setup the document.
 print("Generating PDF...")
 # Add encryption to the PDF so that it cannot be printed.
-enc = pdfencrypt.StandardEncryption(
-    "", canPrint=0, canModify=0, canCopy=0, canAnnotate=0
-)
+enc = pdfencrypt.StandardEncryption("", canPrint=0, canModify=0, canCopy=0, canAnnotate=0)
 c = canvas.Canvas("reportlab_testfile.pdf", encrypt=None)
 
 # START DRAWING BARCODE
@@ -92,7 +90,9 @@ print("Graphic start width:", width)
 print("Graphic start height:", height)
 
 # vector_graphic.__setattr__('fillColor', '(0,1,0,0)')
-# vector_graphic.contents[0].contents[0].contents[0].contents[0].setProperties({'fillColor': CMYKColor(0,0,0,1)})
+# vector_graphic.contents[0].contents[0].contents[0].contents[0].setProperties(
+#     {'fillColor': CMYKColor(0,0,0,1)}
+# )
 convert_svg_to_color(vector_graphic)
 
 # Place the graphic in a group to perform scaling.

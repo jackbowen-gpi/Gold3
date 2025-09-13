@@ -14,7 +14,8 @@ Features:
 
 Usage:
     python scripts/db_replicate.py --source gchub_db-postgres-dev-1 --target gold3-db-1
-    python scripts/db_replicate.py --source host=localhost:5433 --target host=localhost:5438
+    python scripts/db_replicate.py --source host=localhost:5433 \
+        --target host=localhost:5438
 """
 
 import argparse
@@ -69,7 +70,8 @@ class DatabaseReplicator:
             return f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
         else:
             # Docker container name - connect via exposed port
-            # Assume default PostgreSQL port 5432, but we'll override with actual exposed port
+            # Assume default PostgreSQL port 5432, but we'll override with
+            # actual exposed port
             container_port = self._get_container_port(conn_str)
             user = user or "postgres"
             password = password or "postgres"

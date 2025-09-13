@@ -3,6 +3,8 @@
 import os
 import sys
 
+from django.core.wsgi import get_wsgi_application
+
 # This will quiet the errors when printing but is not ideal.
 # sys.stdout = sys.stderr
 
@@ -21,6 +23,5 @@ if workspace not in sys.path:
     sys.path.insert(0, workspace)
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "gchub_db.settings"
-from django.core.wsgi import get_wsgi_application
 
 application = get_wsgi_application()

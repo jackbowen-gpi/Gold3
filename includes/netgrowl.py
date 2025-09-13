@@ -31,9 +31,7 @@ class GrowlRegistrationPacket:
 
     # end def
 
-    def addNotification(
-        self, notification="Command-Line Growl Notification", enabled=True
-    ):
+    def addNotification(self, notification="Command-Line Growl Notification", enabled=True):
         """Adds a notification type and sets whether it is enabled on the GUI"""
         self.notifications.append(notification)
         if enabled:

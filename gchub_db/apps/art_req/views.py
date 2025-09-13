@@ -68,17 +68,13 @@ class NewArtReqForm(ModelForm):
     """Form used for adding a new art request."""
 
     # Use those custom choices we defined earlier.
-    printgroup = CustomPrintGroupChoice(
-        queryset=QAD_PrintGroups.objects.all().order_by("description")
-    )
+    printgroup = CustomPrintGroupChoice(queryset=QAD_PrintGroups.objects.all().order_by("description"))
     sales_rep = CustomSalesRepChoice(
         queryset=User.objects.filter(is_active=True, groups__name="Salesperson")
         .exclude(groups__name="Evergreen Analyst")
         .order_by("last_name")
     )
-    save_address = forms.BooleanField(
-        label="", required=False, help_text="Save to address book"
-    )
+    save_address = forms.BooleanField(label="", required=False, help_text="Save to address book")
 
     class Meta:
         model = ArtReq
@@ -88,9 +84,7 @@ class NewArtReqForm(ModelForm):
         super(NewArtReqForm, self).__init__(*args, **kwargs)
         self.fields["design_name"].label = "*Design Name"
         self.fields["design_name"].widget.attrs["size"] = 70
-        self.fields["design_name"].widget.attrs["title"] = (
-            "This will be the name of the job in GOLD."
-        )
+        self.fields["design_name"].widget.attrs["title"] = "This will be the name of the job in GOLD."
         self.fields["contact_name"].label = "*Contact Name"
         self.fields["contact_email"].label = "*Contact Email"
         self.fields["contact_email"].widget.attrs["size"] = 70
@@ -99,9 +93,7 @@ class NewArtReqForm(ModelForm):
         self.fields["channel"].label = "*Channel"
         self.fields["print_type"].label = "*Print Type"
         self.fields["contact_name"].widget.attrs["size"] = 70
-        self.fields["contact_name"].widget.attrs["title"] = (
-            "This will be the primary contact for the job."
-        )
+        self.fields["contact_name"].widget.attrs["title"] = "This will be the primary contact for the job."
         self.fields["ship_to_name"].label = "*Customer Name"
         self.fields["ship_to_name"].widget.attrs["size"] = 70
         self.fields["ship_to_company"].label = "Company"
@@ -120,12 +112,10 @@ class NewArtReqForm(ModelForm):
         self.fields["ship_to_phone"].label = "*Phone"
         self.fields["mkt_segment"].label = "*Market Segment"
         self.fields["design_name"].widget.attrs["size"] = 70
-        self.fields["design_name"].widget.attrs["title"] = (
-            "This will be the name of the job in GOLD."
+        self.fields["design_name"].widget.attrs["title"] = "This will be the name of the job in GOLD."
+        self.fields["csr"].queryset = User.objects.filter(is_active=True, groups__in=CSR_PERMISSION.group_set.all()).order_by(
+            "last_name"
         )
-        self.fields["csr"].queryset = User.objects.filter(
-            is_active=True, groups__in=CSR_PERMISSION.group_set.all()
-        ).order_by("last_name")
         self.fields["printgroup"].label = "*Printgroup"
 
 
@@ -135,9 +125,7 @@ class ExtraProofForm(ModelForm):
     ExtraProofFormSet genetrated by modelformset_factory.
     """
 
-    save_address = forms.BooleanField(
-        label="", required=False, help_text="Save to address book"
-    )
+    save_address = forms.BooleanField(label="", required=False, help_text="Save to address book")
 
     def __init__(self, *args, **kwargs):
         super(ExtraProofForm, self).__init__(*args, **kwargs)
@@ -155,9 +143,7 @@ class ProductForm(ModelForm):
     """
 
     # Use those custom choices we defined earlier.
-    case_pack = CustomCasePackChoice(
-        required=False, queryset=QAD_CasePacks.objects.all()
-    )
+    case_pack = CustomCasePackChoice(required=False, queryset=QAD_CasePacks.objects.all())
 
     def __init__(self, *args, **kwargs):
         super(ProductForm, self).__init__(*args, **kwargs)
@@ -170,9 +156,7 @@ class ProductForm(ModelForm):
         self.fields["corr_only"].widget.attrs["title"] = (
             "Check this if you just want a corrugated (KD) job created in GOLD. No cup job will be created."
         )
-        self.fields["customer_number"].widget.attrs["title"] = (
-            "Customer specific numbers like WRIN#, GIN#, SKU#, etc."
-        )
+        self.fields["customer_number"].widget.attrs["title"] = "Customer specific numbers like WRIN#, GIN#, SKU#, etc."
         self.fields["plant1"].label = "Plant/Press"
         self.fields["plant1"].widget.attrs["title"] = "Plant 1"
         self.fields["plant2"].label = ""
@@ -185,12 +169,10 @@ class ProductForm(ModelForm):
         self.fields["press1"].widget.attrs["title"] = "Press 1"
         self.fields["press2"].widget.attrs["title"] = "Press 2"
         self.fields["press3"].widget.attrs["title"] = "Press 3"
-        self.fields["case_pack"].queryset = QAD_CasePacks.objects.filter(
-            active=True
-        ).order_by("size", "case_pack")
-        self.fields["size"].queryset = ItemCatalog.objects.filter(
-            workflow__name="Foodservice", active="True"
-        ).exclude(size__contains=" KD")
+        self.fields["case_pack"].queryset = QAD_CasePacks.objects.filter(active=True).order_by("size", "case_pack")
+        self.fields["size"].queryset = ItemCatalog.objects.filter(workflow__name="Foodservice", active="True").exclude(
+            size__contains=" KD"
+        )
 
 
 class AdditionalInfoForm(ModelForm):
@@ -204,13 +186,9 @@ class AdditionalInfoForm(ModelForm):
         super(AdditionalInfoForm, self).__init__(*args, **kwargs)
         self.fields["keep_same_upc"].help_text = "Keep same UPC"
         self.fields["keep_same_upc"].label = ""
-        self.fields[
-            "replaces_prev_design"
-        ].help_text = "Replaces previous design (Requires previous 9-Digit #)"
+        self.fields["replaces_prev_design"].help_text = "Replaces previous design (Requires previous 9-Digit #)"
         self.fields["replaces_prev_design"].label = ""
-        self.fields["prev_9_digit"].widget = forms.Textarea(
-            attrs={"cols": 15, "rows": 3}
-        )
+        self.fields["prev_9_digit"].widget = forms.Textarea(attrs={"cols": 15, "rows": 3})
         self.fields["prev_9_digit"].help_text = "(Separate multiples with comma.)"
         self.fields["incoming_art_format"].label = "Incoming Art Format"
         self.fields["arrival_date"].label = "Arrival Date"
@@ -293,9 +271,7 @@ def art_req_delete(request, temp_id):
 
 @login_required
 def art_req_home(request):
-    reqs = PartialArtReq.objects.filter(
-        created_by=threadlocals.get_current_user(), is_completed=False
-    )
+    reqs = PartialArtReq.objects.filter(created_by=threadlocals.get_current_user(), is_completed=False)
 
     pagevars = {
         "page_title": "Art Requests Home",
@@ -350,28 +326,18 @@ def art_req_add(request, artreq_id=None, new_artreq_id=None):
     else:
         pass
     # Build our formsets.
-    ExtraProofFormSet = modelformset_factory(
-        ExtraProof, form=ExtraProofForm, exclude=("artreq",), extra=blank_proofs_forms
-    )
-    ProductFormSet = modelformset_factory(
-        Product, form=ProductForm, exclude=("artreq",), min_num=1, extra=0
-    )
+    ExtraProofFormSet = modelformset_factory(ExtraProof, form=ExtraProofForm, exclude=("artreq",), extra=blank_proofs_forms)
+    ProductFormSet = modelformset_factory(Product, form=ProductForm, exclude=("artreq",), min_num=1, extra=0)
     ArtReqFileFormSet = formset_factory(ArtReqFileForm, extra=1)
 
     # Normal form stuff starts
     if request.POST:
         if "form_submit" in request.POST:
             artreqform = NewArtReqForm(request, request.POST, instance=artreq)
-            extraproofformset = ExtraProofFormSet(
-                request.POST, queryset=extra_proofs, prefix="Proof"
-            )
-            productformset = ProductFormSet(
-                request.POST, queryset=products, prefix="Product"
-            )
+            extraproofformset = ExtraProofFormSet(request.POST, queryset=extra_proofs, prefix="Proof")
+            productformset = ProductFormSet(request.POST, queryset=products, prefix="Product")
             infoform = AdditionalInfoForm(request, request.POST, instance=info)
-            fileformset = ArtReqFileFormSet(
-                request.POST, request.FILES, prefix="ArtReqFiles"
-            )
+            fileformset = ArtReqFileFormSet(request.POST, request.FILES, prefix="ArtReqFiles")
 
             # Validate the form data and save.
             if (
@@ -445,15 +411,10 @@ def art_req_add(request, artreq_id=None, new_artreq_id=None):
                 for fileform in fileformset.cleaned_data:
                     if fileform:
                         # Designate temporary upload path and file name
-                        path = (
-                            os.path.join(settings.ARTREQFILES_DIR, "ArtRequest_%s")
-                            % new_artreq.id
-                        )
+                        path = os.path.join(settings.ARTREQFILES_DIR, "ArtRequest_%s") % new_artreq.id
                         if not os.path.exists(path):
                             os.makedirs(path)
-                        destination = open(
-                            os.path.join(path, fileform["file"].name), "wb+"
-                        )
+                        destination = open(os.path.join(path, fileform["file"].name), "wb+")
                         # Write file to folder
                         for chunk in fileform["file"]:
                             destination.write(chunk)
@@ -478,9 +439,7 @@ def art_req_add(request, artreq_id=None, new_artreq_id=None):
                     partialArt.save()
                 except Exception:
                     pass
-                return HttpResponseRedirect(
-                    "/art_req/review/%s/%s/True/" % (new_artreq.id, partial_id)
-                )
+                return HttpResponseRedirect("/art_req/review/%s/%s/True/" % (new_artreq.id, partial_id))
             else:
                 print("Form validation error.")
 
@@ -534,12 +493,8 @@ def art_req_add(request, artreq_id=None, new_artreq_id=None):
             filelist = None
 
             # Build our formsets.
-            ExtraProofFormSet = modelformset_factory(
-                ExtraProof, form=ExtraProofForm, exclude=("artreq",), extra=0
-            )
-            ProductFormSet = modelformset_factory(
-                Product, form=ProductForm, exclude=("artreq",), extra=0
-            )
+            ExtraProofFormSet = modelformset_factory(ExtraProof, form=ExtraProofForm, exclude=("artreq",), extra=0)
+            ProductFormSet = modelformset_factory(Product, form=ProductForm, exclude=("artreq",), extra=0)
             ArtReqFileFormSet = formset_factory(ArtReqFileForm, extra=1)
 
             artreqform = NewArtReqForm(request, obj, instance=None)
@@ -571,9 +526,7 @@ def art_req_add(request, artreq_id=None, new_artreq_id=None):
         try:
             print("Gathering up newly created jobs for display at top of page.")
             artreq = ArtReq.objects.get(id=new_artreq_id)
-            new_jobs = Job.objects.filter(
-                Q(id=artreq.job_num) | Q(id=artreq.corr_job_num)
-            )
+            new_jobs = Job.objects.filter(Q(id=artreq.job_num) | Q(id=artreq.corr_job_num))
         except Exception:
             new_jobs = None
             print("No art req found. Can't display success message.")
@@ -656,9 +609,7 @@ def art_req_process(request, artreq_id, temp_id):
             salespersonArr = job.salesperson.username.split("_")
             salesperson = salespersonArr[0] + " " + salespersonArr[1]
             mail_send_to = []
-            group_members = User.objects.filter(
-                groups__name="EmailArtReqPromotional", is_active=True
-            )
+            group_members = User.objects.filter(groups__name="EmailArtReqPromotional", is_active=True)
             for user in group_members:
                 mail_send_to.append(user.email)
             mail_from = "Gold - Clemson Support <%s>" % settings.EMAIL_SUPPORT
@@ -666,9 +617,7 @@ def art_req_process(request, artreq_id, temp_id):
             mail_body = loader.get_template("emails/promotional_job.txt")
             mail_context = {"job": job, "salesperson": salesperson}
             # send the email
-            msg = EmailMultiAlternatives(
-                mail_subject, mail_body.render(mail_context), mail_from, mail_send_to
-            )
+            msg = EmailMultiAlternatives(mail_subject, mail_body.render(mail_context), mail_from, mail_send_to)
             msg.content_subtype = "html"
             msg.send()
     except Exception as ex:
@@ -729,9 +678,7 @@ def address_autocomplete(request):
         except Exception:
             pass
         contacts = Contact.objects.filter(
-            Q(first_name__icontains=term)
-            | Q(last_name__icontains=term)
-            | Q(first_name__icontains=term1, last_name__icontains=term2)
+            Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(first_name__icontains=term1, last_name__icontains=term2)
         )
         for contact in contacts:
             name_string = contact.first_name + " " + contact.last_name
@@ -780,9 +727,7 @@ def create_new_job(artreq):
     making a non-KD job. So let's check and see if there are any products that
     don't have that checked before we make a job to contain them.
     """
-    non_corr_only_products = Product.objects.filter(
-        artreq=artreq, corr_only=False
-    ).order_by("id")
+    non_corr_only_products = Product.objects.filter(artreq=artreq, corr_only=False).order_by("id")
     if non_corr_only_products:
         job.save()
         print("Job saved for %s." % artreq)
@@ -797,9 +742,7 @@ def create_new_job(artreq):
         create_items(job, artreq)
 
     # Check for items with preprint corrugated specified. They get seperate jobs.
-    corr_products = Product.objects.filter(
-        artreq=artreq, corr_type="preprint"
-    ).order_by("id")
+    corr_products = Product.objects.filter(artreq=artreq, corr_type="preprint").order_by("id")
     if corr_products:
         print("Making corrugated job.")
         # We can copy the job objects we just created by wiping the primary key
@@ -857,9 +800,7 @@ def create_items(job, artreq, corr_flag=False):
 
     # Gather all the products specified in the art request.
     if corr_flag:
-        products = Product.objects.filter(artreq=artreq, corr_type="preprint").order_by(
-            "id"
-        )
+        products = Product.objects.filter(artreq=artreq, corr_type="preprint").order_by("id")
     else:
         products = Product.objects.filter(artreq=artreq, corr_only=False).order_by("id")
     # Grab the additional info object for this art request.
@@ -900,9 +841,7 @@ def create_items(job, artreq, corr_flag=False):
         # If it's a corrugated item add some specific charges.
         if corr_flag:
             charge_type = ChargeType.objects.get(type="PDF Proof")
-            charge = Charge(
-                item=item, description=charge_type, amount=charge_type.base_amount
-            )
+            charge = Charge(item=item, description=charge_type, amount=charge_type.base_amount)
             charge.save()
             charge_type = ChargeType.objects.get(type="Prepress Package")
             charge = Charge(item=item, description=charge_type, amount=100)
@@ -1005,12 +944,8 @@ def send_item_replaces_email(items_replacing_designs, job):
         mail_body = loader.get_template("emails/etools_replaces_design.txt")
         mail_context = {"items": items_replacing_designs, "job": job}
         mail_send_to = [settings.EMAIL_GCHUB]
-        group_members = User.objects.filter(
-            groups__name="EmailGCHubNewItems", is_active=True
-        )
+        group_members = User.objects.filter(groups__name="EmailGCHubNewItems", is_active=True)
         for user in group_members:
             mail_send_to.append(user.email)
-        general_funcs.send_info_mail(
-            mail_subject, mail_body.render(mail_context), mail_send_to
-        )
+        general_funcs.send_info_mail(mail_subject, mail_body.render(mail_context), mail_send_to)
         print("Notification e-mail sent.")

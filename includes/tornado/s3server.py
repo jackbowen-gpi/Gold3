@@ -84,9 +84,7 @@ class BaseRequestHandler(web.RequestHandler):
         self.set_header("Content-Type", "application/xml; charset=UTF-8")
         name = list(value.keys())[0]
         parts = []
-        parts.append(
-            "<" + escape.utf8(name) + ' xmlns="http://doc.s3.amazonaws.com/2006-03-01">'
-        )
+        parts.append("<" + escape.utf8(name) + ' xmlns="http://doc.s3.amazonaws.com/2006-03-01">')
         self._render_parts(list(value.values())[0], parts)
         parts.append("</" + escape.utf8(name) + ">")
         self.finish('<?xml version="1.0" encoding="UTF-8"?>\n' + "".join(parts))
@@ -111,9 +109,7 @@ class BaseRequestHandler(web.RequestHandler):
 
     def _object_path(self, bucket, object_name):
         if self.application.bucket_depth < 1:
-            return os.path.abspath(
-                os.path.join(self.application.directory, bucket, object_name)
-            )
+            return os.path.abspath(os.path.join(self.application.directory, bucket, object_name))
         hash = hashlib.md5(object_name).hexdigest()
         path = os.path.abspath(os.path.join(self.application.directory, bucket))
         for i in range(self.application.bucket_depth):
@@ -182,9 +178,7 @@ class BucketHandler(BaseRequestHandler):
                 info = os.stat(object_path)
                 c.update(
                     {
-                        "LastModified": datetime.datetime.utcfromtimestamp(
-                            info.st_mtime
-                        ),
+                        "LastModified": datetime.datetime.utcfromtimestamp(info.st_mtime),
                         "Size": info.st_size,
                     }
                 )
@@ -229,9 +223,7 @@ class ObjectHandler(BaseRequestHandler):
             raise web.HTTPError(404)
         info = os.stat(path)
         self.set_header("Content-Type", "application/unknown")
-        self.set_header(
-            "Last-Modified", datetime.datetime.utcfromtimestamp(info.st_mtime)
-        )
+        self.set_header("Last-Modified", datetime.datetime.utcfromtimestamp(info.st_mtime))
         object_file = open(path, "r")
         try:
             self.finish(object_file.read())
@@ -241,9 +233,7 @@ class ObjectHandler(BaseRequestHandler):
     def put(self, bucket, object_name):
         object_name = urllib.parse.unquote(object_name)
         bucket_dir = os.path.abspath(os.path.join(self.application.directory, bucket))
-        if not bucket_dir.startswith(self.application.directory) or not os.path.isdir(
-            bucket_dir
-        ):
+        if not bucket_dir.startswith(self.application.directory) or not os.path.isdir(bucket_dir):
             raise web.HTTPError(404)
         path = self._object_path(bucket, object_name)
         if not path.startswith(bucket_dir) or os.path.isdir(path):

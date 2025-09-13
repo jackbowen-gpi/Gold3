@@ -85,15 +85,11 @@ class CollidableTextElement(TextElement, CollidableElement):
         # Call the CollidableElement superclass's __init__ method. This sets
         # the coordinate attributes up. Note that we'll set the width and
         # height attributes later, None works for now.
-        CollidableElement.__init__(
-            self, name, bottom_left_x, bottom_left_y, None, None, **kwargs
-        )
+        CollidableElement.__init__(self, name, bottom_left_x, bottom_left_y, None, None, **kwargs)
         # Call the CollidableTextElement's superclass's __init__ method, which
         # also calculates and sets the width and height attributes, along with
         # a self.drawing attribute.
-        TextElement.__init__(
-            self, bottom_left_x, bottom_left_y, label_text, font=font, size=size
-        )
+        TextElement.__init__(self, bottom_left_x, bottom_left_y, label_text, font=font, size=size)
         # By the end of this, we've got all of the normal attributes, along
         # with self.drawing. This matches up with the other label classes
         # in this module.
@@ -118,9 +114,7 @@ class CollidableSVGGraphicElement(SVGGraphicElement, CollidableElement):
         available_area_x: (int) Horiz. area available for graphic placement.
         available_area_Y: (int) Vert. area available for graphic placement.
         """
-        CollidableElement.__init__(
-            self, name, bottom_left_x, bottom_left_y, None, None, **kwargs
-        )
+        CollidableElement.__init__(self, name, bottom_left_x, bottom_left_y, None, None, **kwargs)
 
         SVGGraphicElement.__init__(
             self,

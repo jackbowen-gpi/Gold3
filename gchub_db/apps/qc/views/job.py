@@ -22,16 +22,16 @@ def qc_manager(request, job_id):
 @csrf_exempt
 def select_and_create(request, job_id):
     """Select the items for which this QC applies."""
-    job = get_object_or_404(Job, id=int(job_id))
 
     pagevars = {
-        "job": job,
+        "job_id": job_id,
     }
     return render(request, "qc_manager/select_and_create.html", context=pagevars)
 
 
 def ajax_create_qc(request, job_id):
     """Sends the request to create a QC."""
+
     if not request.user.is_authenticated:
         return HttpResponse(
             JSMessage(
@@ -59,6 +59,7 @@ def ajax_create_qc(request, job_id):
 
 def ajax_create_qc2(request, job_id):
     """Sends the request to create a QC."""
+
     if not request.user.is_authenticated:
         return HttpResponse(
             JSMessage(

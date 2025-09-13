@@ -71,12 +71,7 @@ class WebSocketHandler(tornado.web.RequestHandler):
             or not self.request.headers.get("Origin")
         ):
             message = "Expected WebSocket headers"
-            self.stream.write(
-                "HTTP/1.1 403 Forbidden\r\nContent-Length: "
-                + str(len(message))
-                + "\r\n\r\n"
-                + message
-            )
+            self.stream.write("HTTP/1.1 403 Forbidden\r\nContent-Length: " + str(len(message)) + "\r\n\r\n" + message)
             return
         self.stream.write(
             "HTTP/1.1 101 Web Socket Protocol Handshake\r\n"
@@ -84,10 +79,7 @@ class WebSocketHandler(tornado.web.RequestHandler):
             "Connection: Upgrade\r\n"
             "Server: TornadoServer/0.1\r\n"
             "WebSocket-Origin: " + self.request.headers["Origin"] + "\r\n"
-            "WebSocket-Location: ws://"
-            + self.request.host
-            + self.request.path
-            + "\r\n\r\n"
+            "WebSocket-Location: ws://" + self.request.host + self.request.path + "\r\n\r\n"
         )
         self.async_callback(self.open)(*args, **kwargs)
 
@@ -128,9 +120,7 @@ class WebSocketHandler(tornado.web.RequestHandler):
             try:
                 return callback(*args, **kwargs)
             except Exception:
-                logging.error(
-                    "Uncaught exception in %s", self.request.path, exc_info=True
-                )
+                logging.error("Uncaught exception in %s", self.request.path, exc_info=True)
                 self.stream.close()
 
         return wrapper
@@ -138,9 +128,7 @@ class WebSocketHandler(tornado.web.RequestHandler):
     def _on_frame_type(self, callback, byte):
         if ord(byte) & 0x80 == 0x80:
             raise Exception("Length-encoded format not yet supported")
-        self.stream.read_until(
-            "\xff", functools.partial(self._on_end_delimiter, callback)
-        )
+        self.stream.read_until("\xff", functools.partial(self._on_end_delimiter, callback))
 
     def _on_end_delimiter(self, callback, frame):
         callback(frame[:-1].decode("utf-8", "replace"))

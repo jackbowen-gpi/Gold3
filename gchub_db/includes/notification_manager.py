@@ -73,9 +73,7 @@ def send_user_notification(
             logging.warning(
                 "Could not read user preference '%s' for user %s: %s - falling back to disabled",
                 pref_field,
-                getattr(
-                    getattr(user_profile, "user", None), "username", repr(user_profile)
-                ),
+                getattr(getattr(user_profile, "user", None), "username", repr(user_profile)),
                 e,
             )
             growl_pref = GROWL_STATUS_DISABLED
@@ -97,9 +95,7 @@ def send_user_notification(
         icon_path = getattr(settings, "NOTIFICATION_ICON_PATH", None)
 
         if sticky:
-            success = windows_notifier.send_sticky_notification(
-                title=title, message=description, icon_path=icon_path
-            )
+            success = windows_notifier.send_sticky_notification(title=title, message=description, icon_path=icon_path)
         else:
             success = windows_notifier.send_notification(
                 title=title,
@@ -111,9 +107,7 @@ def send_user_notification(
         return success
 
     except Exception as e:
-        logging.error(
-            f"Windows notification error for user {user_profile.user.username}: {e}"
-        )
+        logging.error(f"Windows notification error for user {user_profile.user.username}: {e}")
         # Fallback to console output
         print(f"NOTIFICATION for {user_profile.user.username}: {title} - {description}")
         return False
@@ -155,7 +149,5 @@ def bulk_notify_users(
             logging.error(f"Failed to notify user {user.username}: {e}")
             continue
 
-    logging.info(
-        f"Windows notifications sent to {success_count}/{users_queryset.count()} users"
-    )
+    logging.info(f"Windows notifications sent to {success_count}/{users_queryset.count()} users")
     return success_count

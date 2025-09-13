@@ -1,3 +1,4 @@
+# ruff: noqa
 #!/usr/bin/env python
 #
 # Copyright 2009 Facebook
@@ -235,21 +236,13 @@ class _Option(object):
     def set(self, value):
         if self.multiple:
             if not isinstance(value, list):
-                raise Error(
-                    "Option %r is required to be a list of %s"
-                    % (self.name, self.type.__name__)
-                )
+                raise Error("Option %r is required to be a list of %s" % (self.name, self.type.__name__))
             for item in value:
                 if item != None and not isinstance(item, self.type):
-                    raise Error(
-                        "Option %r is required to be a list of %s"
-                        % (self.name, self.type.__name__)
-                    )
+                    raise Error("Option %r is required to be a list of %s" % (self.name, self.type.__name__))
         else:
             if value != None and not isinstance(value, self.type):
-                raise Error(
-                    "Option %r is required to be a %s" % (self.name, self.type.__name__)
-                )
+                raise Error("Option %r is required to be a %s" % (self.name, self.type.__name__))
         self._value = value
 
     # Supported date/time formats in our options
@@ -284,15 +277,11 @@ class _Option(object):
         ("weeks", ["w"]),
     ]
 
-    _TIMEDELTA_ABBREV_DICT = dict(
-        (abbrev, full) for full, abbrevs in _TIMEDELTA_ABBREVS for abbrev in abbrevs
-    )
+    _TIMEDELTA_ABBREV_DICT = dict((abbrev, full) for full, abbrevs in _TIMEDELTA_ABBREVS for abbrev in abbrevs)
 
     _FLOAT_PATTERN = r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?"
 
-    _TIMEDELTA_PATTERN = re.compile(
-        r"\s*(%s)\s*(\w*)\s*" % _FLOAT_PATTERN, re.IGNORECASE
-    )
+    _TIMEDELTA_PATTERN = re.compile(r"\s*(%s)\s*(\w*)\s*" % _FLOAT_PATTERN, re.IGNORECASE)
 
     def _parse_timedelta(self, value):
         try:
@@ -354,12 +343,8 @@ class _ColorLogFormatter(logging.Formatter):
             record.message = record.getMessage()
         except Exception as e:
             record.message = "Bad message (%r): %r" % (e, record.__dict__)
-        record.asctime = time.strftime(
-            "%y%m%d %H:%M:%S", self.converter(record.created)
-        )
-        prefix = (
-            "[%(levelname)1.1s %(asctime)s %(module)s:%(lineno)d]" % record.__dict__
-        )
+        record.asctime = time.strftime("%y%m%d %H:%M:%S", self.converter(record.created))
+        prefix = "[%(levelname)1.1s %(asctime)s %(module)s:%(lineno)d]" % record.__dict__
         color = self._colors.get(record.levelno, self._normal)
         formatted = color + prefix + self._normal + " " + record.message
         if record.exc_info:

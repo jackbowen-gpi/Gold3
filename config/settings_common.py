@@ -167,6 +167,24 @@ if not _allow_sqlite:
             "ALLOW_PROJECT_SQLITE=1 in the environment."
         )
 
+# Caching configuration for improved performance
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache_table",
+        "TIMEOUT": 300,  # 5 minutes default timeout
+        "OPTIONS": {
+            "MAX_ENTRIES": 1000,
+            "CULL_FREQUENCY": 3,
+        },
+    }
+}
+
+# Cache settings for different types of data
+CACHE_MIDDLEWARE_ALIAS = "default"
+CACHE_MIDDLEWARE_SECONDS = 600  # 10 minutes
+CACHE_MIDDLEWARE_KEY_PREFIX = "gchub"
+
 # The host/port of the FS daemon. Should run on master.
 FS_SERVER_HOST = "172.23.8.60"
 FS_SERVER_PORT = 8000
@@ -319,8 +337,44 @@ LOGIN_URL = "/accounts/login/"
 
 STATIC_URL = "/static/"
 
+# CDN Configuration - Production Only
+# Only enable CDN in production (when DEBUG=False and STATIC_URL_CDN is set)
+if not DEBUG and os.environ.get("STATIC_URL_CDN"):
+    cdn_url = os.environ.get("STATIC_URL_CDN")
+    if cdn_url:  # Ensure it's not None
+        STATIC_URL = cdn_url
+        # Ensure CDN URL ends with /
+        if not STATIC_URL.endswith("/"):
+            STATIC_URL += "/"
+
+# Static file optimization settings for improved performance
+# Enable static file compression and caching with cache busting
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+
+# Static file caching headers - cache static files for 1 year
+STATIC_CACHE_TIMEOUT = 31536000  # 1 year in seconds
+
+# Add cache control headers for static files
+STATICFILES_DIRS = [
+    os.path.join(MAIN_PATH, "staticfiles"),  # Include existing collected static files
+    # Add any additional static file directories here if needed
+]
+
+# Enable GZip compression for static files (requires WhiteNoise or similar)
+# For production, consider using a CDN or reverse proxy for static file serving
+# STATIC_URL_CDN is now handled above in the main STATIC_URL configuration
+
+# Cache versioning for cache busting
+STATICFILES_USE_GZIP = True
+
+# Production Monitoring Settings
+# Only active when DEBUG=False
+SLOW_REQUEST_THRESHOLD = 2.0  # seconds - requests slower than this are logged as slow
+MONITORING_LOG_LEVEL = "INFO"  # Log level for monitoring messages
+
 MIDDLEWARE = (
     "django.middleware.common.CommonMiddleware",
+    "django.middleware.cache.UpdateCacheMiddleware",  # Add cache middleware for static files
     "django.contrib.sessions.middleware.SessionMiddleware",
     # Ensure CSRF tokens are available to templates and POST handlers.
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -332,7 +386,22 @@ MIDDLEWARE = (
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
     "gchub_db.middleware.threadlocals.ThreadLocals",
     "gchub_db.middleware.maintenance_mode.middleware.MaintenanceModeMiddleware",
+    "gchub_db.middleware.static_cache.StaticFileCacheMiddleware",  # Custom static file caching
+    "django.middleware.cache.FetchFromCacheMiddleware",  # Add cache fetch middleware
 )
+
+# Production-only middleware for monitoring (only add if not DEBUG)
+if not DEBUG:
+    # Convert tuple to list for modification, then back to tuple
+    middleware_list = list(MIDDLEWARE)
+    # Add monitoring middleware at the end
+    middleware_list.extend(
+        [
+            "gchub_db.middleware.monitoring.PerformanceMonitoringMiddleware",
+            "gchub_db.middleware.monitoring.StaticFileMonitoringMiddleware",
+        ]
+    )
+    MIDDLEWARE = tuple(middleware_list)  # type: ignore[assignment]
 
 INSTALLED_APPS = (
     "maintenance_mode",
@@ -349,6 +418,7 @@ INSTALLED_APPS = (
     # Lots of useful extensions for Django and manage.py
     # http://code.google.com/p/django-command-extensions/
     "django_extensions",
+    "gchub_db",  # Main app for management commands
     "gchub_db.apps.accounts",
     "gchub_db.apps.admin_log",
     "gchub_db.apps.archives",

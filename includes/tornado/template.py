@@ -1,3 +1,4 @@
+# ruff: noqa
 #!/usr/bin/env python
 #
 # Copyright 2009 Facebook
@@ -97,9 +98,7 @@ class Template(object):
     the template from variables with generate().
     """
 
-    def __init__(
-        self, template_string, name="<string>", loader=None, compress_whitespace=None
-    ):
+    def __init__(self, template_string, name="<string>", loader=None, compress_whitespace=None):
         self.name = name
         if compress_whitespace is None:
             compress_whitespace = name.endswith(".html") or name.endswith(".js")
@@ -141,9 +140,7 @@ class Template(object):
             for ancestor in ancestors:
                 ancestor.find_named_blocks(loader, named_blocks)
             self.file.find_named_blocks(loader, named_blocks)
-            writer = _CodeWriter(
-                buffer, named_blocks, loader, self, compress_whitespace
-            )
+            writer = _CodeWriter(buffer, named_blocks, loader, self, compress_whitespace)
             ancestors[0].generate(writer)
             return buffer.getvalue()
         finally:
@@ -154,9 +151,7 @@ class Template(object):
         for chunk in self.file.body.chunks:
             if isinstance(chunk, _ExtendsBlock):
                 if not loader:
-                    raise ParseError(
-                        "{% extends %} block found, but no template loader"
-                    )
+                    raise ParseError("{% extends %} block found, but no template loader")
                 template = loader.load(chunk.name, self.name)
                 ancestors.extend(template._get_ancestors(loader))
         return ancestors
@@ -176,12 +171,7 @@ class Loader(object):
         self.templates = {}
 
     def load(self, name, parent_path=None):
-        if (
-            parent_path
-            and not parent_path.startswith("<")
-            and not parent_path.startswith("/")
-            and not name.startswith("/")
-        ):
+        if parent_path and not parent_path.startswith("<") and not parent_path.startswith("/") and not name.startswith("/"):
             current_path = os.path.join(self.root, parent_path)
             file_dir = os.path.dirname(os.path.abspath(current_path))
             relative_path = os.path.abspath(os.path.join(file_dir, name))
@@ -328,9 +318,7 @@ class _Expression(_Node):
     def generate(self, writer):
         writer.write_line("_tmp = %s" % self.expression)
         writer.write_line("if isinstance(_tmp, str): _buffer.append(_tmp)")
-        writer.write_line(
-            "elif isinstance(_tmp, unicode): _buffer.append(_tmp.encode('utf-8'))"
-        )
+        writer.write_line("elif isinstance(_tmp, unicode): _buffer.append(_tmp.encode('utf-8'))")
         writer.write_line("else: _buffer.append(str(_tmp))")
 
 
@@ -359,9 +347,7 @@ class ParseError(Exception):
 
 
 class _CodeWriter(object):
-    def __init__(
-        self, file, named_blocks, loader, current_template, compress_whitespace
-    ):
+    def __init__(self, file, named_blocks, loader, current_template, compress_whitespace):
         self.file = file
         self.named_blocks = named_blocks
         self.loader = loader
@@ -518,9 +504,7 @@ def _parse(reader, in_block=None):
             if not in_block:
                 raise ParseError("%s outside %s block" % (operator, allowed_parents))
             if in_block not in allowed_parents:
-                raise ParseError(
-                    "%s block cannot be attached to %s block" % (operator, in_block)
-                )
+                raise ParseError("%s block cannot be attached to %s block" % (operator, in_block))
             body.chunks.append(_IntermediateControlBlock(contents))
             continue
 

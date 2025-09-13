@@ -175,10 +175,7 @@ class HTTPServer(object):
             try:
                 num_processes = os.sysconf("SC_NPROCESSORS_CONF")
             except ValueError:
-                logging.error(
-                    "Could not get num processors from sysconf; "
-                    "running with one process"
-                )
+                logging.error("Could not get num processors from sysconf; running with one process")
                 num_processes = 1
         if num_processes > 1 and ioloop.IOLoop.initialized():
             logging.error(
@@ -191,16 +188,12 @@ class HTTPServer(object):
             logging.info("Pre-forking %d server processes", num_processes)
             for i in range(num_processes):
                 if os.fork() == 0:
-                    ioloop.IOLoop.instance().add_handler(
-                        self._socket.fileno(), self._handle_events, ioloop.IOLoop.READ
-                    )
+                    ioloop.IOLoop.instance().add_handler(self._socket.fileno(), self._handle_events, ioloop.IOLoop.READ)
                     return
             os.waitpid(-1, 0)
         else:
             io_loop = self.io_loop or ioloop.IOLoop.instance()
-            io_loop.add_handler(
-                self._socket.fileno(), self._handle_events, ioloop.IOLoop.READ
-            )
+            io_loop.add_handler(self._socket.fileno(), self._handle_events, ioloop.IOLoop.READ)
 
     def _handle_events(self, fd, events):
         while True:
@@ -212,9 +205,7 @@ class HTTPServer(object):
                 raise
             if self.ssl_options is not None:
                 assert ssl, "Python 2.6+ and OpenSSL required for SSL"
-                connection = ssl.wrap_socket(
-                    connection, server_side=True, **self.ssl_options
-                )
+                connection = ssl.wrap_socket(connection, server_side=True, **self.ssl_options)
             try:
                 stream = iostream.IOStream(connection, io_loop=self.io_loop)
                 HTTPConnection(
@@ -236,9 +227,7 @@ class HTTPConnection(object):
     until the HTTP conection is closed.
     """
 
-    def __init__(
-        self, stream, address, request_callback, no_keep_alive=False, xheaders=False
-    ):
+    def __init__(self, stream, address, request_callback, no_keep_alive=False, xheaders=False):
         self.stream = stream
         self.address = address
         self.request_callback = request_callback
@@ -357,11 +346,7 @@ class HTTPConnection(object):
             name = name_values["name"]
             if name_values.get("filename"):
                 ctype = headers.get("Content-Type", "application/unknown")
-                self._request.files.setdefault(name, []).append(
-                    dict(
-                        filename=name_values["filename"], body=value, content_type=ctype
-                    )
-                )
+                self._request.files.setdefault(name, []).append(dict(filename=name_values["filename"], body=value, content_type=ctype))
             else:
                 self._request.arguments.setdefault(name, []).append(value)
 
@@ -406,9 +391,7 @@ class HTTPRequest(object):
         self.body = body or ""
         if connection and connection.xheaders:
             # Squid uses X-Forwarded-For, others use X-Real-Ip
-            self.remote_ip = headers.get(
-                "X-Real-Ip", headers.get("X-Forwarded-For", remote_ip)
-            )
+            self.remote_ip = headers.get("X-Real-Ip", headers.get("X-Forwarded-For", remote_ip))
             self.protocol = headers.get("X-Scheme", protocol) or "http"
         else:
             self.remote_ip = remote_ip

@@ -76,36 +76,18 @@ def filter_query_same_perms(request, qset):
     qset_4 = User.objects.none()
     if request.user.has_perm("accounts.beverage_access"):
         workflow_permission = Permission.objects.get(codename="beverage_access")
-        qset_1 = (
-            qset.filter(Q(groups__in=workflow_permission.group_set.all()))
-            .values("id")
-            .query
-        )
+        qset_1 = qset.filter(Q(groups__in=workflow_permission.group_set.all())).values("id").query
     if request.user.has_perm("accounts.foodservice_access"):
         workflow_permission = Permission.objects.get(codename="foodservice_access")
-        qset_2 = (
-            qset.filter(Q(groups__in=workflow_permission.group_set.all()))
-            .values("id")
-            .query
-        )
+        qset_2 = qset.filter(Q(groups__in=workflow_permission.group_set.all())).values("id").query
     if request.user.has_perm("accounts.container_access"):
         workflow_permission = Permission.objects.get(codename="container_access")
-        qset_3 = (
-            qset.filter(Q(groups__in=workflow_permission.group_set.all()))
-            .values("id")
-            .query
-        )
+        qset_3 = qset.filter(Q(groups__in=workflow_permission.group_set.all())).values("id").query
     if request.user.has_perm("accounts.carton_access"):
         workflow_permission = Permission.objects.get(codename="carton_access")
-        qset_4 = (
-            qset.filter(Q(groups__in=workflow_permission.group_set.all()))
-            .values("id")
-            .query
-        )
+        qset_4 = qset.filter(Q(groups__in=workflow_permission.group_set.all())).values("id").query
     # Return a query of users that appear in any of the 3 sub-qsets.
-    return User.objects.filter(
-        Q(id__in=qset_1) | Q(id__in=qset_2) | Q(id__in=qset_3) | Q(id__in=qset_4)
-    ).order_by("username")
+    return User.objects.filter(Q(id__in=qset_1) | Q(id__in=qset_2) | Q(id__in=qset_3) | Q(id__in=qset_4)).order_by("username")
 
 
 def set_cookie(response, key, value, expire=None):
@@ -123,9 +105,7 @@ def set_cookie(response, key, value, expire=None):
     else:
         max_age = expire
     # Use an aware UTC datetime for cookie expiration to avoid naive/aware warnings
-    expires_dt = timezone.now().astimezone(datetime.timezone.utc) + datetime.timedelta(
-        seconds=max_age
-    )
+    expires_dt = timezone.now().astimezone(datetime.timezone.utc) + datetime.timedelta(seconds=max_age)
     expires = expires_dt.strftime("%a, %d-%b-%Y %H:%M:%S GMT")
     response.set_cookie(key, value, max_age=max_age, expires=expires)
 

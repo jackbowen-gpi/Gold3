@@ -261,14 +261,7 @@ def direct_lock_job_folder(jobnum):
     This is typically only done by master.
     """
     job_path = get_job_folder(jobnum)
-    permission_bits = (
-        stat.S_IRUSR
-        | stat.S_IXUSR
-        | stat.S_IRGRP
-        | stat.S_IXGRP
-        | stat.S_IROTH
-        | stat.S_IXOTH
-    )
+    permission_bits = stat.S_IRUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH
     _recursive_chmod(job_path, permission_bits)
 
 
@@ -327,9 +320,7 @@ def get_jobnum_itemnum_finder_regexp(jobnum, itemnum, extension=None):
     if not extension:
         return re.compile(r"(%s)-(%s)( |$)" % (jobnum, itemnum))
     else:
-        return re.compile(
-            r"(%s)-(%s)( .*\.%s$|\.%s$)" % (jobnum, itemnum, extension, extension)
-        )
+        return re.compile(r"(%s)-(%s)( .*\.%s$|\.%s$)" % (jobnum, itemnum, extension, extension))
 
 
 def _generic_item_subfolder_search(folder, pattern):
@@ -361,9 +352,7 @@ def _generic_item_subfolder_search(folder, pattern):
         return None
 
 
-def _generic_item_file_search(
-    folder, pattern, return_first=True, excluded_files=[".DS_Store"]
-):
+def _generic_item_file_search(folder, pattern, return_first=True, excluded_files=[".DS_Store"]):
     """A generic sub-folder item search. DRY."""
     # Build a list of the job folder's files. walk() returns a 3-tuple of
     # the root directory, the directories in the location, and the files in the
@@ -379,11 +368,7 @@ def _generic_item_file_search(
 
     try:
         # Make sure this match isn't one of the excluded files.
-        retval = [
-            os.path.join(folder, match)
-            for match in matches
-            if match not in excluded_files
-        ]
+        retval = [os.path.join(folder, match) for match in matches if match not in excluded_files]
 
         # No matches were found, kablooey.
         if not retval:
@@ -419,19 +404,13 @@ def create_item_folder(jobnum, itemnum, itemname):
     item_folder_str = "%s-%s %s" % (jobnum, itemnum, itemname)
     created_folders = []
 
-    ff_folder_str = os.path.join(
-        get_job_folder(jobnum), JOBDIR["final_files"], item_folder_str
-    )
+    ff_folder_str = os.path.join(get_job_folder(jobnum), JOBDIR["final_files"], item_folder_str)
     created_folders.append(ff_folder_str)
 
-    proof_folder_str = os.path.join(
-        get_job_folder(jobnum), JOBDIR["proofs"], item_folder_str
-    )
+    proof_folder_str = os.path.join(get_job_folder(jobnum), JOBDIR["proofs"], item_folder_str)
     created_folders.append(proof_folder_str)
 
-    tiff_folder_str = os.path.join(
-        get_job_folder(jobnum), JOBDIR["tiffs"], item_folder_str
-    )
+    tiff_folder_str = os.path.join(get_job_folder(jobnum), JOBDIR["tiffs"], item_folder_str)
     created_folders.append(tiff_folder_str)
 
     for folder in created_folders:
@@ -484,9 +463,7 @@ def create_tiff_folder(jobnum, itemnum, itemname):
     and new jobs automatically get a tiffs folder.
     """
     item_folder_str = "%s-%s %s" % (jobnum, itemnum, itemname)
-    tiffs_folder_str = os.path.join(
-        get_job_folder(jobnum), JOBDIR["tiffs"], item_folder_str
-    )
+    tiffs_folder_str = os.path.join(get_job_folder(jobnum), JOBDIR["tiffs"], item_folder_str)
     # Create the folder
     g_mkdir(tiffs_folder_str)
 
@@ -673,9 +650,7 @@ def copy_carton_imp_files(jobnum, itemnum, dest_jobnum, dest_itemnum):
         source_filename = source_file.split("/")[-1]
         source_job_item = str(jobnum) + "-" + str(itemnum)
         dest_job_item = str(dest_jobnum) + "-" + str(dest_itemnum)
-        dest_filename = source_filename.replace(
-            str(source_job_item), str(dest_job_item)
-        )
+        dest_filename = source_filename.replace(str(source_job_item), str(dest_job_item))
         dest_file = os.path.join(dest_folder, dest_filename)
         # Copy
         shutil.copyfile(source_file, dest_file)
@@ -743,10 +718,7 @@ def copy_item_proof_folder(jobnum, itemnum, proof_log_id):
     proof_folder = _generic_item_subfolder_search(folder, pattern)
     proof_copy_folder = os.path.join(
         proof_folder,
-        str(
-            "%s %s_%s %s"
-            % ("Previous Proofs", str(jobnum), str(itemnum), str(proof_log_id))
-        ),
+        str("%s %s_%s %s" % ("Previous Proofs", str(jobnum), str(itemnum), str(proof_log_id))),
     )
     shutil.copytree(proof_folder, proof_copy_folder)
 
@@ -765,17 +737,12 @@ def get_item_proof(jobnum, itemnum, quality=None, proof_log_id=None, return_firs
     if proof_log_id:
         item_subfolder = os.path.join(
             item_subfolder,
-            str(
-                "%s %s_%s %s"
-                % ("Previous Proofs", str(jobnum), str(itemnum), str(proof_log_id))
-            ),
+            str("%s %s_%s %s" % ("Previous Proofs", str(jobnum), str(itemnum), str(proof_log_id))),
         )
 
     # If quality is 'l', 'h' or anything else, match that here.
     if quality:
-        pattern = re.compile(
-            r"(.*)-(%s)( .*%s\.pdf$|%s\.pdf$)" % (itemnum, quality, quality)
-        )
+        pattern = re.compile(r"(.*)-(%s)( .*%s\.pdf$|%s\.pdf$)" % (itemnum, quality, quality))
     else:
         # This is usually Foodservice, who has no -l.pdf suffix.
         pattern = re.compile(r"(.*)-(%s)( .*\.pdf$|\.pdf$)" % (itemnum))
@@ -880,9 +847,7 @@ def list_job_database_docs(jobnum):
                 {
                     "file_name": doc.split("/")[-1:][0],
                     "file_path": doc,
-                    "last_modified_time": datetime.datetime.utcfromtimestamp(
-                        os.path.getmtime(doc)
-                    ),
+                    "last_modified_time": datetime.datetime.utcfromtimestamp(os.path.getmtime(doc)),
                     "file_size": os.path.getsize(doc),
                 }
             )
@@ -947,21 +912,14 @@ def get_fsb_production_template(size_name, product_type, plantcode, press_shortn
     folder = os.path.join(folder, product_type)
     # Note: the (?i)%s mean look for case insensitve match to the %s string.
     # print( product_type, size_name, plantcode, press_shortname)
-    pattern = re.compile(
-        r"((?i)%s-%s(?i)%s)( .*\.pdf$|\.pdf$)"
-        % (size_name, str(plantcode), press_shortname)
-    )
+    pattern = re.compile(r"((?i)%s-%s(?i)%s)( .*\.pdf$|\.pdf$)" % (size_name, str(plantcode), press_shortname))
     template = _generic_item_file_search(folder, pattern)
     return template
 
 
-def copy_fsb_production_template(
-    size_name, product_type, plantcode, press_shortname, jobnum, itemnum
-):
+def copy_fsb_production_template(size_name, product_type, plantcode, press_shortname, jobnum, itemnum):
     """Get and copy the FSB productuion template into the item Final Files subfolder."""
-    pdf_template = get_fsb_production_template(
-        size_name, product_type, plantcode, press_shortname
-    )
+    pdf_template = get_fsb_production_template(size_name, product_type, plantcode, press_shortname)
     # Will be placing the PDF into the item's Final File subfolder.
     item_subfolder = get_item_finalfile_folder(jobnum, itemnum)
     # eg: 59300-2 DMR-22-45FK.pdf"
@@ -1003,11 +961,7 @@ def list_item_tiffs(jobnum, itemnum):
     contents_list = os.listdir(tiffs_folder)
     tiff_pattern = re.compile(r"(.*).tif")
     len_pattern = re.compile(r"(.*).len")
-    tiffs = [
-        tiff_file
-        for tiff_file in contents_list
-        if tiff_pattern.search(tiff_file) or len_pattern.search(tiff_file)
-    ]
+    tiffs = [tiff_file for tiff_file in contents_list if tiff_pattern.search(tiff_file) or len_pattern.search(tiff_file)]
 
     tiff_list = []
     for tiff in tiffs:
@@ -1095,9 +1049,7 @@ def get_zip_all_tiffs(jobnum, itemnum):
     # Add each of the tiffs to the Zip file.
     for tiff in tiff_list:
         # This creates a zip file which unzips correctly (1 folder w/ tiffs inside)
-        zipped_tiff_file.write(
-            tiff["file_path"], tiff["file_name"], zipfile.ZIP_DEFLATED
-        )
+        zipped_tiff_file.write(tiff["file_path"], tiff["file_name"], zipfile.ZIP_DEFLATED)
     # Absolutely critical to close the zip file before reading it. Causes
     # the reference tables to be written, resulting in a readable ZIP archive.
     zipped_tiff_file.close()
@@ -1121,21 +1073,15 @@ def get_ftp_plate_files(jobnum, itemnum):
     # Add each of the tiffs to the Zip file.
     for tiff in tiff_list:
         # This creates a zip file which unzips correctly (1 folder w/ tiffs inside)
-        zipped_tiff_file.write(
-            tiff["file_path"], tiff["file_name"], zipfile.ZIP_DEFLATED
-        )
+        zipped_tiff_file.write(tiff["file_path"], tiff["file_name"], zipfile.ZIP_DEFLATED)
 
     # Add the low res proof to the Zip file.
     try:
         # Returns the path to the item's low res proof.
         proof_file_path = get_item_proof(jobnum, itemnum, quality="l")
         # Yank the '-l' out of the file name for the remote copy.
-        proof_remote_filename = os.path.split(proof_file_path)[1].replace(
-            "-l.pdf", ".pdf"
-        )
-        zipped_tiff_file.write(
-            proof_file_path, proof_remote_filename, zipfile.ZIP_DEFLATED
-        )
+        proof_remote_filename = os.path.split(proof_file_path)[1].replace("-l.pdf", ".pdf")
+        zipped_tiff_file.write(proof_file_path, proof_remote_filename, zipfile.ZIP_DEFLATED)
     except Exception:
         pass
 
@@ -1178,9 +1124,7 @@ def get_zip_all_proofs(jobnum, itemcount):
         # Add each of the proofs to the Zip file.
         for proof in proof_list:
             # Create a zip file which unzips correctly (1 folder w/ proofs inside)
-            zipped_proof_file.write(
-                proof["file_path"], proof["file_name"], zipfile.ZIP_DEFLATED
-            )
+            zipped_proof_file.write(proof["file_path"], proof["file_name"], zipfile.ZIP_DEFLATED)
         # Absolutely critical to close the zip file before reading it. Causes
         # the reference tables to be written, resulting in a readable ZIP archive.
         zipped_proof_file.close()

@@ -147,26 +147,16 @@ Examples:
     # Test type options
     test_group = parser.add_mutually_exclusive_group()
     test_group.add_argument("--unit", action="store_true", help="Run unit tests only")
-    test_group.add_argument(
-        "--integration", action="store_true", help="Run integration tests only"
-    )
+    test_group.add_argument("--integration", action="store_true", help="Run integration tests only")
     test_group.add_argument("--smoke", action="store_true", help="Run smoke tests only")
-    test_group.add_argument(
-        "--app", metavar="APP_NAME", help="Run tests for specific Django app"
-    )
-    test_group.add_argument(
-        "--workflow", action="store_true", help="Run workflow tests"
-    )
+    test_group.add_argument("--app", metavar="APP_NAME", help="Run tests for specific Django app")
+    test_group.add_argument("--workflow", action="store_true", help="Run workflow tests")
 
     # Test configuration options
-    parser.add_argument(
-        "--coverage", action="store_true", help="Run with coverage report"
-    )
+    parser.add_argument("--coverage", action="store_true", help="Run with coverage report")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
     parser.add_argument("--failfast", action="store_true", help="Stop on first failure")
-    parser.add_argument(
-        "--django", action="store_true", help="Use Django test runner instead of pytest"
-    )
+    parser.add_argument("--django", action="store_true", help="Use Django test runner instead of pytest")
 
     args = parser.parse_args()
 

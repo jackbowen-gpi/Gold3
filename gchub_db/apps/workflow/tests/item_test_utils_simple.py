@@ -87,9 +87,9 @@ class ItemTestData:
 
         for i in range(count):
             data = {
-                "item_type": f"Test Item {i+1}",
-                "po_number": f"PO{i+1:04d}",
-                "description": f"Test item description {i+1}",
+                "item_type": f"Test Item {i + 1}",
+                "po_number": f"PO{i + 1:04d}",
+                "description": f"Test item description {i + 1}",
                 "length": Decimal("12.5"),
                 "width": Decimal("9.0"),
                 "height": Decimal("3.25"),

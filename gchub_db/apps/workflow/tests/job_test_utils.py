@@ -68,9 +68,9 @@ class JobTestMixin:
         jobs = {}
         # Use creation date differences instead of priority
         for i, delay in enumerate([0, 1, 2, 3, 4]):
-            job = self.create_test_job(name=f"Job {i+1}", workflow=site)
+            job = self.create_test_job(name=f"Job {i + 1}", workflow=site)
             # Mock the creation_date if needed
-            jobs[f"job_{i+1}"] = job
+            jobs[f"job_{i + 1}"] = job
 
         return jobs
 
@@ -92,7 +92,7 @@ class JobTestMixin:
 
         for key, due_date in date_configs:
             jobs[key] = self.create_test_job(
-                name=f'{key.replace("_", " ").title()} Job',
+                name=f"{key.replace('_', ' ').title()} Job",
                 workflow=site,
                 due_date=due_date,
             )
@@ -238,8 +238,8 @@ class JobTestData:
                     "brand_name": random.choice(cls.COMMON_BRAND_NAMES),
                     "status": random.choice(cls.VALID_STATUSES),
                     "due_date": date.today() + timedelta(days=random.randint(1, 60)),
-                    "customer_name": f"Customer {i+1}",
-                    "comments": f"Sample comments for job {i+1}",
+                    "customer_name": f"Customer {i + 1}",
+                    "comments": f"Sample comments for job {i + 1}",
                 }
             )
 
@@ -275,7 +275,7 @@ def create_sample_jobs(site, count=10):
 
     for i, data in enumerate(sample_data if isinstance(sample_data, list) else [sample_data]):
         data["workflow"] = site
-        data["name"] = f"{data['name']} {i+1}"  # Make names unique
+        data["name"] = f"{data['name']} {i + 1}"  # Make names unique
         jobs.append(Job.objects.create(**data))
 
     return jobs

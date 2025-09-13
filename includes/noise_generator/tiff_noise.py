@@ -30,9 +30,7 @@ def apply_flexo_noise(tiff_path, noise_mode, saving_path, dest_path):
     else:
         noise_tiff = "noise_not_hot_inverted.tif"
 
-    noise_tiff_path = os.path.join(
-        settings.MAIN_PATH, "apps", "noise_generator", "noise_tiffs", noise_tiff
-    )
+    noise_tiff_path = os.path.join(settings.MAIN_PATH, "apps", "noise_generator", "noise_tiffs", noise_tiff)
     noise = Image.open(noise_tiff_path)
     # print noise.format, noise.size, noise.mode
 

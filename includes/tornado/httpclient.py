@@ -122,9 +122,7 @@ class AsyncHTTPClient(object):
             instance = super(AsyncHTTPClient, cls).__new__(cls)
             instance.io_loop = io_loop
             instance._multi = pycurl.CurlMulti()
-            instance._curls = [
-                _curl_create(max_simultaneous_connections) for i in range(max_clients)
-            ]
+            instance._curls = [_curl_create(max_simultaneous_connections) for i in range(max_clients)]
             instance._free_list = instance._curls[:]
             instance._requests = collections.deque()
             instance._fds = {}
@@ -196,9 +194,7 @@ class AsyncHTTPClient(object):
                     "callback": callback,
                     "start_time": time.time(),
                 }
-                _curl_setup_request(
-                    curl, request, curl.info["buffer"], curl.info["headers"]
-                )
+                _curl_setup_request(curl, request, curl.info["buffer"], curl.info["headers"])
                 self._multi.add_handle(curl)
 
             if not started and not completed:
@@ -209,9 +205,7 @@ class AsyncHTTPClient(object):
             self._timeout = None
 
         if num_handles:
-            self._timeout = self.io_loop.add_timeout(
-                time.time() + 0.2, self._handle_timeout
-            )
+            self._timeout = self.io_loop.add_timeout(time.time() + 0.2, self._handle_timeout)
 
         # Wait for more I/O
         fds = {}
@@ -295,9 +289,7 @@ class HTTPRequest(object):
     ):
         if if_modified_since:
             timestamp = calendar.timegm(if_modified_since.utctimetuple())
-            headers["If-Modified-Since"] = email.utils.formatdate(
-                timestamp, localtime=False, usegmt=True
-            )
+            headers["If-Modified-Since"] = email.utils.formatdate(timestamp, localtime=False, usegmt=True)
         if "Pragma" not in headers:
             headers["Pragma"] = ""
         self.url = _utf8(url)
@@ -379,9 +371,7 @@ def _curl_setup_request(curl, request, buffer, headers):
     curl.setopt(pycurl.URL, request.url)
     curl.setopt(pycurl.HTTPHEADER, ["%s: %s" % i for i in request.headers.items()])
     try:
-        curl.setopt(
-            pycurl.HEADERFUNCTION, functools.partial(_curl_header_callback, headers)
-        )
+        curl.setopt(pycurl.HEADERFUNCTION, functools.partial(_curl_header_callback, headers))
     except Exception:
         # Old version of curl; response will not include headers
         pass
@@ -442,9 +432,7 @@ def _curl_setup_request(curl, request, buffer, headers):
         userpwd = "%s:%s" % (request.auth_username, request.auth_password)
         curl.setopt(pycurl.HTTPAUTH, pycurl.HTTPAUTH_BASIC)
         curl.setopt(pycurl.USERPWD, userpwd)
-        logging.info(
-            "%s %s (username: %r)", request.method, request.url, request.auth_username
-        )
+        logging.info("%s %s (username: %r)", request.method, request.url, request.auth_username)
     else:
         curl.unsetopt(pycurl.USERPWD)
         logging.info("%s %s", request.method, request.url)

@@ -1,9 +1,5 @@
 """Generic corrugated documents."""
 
-"""
-This module contains high-level document classes for generating things such
-as Foodservice containerboard artwork and label images.
-"""
 from fractions import Fraction
 
 from reportlab.graphics import renderPDF
@@ -12,6 +8,11 @@ from reportlab.lib.units import inch
 from gchub_db.apps.auto_corrugated.elements.common import MarginElement
 from gchub_db.includes.reportlib.documents.canvas import GenericCanvas
 from gchub_db.includes.reportlib.util import check_text_width
+
+"""
+This module contains high-level document classes for generating things such
+as Foodservice containerboard artwork and label images.
+"""
 
 
 class ElementGroup(object):
@@ -60,9 +61,7 @@ class ElementGroup(object):
 
 
 class GenericBox(GenericCanvas):
-    def __init__(
-        self, file_name, width, height, length, format, print_header, encrypt, plant
-    ):
+    def __init__(self, file_name, width, height, length, format, print_header, encrypt, plant):
         """Handles drawing the canvas and preparing other storage variables.
 
         file_name: (str) Path to the eventual finished PDF.
@@ -80,9 +79,7 @@ class GenericBox(GenericCanvas):
         self.box_shift_left = 0
         self.box_shift_right = 0
         if plant == "Kenton":
-            self.side_flap_offset = (
-                1.0  # (1 and 3/8 inch) but we shortended it to 1 for spacing reasons
-            )
+            self.side_flap_offset = 1.0  # (1 and 3/8 inch) but we shortended it to 1 for spacing reasons
             # Has a glue flap on the right.
             self.box_shift_right = 1.375
         elif plant == "Pittston":
@@ -132,9 +129,7 @@ class GenericBox(GenericCanvas):
             self.canvas_height += self.canvas_width / 7.6
 
         # Call the __init__ method from the GenericCanvas parent class.
-        super(GenericBox, self).__init__(
-            file_name, self.canvas_width, self.canvas_height, encrypt=self.encrypt
-        )
+        super(GenericBox, self).__init__(file_name, self.canvas_width, self.canvas_height, encrypt=self.encrypt)
         # Moves the origin out of the bleed to the beginning of the art board.
         self.canvas.translate(
             (CANVAS_MARGIN / 2.0 + self.side_flap_offset) * inch,
@@ -176,9 +171,6 @@ class GenericBox(GenericCanvas):
             drawing_bottom_left_x += element.width
             drawing_bottom_left_y += element.height
 
-        upper_right_x = drawing_bottom_left_x + element.width
-        upper_right_y = drawing_bottom_left_y + element.height
-
         # canvas.setStrokeColorCMYK(0, 0.5, 0, 0)
         # canvas.setFillColorCMYK(0, 0.5, 0, 0)
 
@@ -207,7 +199,6 @@ class GenericBox(GenericCanvas):
         bottom_left_x = element.bottom_left_x
         bottom_left_y = element.bottom_left_y
 
-        can_scale = element.can_scale
         fix_x = element.fix_x
         fix_y = element.fix_y
 
@@ -230,21 +221,13 @@ class GenericBox(GenericCanvas):
                 # Setup variables for each existing obj.
                 existing_obj_bottom_left_x = obj.bottom_left_x - obj.padding
                 existing_obj_bottom_left_y = obj.bottom_left_y - obj.padding
-                existing_obj_top_right_x = (
-                    existing_obj_bottom_left_x + obj.width + (2.0 * obj.padding)
-                )
-                existing_obj_top_right_y = (
-                    existing_obj_bottom_left_y + obj.height + (2.0 * obj.padding)
-                )
+                existing_obj_top_right_x = existing_obj_bottom_left_x + obj.width + (2.0 * obj.padding)
+                existing_obj_top_right_y = existing_obj_bottom_left_y + obj.height + (2.0 * obj.padding)
                 # Either bottom left point of test obj. is above and right of existing obj.
                 # or top right point of test obj. is below and left of existing obj.
                 # This means that the objects definitely don't overlap.
-                if (
-                    bottom_left_y >= existing_obj_top_right_y
-                    or bottom_left_x >= existing_obj_top_right_x
-                ) or (
-                    top_right_y <= existing_obj_bottom_left_y
-                    or top_right_x <= existing_obj_bottom_left_x
+                if (bottom_left_y >= existing_obj_top_right_y or bottom_left_x >= existing_obj_top_right_x) or (
+                    top_right_y <= existing_obj_bottom_left_y or top_right_x <= existing_obj_bottom_left_x
                 ):
                     collision = False
                 else:
@@ -252,67 +235,35 @@ class GenericBox(GenericCanvas):
                     # is left of the test right x, or the right x is right of the text
                     # left x.
                     if (
-                        existing_obj_bottom_left_y
-                        < bottom_left_y
-                        < existing_obj_top_right_y
-                        or existing_obj_bottom_left_y
-                        < top_right_y
-                        < existing_obj_top_right_y
-                    ) and (
-                        bottom_left_x > existing_obj_top_right_x
-                        or top_right_x > existing_obj_bottom_left_x
-                    ):
+                        existing_obj_bottom_left_y < bottom_left_y < existing_obj_top_right_y
+                        or existing_obj_bottom_left_y < top_right_y < existing_obj_top_right_y
+                    ) and (bottom_left_x > existing_obj_top_right_x or top_right_x > existing_obj_bottom_left_x):
                         collision = True
                     # One of the x points is between the test x points, and the top y
                     # is above the test bottom y, or the bottom y is below the test
                     # top y.
                     if (
-                        existing_obj_bottom_left_x
-                        < bottom_left_x
-                        < existing_obj_top_right_x
-                        or existing_obj_bottom_left_x
-                        < top_right_x
-                        < existing_obj_top_right_x
-                    ) and (
-                        bottom_left_y > existing_obj_top_right_y
-                        or top_right_y > existing_obj_bottom_left_y
-                    ):
+                        existing_obj_bottom_left_x < bottom_left_x < existing_obj_top_right_x
+                        or existing_obj_bottom_left_x < top_right_x < existing_obj_top_right_x
+                    ) and (bottom_left_y > existing_obj_top_right_y or top_right_y > existing_obj_bottom_left_y):
                         collision = True
 
                 # Check for complete overlap.
-                if (
-                    bottom_left_x <= existing_obj_bottom_left_x
-                    and bottom_left_y <= existing_obj_bottom_left_y
-                ) and (
-                    top_right_x >= existing_obj_top_right_x
-                    and top_right_y >= existing_obj_top_right_y
+                if (bottom_left_x <= existing_obj_bottom_left_x and bottom_left_y <= existing_obj_bottom_left_y) and (
+                    top_right_x >= existing_obj_top_right_x and top_right_y >= existing_obj_top_right_y
                 ):
-                    collison = True
                     if self.DEBUG:
-                        print(
-                            "@>>>WARNING: Complete coverage of new object over existing!"
-                        )
+                        print("@>>>WARNING: Complete coverage of new object over existing!")
                     element.draw_element = False
 
                 # When a collision occurs, note direction and distance.
                 if collision:
                     # Determine course of action to fix it.
                     # First, get midpoints.
-                    existing_midpoint_x = (
-                        (existing_obj_top_right_x - existing_obj_bottom_left_x) / 2.0
-                    ) + existing_obj_bottom_left_x
-                    existing_midpoint_y = (
-                        (existing_obj_top_right_y - existing_obj_bottom_left_y) / 2.0
-                    ) + existing_obj_bottom_left_y
-                    comp_midpoint_x = (
-                        (top_right_x - bottom_left_x) / 2.0
-                    ) + bottom_left_x
-                    comp_midpoint_y = (
-                        (top_right_y - bottom_left_y) / 2.0
-                    ) + bottom_left_y
-                    # Compare midpoints. Positive means object is below/left.
-                    delta_y = existing_midpoint_y - comp_midpoint_y
-                    delta_x = existing_midpoint_x - comp_midpoint_x
+                    existing_midpoint_x = ((existing_obj_top_right_x - existing_obj_bottom_left_x) / 2.0) + existing_obj_bottom_left_x
+                    existing_midpoint_y = ((existing_obj_top_right_y - existing_obj_bottom_left_y) / 2.0) + existing_obj_bottom_left_y
+                    comp_midpoint_x = ((top_right_x - bottom_left_x) / 2.0) + bottom_left_x
+                    comp_midpoint_y = ((top_right_y - bottom_left_y) / 2.0) + bottom_left_y
                     # TODO: account for equal differently?
                     # New object is up or down. Register both direction and distance.
                     # Distance is the OVERLAP amount.
@@ -403,22 +354,17 @@ class GenericBox(GenericCanvas):
 
         padding = element.padding
 
-        change_xy = False
         scaling = None
         # Move if allowed to move in the x direction.
         if direction == "RIGHT":
             draw_x += distance + padding
-            change_xy = True
         elif direction == "LEFT":
             draw_x -= distance + padding
-            change_xy = True
         # Move if allowed to move in the y direction.
         elif direction == "UP":
             draw_y += distance + padding
-            change_xy = True
         elif direction == "DOWN":
             draw_y -= distance + padding
-            change_xy = True
         # If XY is fixed, try to scale element.
         elif direction == "SCALE_DOWN":
             scaling = (element.height - padding - distance) / element.height
@@ -516,9 +462,7 @@ class GenericBox(GenericCanvas):
         max_iterations = 4
         for iter in range(0, max_iterations):
             # Collision Detection here.
-            collision_check = self.__detect_collisions(
-                element, ignore_margins, **kwargs
-            )
+            collision_check = self.__detect_collisions(element, ignore_margins, **kwargs)
 
             # Adjust for collisions if there are any.
             if collision_check:
@@ -547,9 +491,7 @@ class GenericBox(GenericCanvas):
 
         # Check to see if the element, after adjustments, is smaller
         # than allowed. If so, disable drawing.
-        if (element.min_y_dim and element.height < element.min_y_dim) or (
-            element.min_x_dim and element.width < element.min_x_dim
-        ):
+        if (element.min_y_dim and element.height < element.min_y_dim) or (element.min_x_dim and element.width < element.min_x_dim):
             if can_delete:
                 element.draw_element = False
                 if self.DEBUG:
@@ -564,9 +506,7 @@ class GenericBox(GenericCanvas):
                     )
             else:
                 if self.DEBUG:
-                    print(
-                        "@>>>WARNING: Element too small, set to not delete, placing anyway."
-                    )
+                    print("@>>>WARNING: Element too small, set to not delete, placing anyway.")
         # Handle margins separetly from other objects.
         if element.name.lower().startswith("margin"):
             # After collision adjustments, register the object.
@@ -609,12 +549,7 @@ class GenericBox(GenericCanvas):
             "MarginBottom",
             0,
             0,
-            (
-                self.A_PANEL_SIDE
-                + self.B_PANEL_SIDE
-                + self.C_PANEL_SIDE
-                + self.D_PANEL_SIDE
-            ),
+            (self.A_PANEL_SIDE + self.B_PANEL_SIDE + self.C_PANEL_SIDE + self.D_PANEL_SIDE),
             self.MARGIN_WIDTH,
         )
         self.place_element(bottom_horizontal, draw=False, ignore_margins=True)
@@ -623,15 +558,8 @@ class GenericBox(GenericCanvas):
         top_horizontal = MarginElement(
             "MarginTop",
             0,
-            (self.box_height - self.heightMod)
-            + (self.FLAP_HEIGHT * 2)
-            - self.MARGIN_WIDTH,
-            (
-                self.A_PANEL_SIDE
-                + self.B_PANEL_SIDE
-                + self.C_PANEL_SIDE
-                + self.D_PANEL_SIDE
-            ),
+            (self.box_height - self.heightMod) + (self.FLAP_HEIGHT * 2) - self.MARGIN_WIDTH,
+            (self.A_PANEL_SIDE + self.B_PANEL_SIDE + self.C_PANEL_SIDE + self.D_PANEL_SIDE),
             self.MARGIN_WIDTH,
         )
         self.place_element(top_horizontal, draw=False, ignore_margins=True)
@@ -639,13 +567,7 @@ class GenericBox(GenericCanvas):
         # Right Vert
         right_vertical = MarginElement(
             "MarginRight",
-            (
-                self.A_PANEL_SIDE
-                + self.B_PANEL_SIDE
-                + self.C_PANEL_SIDE
-                + self.D_PANEL_SIDE
-                - self.MARGIN_WIDTH
-            ),
+            (self.A_PANEL_SIDE + self.B_PANEL_SIDE + self.C_PANEL_SIDE + self.D_PANEL_SIDE - self.MARGIN_WIDTH),
             0,
             self.MARGIN_WIDTH,
             (self.box_height - self.heightMod) + (self.FLAP_HEIGHT * 2),
@@ -657,12 +579,7 @@ class GenericBox(GenericCanvas):
             "MarginBottomFormed",
             0,
             self.Y_PANEL_A - self.MARGIN_WIDTH,
-            (
-                self.A_PANEL_SIDE
-                + self.B_PANEL_SIDE
-                + self.C_PANEL_SIDE
-                + self.D_PANEL_SIDE
-            ),
+            (self.A_PANEL_SIDE + self.B_PANEL_SIDE + self.C_PANEL_SIDE + self.D_PANEL_SIDE),
             2.0 * self.MARGIN_WIDTH,
         )
         self.place_element(bottom_flap, draw=False, ignore_margins=True)
@@ -672,12 +589,7 @@ class GenericBox(GenericCanvas):
             "MarginTopFormed",
             0,
             self.Y_PANEL_A + (self.box_height - self.heightMod) - self.MARGIN_WIDTH,
-            (
-                self.A_PANEL_SIDE
-                + self.B_PANEL_SIDE
-                + self.C_PANEL_SIDE
-                + self.D_PANEL_SIDE
-            ),
+            (self.A_PANEL_SIDE + self.B_PANEL_SIDE + self.C_PANEL_SIDE + self.D_PANEL_SIDE),
             2.0 * self.MARGIN_WIDTH,
         )
         self.place_element(top_flap, draw=False, ignore_margins=True)
@@ -917,9 +829,7 @@ class GenericBox(GenericCanvas):
 
         self.X_PANEL_B = self.X_PANEL_A + self.A_PANEL_SIDE
         self.X_PANEL_C = self.X_PANEL_A + self.A_PANEL_SIDE + self.B_PANEL_SIDE
-        self.X_PANEL_D = (
-            self.X_PANEL_A + self.A_PANEL_SIDE + self.B_PANEL_SIDE + self.C_PANEL_SIDE
-        )
+        self.X_PANEL_D = self.X_PANEL_A + self.A_PANEL_SIDE + self.B_PANEL_SIDE + self.C_PANEL_SIDE
 
     def __determine_long_and_short_sides(self, width, height, length):
         """Most boxes are not geometrical 'boxes' in a sense that there are
@@ -1237,9 +1147,7 @@ class GenericBox(GenericCanvas):
         CMYKArr = [0.5, 0, 0.5, 0]
 
         # Panel A width.
-        self.__draw_dimension_line(
-            "bottom", self.X_PANEL_A, 0.0, self.X_PANEL_B, 0.0, CMYKArr, "Decimal"
-        )
+        self.__draw_dimension_line("bottom", self.X_PANEL_A, 0.0, self.X_PANEL_B, 0.0, CMYKArr, "Decimal")
         # Panel B width.
         self.__draw_dimension_line(
             "bottom",
@@ -1514,9 +1422,7 @@ class GenericBox(GenericCanvas):
                 )
 
         # Sort the groups by width before laying out the slugs.
-        sorted_elements = sorted(
-            master_element_groups, key=lambda x: x.width, reverse=True
-        )
+        sorted_elements = sorted(master_element_groups, key=lambda x: x.width, reverse=True)
 
         for grp in sorted_elements:
             # Determine slug dimensions with added marks (extra dimensions)
@@ -1541,12 +1447,8 @@ class GenericBox(GenericCanvas):
             for element in grp.element_list:
                 # Draw each element in the group's list.
                 # Draw element at cursor position.
-                element.bottom_left_x = (
-                    X_CURSOR + element.group_delta_x + EXTRA_DIMENSIONS / 2.0
-                )
-                element.bottom_left_y = (
-                    Y_CURSOR + element.group_delta_y + EXTRA_DIMENSIONS / 2.0
-                )
+                element.bottom_left_x = X_CURSOR + element.group_delta_x + EXTRA_DIMENSIONS / 2.0
+                element.bottom_left_y = Y_CURSOR + element.group_delta_y + EXTRA_DIMENSIONS / 2.0
                 self.__draw_element(self.canvas, element)
 
             # Draw center and corner marks for each slug.
@@ -1667,9 +1569,7 @@ class GenericLabel(GenericCanvas):
         self.canvas_height = 5.125
 
         # Call the __init__ method from the GenericCanvas parent class.
-        super(GenericLabel, self).__init__(
-            file_name, self.canvas_width, self.canvas_height
-        )
+        super(GenericLabel, self).__init__(file_name, self.canvas_width, self.canvas_height)
         # Moves the origin out of the bleed to the beginning of the art board.
         self.canvas.translate(0.5 * inch, 0.5 * inch)
 

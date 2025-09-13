@@ -48,9 +48,7 @@ def run_verification():
 
     try:
         print("📤 Copying verification script to container...")
-        result = subprocess.run(
-            copy_cmd, capture_output=True, text=True, cwd=os.getcwd()
-        )
+        result = subprocess.run(copy_cmd, capture_output=True, text=True, cwd=os.getcwd())
 
         if result.returncode != 0:
             print(f"❌ Error copying file: {result.stderr}")
@@ -60,9 +58,7 @@ def run_verification():
         print()
 
         print("🔍 Running verification checks...")
-        result = subprocess.run(
-            docker_cmd, capture_output=True, text=True, cwd=os.getcwd()
-        )
+        result = subprocess.run(docker_cmd, capture_output=True, text=True, cwd=os.getcwd())
 
         if result.returncode == 0:
             print("✅ Verification completed successfully!")
@@ -82,9 +78,7 @@ def run_verification():
         return False
 
     print()
-    print(
-        f"🏁 Verification completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-    )
+    print(f"🏁 Verification completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     return True
 
 
@@ -123,9 +117,7 @@ def show_quick_status():
     ]
 
     try:
-        result = subprocess.run(
-            docker_cmd, capture_output=True, text=True, cwd=os.getcwd()
-        )
+        result = subprocess.run(docker_cmd, capture_output=True, text=True, cwd=os.getcwd())
 
         if result.returncode == 0:
             print("📋 Current Database Status:")

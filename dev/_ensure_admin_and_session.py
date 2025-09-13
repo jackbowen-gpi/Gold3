@@ -1,6 +1,9 @@
 import os
 import sys
 
+from django.contrib.auth import get_user_model
+from django.contrib.sessions.backends.db import SessionStore
+
 # Ensure imports behave like manage.py so running this script directly works.
 # Insert the repository root and its parent on sys.path (same approach as manage.py).
 repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,9 +25,6 @@ try:
 except Exception as e:
     print("Django setup failed:", e)
     raise
-
-from django.contrib.auth import get_user_model
-from django.contrib.sessions.backends.db import SessionStore
 
 User = get_user_model()
 

@@ -18,7 +18,7 @@ for f in files:
     # Keep fallback as a string to avoid mixed-type assignment warnings from mypy
     fallback = "yes" if (".fallback" in name or ".fallback.txt" in f) else "no"
     summary.append((name, status, fallback))
-with open(os.path.join(out_dir, "test_results_summary.txt"), "w", encoding="utf-8") as sf:
-    for n, s, f in summary:
-        sf.write(f"{n}\t{s}\tfallback={f}\n")
+    with open(os.path.join(out_dir, "test_results_summary.txt"), "w", encoding="utf-8") as sf:
+        for n, s, f in summary:
+            sf.write(f"{n}\t{s}\tfallback={f}\n")
 print("Wrote", os.path.join(out_dir, "test_results_summary.txt"))

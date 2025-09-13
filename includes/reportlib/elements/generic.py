@@ -64,9 +64,7 @@ class MultiLineTextElement(object):
 class TextElement(object):
     """This class represents any single chunk of single line text on the box."""
 
-    def __init__(
-        self, bottom_left_x, bottom_left_y, label_text, font="Helvetica-Bold", size=12
-    ):
+    def __init__(self, bottom_left_x, bottom_left_y, label_text, font="Helvetica-Bold", size=12):
         """
         bottom_left_x: (float) X coordinate for object's bottom left point.
         bottom_left_y: (float) Y coordinate for object's bottom left point.
@@ -83,9 +81,7 @@ class TextElement(object):
         # Calculate the height of this element based on font size.
         self.height = size / 100.0
         # Draw the text, ready for placement.
-        self.drawing.add(
-            String(0, 0, text, fontName=font, fontSize=size, fillColor=(0, 0, 0, 1.0))
-        )
+        self.drawing.add(String(0, 0, text, fontName=font, fontSize=size, fillColor=(0, 0, 0, 1.0)))
 
 
 class SVGGraphicElement(object):

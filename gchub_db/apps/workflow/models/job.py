@@ -184,6 +184,15 @@ class Job(models.Model):
         app_label = "workflow"
         verbose_name_plural = "Jobs"
         permissions = (("duplicate_job", "Can duplicate or press change jobs"),)
+        indexes = [
+            models.Index(fields=["is_deleted", "status"]),
+            models.Index(fields=["due_date"]),
+            models.Index(fields=["creation_date"]),
+            models.Index(fields=["last_modified"]),
+            models.Index(fields=["artist"]),
+            models.Index(fields=["salesperson"]),
+            models.Index(fields=["workflow"]),
+        ]
 
     def __str__(self):
         if self.workflow.name == "Beverage":
@@ -1255,7 +1264,9 @@ class Job(models.Model):
         message = None
         trackerTypes = ["Ink Jet Code", "Labels"]
         items = Item.objects.filter(job_id=self.id)
-        trackers = ItemTracker.objects.filter(removed_by=None, item__in=items, type__name__in=trackerTypes).order_by("item__num_in_job")
+        trackers = ItemTracker.objects.filter(removed_by=None, item__in=items, type__name__in=trackerTypes).order_by(
+            "item__num_in_job"
+        )
         if trackers:
             # counter keeps track of the , we need
             counter = 0

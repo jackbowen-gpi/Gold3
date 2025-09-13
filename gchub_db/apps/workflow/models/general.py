@@ -967,7 +967,11 @@ class Charge(models.Model):
         # - It has already been invoiced (invoice date)
         # - It's item is marked as deleted.
         # - The item was worked on by another supplied.
-        if self.invoice_date or self.item.is_deleted or self.item.job.prepress_supplier in ("PHT", "Phototype", "SGS", "Southern Graphics"):
+        if (
+            self.invoice_date
+            or self.item.is_deleted
+            or self.item.job.prepress_supplier in ("PHT", "Phototype", "SGS", "Southern Graphics")
+        ):
             return False
 
         # Now establish billing cycle for each workflow.

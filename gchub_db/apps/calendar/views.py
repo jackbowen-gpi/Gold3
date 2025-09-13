@@ -199,7 +199,9 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
 
         # Make sure the user isn't taking more than 5 consecutive vacation days.
         if request.POST["type"] == "VA" and int(request.POST["eventlength"]) > 5 and not manager:
-            message = "Sorry, you need approval from your manager to schedule a vacation that long. Please speak to your manager first."
+            message = (
+                "Sorry, you need approval from your manager to schedule a vacation that long. Please speak to your manager first."
+            )
             return HttpResponse(JSMessage(message, is_error=True))
 
         # Make sure the user isn't scheduling vacation on a busy day.
@@ -208,7 +210,8 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
         check_event.type = request.POST["type"]
         if check_event.overload() and not manager:
             message = (
-                "Sorry, there are already too many vacations scheduled for %s. Please speak to your manager first." % check_event.event_date
+                "Sorry, there are already too many vacations scheduled for %s. Please speak to your manager first."
+                % check_event.event_date
             )
             return HttpResponse(JSMessage(message, is_error=True))
 

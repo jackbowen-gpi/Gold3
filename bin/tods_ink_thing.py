@@ -28,7 +28,9 @@ def main():
     entry_date_start_time = today + timedelta(weeks=(-4 * 6))
 
     # Find matching items.
-    items = Item.objects.filter(printlocation__press=fk_press, creation_date__gte=entry_date_start_time).order_by("job__id", "num_in_job")
+    items = Item.objects.filter(printlocation__press=fk_press, creation_date__gte=entry_date_start_time).order_by(
+        "job__id", "num_in_job"
+    )
 
     for item in items:
         print("%d-%d %s" % (item.job.id, item.num_in_job, item.size.size))

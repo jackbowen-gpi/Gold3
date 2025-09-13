@@ -14,11 +14,7 @@ class GenericCanvas(object):
             be edited, resaved, or printed. Should make it fairly difficult
             for them to use as production quality artwork.
             """
-            enc = pdfencrypt.StandardEncryption(
-                "", canPrint=1, canModify=0, canCopy=0, canAnnotate=0
-            )
-            self.canvas = Canvas(
-                file_name, pagesize=(width * inch, height * inch), encrypt=enc
-            )
+            enc = pdfencrypt.StandardEncryption("", canPrint=1, canModify=0, canCopy=0, canAnnotate=0)
+            self.canvas = Canvas(file_name, pagesize=(width * inch, height * inch), encrypt=enc)
         else:
             self.canvas = Canvas(file_name, pagesize=(width * inch, height * inch))

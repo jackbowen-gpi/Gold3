@@ -281,7 +281,9 @@ class InkCoverageDocument(object):
 
         Returns True when dimensions match, False otherwise.
         """
-        vsize = float(self.doc_rootjdoc.getElementsByTagName("egGr:vsize")[0].firstChild.nodeValue) * 0.0393701  # Convert from mm to inch
+        vsize = (
+            float(self.doc_rootjdoc.getElementsByTagName("egGr:vsize")[0].firstChild.nodeValue) * 0.0393701
+        )  # Convert from mm to inch
         vsize = self._round_dimension(vsize)
         hsize = float(self.doc_root.getElementsByTagName("egGr:hsize")[0].firstChild.nodeValue) * 0.0393701  # Convert from mm to inch
         hsize = self._round_dimension(hsize)

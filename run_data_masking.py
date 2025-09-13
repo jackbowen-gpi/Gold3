@@ -1,18 +1,5 @@
+# ruff: noqa
 #!/usr/bin/env python3
-"""
-Data Masking Execution Script for Gold3 Database
-
-This script provides a safe way to execute data masking on your Gold3 database.
-It includes safety checks, progress tracking, and rollback capabilities.
-
-Usage:
-    python run_data_masking.py [--dry-run] [--backup] [--verify-only]
-
-Options:
-    --dry-run      Show what would be masked without actually doing it
-    --backup       Create a backup before masking
-    --verify-only  Only run verification, don't mask
-"""
 
 import argparse
 import subprocess
@@ -85,11 +72,11 @@ class DataMaskingRunner:
 
         counts = {}
         for table in tables:
-            command = f'docker exec {self.container_name} psql -U {self.user} -d {self.database_name} -c "SELECT COUNT(*) FROM {table};"'
+            command = (
+                f'docker exec {self.container_name} psql -U {self.user} -d {self.database_name} -c "SELECT COUNT(*) FROM {table};"'
+            )
             try:
-                result = subprocess.run(
-                    command, shell=True, capture_output=True, text=True
-                )
+                result = subprocess.run(command, shell=True, capture_output=True, text=True)
                 if result.returncode == 0:
                     # Extract count from output
                     lines = result.stdout.strip().split("\n")
@@ -116,9 +103,7 @@ class DataMaskingRunner:
             return False
 
         # Copy script to container
-        copy_command = (
-            f"docker cp {script_path} {self.container_name}:/tmp/data_masking.sql"
-        )
+        copy_command = f"docker cp {script_path} {self.container_name}:/tmp/data_masking.sql"
         if not self.run_command(copy_command, "Copying masking script to container"):
             return False
 
@@ -134,12 +119,8 @@ class DataMaskingRunner:
             return False
 
         # Copy script to container
-        copy_command = (
-            f"docker cp {script_path} {self.container_name}:/tmp/verify_masking.sql"
-        )
-        if not self.run_command(
-            copy_command, "Copying verification script to container"
-        ):
+        copy_command = f"docker cp {script_path} {self.container_name}:/tmp/verify_masking.sql"
+        if not self.run_command(copy_command, "Copying verification script to container"):
             return False
 
         # Execute script
@@ -229,9 +210,7 @@ def main():
         action="store_true",
         help="Show what would be done without actually doing it",
     )
-    parser.add_argument(
-        "--no-backup", action="store_true", help="Skip creating a backup"
-    )
+    parser.add_argument("--no-backup", action="store_true", help="Skip creating a backup")
     parser.add_argument(
         "--verify-only",
         action="store_true",

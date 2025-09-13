@@ -285,7 +285,8 @@ class TestItemModel(TestCase):
             upc_number="1234567890123456789012345678901234567890",  # Too long
         )
 
-        # Should still save (no validation in model), but field should be truncated or handled
+        # Should still save (no validation in model), but field should be
+        # truncated or handled
         item.refresh_from_db()
         self.assertIsNotNone(item.upc_number)
 

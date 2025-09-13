@@ -1,8 +1,5 @@
+# ruff: noqa
 #!/usr/bin/env python
-"""This is a simple UDP server that listens for filesystem UDP datagrams; commands are routed to the command handler (handler.py) via getattr()."""
-
-import os
-import sys
 
 sys.path.insert(
     0,

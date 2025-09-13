@@ -48,9 +48,7 @@ def run_masking_script():
 
     try:
         print("📤 Copying SQL script to container...")
-        result = subprocess.run(
-            copy_cmd, capture_output=True, text=True, cwd=os.getcwd()
-        )
+        result = subprocess.run(copy_cmd, capture_output=True, text=True, cwd=os.getcwd())
 
         if result.returncode != 0:
             print(f"❌ Error copying file: {result.stderr}")
@@ -64,18 +62,14 @@ def run_masking_script():
         print()
 
         # Ask for confirmation
-        response = (
-            input("Do you want to proceed with masking? (yes/no): ").lower().strip()
-        )
+        response = input("Do you want to proceed with masking? (yes/no): ").lower().strip()
 
         if response not in ["yes", "y"]:
             print("❌ Masking operation cancelled by user")
             return False
 
         # Execute the masking
-        result = subprocess.run(
-            docker_cmd, capture_output=True, text=True, cwd=os.getcwd()
-        )
+        result = subprocess.run(docker_cmd, capture_output=True, text=True, cwd=os.getcwd())
 
         if result.returncode == 0:
             print("✅ Masking operations completed successfully!")
@@ -151,9 +145,7 @@ def show_masking_plan():
     ]
 
     try:
-        result = subprocess.run(
-            docker_cmd, capture_output=True, text=True, cwd=os.getcwd()
-        )
+        result = subprocess.run(docker_cmd, capture_output=True, text=True, cwd=os.getcwd())
 
         if result.returncode == 0:
             print("📋 Masking Plan:")

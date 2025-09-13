@@ -12,7 +12,8 @@ from django.shortcuts import redirect
 
 def set_dev_session(request):
     """
-    Read the dev/admin_session_cookie.txt file and set sessionid cookie then redirect to '/'.
+    Read the dev/admin_session_cookie.txt file and set sessionid cookie
+    then redirect to '/'.
 
     Only enabled when settings.DEBUG is True.
     """
@@ -37,7 +38,8 @@ def set_dev_session(request):
             val = data
         response = redirect("/")
         # Set host-only cookie (no domain) so it applies to 127.0.0.1 or localhost.
-        # Session cookie must be HttpOnly for security; CSRF cookie must be readable by JS/templates.
+        # Session cookie must be HttpOnly for security; CSRF cookie must be
+        # readable by JS/templates.
         response.set_cookie("sessionid", val, path="/", httponly=True)
 
         # Generate or fetch a CSRF token for this request and set the CSRF cookie

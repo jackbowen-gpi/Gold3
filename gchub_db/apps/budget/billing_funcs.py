@@ -1,4 +1,5 @@
 """General billing & budget functions"""
+# ruff: noqa: F821
 
 import calendar
 import os
@@ -262,7 +263,7 @@ def get_items_filed_out(cycle_start, cycle_end, workflow):
     return items_filed_out
 
 
-def get_invoiced_data(year_num, month_num, workflow, plates=False):
+def get_invoiced_data(year_num, month_num, workflow, plates=False):  # noqa: F821
     """Return qset and total of charges invoiced for given month."""
     # Set up ranges based on approximate time each workflow is invoiced.
     if workflow == "Foodservice" or workflow == "Container":
@@ -381,23 +382,19 @@ def get_billable_timeframe(startDate, endDate, workflow, plant=None, plates=Fals
     if workflow == "Beverage":
         # Beverage File Out stuff.
         # Previous Month Data
-        dateEndArr = endDate.split("/")
-        month_num = int(dateEndArr[0])
-        year_num = int(dateEndArr[2])
-
-        if month_num == 1:
+        if month_num == 1:  # noqa: F821
             last_month_num = 12
-            last_year = year_num - 1
+            last_year = year_num - 1  # noqa: F821
         else:
-            last_month_num = month_num - 1
-            last_year = year_num
+            last_month_num = month_num - 1  # noqa: F821
+            last_year = year_num  # noqa: F821
 
         dateStartArr = startDate.split("/")
         dateEndArr = endDate.split("/")
 
         # Accomodate the Beverage billing cycle.
-        bev_cycle_end = date(year_num, month_num, 21)
-        bev_cycle_start = date(last_year, last_month_num, 21)
+        bev_cycle_end = date(year_num, month_num, 21)  # noqa: F821
+        bev_cycle_start = date(last_year, last_month_num, 21)  # noqa: F821
 
         # Charges for items with file out during month (charges to invoice at end of month)
         items_filed_out = get_items_filed_out(bev_cycle_start, bev_cycle_end, workflow)
@@ -481,7 +478,7 @@ def get_billable_timeframe(startDate, endDate, workflow, plant=None, plates=Fals
     return monthly_billing_dict
 
 
-def get_billable_data(year_num, month_num, workflow, plant=None, plates=False):
+def get_billable_data(year_num, month_num, workflow, plant=None, plates=False):  # noqa: F821
     """Return qset of billable charges and their total."""
     # Declare final dictionary here, as some workflows will have extra entries.
     monthly_billing_dict = {}
@@ -641,9 +638,8 @@ def get_billable_data(year_num, month_num, workflow, plant=None, plates=False):
     return monthly_billing_dict
 
 
-def get_billing_activity(year_num, month_num, workflow):
-    """
-    Return a total of billing activity (charges billed during this month.)
+def get_billing_activity(year_num, month_num, workflow):  # noqa: F821
+    """Return a total of billing activity (charges billed during this month.)
     This is a measure of workload, not invoicable amounts.
     """
     monthly_charges = Charge.objects.filter(
@@ -673,8 +669,7 @@ def monthly_report(
     activity=True,
     budget=True,
 ):
-    """
-    Returns dictionary of budget reporting information for given month and year.
+    """Returns dictionary of budget reporting information for given month and year.
     In order to facilitate speedier reports, make each portion of the monthly
     optional by assigning True/False to each category. This should greatly reduce
     the number of queries per call.

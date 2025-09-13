@@ -12,10 +12,7 @@ class BigIntegerField(fields.IntegerField):
             return "bigint"
         elif settings.DATABASES["default"]["ENGINE"] == "oracle":
             return "NUMBER(19)"
-        elif (
-            settings.DATABASES["default"]["ENGINE"]
-            == "django.db.backends.postgresql_psycopg2"
-        ):
+        elif settings.DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql_psycopg2":
             return "bigint"
         else:
             # Default to a generic integer type for databases like SQLite
@@ -31,6 +28,4 @@ class BigIntegerField(fields.IntegerField):
         try:
             return int(value)
         except (TypeError, ValueError) as ex:
-            raise exceptions.ValidationError(
-                _("This value must be a long integer.")
-            ) from ex
+            raise exceptions.ValidationError(_("This value must be a long integer.")) from ex

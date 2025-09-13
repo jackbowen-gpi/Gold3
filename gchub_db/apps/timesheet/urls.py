@@ -1,6 +1,6 @@
 from django.urls import re_path as url
 
-from gchub_db.apps.timesheet.views import *
+from gchub_db.apps.timesheet.views import add, delete, home
 
 urlpatterns = [
     url(r"^$", home, name="timesheet_home"),

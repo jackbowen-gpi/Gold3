@@ -199,7 +199,9 @@ class Shipment(models.Model):
             shipment.RequestedShipment.CustomsClearanceDetail.Commodities.append(commod)
 
             shipment.RequestedShipment.CustomsClearanceDetail.DutiesPayment.PaymentType = "SENDER"
-            shipment.RequestedShipment.CustomsClearanceDetail.DutiesPayment.Payor.ResponsibleParty.AccountNumber = config_obj.account_number
+            shipment.RequestedShipment.CustomsClearanceDetail.DutiesPayment.Payor.ResponsibleParty.AccountNumber = (
+                config_obj.account_number
+            )
             shipment.RequestedShipment.CustomsClearanceDetail.DutiesPayment.Payor.ResponsibleParty.Address.CountryCode = "US"
 
         # Un-comment this to see the other variables you may set on a package.

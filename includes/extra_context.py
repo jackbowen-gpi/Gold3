@@ -19,6 +19,5 @@ def common_urls(request):
         # Development-only: show all navigation links regardless of permissions.
         # Default to True while developing; set to False in local_settings or env
         # for testing.
-        "SHOW_ALL_LINKS": getattr(settings, "DEV_SHOW_ALL_LINKS", True)
-        and settings.DEBUG,
+        "SHOW_ALL_LINKS": getattr(settings, "DEV_SHOW_ALL_LINKS", True) and settings.DEBUG,
     }

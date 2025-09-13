@@ -316,7 +316,9 @@ class ItemFormProductionCarton(ModelForm, JSONErrorForm):
 
     color = forms.CharField(required=False)
     printlocation = forms.ModelChoiceField(
-        queryset=PrintLocation.objects.filter(plant__workflow=carton_workflow, active=True).exclude(OUTDATED_PRESS).order_by("plant__name"),
+        queryset=PrintLocation.objects.filter(plant__workflow=carton_workflow, active=True)
+        .exclude(OUTDATED_PRESS)
+        .order_by("plant__name"),
         required=False,
     )
     platepackage = forms.ModelChoiceField(
@@ -1862,7 +1864,9 @@ class ChargeForm(ModelForm):
         super(ChargeForm, self).__init__(*args, **kwargs)
         # we pass in workflow here to filter charges so we dont add beverage to foodservice and visa versa
         if workflow is not None:
-            self.fields["description"].queryset = ChargeType.objects.filter(workflow=workflow, active=True).order_by("-category", "type")
+            self.fields["description"].queryset = ChargeType.objects.filter(workflow=workflow, active=True).order_by(
+                "-category", "type"
+            )
 
     class Meta:
         model = Charge

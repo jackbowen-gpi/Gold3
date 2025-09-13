@@ -17,7 +17,7 @@ DEFAULT_COUNT = int(os.environ.get("POPULATE_DEFAULT_COUNT", "5"))
 
 
 class Command(BaseCommand):
-    help = "Populate the dev DB with minimal sample rows " "(dry-run by default)."
+    help = "Populate the dev DB with minimal sample rows (dry-run by default)."
 
     def add_arguments(self, parser):
         """CLI arguments for the command."""
@@ -25,7 +25,9 @@ class Command(BaseCommand):
             "--count",
             type=int,
             default=DEFAULT_COUNT,
-            help=(f"How many rows to create per model (default {DEFAULT_COUNT}). " "Override with POPULATE_DEFAULT_COUNT env or --count."),
+            help=(
+                f"How many rows to create per model (default {DEFAULT_COUNT}). Override with POPULATE_DEFAULT_COUNT env or --count."
+            ),
         )
         parser.add_argument(
             "--commit",
@@ -45,12 +47,12 @@ class Command(BaseCommand):
         parser.add_argument(
             "--apps",
             type=str,
-            help=("Comma-separated app labels to limit population to, " "e.g. workflow,auth"),
+            help=("Comma-separated app labels to limit population to, e.g. workflow,auth"),
         )
         parser.add_argument(
             "--models",
             type=str,
-            help=("Comma-separated model labels to limit population to, " "e.g. workflow.Item,auth.User"),
+            help=("Comma-separated model labels to limit population to, e.g. workflow.Item,auth.User"),
         )
 
     def handle(self, *args, **options):
@@ -91,7 +93,7 @@ class Command(BaseCommand):
                 # after curated seeding, prefer to only populate empty models to
                 # avoid duplicate/unique errors
                 only_empty = True
-                self.stdout.write("Curated seeder finished: will only populate empty models " "in generic pass.")
+                self.stdout.write("Curated seeder finished: will only populate empty models in generic pass.")
 
         for model in all_models:
             # skip unmanaged or proxy models
@@ -108,7 +110,7 @@ class Command(BaseCommand):
                 continue
             # skip admin_log models in the generic pass; AdminLog is special-cased
             if opts.object_name == "AdminLog" or opts.app_label == "admin_log":
-                self.stdout.write(f"Skipping admin app model {opts.app_label}.{opts.object_name} " "(handled separately)")
+                self.stdout.write(f"Skipping admin app model {opts.app_label}.{opts.object_name} (handled separately)")
                 continue
 
             try:
@@ -125,7 +127,7 @@ class Command(BaseCommand):
                     existing = 1 if row else 0
                 except Exception as e2:
                     # still failing: surface the original error and skip model
-                    self.stderr.write(f"Skipping model (count failed): {model.__module__}." f"{model.__name__} -- {e}")
+                    self.stderr.write(f"Skipping model (count failed): {model.__module__}.{model.__name__} -- {e}")
                     self.stderr.write(f"Fallback check failed: {e2}")
                     continue
 
@@ -237,7 +239,7 @@ class Command(BaseCommand):
 
                 # skip creating this model if a required FK was not resolvable
                 if missing_required_fk:
-                    self.stderr.write(f"Skipping {opts.object_name} creation: required FK " f"not available")
+                    self.stderr.write(f"Skipping {opts.object_name} creation: required FK not available")
                     continue
 
                 # create instance (dry-run unless commit)
@@ -265,7 +267,7 @@ class Command(BaseCommand):
                             except Exception:
                                 has_item = False
                     if not has_item:
-                        self.stderr.write(f"Skipping {model.__name__} creation: no persisted " "Item available (generic pass)")
+                        self.stderr.write(f"Skipping {model.__name__} creation: no persisted Item available (generic pass)")
                         continue
                     else:
                         # TEMP DIAGNOSTIC: log the item that will be used for
@@ -276,7 +278,7 @@ class Command(BaseCommand):
                             itrepr = "<repr-failed>"
                         # split to avoid overly long source line
                         self.stderr.write(f"[DIAG][generic-queue] will use item={itrepr}")
-                        self.stderr.write(f"pk={getattr(it,'pk',None)}")
+                        self.stderr.write(f"pk={getattr(it, 'pk', None)}")
                 except Exception:
                     pass
 
@@ -328,7 +330,7 @@ class Command(BaseCommand):
                                         except Exception:
                                             continue
                                     obj, was_created = model.objects.get_or_create(**unique_lookup, defaults=safe_defaults)
-                                    self.stdout.write((f"Used get_or_create for {model.__name__} " f"lookup={unique_lookup}"))
+                                    self.stdout.write((f"Used get_or_create for {model.__name__} lookup={unique_lookup}"))
                                     inst = obj
                                     if was_created:
                                         # ensure m2m relations are set for
@@ -368,7 +370,7 @@ class Command(BaseCommand):
                                         except Exception:
                                             continue
                                     if skip_due_to_unsaved_fk:
-                                        self.stderr.write(f"Skipping {model.__name__} creation: " "related FK could not be persisted")
+                                        self.stderr.write(f"Skipping {model.__name__} creation: related FK could not be persisted")
                                         continue
                                     inst = model(**safe_kwargs)
                                     try:
@@ -418,7 +420,7 @@ class Command(BaseCommand):
                                     except Exception:
                                         continue
                                 if skip_due_to_unsaved_fk:
-                                    self.stderr.write((f"Skipping {model.__name__} creation: " "related FK could not be persisted"))
+                                    self.stderr.write((f"Skipping {model.__name__} creation: related FK could not be persisted"))
                                     continue
                                 inst = model(**safe_kwargs)
                                 try:
@@ -473,7 +475,7 @@ class Command(BaseCommand):
             self.stdout.write(f"Model {name}: existed={existed} added={added}")
 
         if not do_commit:
-            self.stdout.write(("\nDry-run mode: no changes were written. " "Re-run with --commit to persist data."))
+            self.stdout.write(("\nDry-run mode: no changes were written. Re-run with --commit to persist data."))
 
     def _create_minimal_instance(self, model, _depth=0):
         """
@@ -717,7 +719,7 @@ class Command(BaseCommand):
                         continue
                     else:
                         # Dry-run: report what would be created without persisting.
-                        self.stdout.write(("DRYRUN curated: would create " f"{model._meta.label} with {kwargs}"))
+                        self.stdout.write((f"DRYRUN curated: would create {model._meta.label} with {kwargs}"))
 
         # Ensure at least one instance per workflow/site for models that
         # include a workflow FK. This makes sure every Site/workflow has
@@ -733,7 +735,7 @@ class Command(BaseCommand):
                 if sites:
                     # Notify that we will ensure at least one instance per
                     # workflow/site for workflow-scoped models
-                    self.stdout.write(("Curated: ensuring at least one per workflow/site " "for workflow-scoped models"))
+                    self.stdout.write(("Curated: ensuring at least one per workflow/site for workflow-scoped models"))
                     for model in workflow_models:
                         opts = model._meta
                         # find a field that points to Site (workflow FK)
@@ -789,13 +791,13 @@ class Command(BaseCommand):
                                             except Exception as exc:
                                                 site_name = getattr(site, "name", site)
                                                 label = opts.label
-                                                msg = "Curated: failed create " f"{label} " f"for site {site_name}: " f"{exc}"
+                                                msg = f"Curated: failed create {label} for site {site_name}: {exc}"
                                                 self.stderr.write(msg)
                                                 inst = None
 
                                 if inst:
                                     try:
-                                        msg = "Curated: created " f"{opts.label} for " f"site={site_name} " f"pk={getattr(inst,'pk',None)}"
+                                        msg = f"Curated: created {opts.label} for site={site_name} pk={getattr(inst, 'pk', None)}"
                                         self.stdout.write(msg)
                                     except Exception:
                                         pass
@@ -803,7 +805,7 @@ class Command(BaseCommand):
                                 # Dry-run: report which curated instance would be
                                 # created
                                 try:
-                                    msg = "DRYRUN curated: would create " f"{opts.label} for " f"site={getattr(site,'name',site)}"
+                                    msg = f"DRYRUN curated: would create {opts.label} for site={getattr(site, 'name', site)}"
                                     self.stdout.write(msg)
                                 except Exception:
                                     pass
@@ -924,7 +926,7 @@ class Command(BaseCommand):
                         inst.save()
                     # explicit log after save
                     try:
-                        msg = "Created Job pk=" f"{getattr(inst,'pk',None)} " f"name={getattr(inst,'name',None)}"
+                        msg = f"Created Job pk={getattr(inst, 'pk', None)} name={getattr(inst, 'name', None)}"
                         self.stdout.write(msg)
                     except Exception:
                         pass
@@ -1018,9 +1020,9 @@ class Command(BaseCommand):
             if kwargs is None:
                 # required FK missing (e.g. no Job); skip creating this item
                 if do_commit:
-                    self.stderr.write((f"Skipping curated {model._meta.object_name}: " "required FK not available"))
+                    self.stderr.write((f"Skipping curated {model._meta.object_name}: required FK not available"))
                 else:
-                    self.stdout.write((f"DRYRUN curated: would skip {model._meta.object_name} " "(no Job available)"))
+                    self.stdout.write((f"DRYRUN curated: would skip {model._meta.object_name} (no Job available)"))
                 return
 
             # Second pass: fill in simple fields like name/title and basic scalars
@@ -1044,13 +1046,13 @@ class Command(BaseCommand):
                     inst = model(**kwargs)
                     inst.save()
                     try:
-                        self.stdout.write((f"Created {model._meta.object_name} " f"pk={getattr(inst,'pk',None)}"))
+                        self.stdout.write((f"Created {model._meta.object_name} pk={getattr(inst, 'pk', None)}"))
                     except Exception:
                         pass
                 except Exception as exc:
                     self.stderr.write(f"Error creating curated {model._meta.object_name}: {exc}")
             else:
-                self.stdout.write((f"DRYRUN curated: would create {model._meta.object_name} " f"with {kwargs}"))
+                self.stdout.write((f"DRYRUN curated: would create {model._meta.object_name} with {kwargs}"))
 
             # only create the first matching model type
             return
@@ -1125,7 +1127,7 @@ class Command(BaseCommand):
                     inst, created = model.objects.get_or_create(mfg_name=mfg, defaults=defaults)
                     if created:
                         try:
-                            msg = "Created ItemCatalog " f"{mfg} pk={getattr(inst,'pk',None)}"
+                            msg = f"Created ItemCatalog {mfg} pk={getattr(inst, 'pk', None)}"
                             self.stdout.write(msg)
                         except Exception:
                             pass
@@ -1142,7 +1144,7 @@ class Command(BaseCommand):
                         except TypeError:
                             inst.save()
                         try:
-                            msg = "Created ItemCatalog " f"{mfg} pk={getattr(inst,'pk',None)}"
+                            msg = f"Created ItemCatalog {mfg} pk={getattr(inst, 'pk', None)}"
                             self.stdout.write(msg)
                         except Exception:
                             pass
@@ -1150,7 +1152,7 @@ class Command(BaseCommand):
                         self.stderr.write(f"Error creating ItemCatalog (fallback): {exc}")
             else:
                 try:
-                    msg = "DRYRUN curated: would get_or_create ItemCatalog mfg=" f"{mfg} defaults={defaults}"
+                    msg = f"DRYRUN curated: would get_or_create ItemCatalog mfg={mfg} defaults={defaults}"
                     self.stdout.write(msg)
                 except Exception:
                     pass
@@ -1233,7 +1235,7 @@ class Command(BaseCommand):
                                 "Created ItemSpec for size="
                                 f"{self._repr_safe(size_obj)} "
                                 f"pl={self._repr_safe(pl)} "
-                                f"pk={getattr(inst,'pk',None)}"
+                                f"pk={getattr(inst, 'pk', None)}"
                             )
                             self.stdout.write(msg)
                         except Exception:
@@ -1248,7 +1250,7 @@ class Command(BaseCommand):
                         inst.save()
                     except TypeError:
                         inst.save()
-                    self.stdout.write(f"Created ItemSpec (fallback) pk={getattr(inst,'pk',None)}")
+                    self.stdout.write(f"Created ItemSpec (fallback) pk={getattr(inst, 'pk', None)}")
             else:
                 try:
                     msg = (
@@ -1362,7 +1364,7 @@ class Command(BaseCommand):
                 inst, created = model.objects.get_or_create(itemspec=itemspec, special_mfg=special, defaults=kwargs)
                 if created:
                     try:
-                        msg = "Created StepSpec for itemspec=" f"{self._repr_safe(itemspec)} " f"special={self._repr_safe(special)}"
+                        msg = f"Created StepSpec for itemspec={self._repr_safe(itemspec)} special={self._repr_safe(special)}"
                         self.stdout.write(msg)
                     except Exception:
                         pass
@@ -1396,7 +1398,7 @@ class Command(BaseCommand):
         if item is None:
             # item is required by this model; skip to avoid NOT NULL constraint failures
             if do_commit:
-                self.stderr.write(("Skipping TiffToPDF creation: no Item available to assign " "(would violate NOT NULL)"))
+                self.stderr.write(("Skipping TiffToPDF creation: no Item available to assign (would violate NOT NULL)"))
             else:
                 self.stdout.write("DRYRUN curated: would skip TiffToPDF (no item available)")
             return
@@ -1414,9 +1416,9 @@ class Command(BaseCommand):
                         item = None
                     if not item or getattr(item, "pk", None) is None:
                         if do_commit:
-                            self.stderr.write(("Skipping TiffToPDF creation: Item could not " "be persisted"))
+                            self.stderr.write(("Skipping TiffToPDF creation: Item could not be persisted"))
                         else:
-                            self.stdout.write(("DRYRUN curated: would skip TiffToPDF " "(item could not be persisted)"))
+                            self.stdout.write(("DRYRUN curated: would skip TiffToPDF (item could not be persisted)"))
                         return
         except Exception:
             pass
@@ -1456,7 +1458,7 @@ class Command(BaseCommand):
 
         if item is None:
             if do_commit:
-                self.stderr.write(("Skipping ColorKeyQueue creation: no Item available " "to assign (would violate NOT NULL)"))
+                self.stderr.write(("Skipping ColorKeyQueue creation: no Item available to assign (would violate NOT NULL)"))
             else:
                 self.stdout.write("DRYRUN curated: would skip ColorKeyQueue (no Item available)")
             return
@@ -1473,9 +1475,9 @@ class Command(BaseCommand):
                         item = None
                     if not item or getattr(item, "pk", None) is None:
                         if do_commit:
-                            self.stderr.write(("Skipping ColorKeyQueue creation: Item could " "not be persisted"))
+                            self.stderr.write(("Skipping ColorKeyQueue creation: Item could not be persisted"))
                         else:
-                            self.stdout.write(("DRYRUN curated: would skip ColorKeyQueue " "(item could not be persisted)"))
+                            self.stdout.write(("DRYRUN curated: would skip ColorKeyQueue (item could not be persisted)"))
                         return
         except Exception:
             pass
@@ -1502,7 +1504,7 @@ class Command(BaseCommand):
                 self.stderr.write(f"Error creating ColorKeyQueue: {exc}")
             else:
                 try:
-                    msg = "DRYRUN curated: would create ColorKeyQueue with " f"{self._safe_kwargs(kwargs)}"
+                    msg = f"DRYRUN curated: would create ColorKeyQueue with {self._safe_kwargs(kwargs)}"
                     self.stdout.write(msg)
                 except Exception:
                     pass
@@ -1530,7 +1532,7 @@ class Command(BaseCommand):
                 self.stderr.write(f"Error creating QCResponse: {exc}")
         else:
             try:
-                msg = "DRYRUN curated: would create QCResponse with " f"{self._safe_kwargs(kwargs)}"
+                msg = f"DRYRUN curated: would create QCResponse with {self._safe_kwargs(kwargs)}"
                 self.stdout.write(msg)
             except Exception:
                 pass
@@ -1556,7 +1558,7 @@ class Command(BaseCommand):
                 self.stderr.write(f"Error creating QCWhoops: {exc}")
         else:
             try:
-                msg = "DRYRUN curated: would create QCWhoops with " f"{self._safe_kwargs(kwargs)}"
+                msg = f"DRYRUN curated: would create QCWhoops with {self._safe_kwargs(kwargs)}"
                 self.stdout.write(msg)
             except Exception:
                 pass
@@ -1577,7 +1579,7 @@ class Command(BaseCommand):
 
         if item is None:
             if do_commit:
-                self.stderr.write(("Skipping PlateOrder creation: no Item available to " "assign (would violate NOT NULL)"))
+                self.stderr.write(("Skipping PlateOrder creation: no Item available to assign (would violate NOT NULL)"))
             else:
                 self.stdout.write("DRYRUN curated: would skip PlateOrder (no item available)")
             return
@@ -1594,7 +1596,7 @@ class Command(BaseCommand):
             except Exception as exc:
                 self.stderr.write(f"Error creating PlateOrder: {exc}")
         else:
-            self.stdout.write("DRYRUN curated: would create PlateOrder with " f"{self._safe_kwargs(kwargs)}")
+            self.stdout.write(f"DRYRUN curated: would create PlateOrder with {self._safe_kwargs(kwargs)}")
 
     def _factory__plateorderitem(self, index: int, do_commit: bool, users: list):
         try:
@@ -1605,9 +1607,9 @@ class Command(BaseCommand):
         order = PlateOrder.objects.first() if PlateOrder else None
         if order is None:
             if do_commit:
-                self.stderr.write("Skipping PlateOrderItem creation: no PlateOrder available " "(would violate NOT NULL)")
+                self.stderr.write("Skipping PlateOrderItem creation: no PlateOrder available (would violate NOT NULL)")
             else:
-                self.stdout.write("DRYRUN curated: would skip PlateOrderItem " "(no PlateOrder available)")
+                self.stdout.write("DRYRUN curated: would skip PlateOrderItem (no PlateOrder available)")
             return
 
         item_color_model = apps.get_model("workflow", "ItemColor")
@@ -1621,7 +1623,7 @@ class Command(BaseCommand):
             except Exception as exc:
                 self.stderr.write(f"Error creating PlateOrderItem: {exc}")
         else:
-            self.stdout.write("DRYRUN curated: would create PlateOrderItem with " f"{self._safe_kwargs(kwargs)}")
+            self.stdout.write(f"DRYRUN curated: would create PlateOrderItem with {self._safe_kwargs(kwargs)}")
 
     def _factory__colordefinition(self, index: int, do_commit: bool, users: list):
         try:
@@ -1638,7 +1640,7 @@ class Command(BaseCommand):
                 if created:
                     self.stdout.write(f"Created ColorDefinition {name} coating={coating}")
             else:
-                self.stdout.write("DRYRUN curated: would get_or_create ColorDefinition " f"name={name} coating={coating}")
+                self.stdout.write(f"DRYRUN curated: would get_or_create ColorDefinition name={name} coating={coating}")
         except Exception as exc:
             self.stderr.write(f"Error creating ColorDefinition: {exc}")
 
@@ -1683,7 +1685,7 @@ class Command(BaseCommand):
                 self.stderr.write(f"Error creating AdminLog: {exc}")
         else:
             if origin and getattr(origin, "pk", None):
-                self.stdout.write("DRYRUN curated: would create AdminLog with origin=" f"{self._repr_safe(origin)}")
+                self.stdout.write(f"DRYRUN curated: would create AdminLog with origin={self._repr_safe(origin)}")
             else:
                 self.stdout.write("DRYRUN curated: would create AdminLog without origin")
 
@@ -1698,11 +1700,11 @@ class Command(BaseCommand):
         if name_l in ("last_name", "lastname", "surname"):
             return random.choice(("Smith", "Johnson", "Brown", "Williams", "Jones"))
         if "phone" in name_l or "tel" in name_l:
-            return f"+1-555-{random.randint(200,999)}-{random.randint(1000,9999)}"
+            return f"+1-555-{random.randint(200, 999)}-{random.randint(1000, 9999)}"
         if "name" in name_l or "title" in name_l:
             return f"{model_name}_{field_name}_{index}"
         if "code" in name_l or "sku" in name_l or "mfg" in name_l:
-            return f"{field_name.upper()}_{random.randint(1000,9999)}"
+            return f"{field_name.upper()}_{random.randint(1000, 9999)}"
         # default fallback
         return f"{model_name}_{index}_{field_name}"
 

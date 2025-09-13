@@ -73,18 +73,12 @@ class WSGIApplication(web.Application):
     """
 
     def __init__(self, handlers=None, default_host="", **settings):
-        web.Application.__init__(
-            self, handlers, default_host, transforms=[], wsgi=True, **settings
-        )
+        web.Application.__init__(self, handlers, default_host, transforms=[], wsgi=True, **settings)
 
     def __call__(self, environ, start_response):
         handler = web.Application.__call__(self, HTTPRequest(environ))
         assert handler._finished
-        status = (
-            str(handler._status_code)
-            + " "
-            + http.client.responses[handler._status_code]
-        )
+        status = str(handler._status_code) + " " + http.client.responses[handler._status_code]
         headers = list(handler._headers.items())
         for cookie_dict in getattr(handler, "_new_cookies", []):
             for cookie in list(cookie_dict.values()):
@@ -189,11 +183,7 @@ class HTTPRequest(object):
             name = name_values["name"]
             if name_values.get("filename"):
                 ctype = headers.get("Content-Type", "application/unknown")
-                self.files.setdefault(name, []).append(
-                    dict(
-                        filename=name_values["filename"], body=value, content_type=ctype
-                    )
-                )
+                self.files.setdefault(name, []).append(dict(filename=name_values["filename"], body=value, content_type=ctype))
             else:
                 self.arguments.setdefault(name, []).append(value)
 
@@ -231,9 +221,7 @@ class WSGIContainer(object):
             data["status"] = status
             data["headers"] = HTTPHeaders(response_headers)
 
-        body = "".join(
-            self.wsgi_application(WSGIContainer.environ(request), start_response)
-        )
+        body = "".join(self.wsgi_application(WSGIContainer.environ(request), start_response))
         if not data:
             raise Exception("WSGI app did not call start_response")
 

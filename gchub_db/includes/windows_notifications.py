@@ -14,9 +14,7 @@ class WindowsNotificationManager:
     Stub notification manager: always prints to console (no-op for Windows toasts)
     """
 
-    def send_notification(
-        self, title, message, duration=10, icon_path=None, threaded=False
-    ):
+    def send_notification(self, title, message, duration=10, icon_path=None, threaded=False):
         print(f"NOTIFICATION: {title} - {message}")
         return False
 

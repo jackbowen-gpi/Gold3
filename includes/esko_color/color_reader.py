@@ -67,21 +67,15 @@ class EskoColor(object):
         # First line
         v0_values = self.config_parser.get(color_header_name, "v0").split()
         v0_float_list = [float(num) for num in v0_values]
-        w380, w390, w400, w410, w420, w430, w440, w450, w460, w470 = tuple(
-            v0_float_list
-        )
+        w380, w390, w400, w410, w420, w430, w440, w450, w460, w470 = tuple(v0_float_list)
         # Second line
         v1_values = self.config_parser.get(color_header_name, "v1").split()
         v1_float_list = [float(num) for num in v1_values]
-        w480, w490, w500, w510, w520, w530, w540, w550, w560, w570 = tuple(
-            v1_float_list
-        )
+        w480, w490, w500, w510, w520, w530, w540, w550, w560, w570 = tuple(v1_float_list)
         # Third line
         v2_values = self.config_parser.get(color_header_name, "v2").split()
         v2_float_list = [float(num) for num in v2_values]
-        w580, w590, w600, w610, w620, w630, w640, w650, w660, w670 = tuple(
-            v2_float_list
-        )
+        w580, w590, w600, w610, w620, w630, w640, w650, w660, w670 = tuple(v2_float_list)
         # Fourth line
         v3_values = self.config_parser.get(color_header_name, "v3").split()
         v3_float_list = [float(num) for num in v3_values]
