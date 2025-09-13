@@ -10,6 +10,7 @@ function Show-Help {
     Write-Host "Available commands:"
     Write-Host "  install         - Install production dependencies"
     Write-Host "  install-dev     - Install development dependencies"
+    Write-Host "  setup-dev       - Install development dependencies and pre-commit hooks"
     Write-Host "  lint            - Run ruff linter"
     Write-Host "  lint-fix        - Run ruff linter and fix issues"
     Write-Host "  format          - Format code with ruff"
@@ -36,6 +37,15 @@ function Install-Prod {
 function Install-Dev {
     Write-Host "Installing development dependencies..."
     & python -m pip install -r requirements-dev.txt
+}
+
+function Setup-Dev {
+    Write-Host "Setting up development environment..."
+    Install-Dev
+    PreCommit-Install
+    Write-Host "Development environment setup complete!"
+    Write-Host "Run '.\make.ps1 lint' to check code quality"
+    Write-Host "Run '.\make.ps1 test' to run tests"
 }
 
 function Lint {
@@ -129,6 +139,7 @@ function PreCommit-Run {
 switch ($Command) {
     "install" { Install-Prod }
     "install-dev" { Install-Dev }
+    "setup-dev" { Setup-Dev }
     "lint" { Lint }
     "lint-fix" { Lint-Fix }
     "format" { Format }

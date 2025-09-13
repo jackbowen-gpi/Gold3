@@ -7,6 +7,10 @@ _Get up and running with GOLD3's enterprise development infrastructure in 5 minu
 ## ⚡ **Quick Setup (Windows)**
 
 ```powershell
+# One-command setup (recommended)
+.\make.ps1 setup-dev
+
+# Or run commands separately:
 # 1. Install development dependencies
 .\make.ps1 install-dev
 

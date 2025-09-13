@@ -1,10 +1,11 @@
-.PHONY: help install install-dev lint lint-fix format test test-cov test-fast clean clean-all migrate makemigrations shell security coverage pre-commit-install pre-commit-run docs build
+.PHONY: help install install-dev setup-dev lint lint-fix format test test-cov test-fast clean clean-all migrate makemigrations shell security coverage pre-commit-install pre-commit-run docs build
 
 # Default target
 help:
 	@echo "Available commands:"
 	@echo "  install         - Install production dependencies"
 	@echo "  install-dev     - Install development dependencies"
+	@echo "  setup-dev       - Install development dependencies and pre-commit hooks"
 	@echo "  lint            - Run ruff linter"
 	@echo "  lint-fix        - Run ruff linter and fix issues"
 	@echo "  format          - Format code with ruff"
@@ -29,6 +30,11 @@ install:
 
 install-dev:
 	pip install -r requirements-dev.txt
+
+setup-dev: install-dev pre-commit-install
+	@echo "Development environment setup complete!"
+	@echo "Run 'make lint' to check code quality"
+	@echo "Run 'make test' to run tests"
 
 # Code Quality
 lint:

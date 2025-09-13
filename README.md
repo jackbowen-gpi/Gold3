@@ -11,6 +11,7 @@
 **✅ Enterprise-Grade Status**: This application is **production-ready** with comprehensive security, 2.16GB production database integration, and enterprise-level testing. Only minor refinements remain for full production deployment.
 
 **Key Production Features:**
+
 - **🔒 Security**: Complete CSRF protection, modern Django 5.2.5 security middleware
 - **🏭 Scale**: 2.16GB PostgreSQL database with 1,136 production users and 4M+ records
 - **🔌 Integration**: Full external system connections (ETOOLS, QAD, FTP, Email, JDF/JMF)
@@ -19,6 +20,7 @@
 - **📱 UX**: Modern responsive design with professional styling
 
 **Remaining for 100% Production:**
+
 - Final security audit and penetration testing
 - Performance optimization for peak loads
 - Production monitoring and alerting setup
@@ -48,6 +50,7 @@
 ## 🚀 **Quick Start**
 
 ### **Prerequisites**
+
 - **OS**: Windows 10/11 (PowerShell recommended)
 - **Python**: 3.13+ (matches CI environment)
 - **Database**: PostgreSQL 15+ or Docker
@@ -71,6 +74,11 @@ cd GOLD3
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
+
+# Quick development setup (installs dev dependencies + pre-commit hooks)
+.\make.ps1 setup-dev
+
+# Or install manually:
 pip install -r config/requirements.txt
 
 # Or use the convenience script:
@@ -96,15 +104,15 @@ python manage.py runserver
 
 ### **Core Capabilities**
 
-| Feature | Description | Status |
-|---------|-------------|---------|
-| **Job Workflow Management** | Complete beverage job creation and tracking | ✅ Production Ready |
-| **Item Catalog System** | Advanced search and filtering with preferences | ✅ Production Ready |
-| **User Preferences** | Comprehensive customization system | ✅ Production Ready |
-| **Production Integration** | ETOOLS, QAD, Auto FTP, Email systems | ✅ Mock + Production |
-| **Security Framework** | CSRF protection, authentication, permissions | ✅ Enterprise Grade |
-| **Responsive Design** | Mobile-first CSS Grid layouts | ✅ Modern UI/UX |
-| **Offline Development** | Complete mock systems for all external deps | ✅ Full Coverage |
+| Feature                     | Description                                    | Status               |
+| --------------------------- | ---------------------------------------------- | -------------------- |
+| **Job Workflow Management** | Complete beverage job creation and tracking    | ✅ Production Ready  |
+| **Item Catalog System**     | Advanced search and filtering with preferences | ✅ Production Ready  |
+| **User Preferences**        | Comprehensive customization system             | ✅ Production Ready  |
+| **Production Integration**  | ETOOLS, QAD, Auto FTP, Email systems           | ✅ Mock + Production |
+| **Security Framework**      | CSRF protection, authentication, permissions   | ✅ Enterprise Grade  |
+| **Responsive Design**       | Mobile-first CSS Grid layouts                  | ✅ Modern UI/UX      |
+| **Offline Development**     | Complete mock systems for all external deps    | ✅ Full Coverage     |
 
 ### **Technical Stack**
 
@@ -232,18 +240,18 @@ graph TD
 
 ### **Network Architecture & Port Mapping**
 
-| Container | Internal Port | External Port | Purpose | Dependencies |
-|-----------|---------------|---------------|---------|--------------|
-| **Django Web** | 8000 | 8000 | Main web application | PostgreSQL, Redis |
-| **PostgreSQL** | 5432 | 5438 | Database server | None |
-| **Redis** | 6379 | 6379 | Cache & message broker | None |
-| **Notification Daemon** | 5341 | 5341 | Desktop notifications | PostgreSQL |
-| **Celery Worker** | - | - | Background tasks | Redis, PostgreSQL |
-| **Celery Beat** | - | - | Scheduled tasks | Redis, PostgreSQL |
-| **Flower** | 5555 | 5555 | Task monitoring UI | Redis |
-| **Prometheus** | 9090 | 9090 | Metrics collection | Node Exporter |
-| **Grafana** | 3000 | 3000 | Monitoring dashboards | Prometheus |
-| **Node Exporter** | 9100 | 9100 | System metrics | None |
+| Container               | Internal Port | External Port | Purpose                | Dependencies      |
+| ----------------------- | ------------- | ------------- | ---------------------- | ----------------- |
+| **Django Web**          | 8000          | 8000          | Main web application   | PostgreSQL, Redis |
+| **PostgreSQL**          | 5432          | 5438          | Database server        | None              |
+| **Redis**               | 6379          | 6379          | Cache & message broker | None              |
+| **Notification Daemon** | 5341          | 5341          | Desktop notifications  | PostgreSQL        |
+| **Celery Worker**       | -             | -             | Background tasks       | Redis, PostgreSQL |
+| **Celery Beat**         | -             | -             | Scheduled tasks        | Redis, PostgreSQL |
+| **Flower**              | 5555          | 5555          | Task monitoring UI     | Redis             |
+| **Prometheus**          | 9090          | 9090          | Metrics collection     | Node Exporter     |
+| **Grafana**             | 3000          | 3000          | Monitoring dashboards  | Prometheus        |
+| **Node Exporter**       | 9100          | 9100          | System metrics         | None              |
 
 ### **Data Flow Architecture**
 
@@ -408,15 +416,16 @@ graph TB
 
 ### **Deployment Environments**
 
-| Environment | Purpose | Infrastructure | Scaling |
-|-------------|---------|----------------|---------|
-| **Development** | Feature development | Local Docker | Single container |
-| **Staging** | Pre-production testing | Docker Compose | Multi-container stack |
-| **Production** | Live application | Docker Swarm/K8s | Load balanced cluster |
+| Environment     | Purpose                | Infrastructure   | Scaling               |
+| --------------- | ---------------------- | ---------------- | --------------------- |
+| **Development** | Feature development    | Local Docker     | Single container      |
+| **Staging**     | Pre-production testing | Docker Compose   | Multi-container stack |
+| **Production**  | Live application       | Docker Swarm/K8s | Load balanced cluster |
 
 ### **Production Deployment Steps**
 
 #### **1. Infrastructure Preparation**
+
 ```bash
 # Create production network
 docker network create --driver overlay gold3_prod
@@ -429,6 +438,7 @@ kubectl create namespace gold3-production
 ```
 
 #### **2. Database Setup**
+
 ```bash
 # Deploy PostgreSQL with replication
 docker stack deploy -c docker-compose.prod.db.yml gold3-db
@@ -444,6 +454,7 @@ docker run --rm --network gold3_prod \
 ```
 
 #### **3. Redis & Caching Setup**
+
 ```bash
 # Deploy Redis cluster
 docker stack deploy -c docker-compose.prod.redis.yml gold3-cache
@@ -454,6 +465,7 @@ docker run --rm --network gold3_prod \
 ```
 
 #### **4. Application Deployment**
+
 ```bash
 # Build production images
 docker build -t gold3:latest -f Dockerfile.prod .
@@ -466,6 +478,7 @@ docker stack services gold3-app
 ```
 
 #### **5. Load Balancer Configuration**
+
 ```nginx
 # nginx.conf for production
 upstream gold3_backend {
@@ -497,6 +510,7 @@ server {
 ```
 
 #### **6. Monitoring Setup**
+
 ```bash
 # Deploy monitoring stack
 docker stack deploy -c docker-compose.monitoring.yml gold3-monitoring
@@ -511,6 +525,7 @@ docker stack deploy -c docker-compose.monitoring.yml gold3-monitoring
 ### **Production Configuration**
 
 #### **Environment Variables**
+
 ```bash
 # Production environment file (.env.prod)
 DEBUG=False
@@ -538,6 +553,7 @@ QAD_ODBC_DSN=production-qad-dsn
 ```
 
 #### **Security Hardening**
+
 ```yaml
 # docker-compose.prod.yml security additions
 services:
@@ -557,6 +573,7 @@ services:
 ### **Scaling Strategy**
 
 #### **Horizontal Scaling**
+
 ```bash
 # Scale web application
 docker service scale gold3-app_web=5
@@ -569,6 +586,7 @@ docker service scale gold3-db_postgres_replica=3
 ```
 
 #### **Auto-scaling Configuration**
+
 ```yaml
 # Kubernetes HPA for web application
 apiVersion: autoscaling/v2
@@ -583,17 +601,18 @@ spec:
   minReplicas: 3
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
 ```
 
 ### **Backup & Recovery**
 
 #### **Database Backup Strategy**
+
 ```bash
 # Daily automated backup
 0 2 * * * docker exec gold3-db_postgres_1 pg_dump -U gchub_prod gchub_prod > /backup/daily_$(date +\%Y\%m\%d).sql
@@ -603,6 +622,7 @@ spec:
 ```
 
 #### **Disaster Recovery**
+
 ```bash
 # Restore from backup
 docker exec -i gold3-db_postgres_1 psql -U gchub_prod gchub_prod < /backup/daily_20241201.sql
@@ -615,18 +635,21 @@ docker service update --replicas 1 gold3-db_postgres_replica
 ### **Performance Optimization**
 
 #### **Database Optimization**
+
 - Connection pooling with PgBouncer
 - Query optimization and indexing
 - Read replicas for heavy queries
 - Database partitioning for large tables
 
 #### **Application Optimization**
+
 - Django caching with Redis
 - Static file serving with CDN
 - Gzip compression
 - Database query optimization
 
 #### **Infrastructure Optimization**
+
 - Load balancer sticky sessions
 - Redis clustering for high availability
 - Monitoring and alerting
@@ -635,6 +658,7 @@ docker service update --replicas 1 gold3-db_postgres_replica
 ### **Monitoring & Observability**
 
 #### **Key Metrics to Monitor**
+
 - Application response time
 - Database connection pool usage
 - Celery queue length
@@ -643,26 +667,27 @@ docker service update --replicas 1 gold3-db_postgres_replica
 - External service availability
 
 #### **Alerting Rules**
+
 ```yaml
 # Prometheus alerting rules
 groups:
-- name: gold3_alerts
-  rules:
-  - alert: HighErrorRate
-    expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
-    for: 5m
-    labels:
-      severity: critical
-    annotations:
-      summary: "High error rate detected"
+  - name: gold3_alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
 
-  - alert: DatabaseDown
-    expr: up{job="postgres"} == 0
-    for: 1m
-    labels:
-      severity: critical
-    annotations:
-      summary: "Database is down"
+      - alert: DatabaseDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database is down"
 ```
 
 This production deployment strategy ensures high availability, scalability, and maintainability of the GOLD3 application in enterprise environments.
@@ -679,47 +704,47 @@ This production deployment strategy ensures high availability, scalability, and 
 
 ### **Production Database Systems**
 
-| System | Technology | Purpose | Current Status | Future Plans |
-|--------|------------|---------|----------------|--------------|
-| **PostgreSQL** | Native Django ORM | Primary application database with 2.16GB production data | ✅ **Production Ready** | Database optimization, read replicas |
-| **ETOOLS** | ODBC (MS SQL) | Manufacturing execution system integration | ✅ **Mock System** | Real-time data synchronization |
-| **QAD** | ODBC (Data Warehouse) | Enterprise resource planning data | ✅ **Mock System** | Automated inventory updates |
-| **FSCorrugated** | ODBC (MS SQL) | Corrugated material specifications | ✅ **Mock System** | Dynamic pricing integration |
+| System           | Technology            | Purpose                                                  | Current Status          | Future Plans                         |
+| ---------------- | --------------------- | -------------------------------------------------------- | ----------------------- | ------------------------------------ |
+| **PostgreSQL**   | Native Django ORM     | Primary application database with 2.16GB production data | ✅ **Production Ready** | Database optimization, read replicas |
+| **ETOOLS**       | ODBC (MS SQL)         | Manufacturing execution system integration               | ✅ **Mock System**      | Real-time data synchronization       |
+| **QAD**          | ODBC (Data Warehouse) | Enterprise resource planning data                        | ✅ **Mock System**      | Automated inventory updates          |
+| **FSCorrugated** | ODBC (MS SQL)         | Corrugated material specifications                       | ✅ **Mock System**      | Dynamic pricing integration          |
 
 ### **File Transfer & Communication Systems**
 
-| System | Protocol | Purpose | Current Status | Future Plans |
-|--------|----------|---------|----------------|--------------|
-| **Fusion Flexo FTP** | FTP/SFTP | High-resolution file transfers | ✅ **Production Ready** | SFTP migration, automated workflows |
-| **Cyber Graphics FTP** | FTP | Print production files | ✅ **Production Ready** | Secure file transfer protocols |
-| **Southern Graphic FTP** | FTP | Regional file distribution | ✅ **Production Ready** | Bandwidth optimization |
-| **Phototype FTP** | FTP | Proofing and approval files | ✅ **Production Ready** | Digital asset management |
-| **Email System** | SMTP | Notifications and alerts | ✅ **Production Ready** | Email templates, delivery tracking |
+| System                   | Protocol | Purpose                        | Current Status          | Future Plans                        |
+| ------------------------ | -------- | ------------------------------ | ----------------------- | ----------------------------------- |
+| **Fusion Flexo FTP**     | FTP/SFTP | High-resolution file transfers | ✅ **Production Ready** | SFTP migration, automated workflows |
+| **Cyber Graphics FTP**   | FTP      | Print production files         | ✅ **Production Ready** | Secure file transfer protocols      |
+| **Southern Graphic FTP** | FTP      | Regional file distribution     | ✅ **Production Ready** | Bandwidth optimization              |
+| **Phototype FTP**        | FTP      | Proofing and approval files    | ✅ **Production Ready** | Digital asset management            |
+| **Email System**         | SMTP     | Notifications and alerts       | ✅ **Production Ready** | Email templates, delivery tracking  |
 
 ### **Background Processing & Caching**
 
-| System | Technology | Purpose | Current Status | Future Plans |
-|--------|------------|---------|----------------|--------------|
-| **Redis** | In-memory store | Celery message broker and caching | ✅ **Production Ready** | Redis Cluster, persistence layer |
-| **Celery** | Distributed tasks | Asynchronous job processing | ✅ **Production Ready** | Task monitoring, priority queues |
-| **Celery Beat** | Scheduled tasks | Periodic job execution | ✅ **Production Ready** | Dynamic scheduling, job dependencies |
+| System          | Technology        | Purpose                           | Current Status          | Future Plans                         |
+| --------------- | ----------------- | --------------------------------- | ----------------------- | ------------------------------------ |
+| **Redis**       | In-memory store   | Celery message broker and caching | ✅ **Production Ready** | Redis Cluster, persistence layer     |
+| **Celery**      | Distributed tasks | Asynchronous job processing       | ✅ **Production Ready** | Task monitoring, priority queues     |
+| **Celery Beat** | Scheduled tasks   | Periodic job execution            | ✅ **Production Ready** | Dynamic scheduling, job dependencies |
 
 ### **Third-Party API Integrations**
 
-| System | API Type | Purpose | Current Status | Future Plans |
-|--------|----------|---------|----------------|--------------|
-| **FedEx API** | SOAP/REST | Shipping and tracking integration | ✅ **Production Ready** | Rate shopping, label generation |
-| **JMF Web Connector** | HTTP | Backstage workflow integration | ✅ **Production Ready** | Real-time status updates |
-| **Notification Daemon** | REST API | Desktop notifications | ✅ **Development Ready** | Push notifications, mobile alerts |
+| System                  | API Type  | Purpose                           | Current Status           | Future Plans                      |
+| ----------------------- | --------- | --------------------------------- | ------------------------ | --------------------------------- |
+| **FedEx API**           | SOAP/REST | Shipping and tracking integration | ✅ **Production Ready**  | Rate shopping, label generation   |
+| **JMF Web Connector**   | HTTP      | Backstage workflow integration    | ✅ **Production Ready**  | Real-time status updates          |
+| **Notification Daemon** | REST API  | Desktop notifications             | ✅ **Development Ready** | Push notifications, mobile alerts |
 
 ### **JDF (Job Definition Format) Processing System**
 
-| Component | Technology | Purpose | Current Status | Future Plans |
-|-----------|------------|---------|----------------|--------------|
-| **JDF Hotfolder** | File System | Automated job processing queue | ✅ **Production Ready** | Queue monitoring, error recovery |
-| **XML Processing** | Python XML | JDF file parsing and generation | ✅ **Production Ready** | Schema validation, error handling |
-| **Backstage Integration** | JMF Protocol | Workflow automation engine | ✅ **Production Ready** | Real-time status updates |
-| **Queue Management** | Django Models | Job processing tracking | ✅ **Production Ready** | Priority queuing, batch processing |
+| Component                 | Technology    | Purpose                         | Current Status          | Future Plans                       |
+| ------------------------- | ------------- | ------------------------------- | ----------------------- | ---------------------------------- |
+| **JDF Hotfolder**         | File System   | Automated job processing queue  | ✅ **Production Ready** | Queue monitoring, error recovery   |
+| **XML Processing**        | Python XML    | JDF file parsing and generation | ✅ **Production Ready** | Schema validation, error handling  |
+| **Backstage Integration** | JMF Protocol  | Workflow automation engine      | ✅ **Production Ready** | Real-time status updates           |
+| **Queue Management**      | Django Models | Job processing tracking         | ✅ **Production Ready** | Priority queuing, batch processing |
 
 #### **JDF Processing Workflow**
 
@@ -736,12 +761,14 @@ graph TD
 #### **JDF File Structure & Processing**
 
 **📄 JDF File Generation**
+
 - **Location**: `/mnt/Production/jdf_queue/` (Production) or `/mnt/Production/jdf_queue_test/` (Development)
 - **Naming**: `{job_id}-{item_num}-{timestamp}.jdf`
 - **Format**: CIP4 JDF 1.2 compliant XML with Esko extensions
 - **Content**: Resource pools, task parameters, file references, workflow metadata
 
 **🔄 Processing Methods**
+
 - **`do_jdf_fsb_proof()`**: Flexo proof generation and processing
 - **`do_jdf_fsb_colorkeys()`**: Color key file creation for separations
 - **`do_jdf_tiff_to_pdf()`**: TIFF to PDF conversion workflows
@@ -750,6 +777,7 @@ graph TD
 - **`do_jdf_fsb_ffo()`**: FSB workflow automation
 
 **🗂️ Directory Structure**
+
 ```
 /mnt/Production/
 ├── jdf_queue/                    # Main JDF hotfolder
@@ -778,18 +806,21 @@ APPEND_SLASH = False  # Required for JMF compatibility
 #### **JDF Testing & Development**
 
 **🧪 Test Environment Setup**
+
 - **Mock Queue**: Use `jdf_queue_test/` directory for development
 - **File Monitoring**: Automated hotfolder watching via `bin/jdf.py`
 - **Error Handling**: Duplicate prevention and timeout management
 - **Logging**: Comprehensive processing logs and error tracking
 
 **🔍 Development Tools**
+
 - **JDF Writer**: `gchub_db.apps.xml_io.jdf_writer.ItemJDF` class
 - **Queue Scripts**: `bin/color_key_jdf_queue.py` for batch processing
 - **Validation**: XML schema validation and file integrity checks
 - **Debugging**: Hotfolder monitoring and processing status tracking
 
 **⚠️ Error Prevention**
+
 - **Duplicate Detection**: Prevents multiple simultaneous JDF tasks per item
 - **Timeout Protection**: 1-minute cooldown between duplicate task launches
 - **File Validation**: XML structure and required field verification
@@ -805,11 +836,11 @@ APPEND_SLASH = False  # Required for JMF compatibility
 
 ### **Development & Testing Environments**
 
-| Environment | Purpose | Configuration | Status |
-|-------------|---------|---------------|---------|
-| **Mock Systems** | Offline development | Disabled ODBC/FTP connections | ✅ **Complete Coverage** |
-| **Docker Stack** | Containerized deployment | PostgreSQL, Redis, Celery | ✅ **Production Ready** |
-| **Local SMTP** | Email testing | Console backend for development | ✅ **Configured** |
+| Environment      | Purpose                  | Configuration                   | Status                   |
+| ---------------- | ------------------------ | ------------------------------- | ------------------------ |
+| **Mock Systems** | Offline development      | Disabled ODBC/FTP connections   | ✅ **Complete Coverage** |
+| **Docker Stack** | Containerized deployment | PostgreSQL, Redis, Celery       | ✅ **Production Ready**  |
+| **Local SMTP**   | Email testing            | Console backend for development | ✅ **Configured**        |
 
 ### **Connection Security & Monitoring**
 
@@ -842,6 +873,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 📋 **View our complete accomplishments history in [accomplishments.md](accomplishments.md)**
 
 ### **🚀 Latest Achievement (September 12, 2025)**
+
 - **✅ Production Deployment Features**: Complete nginx configuration, CDN integration, and monitoring middleware
 - **✅ Comprehensive Testing**: 15 test methods covering all production features with 100% code quality
 - **✅ Enterprise Security**: 100% CSRF protection with modern Django 5.2.5 security standards
@@ -912,13 +944,13 @@ docker-compose -f config/docker-compose.yml logs -f web
 
 ### **Docker Services**
 
-| Service | Purpose | Port | Status |
-|---------|---------|------|---------|
-| **web** | Django application | 8000 | ✅ Ready |
-| **db** | PostgreSQL database | 5438 | ✅ Ready |
-| **redis** | Task queue broker | 6379 | ✅ Ready |
-| **celery** | Background worker | N/A | ✅ Ready |
-| **celery-beat** | Task scheduler | N/A | ✅ Ready |
+| Service         | Purpose             | Port | Status   |
+| --------------- | ------------------- | ---- | -------- |
+| **web**         | Django application  | 8000 | ✅ Ready |
+| **db**          | PostgreSQL database | 5438 | ✅ Ready |
+| **redis**       | Task queue broker   | 6379 | ✅ Ready |
+| **celery**      | Background worker   | N/A  | ✅ Ready |
+| **celery-beat** | Task scheduler      | N/A  | ✅ Ready |
 
 ---
 
@@ -926,12 +958,12 @@ docker-compose -f config/docker-compose.yml logs -f web
 
 ### **Production Systems Overview**
 
-| System | Purpose | Connection | Mock Status |
-|--------|---------|------------|-------------|
-| **ETOOLS** | Job tracking & production data | ODBC | ✅ Complete |
-| **QAD** | Packaging specs & quality data | ODBC | ✅ Complete |
-| **Auto FTP** | File uploads to vendors | SFTP | ✅ Complete |
-| **Email** | Notifications & alerts | SMTP | ✅ Complete |
+| System       | Purpose                        | Connection | Mock Status |
+| ------------ | ------------------------------ | ---------- | ----------- |
+| **ETOOLS**   | Job tracking & production data | ODBC       | ✅ Complete |
+| **QAD**      | Packaging specs & quality data | ODBC       | ✅ Complete |
+| **Auto FTP** | File uploads to vendors        | SFTP       | ✅ Complete |
+| **Email**    | Notifications & alerts         | SMTP       | ✅ Complete |
 
 ### **Mock System Benefits**
 
@@ -1012,18 +1044,21 @@ GOLD3/
 ### **🔥 High Priority Features**
 
 #### **1. Advanced Analytics Dashboard**
+
 - **Real-time Metrics**: Job completion rates, user activity, system performance
 - **Interactive Charts**: D3.js or Chart.js integration for data visualization
 - **Export Capabilities**: PDF/Excel report generation
 - **Custom Dashboards**: User-configurable analytics views
 
 #### **2. API-First Architecture**
+
 - **REST API**: Complete Django REST Framework implementation
 - **GraphQL Support**: Optional GraphQL API for complex queries
 - **API Documentation**: OpenAPI/Swagger documentation
 - **Mobile App Support**: API endpoints for mobile applications
 
 #### **3. Advanced Search & Filtering**
+
 - **Elasticsearch Integration**: Full-text search capabilities
 - **Faceted Search**: Multi-dimensional filtering options
 - **Search Analytics**: Popular searches and user behavior tracking
@@ -1095,11 +1130,12 @@ django-structlog==8.1.0              # Structured logging
 - **📝 Enhanced Logging**: Logs wait progress, timeouts, and elapsed time for better debugging.
 
 **Usage in Docker Compose**:
+
 ```yaml
 celery-beat:
   environment:
-    WAIT_TIMEOUT: "120"  # Optional: timeout after 120 seconds
-    WAIT_INTERVAL: "2"   # Optional: check every 2 seconds
+    WAIT_TIMEOUT: "120" # Optional: timeout after 120 seconds
+    WAIT_INTERVAL: "2" # Optional: check every 2 seconds
 ```
 
 **📖 Documentation**: See `docs/CELERY-STARTUP.md` for detailed startup mechanics and troubleshooting.
@@ -1107,18 +1143,21 @@ celery-beat:
 ### **🎨 UI/UX Enhancement Ideas**
 
 #### **Modern Frontend Stack**
+
 - **Tailwind CSS**: Utility-first CSS framework
 - **Alpine.js**: Lightweight JavaScript framework
 - **HTMX**: Dynamic HTML without JavaScript complexity
 - **Django Templates**: Enhanced with modern patterns
 
 #### **Progressive Web App (PWA)**
+
 - **Service Workers**: Offline functionality
 - **Web App Manifest**: Installable web application
 - **Push Notifications**: Real-time updates
 - **Background Sync**: Offline data synchronization
 
 #### **Accessibility Improvements**
+
 - **WCAG 2.1 AA Compliance**: Full accessibility standards
 - **Screen Reader Support**: ARIA labels and navigation
 - **Keyboard Navigation**: Complete keyboard accessibility
@@ -1127,12 +1166,14 @@ celery-beat:
 ### **🔧 Infrastructure Enhancements**
 
 #### **Cloud-Native Features**
+
 - **Multi-Environment Support**: Dev/Staging/Production configurations
 - **Horizontal Scaling**: Load balancing and session management
 - **Database Sharding**: Large-scale data distribution
 - **CDN Integration**: Static asset optimization
 
 #### **Advanced Monitoring**
+
 - **Application Performance Monitoring (APM)**
 - **Distributed Tracing**: Request flow visualization
 - **Log Aggregation**: Centralized logging system
@@ -1145,6 +1186,7 @@ celery-beat:
 📊 **View detailed metrics and impact analysis in [accomplishments.md](accomplishments.md)**
 
 ### **📊 Key Achievements Summary**
+
 - **🔒 Security**: 100% CSRF protection, enterprise-grade security implementation
 - **🏭 Scale**: 2.16GB production database with 1,136 active users
 - **⚡ Productivity**: 10x faster development with automated workflows
@@ -1198,13 +1240,13 @@ python -m cProfile manage.py runserver
 
 ### **Common Issues & Solutions**
 
-| Issue | Symptom | Solution |
-|-------|---------|----------|
+| Issue                   | Symptom            | Solution                                                      |
+| ----------------------- | ------------------ | ------------------------------------------------------------- |
 | **Database Connection** | Connection refused | `docker compose -f .\dev\docker-compose.yml restart postgres` |
-| **CSRF Errors** | 403 Forbidden | Check CSRF token in forms and AJAX requests |
-| **Import Errors** | Module not found | Clear `__pycache__` and reinstall dependencies |
-| **Static Files** | 404 errors | Run `python manage.py collectstatic` |
-| **Permission Errors** | Access denied | Check file permissions and user roles |
+| **CSRF Errors**         | 403 Forbidden      | Check CSRF token in forms and AJAX requests                   |
+| **Import Errors**       | Module not found   | Clear `__pycache__` and reinstall dependencies                |
+| **Static Files**        | 404 errors         | Run `python manage.py collectstatic`                          |
+| **Permission Errors**   | Access denied      | Check file permissions and user roles                         |
 
 ### **Debug Configuration**
 
@@ -1227,6 +1269,7 @@ LOGGING = {
 🤖 **View comprehensive AI development metrics in [accomplishments.md](accomplishments.md)**
 
 ### **GitHub Copilot Integration Summary**
+
 - **⏱️ Total Development Time**: 47.5 hours of active AI-assisted sessions
 - **💬 User Prompts**: 284 code generation and assistance requests
 - **📝 Code Generated**: 12,847 lines of AI-assisted code production
@@ -1249,6 +1292,7 @@ LOGGING = {
 **Built with**: Django 5.2.5, Python 3.13+, PostgreSQL 15+, Docker, and modern web technologies
 
 **Special Thanks**:
+
 - GitHub Copilot for AI-powered development assistance
 - Django community for excellent framework and documentation
 - Open source contributors for security, performance, and usability improvements
@@ -1274,19 +1318,22 @@ LOGGING = {
 For detailed information about specific components and features, please refer to the documentation in the `docs/` folder:
 
 ### **Core Documentation**
+
 - **[Celery Configuration](docs/CELERY-README.md)** - Task queue setup and management
 - **[External Database Integration](docs/EXTERNAL_DB_README.md)** - Database connection and integration guides
 
 ### **Data Management**
+
 - **[Data Masking Guide](docs/DATA_MASKING_README.md)** - Data protection and masking procedures
 - **[Comprehensive Masking](docs/COMPREHENSIVE_MASKING_README.md)** - Advanced data masking techniques
 - **[Masking Coverage Report](docs/MASKING_COVERAGE_REPORT.md)** - Coverage analysis and reporting
 
 ### **Additional Resources**
+
 - **[Developer Guide](docs/DEVELOPER.md)** - Development setup and best practices
 - **[Contributing Guidelines](docs/CONTRIBUTING.md)** - How to contribute to the project
 - **[Poetry Setup](docs/README_POETRY.md)** - Dependency management with Poetry
 
 ---
 
-*Last Updated: September 10, 2025 | Django 5.2.5 | Python 3.13+ | PostgreSQL 15+*
+_Last Updated: September 10, 2025 | Django 5.2.5 | Python 3.13+ | PostgreSQL 15+_

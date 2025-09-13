@@ -30,6 +30,12 @@ var/
 # Pytest
 .pytest_cache/
 
+# Coverage reports
+coverage.xml
+htmlcov/
+.coverage
+coverage-*.xml
+
 # Database backups
 backup.sql
 backup_before_masking_*.sql

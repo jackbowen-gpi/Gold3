@@ -1,5 +1,8 @@
 # Explicit imports from workflow models - only commonly used classes
 # General models
+# Django built-in models used by workflow
+from django.contrib.sites.models import Site
+
 from .general import (
     BeverageBrandCode,
     BeverageCenterCode,
@@ -15,17 +18,16 @@ from .general import (
     ItemColor,
     ItemReview,
     ItemSpec,
-    StepSpec,
     ItemTracker,
     ItemTrackerType,
     JobAddress,
     JobComplexity,
     LineScreen,
+    Plant,
+    Platemaker,
     PlateOrder,
     PlateOrderItem,
     PlatePackage,
-    Platemaker,
-    Plant,
     Press,
     PrintCondition,
     PrintLocation,
@@ -33,6 +35,7 @@ from .general import (
     Revision,
     SalesServiceRep,
     SpecialMfgConfiguration,
+    StepSpec,
     Substrate,
     Trap,
 )
@@ -80,6 +83,8 @@ __all__ = [
     "SpecialMfgConfiguration",
     "Substrate",
     "Trap",
+    # Django built-in models
+    "Site",
     # Item models
     "Item",
     # Job models

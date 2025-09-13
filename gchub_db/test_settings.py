@@ -36,7 +36,7 @@ TEST_PG_NAME = os.environ.get("TEST_PG_NAME") or os.environ.get("PG_TEST_DB")
 TEST_PG_USER = os.environ.get("TEST_PG_USER") or os.environ.get("PG_TEST_USER")
 TEST_PG_PASSWORD = os.environ.get("TEST_PG_PASSWORD") or os.environ.get("PG_TEST_PASSWORD")
 TEST_PG_HOST = os.environ.get("TEST_PG_HOST") or os.environ.get("PG_TEST_HOST") or "localhost"
-TEST_PG_PORT = os.environ.get("TEST_PG_PORT") or os.environ.get("PG_TEST_PORT") or "5432"
+TEST_PG_PORT = os.environ.get("TEST_PG_PORT") or os.environ.get("PG_TEST_PORT") or "5438"
 
 if TEST_PG_NAME:
     DATABASES = {

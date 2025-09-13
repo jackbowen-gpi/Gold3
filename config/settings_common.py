@@ -122,19 +122,18 @@ DATABASES_RAW_PROD = {
 }
 
 # Dev DB values are read from environment variables if provided, falling back
-# to a sensible local Postgres development database on 127.0.0.1:5432.
+# to a sensible local Postgres development database on 127.0.0.1:5438.
 DATABASES_RAW_DEV = {
     "ENGINE": os.environ.get("DEV_DB_ENGINE", "django.db.backends.postgresql"),
     "NAME": os.environ.get("DEV_DB_NAME", "gchub_dev"),
-    # Allow overriding the dev DB user/password/port via environment variables.
-    # Default to the 'gchub' role and the PostgreSQL default port so compose
-    # services and the local Postgres image work without further edits.
+    # Allow overriding the dev DB user/password via environment variables.
+    # Default to the 'gchub' role and port 5438 for the gold3-db-1 container.
     "USER": os.environ.get("DEV_DB_USER", os.environ.get("POSTGRES_USER", "gchub")),
     "PASSWORD": os.environ.get(
         "DEV_DB_PASSWORD", os.environ.get("POSTGRES_PASSWORD", "gchub")
     ),
     "HOST": os.environ.get("DEV_DB_HOST", "127.0.0.1"),
-    "PORT": os.environ.get("DEV_DB_PORT", os.environ.get("POSTGRES_PORT", "5432")),
+    "PORT": "5438",  # Always use port 5438 for gold3-db-1 container
 }
 
 # Apply the selected profile. Keep the final DATABASES dict shape the same.
