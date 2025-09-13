@@ -1,6 +1,5 @@
 #!/usr/bin/python
-"""
-Generate QC analysis spreadsheets for artist error tracking.
+"""Generate QC analysis spreadsheets for artist error tracking.
 
 Produces an Excel file summarizing QC catches by artist and category.
 """
@@ -18,15 +17,14 @@ from gchub_db.apps.qc.models import QCCategory, QCWhoops
 
 # Setup the Worksheet
 workBookDocument = openpyxl.Workbook()
-
-# Define artist set:
+docSheet1 = workBookDocument.active
+docSheet1.title = "QC Catches"
 ARTIST_PERMISSION = Permission.objects.get(codename="in_artist_pulldown")
 artists = User.objects.filter(groups__in=ARTIST_PERMISSION.group_set.all(), is_active=True).order_by("last_name")
 
 
 def _do_qc_breakdown():
-    """
-    Look at catches caught on QCs and break down by artists.
+    """Look at catches caught on QCs and break down by artists.
 
     Populates an Excel worksheet with counts of errors made and caught
     per artist and category.
@@ -34,8 +32,6 @@ def _do_qc_breakdown():
     print("Begin QC Breakdown")
     # QC Breakdown Worksheet
 
-    docSheet1 = workBookDocument.active
-    docSheet1.title = "QC Catches"
     # Label column headings
     docSheet1.cell(row=1, column=1).value = "Artist"
     docSheet1.cell(row=1, column=2).value = "Errors Made"
@@ -66,9 +62,9 @@ def _do_qc_breakdown():
                 n += 1
             i += 1
 
-    # Freeze the top row of column headings.
-    docSheet1.panes_frozen = docSheet1["B2"]
 
+# Freeze the top row of column headings.
+docSheet1.panes_frozen = docSheet1["B2"]
 
 # Execute each breakdown.
 _do_qc_breakdown()

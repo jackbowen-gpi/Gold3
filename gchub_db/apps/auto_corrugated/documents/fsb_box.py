@@ -11,7 +11,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 from gchub_db.apps.auto_corrugated.elements.fsb_elements import (
     Code128Barcode_Kenton,
-    CollidableSVGGraphicElement,
     CompanyLogoElement,
     CountLabelElement,
     FlapTextElement,
@@ -21,17 +20,12 @@ from gchub_db.apps.auto_corrugated.elements.fsb_elements import (
     SpecialtyLogoElement,
     StamperBoxElement,
 )
-from includes.reportlib.elements.collidables import CollidableTextElement
 from gchub_db.includes import general_funcs
-
-try:
-    from gchub_db.includes.reportlib.util import check_text_width
-except ImportError:
-    # Fallback: define a dummy check_text_width or import from an alternative location
-    def check_text_width(size, font, text):
-        # Implement a basic width estimation or raise an error as appropriate
-        return len(str(text)) * (size / 2)  # crude estimation, adjust as needed
-
+from gchub_db.includes.reportlib.elements.collidables import (
+    CollidableSVGGraphicElement,
+    CollidableTextElement,
+)
+from gchub_db.includes.reportlib.util import check_text_width
 
 from .generic import GenericBox, GenericLabel
 
@@ -92,8 +86,7 @@ class FSBBox(GenericBox):
         job_id=None,
         watermark=False,
     ):
-        """
-        Handles drawing the canvas and preparing other storage variables.
+        """Handles drawing the canvas and preparing other storage variables.
 
         file_name: (str) Path to the eventual finished PDF.
         width: (float) Width of the box (in inches)
@@ -420,8 +413,7 @@ class FSBBox(GenericBox):
         self.place_element(self.stamper, ignore_margins=True)
 
     def __draw_machine_barcode_box(self):
-        """
-        Draws the machine bar code box to the left of the label area. Only for
+        """Draws the machine bar code box to the left of the label area. Only for
         Kenton with box format left.
         """
         if self.format.lower() == "left" and self.plant.lower() == "kenton":
@@ -682,8 +674,7 @@ class FSBBox(GenericBox):
         self.place_element(self.item_name_top, rotated=True)
 
     def __draw_item_description(self):
-        """
-        Draw item descriptions & lid information under the item names.
+        """Draw item descriptions & lid information under the item names.
         Three different languages.
         """
         # Setup kwargs for this set of elements.
@@ -1094,15 +1085,9 @@ class FSBBox(GenericBox):
                     elementArr[x].drawing.scale(currentSmallestItem["scaling"], currentSmallestItem["scaling"])
                     elementArr[x].bottom_left_y = currentSmallestItem["draw_y"]
             #                 elif adjustmentArr[x]['scaling'] > currentSmallestItem['scaling']:
-            #                     elementArr[x].height *= (
-            #                         elementArr[x].height * (1 + (1 - adjustmentArr[x]['scaling']))
-            #                     ) * currentSmallestItem['scaling']
-            #                     elementArr[x].width *= (
-            #                         elementArr[x].width * (1 + (1 - adjustmentArr[x]['scaling']))
-            #                     ) * currentSmallestItem['scaling']
-            #                     elementArr[x].drawing.scale(
-            #                         currentSmallestItem['scaling'], currentSmallestItem['scaling']
-            #                     )
+            #                     elementArr[x].height *= (elementArr[x].height*(1 + (1 - adjustmentArr[x]['scaling'])))*currentSmallestItem['scaling']
+            #                     elementArr[x].width *= (elementArr[x].width*(1 + (1 - adjustmentArr[x]['scaling'])))*currentSmallestItem['scaling']
+            #                     elementArr[x].drawing.scale(currentSmallestItem['scaling'], currentSmallestItem['scaling'])
             #                     elementArr[x].bottom_left_y = currentSmallestItem['draw_y']
             elementArr[x].draw_element = True
             self.draw_element(self.canvas, elementArr[x], rotated=False)
@@ -1268,25 +1253,30 @@ class FSBBox(GenericBox):
         """Draw the graphic if the CONTENTS of the box meet SFI certification,"""
         # Determine available area of the graphic. This, along with the width
         # of the graphic, will determine scaling.
-        # (Note: These variables are not currently used but may be needed for future scaling logic)
+        available_area_x = None
+        available_area_y = None
+
+        sfi_logo_location = "sfi_logo_left.svg"
+        if self.plant == "Clarksville" or self.plant == "Pittston":
+            sfi_logo_location = self.plant + "_sfi_logo_right.svg"
 
         # Create and place SFI graphic.
-        # (Currently commented out as the graphic creation is not being used)
-        # sfi_graphic = CollidableSVGGraphicElement(
-        #     "SFIContentLogo",
-        #     sfi_graphic_x,
-        #     sfi_graphic_y,
-        #     os.path.join(CORRUGATED_MEDIA_DIR, sfi_logo_location),
-        #     available_area_x=available_area_x,
-        #     available_area_y=available_area_y,
-        #     alignment="right",
-        #     group_id=7,
-        # )
+        sfi_graphic_x = self.X_PANEL_D - self.MARGIN_WIDTH
+        sfi_graphic_y = self.Y_PANEL_A + self.MARGIN_WIDTH
+        CollidableSVGGraphicElement(
+            "SFIContentLogo",
+            sfi_graphic_x,
+            sfi_graphic_y,
+            os.path.join(CORRUGATED_MEDIA_DIR, sfi_logo_location),
+            available_area_x=available_area_x,
+            available_area_y=available_area_y,
+            alignment="right",
+            group_id=7,
+        )
         # self.place_element(sfi_graphic)
 
     def __draw_specialty_logo(self, type=False, short_mode=False):
-        """
-        Draw specialty logos on the box, near the middle of each panel as
+        """Draw specialty logos on the box, near the middle of each panel as
         needed. Specialty logos include Ecotainer Logos, Hold&Go Logos, and
         Hold&Cold logos.
         """
@@ -1400,8 +1390,7 @@ class FSBBox(GenericBox):
         self.place_element(self.specialty_logo_top, rotated=True)
 
     def __draw_fsb_elements(self):
-        """
-        Draws and places all of the elements on the FSBBox.
+        """Draws and places all of the elements on the FSBBox.
         Currently, the draw order determines the drawing priority. Elements
         drawn last are more likely to move/be deleted in event of collisions.
         """
@@ -1776,8 +1765,7 @@ class FSBBox(GenericBox):
             )
 
     def __draw_watermark(self):
-        """
-        Draws watermark over artwork. This is for pre-approval PDF artwork.
+        """Draws watermark over artwork. This is for pre-approval PDF artwork.
         Discourages use of art before it is approved and paid for.
         """
         c = self.canvas
@@ -1801,8 +1789,7 @@ class FSBBox(GenericBox):
 
 
 class FSBLabel(GenericLabel):
-    """
-    Standard Foodservice label object. Labels are placed on the corner of
+    """Standard Foodservice label object. Labels are placed on the corner of
     a corrugated box. The standard FSBBox has a pre-printed label. This label
     would be placed on top of that with updated/different information.
     """
@@ -1817,8 +1804,7 @@ class FSBLabel(GenericLabel):
         pdf_type,
         label_id,
     ):
-        """
-        Handles drawing the canvas and preparing other storage variables.
+        """Handles drawing the canvas and preparing other storage variables.
 
         file_name: (str) Path to the eventual finished PDF.
         nine_digit_num: (int) Barcode number 1.
@@ -1845,8 +1831,7 @@ class FSBLabel(GenericLabel):
         self.canvas.showPage()
 
     def __draw_label_area(self):
-        """
-        Draw the label area and accompanying barcodes. Label area falls on
+        """Draw the label area and accompanying barcodes. Label area falls on
         the corner of the box, and is equally distributed on two panels.
         """
         label_area_bottom_left_x = 0.0

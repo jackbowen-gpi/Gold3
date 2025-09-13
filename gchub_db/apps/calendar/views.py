@@ -1,7 +1,3 @@
-"""
-Module gchub_db\apps\\calendar\views.py
-"""
-
 from __future__ import division
 
 import calendar
@@ -48,21 +44,9 @@ MIN_CHOICES = (
     ("45", ":45"),
 )
 
-
-# Avoid database access at import time; resolve permission-based query lazily.
-def _get_artist_permission():
-    try:
-        return Permission.objects.get(codename="in_artist_pulldown")
-    except Exception:
-        return None
-
-
-def _get_clemson_artist_qs():
-    perm = _get_artist_permission()
-    if perm is None:
-        # Return an empty queryset when DB or auth tables aren't ready yet.
-        return User.objects.none()
-    return User.objects.filter(groups__in=perm.group_set.all()).order_by("username").filter(is_active=True)
+# These are cached once when the server is started to avoid future queries.
+ARTIST_PERMISSION = Permission.objects.get(codename="in_artist_pulldown")
+CLEMSON_ARTIST = User.objects.filter(groups__in=ARTIST_PERMISSION.group_set.all()).order_by("username").filter(is_active=True)
 
 
 class ModelEventForm(ModelForm):
@@ -78,8 +62,7 @@ class NewEventForm(ModelEventForm):
     time_start_min = forms.ChoiceField(choices=MIN_CHOICES, required=False)
     time_end_hour = forms.ChoiceField(choices=HOUR_CHOICES, required=False)
     time_end_min = forms.ChoiceField(choices=MIN_CHOICES, required=False)
-    # Use a lazy queryset so form construction doesn't trigger DB access at import time.
-    employee_override = forms.ModelChoiceField(queryset=_get_clemson_artist_qs(), required=False)
+    employee_override = forms.ModelChoiceField(queryset=CLEMSON_ARTIST, required=False)
 
 
 @login_required
@@ -218,10 +201,7 @@ def event_add(request, year_num="0", month_num="0", day_num="0"):
         if eventform.is_valid():
             # Make sure the user isn't taking more than 5 consecutive vacation days.
             if check_event.five_consecutive(request.POST["employee"], int(request.POST["eventlength"])) and not manager:
-                message = (
-                    "Sorry, you need approval from your manager to schedule "
-                    "a vacation over 5 consecutive days. Please speak to your manager first."
-                )
+                message = "Sorry, you need approval from your manager to schedule a vacation over 5 consecutive days. Please speak to your manager first."
                 return HttpResponse(JSMessage(message, is_error=True))
 
             # Make sure the user isn't taking more than 10 vacation days in one month.

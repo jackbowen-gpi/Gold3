@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Process Auto FTP upload queue, upload tiffs to FTP site."""
+"""Process the Auto FTP upload queue and upload ready tiffs to the Fusion Flexo FTP site."""
 
 import sys
 
@@ -28,8 +28,7 @@ from gchub_db.includes import fs_api
 
 
 def joblog_error(job_or_item, message, kill_script=False):
-    """
-    Joblogs a job or item-related error message.
+    """Joblogs a job or item-related error message.
 
     kill_script: (int) 1 to kill with generic UNIX error code,
     2 for command line error code.
@@ -41,7 +40,8 @@ def joblog_error(job_or_item, message, kill_script=False):
 
 
 def perform_mock_upload(item, upload):
-    """Mock upload function for development - just logs that upload would have happened."""
+    """Mock upload function for development - just logs that upload would have
+    happened."""
     print(f"MOCK: Would upload item {item.num_in_job} ({item.bev_nomenclature()}) to FTP")
 
     # Create the joblog entry to simulate successful upload

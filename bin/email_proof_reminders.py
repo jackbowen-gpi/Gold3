@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Send email reminders for proofs sitting for 15+ days."""
+"""Send email reminders to salespeople for proofs that have been sitting for 15 days or more."""
 
 import datetime
 from datetime import timedelta

@@ -68,8 +68,7 @@ signals.post_save.connect(boxitem_pre_save, sender=BoxItem)
 
 
 class BoxItemSpec(models.Model):
-    """
-    Different variants for FSB corrugated. Each BoxItem may have several
+    """Different variants for FSB corrugated. Each BoxItem may have several
     combinations of dimensions and case/sleeve counts.
     """
 
@@ -190,8 +189,7 @@ class GeneratedBox(models.Model):
     # mcdonalds_barcode = models.IntegerField()
 
     def generate_box_pdf(self, box_pdf, method, save_to_job=False, creator=None):
-        """
-        Generates a box PDF from the saved values.
+        """Generates a box PDF from the saved values.
         box_pdf: (file-like object) - also, the filename
         """
         # Set up save path. If save_to_job is True, override the given box_pdf (filename)
@@ -305,8 +303,7 @@ class GeneratedBox(models.Model):
         return box_pdf
 
     def create_job_for_box(self, creation_type="PDF_Only", change_requested=""):
-        """
-        Creates a job in the workflow app that the box is linked to. The job will
+        """Creates a job in the workflow app that the box is linked to. The job will
         serve billing purposes, as well as allow for custom modifications by
         an artist to a automatically generated box.
         Three options for creation:
@@ -432,8 +429,7 @@ class GeneratedLabel(models.Model):
     pdf_type = 2
 
     def generate_label_pdf(self, label_pdf, label_id):
-        """
-        Generates a label PDF from the saved values.
+        """Generates a label PDF from the saved values.
         label_pdf: (file-like object)
         """
         glabel = FSBLabel(

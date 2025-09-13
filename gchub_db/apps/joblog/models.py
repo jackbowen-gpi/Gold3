@@ -1,7 +1,3 @@
-"""
-Module gchub_db\apps\\joblog\\models.py
-"""
-
 from datetime import date, timedelta
 
 from django.conf import settings
@@ -56,8 +52,7 @@ class JobLog(models.Model):
     event_time = models.DateTimeField("Date", auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        """
-        Ensure event_time is timezone-aware to avoid runtime warnings when
+        """Ensure event_time is timezone-aware to avoid runtime warnings when
         tests or seed data provide naive datetimes.
         """
         try:
@@ -122,8 +117,7 @@ class JobLog(models.Model):
         return "%s (%s)" % (self.job.name, self.get_type_display())
 
     def is_log_text_truncated(self, truncate_words=200):
-        """
-        Checks the log text to see if it would be truncated, given a limit
+        """Checks the log text to see if it would be truncated, given a limit
         of truncate_words words.
         """
         split_comment = self.log_text.split()

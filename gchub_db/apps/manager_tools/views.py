@@ -9,7 +9,6 @@ from tempfile import NamedTemporaryFile
 # openpyxl is now used instead of pyExcelerator because it supports python3 and pyexcelerator is deprecated
 import openpyxl
 from django import forms
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
@@ -18,6 +17,7 @@ from django.db.models import Q, Sum
 from django.forms import DateField
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.conf import settings
 
 from gchub_db.apps.budget import billing_funcs
 from gchub_db.apps.joblog.app_defs import (
@@ -141,13 +141,19 @@ def sick(request):
             # if profile/perms lookup fails for a user, skip them
             pass
 
-    pass
+    return render(
+        request,
+        "manager_tools/sick.html",
+        {
+            "page_title": "Sick Tool",
+            "clemson_employee_list": clemson_employee_list,
+        },
+    )
 
 
 @login_required
 def stalecharges(request):
-    """
-    Page for totaling up un-invoiced charges by sales person and print group.
+    """Page for totaling up un-invoiced charges by sales person and print group.
     We don't load the page with default data so the page will load quickly and
     the user can select the year before they incur the longer page load. Most
     of the logic is handled by stalecharges_by_date().
@@ -255,8 +261,7 @@ def stalecharges_excel(request, year_from, month_from, day_from, year_to, month_
 
 
 def stalecharges_by_date(date_from, date_to):
-    """
-    Totals charges that haven't been invoiced for a given time span and then breaks
+    """Totals charges that haven't been invoiced for a given time span and then breaks
     them out by sales person and print group.
     """
     items = Item.objects.filter(
@@ -403,8 +408,7 @@ class QCForm(forms.Form):
 
 @login_required
 def qc(request):
-    """
-    QC manager's report. Details errors per employee for the current year.
+    """QC manager's report. Details errors per employee for the current year.
     User can also select a previous year.
     """
     # Default to this year.
@@ -486,8 +490,7 @@ class StaleChargesForm(forms.Form):
 
 
 class TurnTimeForm(forms.Form):
-    """
-    Form used to display the turn time manager tool for a given year and
+    """Form used to display the turn time manager tool for a given year and
     workflow. We only let the user go back to 2018 because there was a bug in
     the data before then so it's not valid.
     """
@@ -535,8 +538,7 @@ class CostAvoidanceForm(forms.Form):
 
 @login_required
 def turntimes_by_artist(request, month, year, workflow):
-    """
-    Breaks turn time averages out by artist for a given month and workflow.
+    """Breaks turn time averages out by artist for a given month and workflow.
 
     Returns a list of dictionaries. Each dictionary is an artist and the keys
     are "name" and "turn_time" which is the average turn time for the artist
@@ -699,8 +701,7 @@ def turntimes_by_artist(request, month, year, workflow):
 
 @login_required
 def turntimes_by_item(request, month, year, workflow, artist_id):
-    """
-    Lists an artists turntimes by item for a given month and workflow.
+    """Lists an artists turntimes by item for a given month and workflow.
 
     Returns a list of dictionaries. Each dictionary is an item and the keys
     are "name" and "turn_time".
@@ -871,8 +872,7 @@ def billing_by_month(month, year):
 
 
 def costavoidance_by_month(month, year):
-    """
-    Calculates the total charges for all the jobs marked as "cost avoidance" for
+    """Calculates the total charges for all the jobs marked as "cost avoidance" for
     a given month. Keys off a charge's invoice date and that doesn't get filled
     in until we run month end billing. So, if the current month is zero then
     billing probably hasn't been run yet.
@@ -909,8 +909,7 @@ def costavoidance_by_month(month, year):
 
 
 def turntimes_by_month(month, year, workflow):
-    """
-    Calculates average turn time in days. Foodservice is measured printlocation
+    """Calculates average turn time in days. Foodservice is measured printlocation
     assignment date to first proof date. Beverage and Carton are from first
     preflight date to first proof date.
 
@@ -1028,8 +1027,7 @@ def turntimes_by_month(month, year, workflow):
 
 @login_required
 def turntime(request):
-    """
-    Turn time manager's report. We don't load the page with default data
+    """Turn time manager's report. We don't load the page with default data
     so the page will load quickly and the user can select their workflow and
     year before they incur the longer page load.
     """
@@ -1092,8 +1090,7 @@ def turntime(request):
 
 
 def loading_complexity_average(job):
-    """
-    Used by artist_loading() to calculate how long it should take an artist to
+    """Used by artist_loading() to calculate how long it should take an artist to
     work on a given job based on how many items it has.
     """
     complexity_average = 0
@@ -1618,8 +1615,7 @@ def costavoidance(request):
 
 @login_required
 def jobcategory_all(request):
-    """
-    Displays the average amount of time artists put into a given type of job
+    """Displays the average amount of time artists put into a given type of job
     based on time sheet data. All the data is displayed at once.
     """
     # Each element in this list will be a row in the table.
@@ -1654,8 +1650,7 @@ def jobcategory_all(request):
 
 @login_required
 def jobcategory_artists(request, supplied_category, supplied_type):
-    """
-    This is a supplemental report for jobcategory_all that breaks things down
+    """This is a supplemental report for jobcategory_all that breaks things down
     by artist.
     """
     # Gather up all Clemson employees.
@@ -1722,8 +1717,7 @@ def jobcategory_artists(request, supplied_category, supplied_type):
 
 
 def overview(request):
-    """
-    Overview Manager's Tool.
+    """Overview Manager's Tool.
     Gather information about employee's
     vacation usage, sick days, performance data, etc...
     """
@@ -1779,8 +1773,7 @@ class MaterialsForm(forms.Form):
 
 @login_required
 def timesheets(request):
-    """
-    Timesheet Manager's Tool.
+    """Timesheet Manager's Tool.
     This is the default view that lists the employees and how many hours they
     spent on each type of activity this month. User can also select a different
     month and year.
@@ -1850,8 +1843,7 @@ def timesheets(request):
 
 
 def timesheets_by_date_span(start_date, end_date):
-    """
-    Generates the data for the monthly and weekly tables in the time sheets
+    """Generates the data for the monthly and weekly tables in the time sheets
     report. Could be used to get data for any span of time.
     """
     # Gather active Clemson employees.
@@ -1860,6 +1852,8 @@ def timesheets_by_date_span(start_date, end_date):
     for user in active_list:
         if user.has_perms(["accounts.clemson_employee"]):
             clemson_employee_list.append(user)
+
+    # Create a list for user metrics.
 
     # Currently available time sheet activities.
     categories = TimeSheetCategory.objects.all().order_by("order")
@@ -1979,8 +1973,7 @@ def timesheets_billable_hours(month, year):
 
 @login_required
 def materials(request):
-    """
-    Materials Manager Tool.
+    """Materials Manager Tool.
     This view is used to show supplies and consumables usage by month. Currently
     just tracks how many proofs we print in a month.
     """
@@ -2045,8 +2038,7 @@ def materials(request):
 
 
 def get_list_of_weeks(month, year):
-    """
-    Returns a month as a list of weeks and days in that month. Used mostly
+    """Returns a month as a list of weeks and days in that month. Used mostly
     to generate weekly reports
     """
     # Set the week to start on Sunday
@@ -2068,8 +2060,7 @@ def get_list_of_weeks(month, year):
 
 
 def get_items_total(user, date_from, date_to):
-    """
-    Used to count the number of items assigned to a given user during a period
+    """Used to count the number of items assigned to a given user during a period
     of time.
     """
     total = Item.objects.filter(creation_date__range=(date_from, date_to), job__artist=user).count()
@@ -2077,8 +2068,7 @@ def get_items_total(user, date_from, date_to):
 
 
 def get_amount_charged(user, date_from, date_to):
-    """
-    Used to count the number of errors for a given user during a period of
+    """Used to count the number of errors for a given user during a period of
     time.
     """
     preAug2015_charges = (
@@ -2113,8 +2103,7 @@ def get_amount_charged(user, date_from, date_to):
 
 
 def get_qc_reviews_total(user, date_from, date_to):
-    """
-    Used to count the number of QC reviews for a given user during a period of
+    """Used to count the number of QC reviews for a given user during a period of
     time.
     """
     num_qc_reviews = QCResponseDoc.objects.filter(reviewer=user, parent__isnull=False, review_date__range=(date_from, date_to))
@@ -2128,8 +2117,7 @@ def get_qc_reviews_total(user, date_from, date_to):
 
 
 def get_proof_out_total(user, date_from, date_to):
-    """
-    Used to count the number of items proofed by a given user during a period of
+    """Used to count the number of items proofed by a given user during a period of
     time.
     """
     proof_out_logs = JobLog.objects.filter(
@@ -2141,8 +2129,7 @@ def get_proof_out_total(user, date_from, date_to):
 
 
 def get_preflight_total(user, date_from, date_to):
-    """
-    Used to count the number of items preflighted by a given user during a
+    """Used to count the number of items preflighted by a given user during a
     period of time.
     """
     preflight_logs = JobLog.objects.filter(
@@ -2154,8 +2141,7 @@ def get_preflight_total(user, date_from, date_to):
 
 
 def get_revisions_proofed_total(user, date_from, date_to):
-    """
-    Used to count the number of revisions proofed out by a given user during a
+    """Used to count the number of revisions proofed out by a given user during a
     period of time.
     """
     revision_logs = JobLog.objects.filter(
@@ -2183,8 +2169,7 @@ def get_revisions_proofed_total(user, date_from, date_to):
 
 
 def get_final_file_total(user, date_from, date_to):
-    """
-    Used to count the number of final files by a given user during a period of
+    """Used to count the number of final files by a given user during a period of
     time.
     """
     final_file_logs = JobLog.objects.filter(
@@ -2196,8 +2181,7 @@ def get_final_file_total(user, date_from, date_to):
 
 
 def metrics_data(date_from, date_to):
-    """
-    Gathers metrics data for artists over a given time period. Returns it as a
+    """Gathers metrics data for artists over a given time period. Returns it as a
     list of dictionaries. Each dictionary will contain the user's data. We use
     dictionaries so that we can easily call out just the data we need.
     """
@@ -2472,8 +2456,7 @@ class MetricsForm(forms.Form):
 
 
 def metrics_form(request):
-    """
-    Used to gather employee metrics for the artists and then format it for
+    """Used to gather employee metrics for the artists and then format it for
     display as tables and charts.
     """
     # Process a submitted form.

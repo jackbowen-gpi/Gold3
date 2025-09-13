@@ -1,5 +1,4 @@
-"""
-Active Item Comparison -- Which currently active items use 'bad colors'.
+"""Active Item Comparison -- Which currently active items use 'bad colors'.
 
 This script imports two XLS files - one containing colors divided into two sets,
 Coated and Uncoated. These colors were ones in which the PMS Digital standard
@@ -15,21 +14,23 @@ to a new XLS file.
 """
 
 #!/usr/bin/python
+import os
 
 # Setup the Django environment
 import bin_functions
+import openpyxl
 
 bin_functions.setup_paths()
 import django
 
 django.setup()
 # Back to the ordinary imports
+import xlrd
+from django.conf import settings
 
-# from gchub_db.tools.importer_functions import *  # BROKEN IMPORT - HolySheet not found
+from gchub_db.apps.workflow import app_defs
+from gchub_db.apps.workflow.models import Item
 
-# BROKEN SCRIPT - Missing HolySheet class and xlrd import issues
-# Commenting out the entire script execution to avoid linting errors
-"""
 print("Pack it up, pack it in, let me begin.")
 # Argument needs to be a valid Excel sheet.
 color_xls_path = os.path.join(
@@ -38,7 +39,22 @@ color_xls_path = os.path.join(
 )
 color_book = xlrd.open_workbook(color_xls_path)
 sheet = color_book.sheet_by_index(0)
-# hs = HolySheet(color_book, sheet)  # BROKEN - HolySheet not defined
+
+
+class HolySheet:
+    def __init__(self, book, sheet):
+        self.book = book
+        self.sheet = sheet
+        self.headers = {self.sheet.cell_value(0, col): col for col in range(self.sheet.ncols)}
+
+    def get_column_val(self, row, col_name):
+        col_idx = self.headers.get(col_name)
+        if col_idx is not None and col_idx < len(row):
+            return row[col_idx].value if hasattr(row[col_idx], "value") else row[col_idx]
+        return None
+
+
+hs = HolySheet(color_book, sheet)
 
 # List of rows to go through
 rows = list(range(1, sheet.nrows))
@@ -73,7 +89,7 @@ item_xls_path = os.path.join(
 )
 book = xlrd.open_workbook(item_xls_path)
 sheet = book.sheet_by_index(0)
-# hs = HolySheet(book, sheet)  # BROKEN - HolySheet not defined
+hs = HolySheet(book, sheet)
 # List of rows to go through
 rows = list(range(1, sheet.nrows))
 
@@ -106,9 +122,7 @@ for row_num in rows:
     printgroup = hs.get_column_val(row, "PartType")
     plants = []
     try:
-        item_matches = Item.objects.filter(fsb_nine_digit=nine_digit).order_by(
-            "-creation_date"
-        )
+        item_matches = Item.objects.filter(fsb_nine_digit=nine_digit).order_by("-creation_date")
         for i in item_matches:
             if i.printlocation.plant.name not in plants:
                 plants.append(i.printlocation.plant.name)
@@ -119,17 +133,11 @@ for row_num in rows:
         # Hey, look, we found an item. Let's see if it's got any crappy colors in it.
         for color in item.itemcolor_set.all():
             flag = False
-            if (
-                color.item.size.product_substrate in app_defs.COATED_SUBSTRATES
-                and color.color in coated_colors
-            ):
+            if color.item.size.product_substrate in app_defs.COATED_SUBSTRATES and color.color in coated_colors:
                 print("Crappy coated color.")
                 flag = True
                 coating = "C"
-            elif (
-                color.item.size.product_substrate in app_defs.UNCOATED_SUBSTRATES
-                and color.color in uncoated_colors
-            ):
+            elif color.item.size.product_substrate in app_defs.UNCOATED_SUBSTRATES and color.color in uncoated_colors:
                 print("Crappy uncoated color.")
                 flag = True
                 coating = "U"
@@ -174,4 +182,3 @@ workBookDocument.save("xls_output/Warning Items.xls")
 print("Finnish'd.")
 print(num_matches)
 print(num_nonmatches)
-"""

@@ -1,9 +1,7 @@
 """Account-Related Views"""
 
 import datetime
-import json
 from datetime import timedelta
-from types import SimpleNamespace
 
 from django import forms
 from django.conf import settings
@@ -21,10 +19,11 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from mwclient import Site
+import json
+from types import SimpleNamespace
 
+from gchub_db.includes.windows_notifications import WindowsNotificationManager
 from gchub_db.includes.notification_manager import send_user_notification
-
-# windows_notifications import removed; use plyer or notification_daemon instead
 
 import gchub_db.apps.workflow.app_defs as workflow_defs
 from gchub_db.apps.calendar.models import Event
@@ -117,9 +116,9 @@ def preferences_settings(request):
     pagevars = {
         "page_title": "Preferences - Settings",
         "use_legacy_search": request.session.get("use_legacy_search", True),
-        "notifications_enabled": (
-            getattr(request.user.profile, "notifications_enabled", True) if hasattr(request.user, "profile") else True
-        ),
+        "notifications_enabled": getattr(request.user.profile, "notifications_enabled", True)
+        if hasattr(request.user, "profile")
+        else True,
         # Job search criteria
         "job_search_brand": request.session.get("job_search_brand", True),
         "job_search_customer": request.session.get("job_search_customer", True),
@@ -156,8 +155,7 @@ def change_password(request):
 
 
 def _seperate_events_by_day(events, date_attrib_name):
-    """
-    This is a generic function to separate events into a list representing
+    """This is a generic function to separate events into a list representing
     days of the month that contain events occuring on that day.
     """
     # Stores the integer day of the month of the last event.
@@ -479,8 +477,7 @@ def index(request):
 
 
 def home(request):
-    """
-    Public homepage: show the authenticated index to logged-in users,
+    """Public homepage: show the authenticated index to logged-in users,
     otherwise render a simple public landing page.
     """
     if request.user.is_authenticated:
@@ -491,8 +488,7 @@ def home(request):
 
 
 def logout_get(request):
-    """
-    Allow logout via GET for compatibility with older templates/links.
+    """Allow logout via GET for compatibility with older templates/links.
 
     This performs the same action as the Django `LogoutView` but accepts GET
     so legacy anchors that point to the logout URL don't get 405.
@@ -504,8 +500,7 @@ def logout_get(request):
 
 
 def office_contacts(request):
-    """
-    Contacts for the Clemson Office. We'll totally link this to the User
+    """Contacts for the Clemson Office. We'll totally link this to the User
     system later, huh? HELL YES WE WILL. Go Thundercuddles!
     """
     pagevars = {
@@ -523,8 +518,7 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(attrs={"style": "width:170px"}))
 
     def __init__(self, request, *args, **kwargs):
-        """
-        Generate the drop-down of active users so they don't have to type their
+        """Generate the drop-down of active users so they don't have to type their
         username in.
         """
         super(LoginForm, self).__init__(*args, **kwargs)
@@ -608,12 +602,16 @@ def test_notification(request):
 
         if notification_type == "direct":
             # Test direct Windows notification manager
-            # WindowsNotificationManager removed; use plyer or notification_daemon instead
-            print("NOTIFICATION: Direct Notification Test - This is a direct test of the Windows notification manager.")
+            mgr = WindowsNotificationManager()
+            result = mgr.send_notification(
+                title="Direct Notification Test",
+                message="This is a direct test of the Windows notification manager.",
+                duration=5,
+            )
             return JsonResponse(
                 {
                     "success": True,
-                    "message": "Direct notification sent (console stub)",
+                    "message": f"Direct notification sent successfully: {result}",
                     "type": "direct",
                 }
             )
@@ -706,12 +704,16 @@ def test_notification(request):
 
         else:
             # Basic test
-            # WindowsNotificationManager removed; use plyer or notification_daemon instead
-            print("NOTIFICATION: Basic Test - This is a basic notification test.")
+            mgr = WindowsNotificationManager()
+            result = mgr.send_notification(
+                title="Basic Test",
+                message="This is a basic notification test.",
+                duration=3,
+            )
             return JsonResponse(
                 {
                     "success": True,
-                    "message": "Basic notification sent (console stub)",
+                    "message": f"Basic notification sent: {result}",
                     "type": "basic",
                 }
             )
