@@ -4,7 +4,7 @@ $wgSitename = "Gold3 Knowledge Base";
 $wgMetaNamespace = "Gold3";
 
 ## Server URL (required for MediaWiki)
-$wgServer = "http://host.docker.internal:8080";
+$wgServer = "http://localhost:8080";
 
 ## Force the server URL to be used
 $wgForceHTTPS = false;
@@ -124,56 +124,10 @@ $wgGroupPermissions['sysop']['*'] = true;
 ## Enable Mermaid extension for diagrams
 wfLoadExtension( 'Mermaid' );
 
-## Manually load Mermaid JavaScript on all pages
+## Simple Mermaid configuration - load from CDN
 $wgHooks['BeforePageDisplay'][] = function( $out, $skin ) {
-    $out->addScript( '<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>' );
-    $out->addScript( '<script>
-        (function() {
-            "use strict";
-
-            function initializeMermaid() {
-                if (typeof mermaid !== "undefined") {
-                    try {
-                        mermaid.initialize({
-                            startOnLoad: false,
-                            theme: "default",
-                            securityLevel: "loose"
-                        });
-                        console.log("Mermaid initialized successfully");
-
-                        // Process all mermaid elements after a short delay
-                        setTimeout(function() {
-                            var mermaidElements = document.querySelectorAll(".mermaid");
-                            if (mermaidElements.length > 0) {
-                                console.log("Found " + mermaidElements.length + " mermaid elements");
-                                mermaidElements.forEach(function(element, index) {
-                                    try {
-                                        var id = "mermaid-" + Date.now() + "-" + index;
-                                        element.id = id;
-                                        mermaid.init(undefined, "#" + id);
-                                        console.log("Processed mermaid element:", id);
-                                    } catch (error) {
-                                        console.error("Error processing mermaid element:", error);
-                                    }
-                                });
-                            }
-                        }, 500);
-                    } catch (error) {
-                        console.error("Mermaid initialization error:", error);
-                    }
-                } else {
-                    console.error("Mermaid library not loaded");
-                }
-            }
-
-            // Initialize on DOM ready
-            if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", initializeMermaid);
-            } else {
-                initializeMermaid();
-            }
-        })();
-    </script>' );
+    $out->addScript( '<script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>' );
+    $out->addScript( '<script>mermaid.initialize({startOnLoad:true,theme:"default",securityLevel:"loose"});</script>' );
     return true;
 };
 

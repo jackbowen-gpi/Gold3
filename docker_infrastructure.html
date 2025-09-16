@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GOLD3 Docker Infrastructure</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1,
+      h2 {
+        color: #333;
+        border-bottom: 2px solid #007cba;
+        padding-bottom: 10px;
+      }
+      .mermaid {
+        text-align: center;
+        margin: 20px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+      }
+      th {
+        background-color: #007cba;
+        color: white;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      .code-block {
+        background: #f4f4f4;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        font-family: "Courier New", monospace;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>GOLD3 Docker Infrastructure</h1>
+      <p>
+        This page documents the GOLD3 Docker container architecture and
+        deployment setup.
+      </p>
+
+      <h2>Core Container Architecture</h2>
+      <div class="mermaid">
+        graph TB subgraph "🎨 Application Layer" WEB[Django Web App<br />Port:
+        8000] NOTIFICATION_DAEMON[Notification Daemon<br />Port: 5341]
+        CELERY_WORKER[Celery Worker<br />Async Tasks] CELERY_BEAT[Celery Beat<br />Scheduled
+        Tasks] end subgraph "🔧 Services Layer" REDIS[(Redis<br />Cache &
+        Broker<br />Port: 6379)] POSTGRES[(PostgreSQL<br />Database<br />Port:
+        5432)] WIKI[MediaWiki<br />Documentation<br />Port: 8080] end subgraph
+        "📊 Monitoring Layer" PROMETHEUS[Prometheus<br />Metrics<br />Port:
+        9090] GRAFANA[Grafana<br />Dashboards<br />Port: 3000] FLOWER[Flower<br />Task
+        Monitoring<br />Port: 5555] NODE_EXPORTER[Node Exporter<br />System
+        Metrics<br />Port: 9100] end WEB --> REDIS WEB --> POSTGRES
+        NOTIFICATION_DAEMON --> REDIS CELERY_WORKER --> REDIS CELERY_WORKER -->
+        POSTGRES CELERY_BEAT --> REDIS PROMETHEUS --> NODE_EXPORTER GRAFANA -->
+        PROMETHEUS FLOWER --> CELERY_WORKER style WEB fill:#e1f5fe style
+        NOTIFICATION_DAEMON fill:#e1f5fe style CELERY_WORKER fill:#e1f5fe style
+        CELERY_BEAT fill:#e1f5fe style REDIS fill:#fff3e0 style POSTGRES
+        fill:#fff3e0 style WIKI fill:#fff3e0 style PROMETHEUS fill:#f3e5f5 style
+        GRAFANA fill:#f3e5f5 style FLOWER fill:#f3e5f5 style NODE_EXPORTER
+        fill:#f3e5f5
+      </div>
+
+      <h2>Container Details</h2>
+
+      <h3>Application Containers</h3>
+      <table>
+        <tr>
+          <th>Service</th>
+          <th>Image</th>
+          <th>Ports</th>
+          <th>Purpose</th>
+          <th>Dependencies</th>
+        </tr>
+        <tr>
+          <td>web</td>
+          <td>gold3-web</td>
+          <td>8000</td>
+          <td>Django web application</td>
+          <td>db, redis, notification-daemon</td>
+        </tr>
+        <tr>
+          <td>notification-daemon</td>
+          <td>gold3-notification-daemon</td>
+          <td>5341</td>
+          <td>Background notification service</td>
+          <td>redis</td>
+        </tr>
+        <tr>
+          <td>celery</td>
+          <td>gold3-celery</td>
+          <td>-</td>
+          <td>Asynchronous task processing</td>
+          <td>redis, db</td>
+        </tr>
+        <tr>
+          <td>celery-beat</td>
+          <td>gold3-celery-beat</td>
+          <td>-</td>
+          <td>Scheduled task management</td>
+          <td>redis</td>
+        </tr>
+      </table>
+
+      <h3>Infrastructure Containers</h3>
+      <table>
+        <tr>
+          <th>Service</th>
+          <th>Image</th>
+          <th>Ports</th>
+          <th>Purpose</th>
+          <th>Persistence</th>
+        </tr>
+        <tr>
+          <td>db</td>
+          <td>postgres:15</td>
+          <td>5438:5432</td>
+          <td>Primary database</td>
+          <td>pgdata volume</td>
+        </tr>
+        <tr>
+          <td>redis</td>
+          <td>redis:7</td>
+          <td>6379</td>
+          <td>Cache and message broker</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>wiki</td>
+          <td>gold3-wiki</td>
+          <td>8080:80</td>
+          <td>Documentation wiki</td>
+          <td>wiki_data volume</td>
+        </tr>
+      </table>
+
+      <h2>Network Architecture</h2>
+      <div class="mermaid">
+        graph LR HOST[Host Machine] --> DOCKER[Docker Network] DOCKER -->
+        WEB_PORT_8000[Port 8000<br />Django Web] DOCKER --> NOTIF_PORT_5341[Port
+        5341<br />Notifications] DOCKER --> WIKI_PORT_8080[Port 8080<br />MediaWiki]
+        DOCKER --> GRAFANA_PORT_3000[Port 3000<br />Grafana] DOCKER -->
+        PROMETHEUS_PORT_9090[Port 9090<br />Prometheus] DOCKER -->
+        FLOWER_PORT_5555[Port 5555<br />Flower] DOCKER --> NODE_PORT_9100[Port
+        9100<br />Node Exporter] DOCKER --> REDIS_PORT_6379[Port 6379<br />Redis]
+        DOCKER --> DB_PORT_5438[Port 5438<br />PostgreSQL] style HOST
+        fill:#e8f5e8 style DOCKER fill:#fff
+      </div>
+
+      <h2>Data Flow</h2>
+      <div class="mermaid">
+        sequenceDiagram participant U as User participant W as Web App
+        participant R as Redis participant P as PostgreSQL participant C as
+        Celery participant N as Notification Daemon U->>W: HTTP Request W->>R:
+        Cache Check R-->>W: Cache Miss W->>P: Database Query P-->>W: Query
+        Result W->>R: Store in Cache W-->>U: HTTP Response W->>C: Async Task
+        C->>P: Task Processing C->>N: Send Notification N->>R: Queue Message
+      </div>
+
+      <h2>Deployment Commands</h2>
+
+      <h3>Start All Services</h3>
+      <div class="code-block">docker-compose up -d</div>
+
+      <h3>Start Specific Service</h3>
+      <div class="code-block">
+        docker-compose up -d web<br />
+        docker-compose up -d wiki<br />
+        docker-compose up -d grafana
+      </div>
+
+      <h3>View Service Logs</h3>
+      <div class="code-block">
+        docker-compose logs -f web<br />
+        docker-compose logs -f wiki
+      </div>
+
+      <h3>Stop Services</h3>
+      <div class="code-block">docker-compose down</div>
+
+      <h3>Rebuild and Restart</h3>
+      <div class="code-block">docker-compose up -d --build web</div>
+
+      <h2>Troubleshooting</h2>
+
+      <h3>Common Issues</h3>
+      <ul>
+        <li>
+          <strong>Port conflicts</strong>: Check if ports are already in use
+        </li>
+        <li>
+          <strong>Database connection</strong>: Ensure PostgreSQL is running
+        </li>
+        <li>
+          <strong>Redis connection</strong>: Verify Redis service is healthy
+        </li>
+        <li>
+          <strong>Memory issues</strong>: Monitor container resource usage
+        </li>
+      </ul>
+
+      <h3>Health Checks</h3>
+      <ul>
+        <li><strong>Web App</strong>: http://localhost:8000/health/</li>
+        <li><strong>Wiki</strong>: http://localhost:8080/api.php</li>
+        <li><strong>Grafana</strong>: http://localhost:3000/login</li>
+        <li><strong>Prometheus</strong>: http://localhost:9090/targets</li>
+      </ul>
+
+      <h2>Configuration Files</h2>
+      <ul>
+        <li><strong>docker-compose.yml</strong>: Main service definitions</li>
+        <li><strong>Dockerfile</strong>: Web application container</li>
+        <li><strong>Dockerfile.wiki</strong>: MediaWiki container</li>
+        <li><strong>wiki/LocalSettings.php</strong>: Wiki configuration</li>
+        <li><strong>prometheus/</strong>: Metrics configuration</li>
+        <li><strong>grafana/provisioning/</strong>: Dashboard configuration</li>
+      </ul>
+
+      <hr />
+      <p><em>Last updated: September 16, 2025</em></p>
+    </div>
+
+    <script>
+      // Initialize Mermaid after page load
+      document.addEventListener("DOMContentLoaded", function () {
+        mermaid.initialize({
+          startOnLoad: true,
+          theme: "default",
+          securityLevel: "loose",
+          flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true,
+          },
+          sequence: {
+            useMaxWidth: true,
+          },
+        });
+
+        // Re-render diagrams after initialization
+        setTimeout(function () {
+          mermaid.init(undefined, document.querySelectorAll(".mermaid"));
+        }, 100);
+      });
+    </script>
+  </body>
+</html>

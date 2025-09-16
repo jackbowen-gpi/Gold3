@@ -1,0 +1,209 @@
+= Docker Infrastructure =
+
+This page documents the GOLD3 Docker container architecture and deployment setup.
+
+== Core Container Architecture ==
+
+<mermaid>
+graph TB
+    subgraph "🎨 Application Layer"
+        WEB[Django Web App<br/>Port: 8000]
+        NOTIFICATION_DAEMON[Notification Daemon<br/>Port: 5341]
+        CELERY_WORKER[Celery Worker<br/>Async Tasks]
+        CELERY_BEAT[Celery Beat<br/>Scheduled Tasks]
+    end
+
+    subgraph "🔧 Services Layer"
+        REDIS[(Redis<br/>Cache & Broker<br/>Port: 6379)]
+        POSTGRES[(PostgreSQL<br/>Database<br/>Port: 5432)]
+        WIKI[MediaWiki<br/>Documentation<br/>Port: 8080]
+    end
+
+    subgraph "📊 Monitoring Layer"
+        PROMETHEUS[Prometheus<br/>Metrics<br/>Port: 9090]
+        GRAFANA[Grafana<br/>Dashboards<br/>Port: 3000]
+        FLOWER[Flower<br/>Task Monitoring<br/>Port: 5555]
+        NODE_EXPORTER[Node Exporter<br/>System Metrics<br/>Port: 9100]
+    end
+
+    WEB --> REDIS
+    WEB --> POSTGRES
+    NOTIFICATION_DAEMON --> REDIS
+    CELERY_WORKER --> REDIS
+    CELERY_WORKER --> POSTGRES
+    CELERY_BEAT --> REDIS
+
+    PROMETHEUS --> NODE_EXPORTER
+    GRAFANA --> PROMETHEUS
+    FLOWER --> CELERY_WORKER
+
+    style WEB fill:#e1f5fe
+    style NOTIFICATION_DAEMON fill:#e1f5fe
+    style CELERY_WORKER fill:#e1f5fe
+    style CELERY_BEAT fill:#e1f5fe
+
+    style REDIS fill:#fff3e0
+    style POSTGRES fill:#fff3e0
+    style WIKI fill:#fff3e0
+
+    style PROMETHEUS fill:#f3e5f5
+    style GRAFANA fill:#f3e5f5
+    style FLOWER fill:#f3e5f5
+    style NODE_EXPORTER fill:#f3e5f5
+</mermaid>
+
+== Container Details ==
+
+=== Application Containers ===
+
+{| class="wikitable"
+|-
+! Service !! Image !! Ports !! Purpose !! Dependencies
+|-
+| web || gold3-web || 8000 || Django web application || db, redis, notification-daemon
+|-
+| notification-daemon || gold3-notification-daemon || 5341 || Background notification service || redis
+|-
+| celery || gold3-celery || - || Asynchronous task processing || redis, db
+|-
+| celery-beat || gold3-celery-beat || - || Scheduled task management || redis
+|}
+
+=== Infrastructure Containers ===
+
+{| class="wikitable"
+|-
+! Service !! Image !! Ports !! Purpose !! Persistence
+|-
+| db || postgres:15 || 5438:5432 || Primary database || pgdata volume
+|-
+| redis || redis:7 || 6379 || Cache and message broker || -
+|-
+| wiki || gold3-wiki || 8080:80 || Documentation wiki || wiki_data volume
+|}
+
+=== Monitoring Containers ===
+
+{| class="wikitable"
+|-
+! Service !! Image !! Ports !! Purpose !! Data Source
+|-
+| prometheus || prom/prometheus:latest || 9090 || Metrics collection || node-exporter
+|-
+| grafana || grafana/grafana:latest || 3000 || Visualization dashboards || prometheus
+|-
+| flower || gold3-flower || 5555 || Celery task monitoring || celery
+|-
+| node-exporter || prom/node-exporter:latest || 9100 || System metrics || host system
+|}
+
+== Network Architecture ==
+
+<mermaid>
+graph LR
+    HOST[Host Machine] --> DOCKER[Docker Network]
+
+    DOCKER --> WEB_PORT_8000[Port 8000<br/>Django Web]
+    DOCKER --> NOTIF_PORT_5341[Port 5341<br/>Notifications]
+    DOCKER --> WIKI_PORT_8080[Port 8080<br/>MediaWiki]
+    DOCKER --> GRAFANA_PORT_3000[Port 3000<br/>Grafana]
+    DOCKER --> PROMETHEUS_PORT_9090[Port 9090<br/>Prometheus]
+    DOCKER --> FLOWER_PORT_5555[Port 5555<br/>Flower]
+    DOCKER --> NODE_PORT_9100[Port 9100<br/>Node Exporter]
+    DOCKER --> REDIS_PORT_6379[Port 6379<br/>Redis]
+    DOCKER --> DB_PORT_5438[Port 5438<br/>PostgreSQL]
+
+    style HOST fill:#e8f5e8
+    style DOCKER fill:#fff
+</mermaid>
+
+== Data Flow ==
+
+<mermaid>
+sequenceDiagram
+    participant U as User
+    participant W as Web App
+    participant R as Redis
+    participant P as PostgreSQL
+    participant C as Celery
+    participant N as Notification Daemon
+
+    U->>W: HTTP Request
+    W->>R: Cache Check
+    R-->>W: Cache Miss
+    W->>P: Database Query
+    P-->>W: Query Result
+    W->>R: Store in Cache
+    W-->>U: HTTP Response
+
+    W->>C: Async Task
+    C->>P: Task Processing
+    C->>N: Send Notification
+    N->>R: Queue Message
+</mermaid>
+
+== Deployment Commands ==
+
+=== Start All Services ===
+<pre>
+docker-compose up -d
+</pre>
+
+=== Start Specific Service ===
+<pre>
+docker-compose up -d web
+docker-compose up -d wiki
+docker-compose up -d grafana
+</pre>
+
+=== View Service Logs ===
+<pre>
+docker-compose logs -f web
+docker-compose logs -f wiki
+</pre>
+
+=== Stop Services ===
+<pre>
+docker-compose down
+</pre>
+
+=== Rebuild and Restart ===
+<pre>
+docker-compose up -d --build web
+</pre>
+
+== Troubleshooting ==
+
+=== Common Issues ===
+
+* '''Port conflicts''': Check if ports are already in use
+* '''Database connection''': Ensure PostgreSQL is running
+* '''Redis connection''': Verify Redis service is healthy
+* '''Memory issues''': Monitor container resource usage
+
+=== Health Checks ===
+
+* '''Web App''': http://localhost:8000/health/
+* '''Wiki''': http://localhost:8080/api.php
+* '''Grafana''': http://localhost:3000/login
+* '''Prometheus''': http://localhost:9090/targets
+
+== Configuration Files ==
+
+* '''docker-compose.yml''': Main service definitions
+* '''Dockerfile''': Web application container
+* '''Dockerfile.wiki''': MediaWiki container
+* '''wiki/LocalSettings.php''': Wiki configuration
+* '''prometheus/''': Metrics configuration
+* '''grafana/provisioning/''': Dashboard configuration
+
+== Related Documentation ==
+
+* [[Development Environment]] - Local development setup
+* [[Production Deployment]] - Production deployment guide
+* [[Database Schema]] - Database structure documentation
+* [[API Documentation]] - REST API endpoints
+* [[CI/CD Pipeline and Database Architecture]] - CI/CD and database architecture
+
+----
+''Last updated: September 16, 2025''
