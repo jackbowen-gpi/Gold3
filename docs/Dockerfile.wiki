@@ -20,6 +20,11 @@ RUN cd /var/www/html/extensions \
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html/extensions/Mermaid
 
+# Configure Apache to suppress ServerName warnings and enable rewrites
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
+    && a2enmod rewrite \
+    && echo "<Directory /var/www/html>\n    AllowOverride All\n    AcceptPathInfo On\n</Directory>" >> /etc/apache2/apache2.conf
+
 # Copy custom LocalSettings.php if it exists
 # COPY LocalSettings.php /var/www/html/LocalSettings.php
 

@@ -13,7 +13,7 @@ $wgForceHTTPS = false;
 $wgScriptPath = "/";
 
 ## Article path (for pretty URLs)
-$wgArticlePath = "/index.php/$1";
+$wgArticlePath = "/wiki/$1";
 
 ## Database settings
 $wgDBtype = "postgres";
@@ -153,7 +153,7 @@ $wgUseSiteJs = true;
 $wgResourceBasePath = "http://localhost:8080";
 $wgLoadScript = "http://localhost:8080/load.php";
 $wgScriptPath = "/";
-$wgArticlePath = "/index.php/$1";
+$wgArticlePath = "/wiki/$1";
 
 ## Fix preload issues by disabling problematic resource hints
 $wgResourceHints = false;

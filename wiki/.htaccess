@@ -1,0 +1,16 @@
+RewriteEngine On
+
+# Handle wiki paths with path info
+RewriteRule ^/?wiki/(.*)$ /index.php/$1 [L]
+
+# Redirect / to Main Page
+RewriteRule ^/?$ /wiki/Main_Page [R=301,L]
+
+# Handle direct index.php access
+RewriteRule ^/?index\.php/.*$ - [L]
+
+# Exclude load.php, api.php, etc. from rewriting
+RewriteRule ^/?(load\.php|api\.php|opensearch_desc\.php|favicon\.ico|robots\.txt) - [L]
+
+# Catch all other requests
+RewriteRule ^/?(.*)$ /index.php/$1 [L]

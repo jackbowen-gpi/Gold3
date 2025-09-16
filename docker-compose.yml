@@ -1,3 +1,5 @@
+name: gold3
+
 services:
   web:
     build: .
@@ -15,6 +17,7 @@ services:
       DEV_DB_USER: gchub
       DEV_DB_PASSWORD: gchub
       NOTIFICATION_DAEMON_URL: "http://notification-daemon:5341/notify"
+      DJANGO_SETTINGS_MODULE: gchub_db.settings
     depends_on:
       - db
 
@@ -139,12 +142,13 @@ services:
   wiki:
     build:
       context: .
-      dockerfile: Dockerfile.wiki
+      dockerfile: docs/Dockerfile.wiki
     ports:
       - "8080:80"
     volumes:
       - wiki_data:/var/www/data
       - ./wiki/LocalSettings.php:/var/www/html/LocalSettings.php
+      - ./wiki/.htaccess:/var/www/html/.htaccess
       - ./scripts/setup_wiki_db.sh:/usr/local/bin/setup_wiki_db.sh
     environment:
       MEDIAWIKI_DB_TYPE: postgres

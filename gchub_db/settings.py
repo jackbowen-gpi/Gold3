@@ -8,7 +8,6 @@ import sys
 from config.settings import (  # type: ignore[attr-defined]
     ALLOWED_HOSTS,
     DEBUG,
-    EMAIL_BACKEND,  # type: ignore[attr-defined]
     EMAIL_HOST,
     INTERNAL_IPS,
     MIDDLEWARE,
@@ -185,6 +184,9 @@ if DEBUG:
     if "debug_toolbar" in [app.split(".")[-1] for app in INSTALLED_APPS]:
         if "MIDDLEWARE" in globals():
             if "debug_toolbar.middleware.DebugToolbarMiddleware" not in globals()["MIDDLEWARE"]:
+                # Convert tuple to list if necessary
+                if isinstance(globals()["MIDDLEWARE"], tuple):
+                    globals()["MIDDLEWARE"] = list(globals()["MIDDLEWARE"])
                 globals()["MIDDLEWARE"].insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
         else:
             # Define MIDDLEWARE if not imported
