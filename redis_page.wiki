@@ -1,0 +1,617 @@
+= Redis Configuration and Management =
+
+{| class="wikitable" style="float:right; margin-left:1em; width:300px;"
+|-
+! colspan="2" | Redis Configuration
+|-
+| '''Service Name''' || redis
+|-
+| '''Port''' || 6379
+|-
+| '''Version''' || 7.x (Latest stable)
+|-
+| '''Primary Role''' || Celery message broker
+|-
+| '''Secondary Role''' || Django cache backend
+|}
+
+== Overview ==
+
+Redis serves as the primary message broker for Celery task processing and provides caching capabilities for the GOLD3 Django application. This documentation covers Redis configuration, monitoring, and troubleshooting.
+
+== Architecture & Roles ==
+
+=== Primary Functions ===
+
+{| class="wikitable"
+|-
+! Function !! Purpose !! Configuration !! Impact
+|-
+| '''Message Broker''' || Celery task queuing || CELERY_BROKER_URL || Critical for async tasks
+|-
+| '''Result Backend''' || Task result storage || CELERY_RESULT_BACKEND || Required for task status
+|-
+| '''Cache Backend''' || Django caching || CACHES setting || Performance optimization
+|-
+| '''Session Storage''' || User sessions || SESSION_ENGINE || User experience
+|}
+
+=== Data Flow ===
+
+<syntaxhighlight lang="mermaid">
+graph TD
+    A[Django App] --> B[Redis Cache]
+    A --> C[Celery Tasks]
+    C --> D[Redis Broker]
+    D --> E[Celery Worker]
+    E --> F[Task Results]
+    F --> G[Redis Backend]
+    B --> H[Django Response]
+</syntaxhighlight>
+
+== Configuration ==
+
+=== Docker Compose Setup ===
+
+'''Redis Service Configuration:'''
+<syntaxhighlight lang="yaml">
+redis:
+  image: redis:7
+  ports:
+    - "6379:6379"
+  volumes:
+    - redis-data:/data
+  command: redis-server --appendonly yes
+  healthcheck:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+</syntaxhighlight>
+
+=== Django Integration ===
+
+'''Cache Configuration:'''
+<syntaxhighlight lang="python">
+# settings.py
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://redis:6379/1',  # Use DB 1 for cache
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+# Session configuration
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+</syntaxhighlight>
+
+'''Celery Configuration:'''
+<syntaxhighlight lang="python">
+# settings.py
+CELERY_BROKER_URL = 'redis://redis:6379/0'  # Use DB 0 for broker
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 3600
+</syntaxhighlight>
+
+== Database Organization ==
+
+=== Redis Database Usage ===
+
+{| class="wikitable"
+|-
+! Database !! Purpose !! Key Pattern !! TTL Policy
+|-
+| '''DB 0''' || Celery broker & results || celery-task:* || Task-dependent
+|-
+| '''DB 1''' || Django cache || django:* || Configurable
+|-
+| '''DB 2''' || User sessions || session:* || Session timeout
+|-
+| '''DB 3''' || Application data || app:* || Application-specific
+|}
+
+=== Key Naming Conventions ===
+
+'''Celery Keys:'''
+<syntaxhighlight lang="bash">
+# Task queues
+celery-task-queue
+celery-task-queue.active
+celery-task-queue.reserved
+
+# Task results
+celery-task-meta-{task_id}
+
+# Worker information
+celery-worker-{hostname}
+</syntaxhighlight>
+
+'''Django Cache Keys:'''
+<syntaxhighlight lang="bash">
+# Cache keys
+:1:django.cache.{cache_key}
+:1:django.sessions.{session_key}
+
+# Lock keys
+:1:django.cache.lock.{lock_key}
+</syntaxhighlight>
+
+== Management Commands ==
+
+=== Basic Operations ===
+
+'''Service Management:'''
+<syntaxhighlight lang="powershell">
+# Start Redis service
+docker-compose up -d redis
+
+# View Redis logs
+docker-compose logs -f redis
+
+# Restart Redis
+docker-compose restart redis
+
+# Stop Redis
+docker-compose stop redis
+</syntaxhighlight>
+
+'''Connection Testing:'''
+<syntaxhighlight lang="powershell">
+# Test basic connectivity
+docker-compose exec redis redis-cli ping
+
+# Connect to Redis CLI
+docker-compose exec redis redis-cli
+
+# Test from web container
+docker-compose exec web redis-cli -h redis ping
+</syntaxhighlight>
+
+=== Data Inspection ===
+
+'''Database Information:'''
+<syntaxhighlight lang="bash">
+# Connect to Redis
+docker-compose exec redis redis-cli
+
+# Select database
+SELECT 0  # For Celery
+SELECT 1  # For Django cache
+
+# View database info
+INFO
+
+# List all keys (be careful with large datasets)
+KEYS *
+
+# Get key count
+DBSIZE
+</syntaxhighlight>
+
+'''Celery Queue Monitoring:'''
+<syntaxhighlight lang="bash">
+# Check queue length
+LLEN celery
+
+# View pending tasks (first 10)
+LRANGE celery 0 9
+
+# Check active tasks
+KEYS celery-task-meta-*
+
+# View worker status
+KEYS celery-worker-*
+</syntaxhighlight>
+
+== Monitoring & Health Checks ==
+
+=== Health Check Configuration ===
+
+'''Docker Health Check:'''
+<syntaxhighlight lang="yaml">
+redis:
+  healthcheck:
+    test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 30s
+</syntaxhighlight>
+
+=== Key Metrics to Monitor ===
+
+{| class="wikitable"
+|-
+! Metric !! Command !! Threshold !! Action
+|-
+| '''Memory Usage''' || INFO memory || >80% || Scale up instance
+|-
+| '''Connected Clients''' || INFO clients || >100 || Check connection pooling
+|-
+| '''Queue Length''' || LLEN celery || >1000 || Scale workers
+|-
+| '''Hit Rate''' || INFO stats || <90% || Review cache strategy
+|-
+| '''Evictions''' || INFO stats || >100/sec || Increase memory
+|}
+
+=== Monitoring Commands ===
+
+'''Real-time Monitoring:'''
+<syntaxhighlight lang="bash">
+# Monitor commands in real-time
+redis-cli MONITOR
+
+# View slow queries
+redis-cli SLOWLOG GET 10
+
+# Check memory usage
+redis-cli INFO memory | grep used_memory_human
+
+# Monitor connections
+redis-cli INFO clients
+</syntaxhighlight>
+
+'''Performance Statistics:'''
+<syntaxhighlight lang="bash">
+# Get all statistics
+redis-cli INFO all
+
+# Keyspace information
+redis-cli INFO keyspace
+
+# Replication information (if applicable)
+redis-cli INFO replication
+</syntaxhighlight>
+
+== Performance Tuning ==
+
+=== Memory Management ===
+
+'''Memory Configuration:'''
+<syntaxhighlight lang="bash">
+# Set maximum memory
+redis-cli CONFIG SET maxmemory 512mb
+
+# Set eviction policy
+redis-cli CONFIG SET maxmemory-policy allkeys-lru
+
+# Enable AOF persistence
+redis-cli CONFIG SET appendonly yes
+</syntaxhighlight>
+
+'''Memory Optimization:'''
+* '''Data Types''': Use appropriate Redis data types
+* '''Key Expiry''': Set TTL on temporary data
+* '''Compression''': Enable compression for large values
+* '''Serialization''': Use efficient serialization (msgpack, protobuf)
+
+=== Connection Pooling ===
+
+'''Django Redis Configuration:'''
+<syntaxhighlight lang="python">
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'CONNECTION_POOL_KWARGS': {
+                'max_connections': 20,
+                'decode_responses': True,
+            },
+        }
+    }
+}
+</syntaxhighlight>
+
+=== Cache Optimization ===
+
+'''Cache Strategies:'''
+{| class="wikitable"
+|-
+! Strategy !! Use Case !! Pros !! Cons
+|-
+| '''Cache Aside''' || Read-heavy data || Simple, reliable || Cache misses
+|-
+| '''Write Through''' || Consistent data || Always fresh || Write overhead
+|-
+| '''Write Behind''' || High write load || Fast writes || Potential data loss
+|-
+| '''TTL Caching''' || Temporary data || Automatic cleanup || Expiration timing
+|}
+
+== Troubleshooting ==
+
+=== Connection Issues ===
+
+==== Cannot Connect to Redis ====
+
+'''Symptoms:'''
+* "Connection refused" errors
+* Celery workers failing to start
+* Cache operations timing out
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check if Redis is running
+docker-compose ps redis
+
+# Check Redis logs
+docker-compose logs redis
+
+# Test connectivity
+docker-compose exec redis redis-cli ping
+
+# Check network connectivity
+docker-compose exec web nc -zv redis 6379
+</syntaxhighlight>
+
+==== Authentication Errors ====
+
+'''Symptoms:'''
+* "NOAUTH Authentication required" errors
+* Connection failures with auth
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check if password is required
+redis-cli -a $REDIS_PASSWORD ping
+
+# Verify password in environment
+docker-compose exec redis env | grep REDIS
+
+# Update connection URLs with password
+redis://:password@redis:6379/0
+</syntaxhighlight>
+
+=== Performance Issues ===
+
+==== High Memory Usage ====
+
+'''Symptoms:'''
+* Redis using excessive memory
+* System running out of RAM
+* Performance degradation
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check memory usage
+redis-cli INFO memory
+
+# Identify large keys
+redis-cli --bigkeys
+
+# Set memory limits
+redis-cli CONFIG SET maxmemory 1gb
+
+# Configure eviction policy
+redis-cli CONFIG SET maxmemory-policy volatile-lru
+</syntaxhighlight>
+
+==== Slow Queries ====
+
+'''Symptoms:'''
+* Cache operations taking too long
+* Application response times increasing
+* High CPU usage in Redis
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check slow log
+redis-cli SLOWLOG GET 10
+
+# Monitor command latency
+redis-cli LATENCY LATEST
+
+# Profile commands
+redis-cli --latency
+</syntaxhighlight>
+
+=== Data Issues ===
+
+==== Data Loss ====
+
+'''Symptoms:'''
+* Cache misses increasing
+* Session data disappearing
+* Task results not available
+
+'''Recovery Steps:'''
+<syntaxhighlight lang="bash">
+# Check persistence settings
+redis-cli CONFIG GET appendonly
+redis-cli CONFIG GET save
+
+# Verify disk space
+df -h /data
+
+# Check Redis logs for errors
+docker-compose logs redis | grep -i error
+</syntaxhighlight>
+
+==== Key Evictions ====
+
+'''Symptoms:'''
+* Unexpected cache misses
+* Session timeouts
+* Task result disappearances
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check eviction statistics
+redis-cli INFO stats | grep evicted
+
+# Increase memory allocation
+redis-cli CONFIG SET maxmemory 2gb
+
+# Change eviction policy
+redis-cli CONFIG SET maxmemory-policy allkeys-lru
+
+# Monitor key TTL distribution
+redis-cli SCAN 0 | head -20
+</syntaxhighlight>
+
+== Backup & Recovery ==
+
+=== Backup Strategies ===
+
+'''RDB Snapshots:'''
+<syntaxhighlight lang="bash">
+# Enable RDB snapshots
+redis-cli CONFIG SET save "900 1 300 10 60 10000"
+
+# Manual snapshot
+redis-cli BGSAVE
+
+# Check last save time
+redis-cli LASTSAVE
+</syntaxhighlight>
+
+'''AOF Persistence:'''
+<syntaxhighlight lang="bash">
+# Enable AOF
+redis-cli CONFIG SET appendonly yes
+
+# Set AOF rewrite policy
+redis-cli CONFIG SET auto-aof-rewrite-percentage 100
+redis-cli CONFIG SET auto-aof-rewrite-min-size 64mb
+</syntaxhighlight>
+
+=== Docker Volume Backup ===
+
+'''Volume Backup:'''
+<syntaxhighlight lang="bash">
+# Stop Redis before backup
+docker-compose stop redis
+
+# Backup volume data
+docker run --rm -v gold3_redis-data:/data -v $(pwd):/backup alpine tar czf /backup/redis-backup.tar.gz -C /data .
+
+# Restart Redis
+docker-compose start redis
+</syntaxhighlight>
+
+=== Disaster Recovery ===
+
+'''Recovery Process:'''
+<syntaxhighlight lang="bash">
+# Stop Redis
+docker-compose stop redis
+
+# Restore from backup
+docker run --rm -v gold3_redis-data:/data -v $(pwd):/backup alpine sh -c "cd /data && tar xzf /backup/redis-backup.tar.gz"
+
+# Start Redis
+docker-compose start redis
+
+# Verify data integrity
+docker-compose exec redis redis-cli DBSIZE
+</syntaxhighlight>
+
+== Security Considerations ==
+
+=== Network Security ===
+
+'''Access Control:'''
+* Bind Redis to specific interfaces
+* Use Redis ACLs for fine-grained permissions
+* Implement connection pooling to limit connections
+
+'''Configuration:'''
+<syntaxhighlight lang="bash">
+# Bind to localhost only
+redis-cli CONFIG SET bind 127.0.0.1
+
+# Require password
+redis-cli CONFIG SET requirepass "strong-password"
+
+# Disable dangerous commands
+redis-cli CONFIG SET rename-command FLUSHDB ""
+redis-cli CONFIG SET rename-command FLUSHALL ""
+</syntaxhighlight>
+
+=== Data Protection ===
+
+'''Encryption:'''
+* Use TLS for Redis connections in production
+* Encrypt sensitive data before storing in Redis
+* Implement proper key rotation policies
+
+'''Compliance:'''
+* Regular security audits of Redis configuration
+* Monitor for unauthorized access attempts
+* Implement proper logging and alerting
+
+== Scaling & High Availability ==
+
+=== Vertical Scaling ===
+
+'''Resource Allocation:'''
+<syntaxhighlight lang="yaml">
+redis:
+  deploy:
+    resources:
+      limits:
+        memory: 2G
+        cpus: '1.0'
+      reservations:
+        memory: 1G
+        cpus: '0.5'
+</syntaxhighlight>
+
+=== Horizontal Scaling ===
+
+'''Redis Cluster Setup:'''
+* Multiple Redis instances for high availability
+* Automatic failover and data sharding
+* Sentinel for monitoring and automatic failover
+
+=== Read Replicas ===
+
+'''Master-Slave Configuration:'''
+* Read operations distributed across replicas
+* Automatic synchronization from master
+* Improved read performance and availability
+
+== Best Practices ==
+
+=== Development ===
+
+* '''Local Testing''': Always test Redis operations locally
+* '''Connection Pooling''': Use connection pools to avoid connection overhead
+* '''Error Handling''': Implement proper error handling for Redis operations
+* '''Monitoring''': Set up monitoring and alerting for Redis health
+
+=== Production ===
+
+* '''Persistence''': Enable both RDB and AOF persistence
+* '''Backups''': Regular automated backups of Redis data
+* '''Security''': Implement proper authentication and access controls
+* '''Monitoring''': Comprehensive monitoring of Redis performance and health
+* '''Resource Limits''': Set appropriate memory and CPU limits
+
+=== Maintenance ===
+
+* '''Version Updates''': Keep Redis updated with latest security patches
+* '''Configuration Review''': Regular review of Redis configuration
+* '''Performance Tuning''': Ongoing performance monitoring and optimization
+* '''Capacity Planning''': Monitor resource usage and plan for scaling
+
+== Related Documentation ==
+
+* [[Main Page|Project Overview]]
+* [[Celery Configuration|Celery Task Processing]]
+* [[Docker Infrastructure|Container Architecture]]
+* [[Monitoring Setup|Application Monitoring]]
+* [[Security Features|Security Implementation]]
+
+---
+
+''Last updated: September 16, 2025''</content>
+<parameter name="filePath">c:\Dev\Gold3\redis_page.wiki

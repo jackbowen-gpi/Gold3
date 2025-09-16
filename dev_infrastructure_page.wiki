@@ -1,0 +1,573 @@
+= Development Infrastructure & Quality Assurance =
+
+{| class="wikitable" style="float:right; margin-left:1em; width:300px;"
+|-
+! colspan="2" | Infrastructure Overview
+|-
+| '''Code Quality''' || Ruff 0.12.12 + MyPy 1.17.1
+|-
+| '''Testing''' || Pytest 8.4.2 + Coverage 7.10.6
+|-
+| '''CI/CD''' || GitHub Actions + Pre-commit
+|-
+| '''Documentation''' || MediaWiki + Markdown
+|-
+| '''Monitoring''' || Prometheus + Grafana
+|}
+
+== Overview ==
+
+This document describes the comprehensive development infrastructure and quality assurance tools implemented to ensure enterprise-grade code quality, security, and maintainability for the GOLD3 Django project.
+
+== Infrastructure Components ==
+
+=== 1. Code Quality & Linting ===
+
+==== Ruff Linter & Formatter ====
+
+* '''Version:''' 0.12.12
+* '''Purpose:''' Fast Python linter and code formatter
+* '''Configuration:''' ruff.toml and pyproject.toml
+
+'''Key Features:'''
+
+* ⚡ '''Lightning Fast''': 10-100x faster than traditional linters
+* 🎯 '''Comprehensive Rules''': Covers style, errors, and best practices
+* 🔧 '''Auto-fix''': Automatically fixes many linting issues
+* 📏 '''Line Length''': Configured for 140 characters (Django standard)
+* 🎨 '''Import Sorting''': Integrated with isort functionality
+
+'''Usage:'''
+<syntaxhighlight lang="bash">
+# Check for issues
+ruff check .
+
+# Auto-fix issues
+ruff check --fix .
+
+# Format code
+ruff format .
+</syntaxhighlight>
+
+==== MyPy Type Checker ====
+
+* '''Version:''' 1.17.1
+* '''Purpose:''' Static type checking for Python
+* '''Configuration:''' mypy.ini
+
+'''Key Features:'''
+
+* 🔍 '''Type Safety''': Catches type-related bugs before runtime
+* 🐍 '''Python 3.13 Support''': Latest Python version compatibility
+* 🎯 '''Django Integration''': Full Django ORM type support
+* 📦 '''Third-party Stubs''': Comprehensive type coverage
+
+'''Configuration Highlights:'''
+<syntaxhighlight lang="ini">
+[mypy]
+python_version = 3.13
+warn_return_any = True
+disallow_untyped_defs = True
+disallow_incomplete_defs = True
+</syntaxhighlight>
+
+=== 2. Testing Infrastructure ===
+
+==== Pytest Testing Framework ====
+
+* '''Version:''' 8.4.2
+* '''Purpose:''' Modern testing framework with Django integration
+* '''Configuration:''' pytest.ini
+
+'''Key Features:'''
+
+* 🚀 '''Fast Execution''': Optimized test discovery and parallel execution
+* 📊 '''Rich Reporting''': Detailed test output with failure analysis
+* 🔗 '''Django Integration''': Seamless Django testing support
+* 📈 '''Coverage Integration''': Built-in coverage reporting
+
+'''Test Categories:'''
+
+* '''Unit Tests''': Isolated function and method testing
+* '''Integration Tests''': Component interaction testing
+* '''Smoke Tests''': Basic functionality validation
+* '''External Tests''': Third-party service integration
+
+==== Coverage Reporting ====
+
+* '''Version:''' 7.10.6
+* '''Purpose:''' Code coverage measurement and reporting
+* '''Formats:''' HTML, XML, Terminal reports
+
+'''Coverage Configuration:'''
+<syntaxhighlight lang="ini">
+[coverage:run]
+source = .
+omit =
+    */tests/*
+    */migrations/*
+</syntaxhighlight>
+
+'''Usage Examples:'''
+<syntaxhighlight lang="bash">
+# Run tests with coverage
+pytest --cov=. --cov-report=html
+
+# Generate coverage report
+coverage html
+
+# View coverage in browser
+# Open htmlcov/index.html
+</syntaxhighlight>
+
+=== 3. Pre-commit Hooks ===
+
+==== Git Hook Automation ====
+
+* '''Version:''' 4.1.0
+* '''Purpose:''' Automated code quality checks before commits
+* '''Configuration:''' .pre-commit-config.yaml
+
+'''Key Features:'''
+
+* 🔄 '''Automated Checks''': Runs quality tools automatically
+* 🚫 '''Prevents Bad Commits''': Stops commits that don't pass quality checks
+* ⚡ '''Fast Execution''': Optimized for speed and reliability
+* 🎯 '''Selective Running''': Can run on specific files or all files
+
+'''Pre-commit Configuration:'''
+<syntaxhighlight lang="yaml">
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
+    hooks:
+      - id: black
+        language_version: python3.13
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+</syntaxhighlight>
+
+'''Usage:'''
+<syntaxhighlight lang="bash">
+# Install pre-commit hooks
+pre-commit install
+
+# Run on all files
+pre-commit run --all-files
+
+# Run specific hook
+pre-commit run black --all-files
+</syntaxhighlight>
+
+=== 4. CI/CD Pipeline ===
+
+==== GitHub Actions ====
+
+* '''Platform:''' GitHub Actions
+* '''Purpose:''' Automated testing and deployment pipeline
+* '''Configuration:''' .github/workflows/
+
+'''Pipeline Stages:'''
+
+* '''Code Quality''': Ruff linting and MyPy type checking
+* '''Testing''': Pytest execution with coverage reporting
+* '''Security''': Dependency vulnerability scanning
+* '''Documentation''': Automated documentation deployment
+
+'''CI Workflow Example:'''
+<syntaxhighlight lang="yaml">
+name: CI Pipeline
+on: [push, pull_request]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-dev.txt
+      - name: Run Ruff
+        run: ruff check .
+      - name: Run MyPy
+        run: mypy .
+      - name: Run Tests
+        run: pytest --cov=. --cov-report=xml
+</syntaxhighlight>
+
+=== 5. Documentation System ===
+
+==== MediaWiki Integration ====
+
+* '''Platform:''' MediaWiki 1.39
+* '''Purpose:''' Centralized project documentation
+* '''Features:''' Mermaid diagrams, syntax highlighting, version control
+
+'''Key Features:'''
+
+* 📚 '''Comprehensive Docs''': All project documentation in one place
+* 🎨 '''Visual Diagrams''': Mermaid diagram support for architecture
+* 🔍 '''Searchable''': Full-text search across all documentation
+* 📖 '''Versioned''': Documentation versioning with Git integration
+
+==== Markdown Integration ====
+
+* '''Tools:''' MkDocs, Sphinx (planned)
+* '''Purpose:''' API documentation and developer guides
+* '''Integration:''' Automated deployment to wiki
+
+=== 6. Development Environment ===
+
+==== Docker Compose Setup ====
+
+* '''Services:''' 10+ containerized services
+* '''Purpose:''' Consistent development environment
+* '''Features:''' Hot reload, debugging, monitoring
+
+'''Development Services:'''
+{| class="wikitable"
+|-
+! Service !! Port !! Purpose !! Status
+|-
+| '''Django Web''' || 8000 || Main application || ✅ Active
+|-
+| '''PostgreSQL''' || 5438 || Database || ✅ Active
+|-
+| '''Redis''' || 6379 || Cache/Broker || ✅ Active
+|-
+| '''Celery''' || - || Task processing || ✅ Active
+|-
+| '''Flower''' || 5555 || Task monitoring || ✅ Active
+|-
+| '''Prometheus''' || 9090 || Metrics || ✅ Active
+|-
+| '''Grafana''' || 3000 || Dashboards || ✅ Active
+|-
+| '''Wiki''' || 8080 || Documentation || ✅ Active
+|-
+| '''Node Exporter''' || 9100 || System metrics || ✅ Active
+|}
+
+==== Development Scripts ====
+
+'''Automation Scripts:'''
+* '''make.ps1''': Windows PowerShell build automation
+* '''activate_venv.ps1''': Virtual environment activation
+* '''start_dev_server.ps1''': One-command setup
+
+'''Key Commands:'''
+<syntaxhighlight lang="powershell">
+# Full development setup
+.\make.ps1 setup-dev
+
+# Run quality checks
+.\make.ps1 quality
+
+# Run tests
+.\make.ps1 test
+
+# Start development server
+.\make.ps1 run
+</syntaxhighlight>
+
+=== 7. Monitoring & Observability ===
+
+==== Prometheus Metrics ====
+
+* '''Version:''' Latest
+* '''Purpose:''' Application and system metrics collection
+* '''Integration:''' Django Prometheus metrics
+
+'''Metrics Collected:'''
+
+* '''Application''': Response times, error rates, request counts
+* '''Database''': Query performance, connection counts
+* '''Cache''': Hit rates, Redis performance
+* '''System''': CPU, memory, disk usage
+
+==== Grafana Dashboards ====
+
+* '''Version:''' Latest
+* '''Purpose:''' Metrics visualization and alerting
+* '''Features:''' Custom dashboards, alerting rules
+
+'''Dashboard Categories:'''
+
+* '''Application Performance''': Request latency, throughput
+* '''System Resources''': CPU, memory, disk usage
+* '''Database Performance''': Query times, connection pools
+* '''Business Metrics''': User activity, feature usage
+
+==== Logging Integration ====
+
+* '''Framework''': Python logging with structlog
+* '''Aggregation''': Centralized log collection
+* '''Analysis''': Log querying and alerting
+
+=== 8. Security Infrastructure ===
+
+==== Dependency Scanning ====
+
+* '''Tools:''' Safety, Dependabot
+* '''Purpose:''' Vulnerability detection in dependencies
+* '''Automation:''' Automated security updates
+
+==== Code Security ====
+
+* '''SAST''': Static Application Security Testing
+* '''DAST''': Dynamic Application Security Testing (planned)
+* '''Secrets Detection''': Credential scanning in code
+
+==== Access Control ====
+
+* '''Authentication''': JWT tokens, session management
+* '''Authorization''': Role-based access control
+* '''Audit Logging''': Security event logging
+
+== Quality Assurance Workflow ==
+
+=== Development Workflow ===
+
+<syntaxhighlight lang="mermaid">
+graph TD
+    A[Code Changes] --> B[Pre-commit Hooks]
+    B --> C[Ruff Linting]
+    C --> D[MyPy Type Check]
+    D --> E[Unit Tests]
+    E --> F[Integration Tests]
+    F --> G[Manual Testing]
+    G --> H[Code Review]
+    H --> I[Merge to Main]
+</syntaxhighlight>
+
+=== CI/CD Pipeline ===
+
+<syntaxhighlight lang="mermaid">
+graph TD
+    A[Push/PR] --> B[Code Quality]
+    B --> C[Security Scan]
+    C --> D[Test Execution]
+    D --> E[Coverage Report]
+    E --> F[Build Artifacts]
+    F --> G[Deploy to Staging]
+    G --> H[Integration Tests]
+    H --> I[Deploy to Production]
+</syntaxhighlight>
+
+== Configuration Files ==
+
+=== Ruff Configuration (ruff.toml) ===
+
+<syntaxhighlight lang="toml">
+[tool.ruff]
+line-length = 140
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "N",  # pep8-naming
+    "UP", # pyupgrade
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "T10",# flake8-debugger
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"*/tests/*" = ["S101"]
+"*/migrations/*" = ["E501"]
+</syntaxhighlight>
+
+=== MyPy Configuration (mypy.ini) ===
+
+<syntaxhighlight lang="ini">
+[mypy]
+python_version = 3.13
+warn_return_any = True
+disallow_untyped_defs = True
+disallow_incomplete_defs = True
+check_untyped_defs = True
+warn_redundant_casts = True
+warn_unused_ignores = True
+no_implicit_optional = True
+
+[mypy-*.migrations.*]
+ignore_errors = True
+
+[mypy-tests.*]
+ignore_errors = True
+</syntaxhighlight>
+
+=== Pytest Configuration (pytest.ini) ===
+
+<syntaxhighlight lang="ini">
+[tool:pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+addopts =
+    --strict-markers
+    --disable-warnings
+    --tb=short
+    -ra
+markers =
+    unit: Unit tests
+    integration: Integration tests
+    slow: Slow running tests
+    external: Tests requiring external services
+</syntaxhighlight>
+
+== Troubleshooting ==
+
+=== Common Issues ===
+
+==== Ruff Performance Issues ====
+'''Symptom:''' Slow linting on large codebases
+'''Solution:'''
+<syntaxhighlight lang="bash">
+# Use parallel processing
+ruff check --parallel .
+
+# Cache results
+ruff check --cache-dir .ruff_cache .
+</syntaxhighlight>
+
+==== MyPy Import Errors ====
+'''Symptom:''' "Cannot find implementation" errors
+'''Solution:'''
+<syntaxhighlight lang="bash">
+# Install type stubs
+pip install types-all
+
+# Use mypy --no-error-summary for cleaner output
+mypy --no-error-summary .
+</syntaxhighlight>
+
+==== Pre-commit Hook Failures ====
+'''Symptom:''' Hooks fail unexpectedly
+'''Solution:'''
+<syntaxhighlight lang="bash">
+# Update pre-commit
+pre-commit autoupdate
+
+# Clear cache
+pre-commit clean
+
+# Reinstall hooks
+pre-commit install
+</syntaxhighlight>
+
+==== Test Coverage Issues ====
+'''Symptom:''' Coverage report not generating
+'''Solution:'''
+<syntaxhighlight lang="bash">
+# Clear coverage cache
+coverage erase
+
+# Run with fresh data
+coverage run -m pytest
+coverage report
+</syntaxhighlight>
+
+== Performance Optimization ==
+
+=== Code Quality Performance ===
+
+* '''Ruff Parallel Processing''': Use multiple cores for faster linting
+* '''MyPy Caching''': Cache type checking results between runs
+* '''Pre-commit Selective Running''': Only run hooks on changed files
+
+=== Testing Performance ===
+
+* '''Pytest Parallel Execution''': Run tests across multiple cores
+* '''Test Selection''': Run only relevant tests for changes
+* '''Coverage Optimization''': Use coverage pragmas for performance-critical code
+
+=== CI/CD Performance ===
+
+* '''Caching''': Cache dependencies and build artifacts
+* '''Parallel Jobs''': Run independent CI jobs in parallel
+* '''Incremental Builds''': Only rebuild what has changed
+
+== Integration with Development Tools ==
+
+=== VS Code Integration ===
+
+'''Recommended Extensions:'''
+* '''Python''': Microsoft Python extension
+* '''Pylance''': Enhanced Python language support
+* '''Ruff''': Ruff integration for VS Code
+* '''Python Test Explorer''': Test discovery and execution
+
+'''VS Code Settings:'''
+<syntaxhighlight lang="json">
+{
+    "python.linting.enabled": true,
+    "python.linting.ruffEnabled": true,
+    "python.testing.pytestEnabled": true,
+    "python.formatting.provider": "ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.ruff": "explicit"
+    }
+}
+</syntaxhighlight>
+
+=== PyCharm Integration ===
+
+'''Configuration Steps:'''
+* Install Ruff plugin
+* Configure MyPy as external tool
+* Set up pytest as test runner
+* Configure pre-commit hooks
+
+== Future Enhancements ==
+
+=== Planned Improvements ===
+
+* '''SAST Integration''': Static Application Security Testing
+* '''DAST Integration''': Dynamic Application Security Testing
+* '''Performance Testing''': Automated performance regression testing
+* '''Chaos Engineering''': Fault injection testing
+* '''AI-Powered Code Review''': Automated code review suggestions
+
+=== Tool Upgrades ===
+
+* '''Ruff 1.0''': Major version upgrade with new features
+* '''MyPy 2.0''': Enhanced type checking capabilities
+* '''Pytest 9.0''': Latest testing framework features
+* '''Pre-commit 5.0''': Improved hook management
+
+== Related Documentation ==
+
+* [[Main Page|Project Overview]]
+* [[Docker Infrastructure|Container Architecture]]
+* [[Testing Strategy|Testing Documentation]]
+* [[CI/CD Pipeline|Deployment Pipeline]]
+* [[Security Features|Security Implementation]]
+* [[Monitoring Setup|Monitoring Configuration]]
+
+---
+
+''Last updated: September 16, 2025''</content>
+<parameter name="filePath">c:\Dev\Gold3\dev_infrastructure_page.wiki

@@ -1,0 +1,564 @@
+= Data Masking for Development =
+
+{| class="wikitable" style="float:right; margin-left:1em; width:300px;"
+|-
+! colspan="2" | Data Masking Overview
+|-
+| '''Purpose''' || Anonymize sensitive data for development
+|-
+| '''Risk Level''' || '''HIGH''' - Irreversible operation
+|-
+| '''Main Script''' || data_masking.sql
+|-
+| '''Verification''' || verify_masking.sql
+|-
+| '''Backup Required''' || '''YES''' - Always backup first
+|}
+
+== ⚠️ IMPORTANT WARNINGS ==
+
+<div class="toccolours mw-collapsible mw-collapsed" style="background-color:#ffe6e6; border:2px solid #ff0000; padding:10px;">
+'''CRITICAL SECURITY NOTICE'''
+
+* '''NEVER run these scripts on production data!'''
+* '''Always backup your database before running masking scripts'''
+* '''Test on a copy of your data first'''
+* '''Data masking is irreversible - you cannot recover original values'''
+
+''Failure to follow these warnings may result in permanent data loss.''
+</div>
+
+== Overview ==
+
+This documentation covers the data masking scripts used to anonymize sensitive data in the GOLD3 database while preserving functionality for development and testing environments.
+
+== Files and Components ==
+
+=== Core Files ===
+
+{| class="wikitable"
+|-
+! File !! Purpose !! Location !! Criticality
+|-
+| '''data_masking.sql''' || Main masking script || /docs/ || High
+|-
+| '''verify_masking.sql''' || Verification script || /docs/ || Medium
+|-
+| '''backup_before_masking.sql''' || Pre-masking backup || / || High
+|-
+| '''comprehensive_field_masking.sql''' || Advanced masking || / || Medium
+|}
+
+=== Masking Functions ===
+
+{| class="wikitable"
+|-
+! Function !! Purpose !! Input !! Output
+|-
+| '''mask_company_name()''' || Generate realistic company names || - || "Global Beverage Corp"
+|-
+| '''mask_person_name()''' || Generate realistic person names || - || "John Smith"
+|-
+| '''mask_email(text)''' || Mask email addresses || "user@domain.com" || "user@example.com"
+|-
+| '''mask_phone(text)''' || Generate valid phone numbers || "(555) 123-4567" || "(201) 555-0123"
+|-
+| '''mask_address()''' || Generate realistic addresses || - || "4567 Oak Ave, Springfield"
+|-
+| '''mask_city()''' || Generate city names || - || "Springfield"
+|-
+| '''mask_comment()''' || Generate generic comments || - || "Standard processing comment"
+|}
+
+== What Gets Masked ==
+
+=== Personal Information ===
+
+{| class="wikitable"
+|-
+! Data Type !! Examples !! Masking Method
+|-
+| '''Names''' || John Doe, Jane Smith || Realistic name generation
+|-
+| '''Email Addresses''' || user@company.com || Domain replacement + format preservation
+|-
+| '''Phone Numbers''' || (555) 123-4567 || Valid format generation
+|-
+| '''Addresses''' || 123 Main St, City, ST || Realistic address generation
+|}
+
+=== Business Information ===
+
+{| class="wikitable"
+|-
+! Data Type !! Examples !! Masking Method
+|-
+| '''Company Names''' || ABC Beverage Company || Industry-specific generation
+|-
+| '''Brand Names''' || Premium Cola Brand || Category-based generation
+|-
+| '''Customer Names''' || Acme Corporation || Business name generation
+|-
+| '''PO Numbers''' || PO-2025-001 || Pattern preservation
+|-
+| '''Comments''' || "Urgent delivery required" || Generic replacement
+|}
+
+=== Preserved Data ===
+
+<div style="background-color:#e6f7e6; border:1px solid #00aa00; padding:10px; margin:10px 0;">
+'''✅ SAFE TO PRESERVE'''
+
+* All IDs and foreign keys (relationships maintained)
+* Dates and timestamps
+* Status fields and enums
+* Numeric values and quantities
+* Boolean flags and settings
+* System-generated codes
+</div>
+
+== Step-by-Step Usage Guide ==
+
+=== Phase 1: Preparation ===
+
+<syntaxhighlight lang="bash">
+# 1. Stop all application services
+docker-compose stop web celery celery-beat
+
+# 2. Create comprehensive backup
+docker exec gold3_db pg_dump -U gchub -d gchub_dev > backup_before_masking_$(date +%Y%m%d_%H%M%S).sql
+
+# 3. Create additional copy for testing
+docker exec gold3_db createdb -U gchub -T gchub_dev gchub_dev_masked_test
+</syntaxhighlight>
+
+=== Phase 2: Execute Masking ===
+
+<syntaxhighlight lang="bash">
+# 1. Connect to database
+docker exec -it gold3_db psql -U gchub -d gchub_dev
+
+# 2. Run masking script
+\i /app/docs/data_masking.sql
+
+# 3. Monitor progress (large databases may take time)
+SELECT schemaname, tablename, n_tup_ins, n_tup_upd, n_tup_del
+FROM pg_stat_user_tables
+WHERE schemaname = 'public';
+</syntaxhighlight>
+
+=== Phase 3: Verification ===
+
+<syntaxhighlight lang="bash">
+# 1. Run verification script
+\i /app/docs/verify_masking.sql
+
+# 2. Check for any remaining sensitive data
+SELECT 'Checking for emails...' as check_type;
+SELECT COUNT(*) as email_count FROM users WHERE email LIKE '%@%' AND email NOT LIKE '%@example.com';
+
+SELECT 'Checking for phone patterns...' as check_type;
+SELECT COUNT(*) as phone_count FROM contacts WHERE phone ~ '\(\d{3}\) \d{3}-\d{4}';
+</syntaxhighlight>
+
+=== Phase 4: Testing ===
+
+<syntaxhighlight lang="bash">
+# 1. Restart application services
+docker-compose start web celery celery-beat
+
+# 2. Test core functionality
+curl -f http://localhost:8000/health/
+curl -f http://localhost:8000/api/users/
+
+# 3. Test user authentication
+# 4. Test order/job processing
+# 5. Test search functionality
+</syntaxhighlight>
+
+== Masking Examples ==
+
+=== Before vs After Comparison ===
+
+{| class="wikitable"
+|+ Data Masking Examples
+|-
+! Data Type !! Original !! Masked !! Status
+|-
+| '''Company''' || "ABC Beverage Company" || "Global Beverage Corporation" || ✅ Realistic
+|-
+| '''Email''' || "john.doe@abcbeverages.com" || "john.doe@example.com" || ✅ Format preserved
+|-
+| '''Phone''' || "(555) 123-4567" || "(201) 555-0123" || ✅ Valid format
+|-
+| '''Address''' || "123 Main St, Anytown, CA 12345" || "4567 Oak Ave, Springfield, CA 90001" || ✅ Realistic
+|-
+| '''Person''' || "John Smith" || "Michael Johnson" || ✅ Believable
+|-
+| '''PO Number''' || "PO-2025-001" || "PO-2025-001" || ✅ Preserved
+|}
+
+== Customization Options ==
+
+=== Company Name Generation ===
+
+'''Modify the mask_company_name() function:'''
+
+<syntaxhighlight lang="sql">
+-- Current prefixes
+CREATE OR REPLACE FUNCTION mask_company_name()
+RETURNS text AS $$
+DECLARE
+    prefixes text[] := ARRAY['Global', 'International', 'National', 'United', 'American'];
+    products text[] := ARRAY['Beverage', 'Food', 'Manufacturing', 'Services', 'Solutions'];
+    suffixes text[] := ARRAY['Corp', 'Inc', 'LLC', 'Ltd', 'Group'];
+BEGIN
+    RETURN prefixes[1 + (random() * array_length(prefixes, 1))::int] || ' ' ||
+           products[1 + (random() * array_length(products, 1))::int] || ' ' ||
+           suffixes[1 + (random() * array_length(suffixes, 1))::int];
+END;
+$$ LANGUAGE plpgsql;
+</syntaxhighlight>
+
+=== Adding New Tables ===
+
+'''Template for adding new tables to masking:'''
+
+<syntaxhighlight lang="sql">
+-- Example: Masking a new customer table
+UPDATE customer_table
+SET
+    customer_name = mask_company_name(),
+    contact_email = mask_email(contact_email),
+    contact_phone = mask_phone(contact_phone),
+    billing_address = mask_address(),
+    last_modified = CURRENT_TIMESTAMP
+WHERE customer_name IS NOT NULL;
+
+-- Log the masking operation
+INSERT INTO masking_log (table_name, records_masked, masking_date)
+VALUES ('customer_table', (SELECT COUNT(*) FROM customer_table), CURRENT_TIMESTAMP);
+</syntaxhighlight>
+
+=== Masking Intensity Levels ===
+
+{| class="wikitable"
+|-
+! Level !! Description !! Use Case !! Example
+|-
+| '''Light''' || Preserve some structure || Development testing || Keep email domains, partial names
+|-
+| '''Medium''' || Balance realism/safety || Staging environment || Generic domains, realistic names
+|-
+| '''Heavy''' || Maximum anonymization || Security testing || Random data, no patterns preserved
+|-
+| '''Predictable''' || Consistent results || Automated testing || "masked_" + id pattern
+|}
+
+== Advanced Features ==
+
+=== Selective Masking ===
+
+'''Mask only specific records:'''
+
+<syntaxhighlight lang="sql">
+-- Mask only test users
+UPDATE users
+SET
+    first_name = mask_person_name(),
+    email = mask_email(email)
+WHERE user_type = 'test' OR created_date > '2024-01-01';
+
+-- Mask data older than 2 years
+UPDATE orders
+SET
+    customer_name = mask_company_name(),
+    shipping_address = mask_address()
+WHERE order_date < CURRENT_DATE - INTERVAL '2 years';
+</syntaxhighlight>
+
+=== Batch Processing ===
+
+'''For large datasets:'''
+
+<syntaxhighlight lang="sql">
+-- Process in batches to avoid locks
+CREATE OR REPLACE FUNCTION mask_table_batch(table_name text, batch_size int DEFAULT 1000)
+RETURNS void AS $$
+DECLARE
+    total_records int;
+    processed int := 0;
+BEGIN
+    -- Get total count
+    EXECUTE format('SELECT COUNT(*) FROM %I', table_name) INTO total_records;
+
+    -- Process in batches
+    WHILE processed < total_records LOOP
+        EXECUTE format('
+            UPDATE %I
+            SET customer_name = mask_company_name()
+            WHERE id IN (
+                SELECT id FROM %I
+                WHERE customer_name IS NOT NULL
+                ORDER BY id
+                LIMIT %s OFFSET %s
+            )', table_name, table_name, batch_size, processed);
+
+        processed := processed + batch_size;
+        RAISE NOTICE 'Processed %/% records in %', processed, total_records, table_name;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+</syntaxhighlight>
+
+=== Audit Trail ===
+
+'''Track masking operations:'''
+
+<syntaxhighlight lang="sql">
+-- Create audit table
+CREATE TABLE masking_audit (
+    id serial PRIMARY KEY,
+    table_name text NOT NULL,
+    column_name text NOT NULL,
+    records_affected int NOT NULL,
+    masking_function text NOT NULL,
+    executed_by text DEFAULT current_user,
+    executed_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Log masking operations
+CREATE OR REPLACE FUNCTION log_masking_operation(
+    p_table text, p_column text, p_records int, p_function text
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO masking_audit (table_name, column_name, records_affected, masking_function)
+    VALUES (p_table, p_column, p_records, p_function);
+END;
+$$ LANGUAGE plpgsql;
+</syntaxhighlight>
+
+== Testing Masked Data ==
+
+=== Functional Testing Checklist ===
+
+{| class="wikitable"
+|-
+! Component !! Test Case !! Expected Result !! Status
+|-
+| '''Authentication''' || Login with masked user || Success || ⏳ Test
+|-
+| '''User Management''' || Create/edit masked users || Success || ⏳ Test
+|-
+| '''Order Processing''' || Process orders with masked data || Success || ⏳ Test
+|-
+| '''Email System''' || Send emails to masked addresses || Success || ⏳ Test
+|-
+| '''Address Validation''' || Validate masked addresses || Success || ⏳ Test
+|-
+| '''Search Features''' || Search masked company names || Returns results || ⏳ Test
+|-
+| '''Reporting''' || Generate reports with masked data || Success || ⏳ Test
+|}
+
+=== Performance Testing ===
+
+'''Monitor system performance after masking:'''
+
+<syntaxhighlight lang="sql">
+-- Check table sizes
+SELECT
+    schemaname,
+    tablename,
+    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as size
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+
+-- Monitor query performance
+EXPLAIN ANALYZE
+SELECT * FROM users WHERE company_name LIKE 'Global%';
+</syntaxhighlight>
+
+== Troubleshooting ==
+
+=== Common Issues ===
+
+==== Foreign Key Constraint Violations ====
+
+'''Problem:''' Masking fails due to foreign key constraints
+'''Solution:'''
+<syntaxhighlight lang="sql">
+-- Temporarily disable constraints
+ALTER TABLE child_table DISABLE TRIGGER ALL;
+
+-- Perform masking
+UPDATE parent_table SET name = mask_company_name();
+
+-- Re-enable constraints
+ALTER TABLE child_table ENABLE TRIGGER ALL;
+</syntaxhighlight>
+
+==== Permission Errors ====
+
+'''Problem:''' "Permission denied" when running masking scripts
+'''Solution:'''
+<syntaxhighlight lang="sql">
+-- Grant necessary permissions
+GRANT UPDATE ON ALL TABLES IN SCHEMA public TO masking_user;
+GRANT USAGE ON SCHEMA public TO masking_user;
+
+-- Or run as superuser
+-- Connect as postgres user instead of gchub
+</syntaxhighlight>
+
+==== Memory Issues ====
+
+'''Problem:''' Out of memory when masking large tables
+'''Solution:'''
+<syntaxhighlight lang="sql">
+-- Increase work memory for the session
+SET work_mem = '256MB';
+
+-- Or process in smaller batches
+UPDATE large_table
+SET masked_column = mask_function(original_column)
+WHERE id BETWEEN 1 AND 10000;
+</syntaxhighlight>
+
+==== Incorrect Masking Results ====
+
+'''Problem:''' Masked data doesn't look realistic
+'''Solution:'''
+<syntaxhighlight lang="sql">
+-- Check random seed
+SELECT setseed(0.12345); -- Consistent results for testing
+
+-- Review masking functions
+SELECT mask_company_name() FROM generate_series(1,10);
+
+-- Adjust function parameters
+-- Edit the masking functions to improve realism
+</syntaxhighlight>
+
+=== Recovery Procedures ===
+
+==== If Masking Goes Wrong ====
+
+<syntaxhighlight lang="bash">
+# 1. Stop all services immediately
+docker-compose stop
+
+# 2. Restore from backup
+docker exec -i gold3_db psql -U gchub -d gchub_dev < backup_before_masking.sql
+
+# 3. Verify restoration
+docker exec gold3_db psql -U gchub -d gchub_dev -c "SELECT COUNT(*) FROM users;"
+
+# 4. Restart services
+docker-compose start
+</syntaxhighlight>
+
+== Security Considerations ==
+
+=== Data Protection ===
+
+* '''Masked data retains utility''' for development and testing
+* '''Original data patterns''' are preserved (length, format, structure)
+* '''Relationships maintained''' between tables and records
+* '''No real PII remains''' in the masked database
+
+=== Compliance ===
+
+* '''GDPR/CCPA Ready''': Removes personal identifiable information
+* '''Development Safe''': Allows full testing without privacy concerns
+* '''Audit Trail''': Tracks all masking operations
+* '''Reversible Planning''': Backup strategy prevents permanent loss
+
+=== Access Control ===
+
+* '''Role-Based Access''': Only authorized users can run masking
+* '''Environment Separation''': Production vs development isolation
+* '''Audit Logging''': All masking operations are logged
+* '''Approval Process''': Requires approval for sensitive operations
+
+== Performance Optimization ==
+
+=== Database Performance ===
+
+'''Before masking:'''
+* Monitor current performance baselines
+* Identify slow queries and optimization opportunities
+* Document performance characteristics
+
+'''During masking:'''
+* Run during low-usage periods
+* Monitor system resources (CPU, memory, I/O)
+* Use batch processing for large tables
+* Consider table partitioning for very large datasets
+
+'''After masking:'''
+<syntaxhighlight lang="sql">
+-- Reclaim space
+VACUUM FULL ANALYZE;
+
+-- Update statistics
+ANALYZE;
+
+-- Rebuild indexes if needed
+REINDEX TABLE large_table;
+</syntaxhighlight>
+
+=== Optimization Techniques ===
+
+{| class="wikitable"
+|-
+! Technique !! Purpose !! Impact !! Use Case
+|-
+| '''Batch Processing''' || Reduce lock contention || High || Large tables
+|-
+| '''Index Management''' || Improve query performance || Medium || Search-heavy tables
+|-
+| '''Parallel Processing''' || Faster execution || High || Multiple tables
+|-
+| '''Temporary Tables''' || Reduce transaction size || Medium || Complex masking
+|}
+
+== Best Practices ==
+
+=== Pre-Masking Checklist ===
+
+* [ ] '''Backup created''' and stored securely
+* [ ] '''Test environment''' prepared and verified
+* [ ] '''Scripts reviewed''' for correctness
+* [ ] '''Permissions confirmed''' for database user
+* [ ] '''Downtime scheduled''' if needed
+* [ ] '''Rollback plan''' documented and tested
+
+=== Post-Masking Validation ===
+
+* [ ] '''Data integrity''' verified (foreign keys, constraints)
+* [ ] '''Application functionality''' tested end-to-end
+* [ ] '''Performance benchmarks''' compared to baseline
+* [ ] '''Backup retention''' policy followed
+* [ ] '''Documentation updated''' with masking details
+
+=== Maintenance ===
+
+* '''Regular Updates''': Keep masking scripts current with schema changes
+* '''Version Control''': Store masking scripts in Git with proper versioning
+* '''Testing''': Regularly test masking on subset of data
+* '''Documentation''': Maintain detailed masking procedure documentation
+
+== Related Documentation ==
+
+* [[Main Page|Project Overview]]
+* [[Database Schema|Database Structure Documentation]]
+* [[Security Features|Security Implementation]]
+* [[Testing Strategy|Testing and Quality Assurance]]
+* [[Backup and Recovery|Backup Procedures]]
+
+---
+
+''Last updated: September 16, 2025''</content>
+<parameter name="filePath">c:\Dev\Gold3\data_masking_page.wiki

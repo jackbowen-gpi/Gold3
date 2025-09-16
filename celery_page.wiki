@@ -1,0 +1,438 @@
+= Celery Task Processing =
+
+{| class="wikitable" style="float:right; margin-left:1em; width:300px;"
+|-
+! colspan="2" | Celery Configuration
+|-
+| '''Service Name''' || celery
+|-
+| '''Broker''' || Redis (redis:6379/0)
+|-
+| '''Result Backend''' || Redis (redis:6379/0)
+|-
+| '''Autodiscovery''' || Django apps + bin package
+|-
+| '''Settings Module''' || gchub_db.settings
+|}
+
+== Overview ==
+
+Celery is the distributed task queue system used by GOLD3 for processing asynchronous tasks, background jobs, and scheduled operations. This documentation covers Celery configuration, management, and troubleshooting.
+
+== Architecture ==
+
+=== Core Components ===
+
+{| class="wikitable"
+|-
+! Component !! Service !! Purpose !! Port
+|-
+| '''Celery Worker''' || celery || Execute asynchronous tasks || -
+|-
+| '''Celery Beat''' || celery-beat || Scheduled task scheduler || -
+|-
+| '''Redis Broker''' || redis || Message broker & result storage || 6379
+|-
+| '''Flower''' || flower || Task monitoring dashboard || 5555
+|}
+
+=== Task Flow ===
+
+<syntaxhighlight lang="mermaid">
+graph TD
+    A[Django View/API] --> B[Task.delay()]
+    B --> C[Redis Broker]
+    C --> D[Celery Worker]
+    D --> E[Task Execution]
+    E --> F[Result Storage]
+    F --> G[Callback/Notification]
+</syntaxhighlight>
+
+== Configuration ==
+
+=== Environment Variables ===
+
+{| class="wikitable"
+|-
+! Variable !! Value !! Required !! Purpose
+|-
+| '''CELERY_BROKER_URL''' || redis://redis:6379/0 || Yes || Message broker connection
+|-
+| '''CELERY_RESULT_BACKEND''' || redis://redis:6379/0 || Yes || Result storage
+|-
+| '''DJANGO_SETTINGS_MODULE''' || gchub_db.settings || Yes || Django configuration
+|-
+| '''CELERY_TIMEZONE''' || America/New_York || No || Scheduler timezone
+|}
+
+=== Docker Compose Configuration ===
+
+'''Celery Worker Service:'''
+<syntaxhighlight lang="yaml">
+celery:
+  build: .
+  command: sh -c "sh ./scripts/start-celery-worker.sh"
+  environment:
+    CELERY_BROKER_URL: redis://redis:6379/0
+    DJANGO_SETTINGS_MODULE: gchub_db.settings
+  depends_on:
+    - redis
+    - web
+</syntaxhighlight>
+
+'''Celery Beat Service:'''
+<syntaxhighlight lang="yaml">
+celery-beat:
+  build: .
+  command: sh -c "sh ./scripts/wait-and-start-celery-beat.sh"
+  environment:
+    CELERY_BROKER_URL: redis://redis:6379/0
+    DJANGO_SETTINGS_MODULE: gchub_db.settings
+    ENABLE_CELERY_BEAT: "1"
+  depends_on:
+    - redis
+    - web
+</syntaxhighlight>
+
+== Task Management ==
+
+=== Creating Tasks ===
+
+'''Basic Task Structure:'''
+<syntaxhighlight lang="python">
+# tasks.py
+from celery import shared_task
+from django.conf import settings
+
+@shared_task
+def process_job(job_id):
+    """Process a job asynchronously"""
+    # Task implementation
+    pass
+
+@shared_task
+def send_notification(user_id, message):
+    """Send notification to user"""
+    # Implementation
+    pass
+</syntaxhighlight>
+
+=== Task Registration ===
+
+'''Autodiscovery Configuration:'''
+<syntaxhighlight lang="python">
+# celery_app.py
+from celery import Celery
+from django.conf import settings
+
+app = Celery('gold3')
+app.config_from_object('django.conf:settings', namespace='CELERY')
+app.autodiscover_tasks()
+
+# Manual task discovery
+app.autodiscover_tasks(['bin', 'apps.accounts', 'apps.workflow'])
+</syntaxhighlight>
+
+=== Task Categories ===
+
+{| class="wikitable"
+|-
+! Category !! Examples !! Priority !! Timeout
+|-
+| '''Fast Tasks''' || Email sending, notifications || High || 30s
+|-
+| '''Medium Tasks''' || Data processing, reports || Medium || 5m
+|-
+| '''Slow Tasks''' || File processing, imports || Low || 30m
+|-
+| '''Scheduled Tasks''' || Daily reports, cleanup || Low || 1h
+|}
+
+== Management Commands ==
+
+=== Starting Services ===
+
+<syntaxhighlight lang="powershell">
+# Start Celery worker
+docker-compose up -d celery
+
+# Start Celery Beat scheduler
+docker-compose up -d celery-beat
+
+# Start Flower monitoring
+docker-compose up -d flower
+</syntaxhighlight>
+
+=== Monitoring Tasks ===
+
+<syntaxhighlight lang="powershell">
+# View worker logs
+docker-compose logs -f celery
+
+# View beat scheduler logs
+docker-compose logs -f celery-beat
+
+# Access Flower dashboard
+# http://localhost:5555
+</syntaxhighlight>
+
+=== Task Operations ===
+
+<syntaxhighlight lang="powershell">
+# Execute task manually from web container
+docker-compose exec web python manage.py shell -c "
+from bin.tasks import bin_test
+result = bin_test.delay()
+print(f'Task ID: {result.id}')
+"
+
+# Check task status
+docker-compose exec web python manage.py shell -c "
+from bin.tasks import bin_test
+result = bin_test.delay()
+print(f'Status: {result.status}')
+print(f'Result: {result.result}')
+"
+</syntaxhighlight>
+
+== Scheduled Tasks ==
+
+=== Django Celery Beat Configuration ===
+
+'''Periodic Tasks Setup:'''
+<syntaxhighlight lang="python">
+# settings.py
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'daily-report': {
+        'task': 'apps.reports.tasks.generate_daily_report',
+        'schedule': crontab(hour=6, minute=0),  # 6:00 AM daily
+    },
+    'cleanup-old-files': {
+        'task': 'apps.cleanup.tasks.remove_temp_files',
+        'schedule': crontab(hour=2, minute=0, day_of_week='sunday'),  # Sunday 2:00 AM
+    },
+    'health-check': {
+        'task': 'apps.monitoring.tasks.system_health_check',
+        'schedule': 300.0,  # Every 5 minutes
+    },
+}
+</syntaxhighlight>
+
+=== Managing Periodic Tasks ===
+
+'''Via Django Admin:'''
+* Access Django admin at http://localhost:8000/admin/
+* Navigate to "Periodic tasks" section
+* Add/edit/remove scheduled tasks
+* Enable/disable tasks as needed
+
+'''Via Management Commands:'''
+<syntaxhighlight lang="bash">
+# List all periodic tasks
+python manage.py celery beat --list
+
+# Run beat scheduler manually (for testing)
+python manage.py celery beat --loglevel=info
+</syntaxhighlight>
+
+== Monitoring & Debugging ==
+
+=== Flower Dashboard ===
+
+'''Access Points:'''
+* '''URL''': http://localhost:5555
+* '''Authentication''': None (development only)
+* '''Features''': Task monitoring, worker status, statistics
+
+'''Flower Features:'''
+* Real-time task monitoring
+* Worker process status
+* Task execution statistics
+* Failed task retry interface
+* Task result inspection
+
+=== Health Checks ===
+
+'''Worker Health:'''
+<syntaxhighlight lang="bash">
+# Check worker status
+docker-compose exec celery celery -A celery_app inspect active
+
+# Check registered tasks
+docker-compose exec celery celery -A celery_app inspect registered
+
+# Check worker statistics
+docker-compose exec celery celery -A celery_app inspect stats
+</syntaxhighlight>
+
+'''Broker Health:'''
+<syntaxhighlight lang="bash">
+# Check Redis connectivity
+docker-compose exec redis redis-cli ping
+
+# Check queue length
+docker-compose exec redis redis-cli LLEN celery
+
+# Monitor Redis memory usage
+docker-compose exec redis redis-cli INFO memory
+</syntaxhighlight>
+
+== Troubleshooting ==
+
+=== Common Issues ===
+
+==== Worker Not Connecting to Broker ====
+
+'''Symptoms:'''
+* Worker logs show connection errors
+* Tasks not being processed
+* "Connection refused" messages
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check broker URL
+docker-compose exec celery env | grep CELERY_BROKER_URL
+
+# Test Redis connectivity
+docker-compose exec celery redis-cli -h redis ping
+
+# Verify Redis service
+docker-compose ps redis
+</syntaxhighlight>
+
+==== Tasks Not Being Discovered ====
+
+'''Symptoms:'''
+* "Task not found" errors
+* Tasks not appearing in Flower
+* Worker logs show missing tasks
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Restart worker to rediscover tasks
+docker-compose up -d --no-deps --force-recreate celery
+
+# Check task module structure
+docker-compose exec web python -c "
+import bin.tasks
+print(dir(bin.tasks))
+"
+
+# Verify task decorator
+docker-compose exec web python -c "
+from bin.tasks import bin_test
+print(bin_test.name)
+"
+</syntaxhighlight>
+
+==== Memory Issues ====
+
+'''Symptoms:'''
+* Worker processes consuming excessive memory
+* Out of memory errors
+* System slowdown
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Set memory limits in docker-compose.yml
+celery:
+  deploy:
+    resources:
+      limits:
+        memory: 512M
+      reservations:
+        memory: 256M
+
+# Monitor memory usage
+docker-compose exec celery ps aux --sort=-%mem | head -10
+</syntaxhighlight>
+
+==== Task Timeouts ====
+
+'''Symptoms:'''
+* Tasks failing with timeout errors
+* Long-running tasks being killed
+* Incomplete processing
+
+'''Solutions:'''
+<syntaxhighlight lang="python">
+# Set task timeouts in settings
+CELERY_TASK_TIME_LIMIT = 3600  # 1 hour
+CELERY_TASK_SOFT_TIME_LIMIT = 3300  # 55 minutes
+
+# Or per task
+@shared_task(time_limit=7200)  # 2 hours
+def long_running_task():
+    pass
+</syntaxhighlight>
+
+=== Performance Tuning ===
+
+==== Worker Configuration ====
+
+'''Optimal Settings:'''
+<syntaxhighlight lang="python">
+# settings.py
+CELERY_WORKER_CONCURRENCY = 4  # Number of worker processes
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Task prefetching
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 1000  # Restart frequency
+</syntaxhighlight>
+
+==== Queue Management ====
+
+'''Multiple Queues:'''
+<syntaxhighlight lang="python">
+# Define queues
+CELERY_TASK_QUEUES = (
+    Queue('high', Exchange('high'), routing_key='high'),
+    Queue('normal', Exchange('normal'), routing_key='normal'),
+    Queue('low', Exchange('low'), routing_key='low'),
+)
+
+# Route tasks to queues
+CELERY_TASK_ROUTES = {
+    'apps.urgent.tasks.*': {'queue': 'high'},
+    'apps.reports.tasks.*': {'queue': 'low'},
+}
+</syntaxhighlight>
+
+== Best Practices ==
+
+=== Development ===
+
+* '''Task Naming''': Use descriptive, namespaced task names
+* '''Error Handling''': Implement proper exception handling in tasks
+* '''Logging''': Add comprehensive logging to tasks
+* '''Testing''': Write unit tests for all tasks
+* '''Documentation''': Document task parameters and behavior
+
+=== Production ===
+
+* '''Monitoring''': Set up comprehensive monitoring and alerting
+* '''Resource Limits''': Configure appropriate memory and CPU limits
+* '''Security''': Run workers as non-root user
+* '''Backup''': Ensure broker data is properly backed up
+* '''Scaling''': Plan for horizontal scaling of workers
+
+=== Task Design ===
+
+* '''Idempotency''': Design tasks to be safely retryable
+* '''Atomicity''': Ensure task operations are atomic
+* '''Timeouts''': Set appropriate timeouts for all tasks
+* '''Cleanup''': Implement proper resource cleanup
+* '''Progress''': Provide progress updates for long-running tasks
+
+== Related Documentation ==
+
+* [[Main Page|Project Overview]]
+* [[Docker Infrastructure|Container Architecture]]
+* [[Redis Configuration|Redis Setup and Configuration]]
+* [[Monitoring Setup|Application Monitoring]]
+* [[Flower Dashboard|Task Monitoring Interface]]
+
+---
+
+''Last updated: September 16, 2025''</content>
+<parameter name="filePath">c:\Dev\Gold3\celery_page.wiki
