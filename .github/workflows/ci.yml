@@ -61,7 +61,7 @@ jobs:
         # progressively clean the codebase. Critical failures (syntax/pyflakes)
         # should still be caught by the later test steps.
         run: |
-          python -m ruff check --select E711,E712,E721,B904,D100,D103,D205 . || true
+          python -m ruff check . || true
 
       - name: Run security scan (bandit)
         run: |
@@ -81,6 +81,18 @@ jobs:
           echo "TEST_PG_PASSWORD=gchub" >> $GITHUB_ENV
           echo "TEST_PG_HOST=127.0.0.1" >> $GITHUB_ENV
           echo "TEST_PG_PORT=5432" >> $GITHUB_ENV
+
+      - name: Reset test database
+        env:
+          TEST_PG_NAME: ${{ env.TEST_PG_NAME }}
+          TEST_PG_USER: ${{ env.TEST_PG_USER }}
+          TEST_PG_PASSWORD: ${{ env.TEST_PG_PASSWORD }}
+          TEST_PG_HOST: ${{ env.TEST_PG_HOST }}
+          TEST_PG_PORT: ${{ env.TEST_PG_PORT }}
+        run: |
+          # Drop and recreate the test database to ensure clean state
+          PGPASSWORD=${{ env.TEST_PG_PASSWORD }} psql -h ${{ env.TEST_PG_HOST }} -p ${{ env.TEST_PG_PORT }} -U ${{ env.TEST_PG_USER }} -d postgres -c "DROP DATABASE IF EXISTS ${{ env.TEST_PG_NAME }};"
+          PGPASSWORD=${{ env.TEST_PG_PASSWORD }} psql -h ${{ env.TEST_PG_HOST }} -p ${{ env.TEST_PG_PORT }} -U ${{ env.TEST_PG_USER }} -d postgres -c "CREATE DATABASE ${{ env.TEST_PG_NAME }};"
 
       - name: Django makemigrations check
         env:
