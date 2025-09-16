@@ -213,6 +213,20 @@ $wgUseSiteJs = true;
 ## Disable link preload headers
 $wgLinkHeader = false;
 
+## Additional configurations to prevent preload warnings
+$wgResourceLoaderEnableJS2PHP = false;  // Disable JS2PHP to prevent preload issues
+$wgResourceLoaderExperimentalAsyncLoading = false;
+$wgResourceLoaderMaxQueryLength = false;
+$wgResourceLoaderDebug = false;
+
+## Disable problematic resource hints completely
+$wgResourceHints = false;
+$wgPreloadModules = [];
+
+## Disable DNS prefetch and preconnect hints
+$wgResourceLoaderDisablePreconnect = true;
+$wgResourceLoaderDisableDNS = true;
+
 ## Sidebar configuration
 $wgSidebar = array(
     'navigation' => array(
