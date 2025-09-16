@@ -91,6 +91,11 @@ template for the sake of maintainability and consistency.
 {% endblock %}
 <div class="clearfix"></div>
 <script type="text/javascript">
+// Basic on_load function to prevent JavaScript errors
+function on_load() {
+    // Default empty implementation - can be overridden by including templates
+}
+
 // Logout link: POSTs to logout URL with CSRF token from cookie to preserve POST-only behavior
 (function(){
 	function getCookie(name){
@@ -129,7 +134,5 @@ template for the sake of maintainability and consistency.
 	});
 })();
 </script>
-{% load debug_toolbar %}
-{% debug_toolbar %}
 </body>
 </html>

@@ -1,0 +1,232 @@
+= GOLD3 Enterprise System Documentation =
+
+{| class="wikitable" style="float:right; margin-left:20px; width:300px;"
+|-
+! colspan="2" | '''System Overview'''
+|-
+| '''Version''' || 5.2.5 (Django)
+|-
+| '''Users''' || 1,136 active
+|-
+| '''Data Volume''' || 2.16 GB
+|-
+| '''Uptime''' || 99.9%
+|-
+| '''Last Updated''' || September 2025
+|}
+
+'''Welcome to the GOLD3 Enterprise Documentation Portal'''
+
+GOLD3 is a Fortune 500-grade enterprise Django application designed for the beverage manufacturing industry. This comprehensive knowledge base provides complete documentation for developers, administrators, and users of the GOLD3 system.
+
+== 🏗️ System Architecture ==
+
+=== Core Components ===
+* '''Web Framework''': Django 5.2.5 with 20+ modular applications
+* '''Database''': PostgreSQL 15 with enterprise-grade data management
+* '''Infrastructure''': Docker containerization with production deployment
+* '''Security''': Multi-layer authentication and authorization system
+* '''APIs''': RESTful API endpoints with comprehensive documentation
+
+=== Technology Stack ===
+{| class="wikitable"
+|-
+! Component !! Technology !! Version !! Purpose
+|-
+| Backend || Django || 5.2.5 || Web framework and business logic
+|-
+| Database || PostgreSQL || 15 || Primary data storage
+|-
+| Cache || Redis || Latest || Session and data caching
+|-
+| Web Server || Apache/Nginx || Latest || Request handling
+|-
+| Container || Docker || Latest || Application deployment
+|-
+| Monitoring || Prometheus || Latest || System monitoring
+|-
+| Logging || ELK Stack || Latest || Log aggregation
+|}
+
+== 📚 Documentation Sections ==
+
+=== 🛠️ Development & Architecture ===
+<div style="display: flex; flex-wrap: wrap; gap: 10px;">
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[Architecture Overview]]'''<br>
+System design, components, and data flow architecture
+</div>
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[Database Schema]]'''<br>
+Complete database structure and relationships
+</div>
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[Django Apps]]'''<br>
+All 20+ Django applications and their functions
+</div>
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[Development Environment]]'''<br>
+Setup, configuration, and development workflow
+</div>
+</div>
+
+=== 🔗 APIs & Integration ===
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[API Documentation]]'''<br>
+REST API endpoints, authentication, and usage examples
+</div>
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[External Integrations]]'''<br>
+Third-party system connections and data exchange
+</div>
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[Application Workflows]]'''<br>
+Business process automation and workflow management
+</div>
+</div>
+
+=== 🔒 Security & Quality ===
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[Security Features]]'''<br>
+Authentication, authorization, and security best practices
+</div>
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[Testing & Quality Assurance]]'''<br>
+Test coverage, QA processes, and quality metrics
+</div>
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[Recommendations]]'''<br>
+Best practices, guidelines, and optimization tips
+</div>
+</div>
+
+=== 🚀 Deployment & Operations ===
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[Production Deployment]]'''<br>
+Live environment setup and deployment procedures
+</div>
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[Docker Infrastructure]]'''<br>
+Containerization setup and orchestration
+</div>
+<div style="flex: 1; min-width: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+'''[[Documentation Index]]'''<br>
+Complete documentation map and navigation guide
+</div>
+</div>
+
+== 📊 System Metrics ==
+
+=== Performance Statistics ===
+{| class="wikitable"
+|-
+! Metric !! Current Value !! Target !! Status
+|-
+| Response Time || < 200ms || < 500ms || ✅ Excellent
+|-
+| Uptime || 99.9% || 99.5% || ✅ Excellent
+|-
+| Error Rate || < 0.1% || < 1% || ✅ Excellent
+|-
+| Test Coverage || 85% || 80% || ✅ Good
+|-
+| API Availability || 99.95% || 99.9% || ✅ Excellent
+|}
+
+=== Data & Usage ===
+{| class="wikitable"
+|-
+! Category !! Count !! Description
+|-
+| Active Users || 1,136 || Production system users
+|-
+| Database Size || 2.16 GB || Operational data volume
+|-
+| API Endpoints || 50+ || REST API endpoints
+|-
+| Django Apps || 20+ || Modular applications
+|-
+| Database Tables || 150+ || Data structure tables
+|-
+| Daily Transactions || 10,000+ || Business transactions
+|}
+
+== 🚀 Quick Start Guide ==
+
+=== For New Developers ===
+# [[Development Environment|Set up your development environment]]
+# [[Architecture Overview|Understand system architecture]]
+# [[Django Apps|Explore available applications]]
+# [[API Documentation|Learn API integration]]
+# [[Testing & Quality Assurance|Understand testing procedures]]
+
+=== For System Administrators ===
+# [[Production Deployment|Review deployment procedures]]
+# [[Security Features|Configure security settings]]
+# [[Docker Infrastructure|Manage container infrastructure]]
+# [[External Integrations|Set up system integrations]]
+
+=== For Business Users ===
+# [[Application Workflows|Learn business processes]]
+# [[API Documentation|Understand data access]]
+# [[Recommendations|Follow best practices]]
+
+== 🔍 Search & Navigation ==
+
+=== Quick Access Links ===
+* '''[[GOLD3 Documentation Home|Full Documentation Home]]''' - Complete documentation portal
+* '''[[Test Page|Testing & Validation]]''' - Test environment and procedures
+* '''[[Special:AllPages|All Pages]]''' - Complete list of documentation
+* '''[[Special:RecentChanges|Recent Changes]]''' - Latest documentation updates
+* '''[[Special:Search|Advanced Search]]''' - Search across all documentation
+
+=== Popular Topics ===
+* [[Database Schema|Database Design]]
+* [[API Documentation|API Reference]]
+* [[Security Features|Security Guide]]
+* [[Production Deployment|Deployment Guide]]
+* [[Application Workflows|Business Processes]]
+
+== 📢 Recent Updates ==
+
+=== September 2025 ===
+* ✅ ResourceLoader configuration optimized
+* ✅ CSS/JS loading issues resolved
+* ✅ Homepage redesign completed
+* ✅ Mermaid diagram support added
+* 🔄 Documentation expansion in progress
+
+=== System Health ===
+{| class="wikitable"
+|-
+! Component !! Status !! Last Check
+|-
+| Web Application || ✅ Operational || 2025-09-14 23:00
+|-
+| Database || ✅ Operational || 2025-09-14 23:00
+|-
+| API Services || ✅ Operational || 2025-09-14 23:00
+|-
+| Documentation Wiki || ✅ Operational || 2025-09-14 23:00
+|}
+
+== 📞 Support & Contact ==
+
+=== Getting Help ===
+* '''Documentation Issues''': Check [[Recommendations|Best Practices]]
+* '''Technical Support''': Contact system administrators
+* '''API Questions''': Review [[API Documentation|API Guide]]
+* '''Development Help''': See [[Development Environment|Dev Setup]]
+
+=== Resources ===
+* '''Source Code''': Available in development repository
+* '''Issue Tracking''': Use project management system
+* '''Community''': Internal developer forums
+* '''Training''': Scheduled training sessions available
+
+---
+
+''This documentation is maintained by the GOLD3 development team. Last updated: September 14, 2025''

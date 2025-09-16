@@ -4,7 +4,10 @@ import os  # Operating System level things (files, dirs, etc)
 import os.path
 import warnings
 
-DJANGO_SERVE_MEDIA = True
+# WORKFLOW_ROOT_DIR = '/mnt'
+WORKFLOW_ROOT_DIR = "/tmp"  # Default for development
+PRODUCTION_DIR = os.path.join(WORKFLOW_ROOT_DIR, "Production")
+# BACKUP_DIR = os.path.join(WORKFLOW_ROOT_DIR, 'Testing/Backup')ANGO_SERVE_MEDIA = True
 DEBUG = True
 YUI_URL = "/media/yui/"
 
@@ -176,7 +179,24 @@ if use_pg:
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # WORKFLOW_ROOT_DIR = '/mnt'
+WORKFLOW_ROOT_DIR = "/tmp"  # Default for development
 # BACKUP_DIR = os.path.join(WORKFLOW_ROOT_DIR, 'Testing/Backup')
+
+# Beverage drop folder for development
+BEVERAGE_DROP_FOLDER = os.path.join(WORKFLOW_ROOT_DIR, "Beverage", "Drop")
+
+# FSB templates
+FSB_TEMPLATES = os.path.join(WORKFLOW_ROOT_DIR, "Templates", "FSB")
+FSB_PROD_TEMPLATES = os.path.join(WORKFLOW_ROOT_DIR, "Templates", "FSB", "Production")
+
+# Job storage directory
+JOBSTORAGE_DIR = os.path.join(WORKFLOW_ROOT_DIR, "Jobs")
+
+# File server port
+FS_SERVER_PORT = 8080
+
+# Email from address
+EMAIL_FROM_ADDRESS = "noreply@localhost"
 
 # For testing postfix installed locally.
 # EMAIL_HOST = "172.23.8.29"

@@ -1,0 +1,30 @@
+# Custom MediaWiki Dockerfile with Mermaid extension
+FROM mediawiki:1.39
+
+# Install required packages for extension installation
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    wget \
+    libpq-dev \
+    && docker-php-ext-install pgsql \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Mermaid extension using wget and unzip
+RUN cd /var/www/html/extensions \
+    && wget -O mermaid.zip https://github.com/6cdh/SimpleMermaid/archive/refs/heads/main.zip \
+    && unzip mermaid.zip \
+    && mv SimpleMermaid-main Mermaid \
+    && rm mermaid.zip
+
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html/extensions/Mermaid
+
+# Copy custom LocalSettings.php if it exists
+# COPY LocalSettings.php /var/www/html/LocalSettings.php
+
+# Expose port 80
+EXPOSE 80
+
+# Start Apache
+CMD ["apache2-foreground"]

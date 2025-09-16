@@ -1,0 +1,2218 @@
+INFO 2025-09-14 11:58:11,642 autoreload 39 124584718797696 Watching for file changes with StatReloader
+INFO 2025-09-14 11:58:23,959 command 7 136725095291776 Visit me at http://0.0.0.0:5555
+INFO 2025-09-14 11:58:23,969 command 7 136725095291776 Broker: redis://redis:6379/0
+INFO 2025-09-14 11:58:23,972 command 7 136725095291776 Registered tasks:
+['bin.tasks.bin_test',
+ 'celery.accumulate',
+ 'celery.backend_cleanup',
+ 'celery.chain',
+ 'celery.chord',
+ 'celery.chord_unlock',
+ 'celery.chunks',
+ 'celery.group',
+ 'celery.map',
+ 'celery.starmap',
+ 'gchub_db.apps.accounts.tasks.hello_world',
+ 'src.celery_app.debug_task']
+INFO 2025-09-14 11:58:23,978 mixins 7 136724255532736 Connected to redis://redis:6379/0
+ERROR 2025-09-14 12:01:42,003 pretty_exception 39 124583878252224
+Exception: AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/template/backends/django.py:107 in render
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:169 in render
+  /usr/local/lib/python3.11/contextlib.py:137 in __enter__
+  /usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py:50 in _request_context_bind_template
+  /app/includes/extra_context.py:16 in common_urls
+  /usr/local/lib/python3.11/site-packages/django/conf/__init__.py:83 in __getattr__
+ERROR 2025-09-14 12:01:42,146 log 39 124583878252224 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/urls.py", line 19, in _view
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/views.py", line 476, in index
+    return render(request, "accounts/index.html", context=pagevars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/local/lib/python3.11/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py", line 50, in _request_context_bind_template
+    context = processor(self.request)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/includes/extra_context.py", line 16, in common_urls
+    "DLOADER_URL": settings.DLOADER_URL,
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/conf/__init__.py", line 83, in __getattr__
+    val = getattr(_wrapped, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+ERROR 2025-09-14 12:01:42,496 log 39 124583878252224 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 12:01:42,497 basehttp 39 124583878252224 "GET / HTTP/1.1" 500 91037
+ERROR 2025-09-14 12:01:42,709 log 39 124583878252224 Internal Server Error: /favicon.ico
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 12:01:42,710 basehttp 39 124583878252224 "GET /favicon.ico HTTP/1.1" 500 90862
+ERROR 2025-09-14 18:33:37,211 pretty_exception 39 124583878252224
+Exception: AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/template/backends/django.py:107 in render
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:169 in render
+  /usr/local/lib/python3.11/contextlib.py:137 in __enter__
+  /usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py:50 in _request_context_bind_template
+  /app/includes/extra_context.py:16 in common_urls
+  /usr/local/lib/python3.11/site-packages/django/conf/__init__.py:83 in __getattr__
+ERROR 2025-09-14 18:33:37,341 log 39 124583878252224 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/urls.py", line 19, in _view
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/views.py", line 476, in index
+    return render(request, "accounts/index.html", context=pagevars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/local/lib/python3.11/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py", line 50, in _request_context_bind_template
+    context = processor(self.request)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/includes/extra_context.py", line 16, in common_urls
+    "DLOADER_URL": settings.DLOADER_URL,
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/conf/__init__.py", line 83, in __getattr__
+    val = getattr(_wrapped, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+ERROR 2025-09-14 18:33:37,632 log 39 124583878252224 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 18:33:37,633 basehttp 39 124583878252224 "GET / HTTP/1.1" 500 91037
+ERROR 2025-09-14 18:33:37,881 log 39 124583878252224 Internal Server Error: /favicon.ico
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 18:33:37,882 basehttp 39 124583878252224 "GET /favicon.ico HTTP/1.1" 500 90862
+ERROR 2025-09-14 22:58:12,593 pretty_exception 39 124583878252224
+Exception: AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/template/backends/django.py:107 in render
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:169 in render
+  /usr/local/lib/python3.11/contextlib.py:137 in __enter__
+  /usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py:50 in _request_context_bind_template
+  /app/includes/extra_context.py:16 in common_urls
+  /usr/local/lib/python3.11/site-packages/django/conf/__init__.py:83 in __getattr__
+ERROR 2025-09-14 22:58:12,715 log 39 124583878252224 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/urls.py", line 19, in _view
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/views.py", line 476, in index
+    return render(request, "accounts/index.html", context=pagevars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/local/lib/python3.11/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py", line 50, in _request_context_bind_template
+    context = processor(self.request)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/includes/extra_context.py", line 16, in common_urls
+    "DLOADER_URL": settings.DLOADER_URL,
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/conf/__init__.py", line 83, in __getattr__
+    val = getattr(_wrapped, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+ERROR 2025-09-14 22:58:13,030 log 39 124583878252224 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 22:58:13,032 basehttp 39 124583878252224 "GET / HTTP/1.1" 500 91037
+ERROR 2025-09-14 22:58:13,244 log 39 124583878252224 Internal Server Error: /favicon.ico
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 22:58:13,246 basehttp 39 124583878252224 "GET /favicon.ico HTTP/1.1" 500 90862
+ERROR 2025-09-14 22:58:56,549 pretty_exception 39 124583878252224
+Exception: AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/template/backends/django.py:107 in render
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:169 in render
+  /usr/local/lib/python3.11/contextlib.py:137 in __enter__
+  /usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py:50 in _request_context_bind_template
+  /app/includes/extra_context.py:16 in common_urls
+  /usr/local/lib/python3.11/site-packages/django/conf/__init__.py:83 in __getattr__
+ERROR 2025-09-14 22:58:56,655 log 39 124583878252224 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/urls.py", line 19, in _view
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/views.py", line 476, in index
+    return render(request, "accounts/index.html", context=pagevars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/local/lib/python3.11/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py", line 50, in _request_context_bind_template
+    context = processor(self.request)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/includes/extra_context.py", line 16, in common_urls
+    "DLOADER_URL": settings.DLOADER_URL,
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/conf/__init__.py", line 83, in __getattr__
+    val = getattr(_wrapped, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+ERROR 2025-09-14 22:58:56,935 log 39 124583878252224 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 22:58:56,936 basehttp 39 124583878252224 "GET / HTTP/1.1" 500 91174
+ERROR 2025-09-14 22:58:57,109 log 39 124583878252224 Internal Server Error: /favicon.ico
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 22:58:57,112 basehttp 39 124583878252224 "GET /favicon.ico HTTP/1.1" 500 90862
+INFO 2025-09-14 22:59:10,580 autoreload 39 124584718797696 /app/gchub_db/settings.py changed, reloading.
+INFO 2025-09-14 22:59:15,668 autoreload 82 130240370109312 Watching for file changes with StatReloader
+ERROR 2025-09-14 22:59:29,905 pretty_exception 82 130239530194624
+Exception: AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/template/backends/django.py:107 in render
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:169 in render
+  /usr/local/lib/python3.11/contextlib.py:137 in __enter__
+  /usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py:50 in _request_context_bind_template
+  /app/includes/extra_context.py:16 in common_urls
+  /usr/local/lib/python3.11/site-packages/django/conf/__init__.py:83 in __getattr__
+ERROR 2025-09-14 22:59:30,049 log 82 130239530194624 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/urls.py", line 19, in _view
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/views.py", line 476, in index
+    return render(request, "accounts/index.html", context=pagevars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/local/lib/python3.11/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py", line 50, in _request_context_bind_template
+    context = processor(self.request)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/includes/extra_context.py", line 16, in common_urls
+    "DLOADER_URL": settings.DLOADER_URL,
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/conf/__init__.py", line 83, in __getattr__
+    val = getattr(_wrapped, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+ERROR 2025-09-14 22:59:30,429 log 82 130239530194624 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 22:59:30,430 basehttp 82 130239530194624 "GET / HTTP/1.1" 500 90889
+ERROR 2025-09-14 22:59:30,608 log 82 130239530194624 Internal Server Error: /favicon.ico
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 22:59:30,609 basehttp 82 130239530194624 "GET /favicon.ico HTTP/1.1" 500 90714
+INFO 2025-09-14 22:59:49,117 autoreload 39 133365098253184 Watching for file changes with StatReloader
+ERROR 2025-09-14 22:59:58,381 log 39 133364258363072 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 22:59:58,383 basehttp 39 133364258363072 "GET / HTTP/1.1" 500 87566
+ERROR 2025-09-14 23:00:12,735 log 39 133364258363072 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 23:00:12,736 basehttp 39 133364258363072 "GET / HTTP/1.1" 500 87566
+ERROR 2025-09-14 23:00:18,363 log 39 133364258363072 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 23:00:18,364 basehttp 39 133364258363072 "GET / HTTP/1.1" 500 87566
+INFO 2025-09-14 23:00:25,381 autoreload 39 133365098253184 /app/config/settings_base.py changed, reloading.
+INFO 2025-09-14 23:00:31,444 autoreload 80 129338031852416 Watching for file changes with StatReloader
+INFO 2025-09-14 23:00:42,871 autoreload 80 129338031852416 /app/config/settings_base.py changed, reloading.
+INFO 2025-09-14 23:00:46,990 autoreload 97 135782326868864 Watching for file changes with StatReloader
+INFO 2025-09-14 23:01:10,146 autoreload 39 134396199807872 Watching for file changes with StatReloader
+ERROR 2025-09-14 23:01:21,615 log 39 134395290711744 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 23:01:21,616 basehttp 39 134395290711744 "GET / HTTP/1.1" 500 87566
+ERROR 2025-09-14 23:01:25,255 log 39 134395290711744 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 23:01:25,257 basehttp 39 134395290711744 "GET / HTTP/1.1" 500 87566
+INFO 2025-09-14 23:01:51,995 autoreload 39 134396199807872 /app/config/settings_base.py changed, reloading.
+INFO 2025-09-14 23:01:56,308 autoreload 92 124713729944448 Watching for file changes with StatReloader
+INFO 2025-09-14 23:02:23,637 autoreload 39 123933378648960 Watching for file changes with StatReloader
+ERROR 2025-09-14 23:02:30,607 pretty_exception 39 123932539541184
+Exception: AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/template/backends/django.py:107 in render
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:169 in render
+  /usr/local/lib/python3.11/contextlib.py:137 in __enter__
+  /usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py:50 in _request_context_bind_template
+  /app/includes/extra_context.py:16 in common_urls
+  /usr/local/lib/python3.11/site-packages/django/conf/__init__.py:83 in __getattr__
+ERROR 2025-09-14 23:02:30,750 log 39 123932539541184 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/urls.py", line 19, in _view
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/views.py", line 476, in index
+    return render(request, "accounts/index.html", context=pagevars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/local/lib/python3.11/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py", line 50, in _request_context_bind_template
+    context = processor(self.request)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/includes/extra_context.py", line 16, in common_urls
+    "DLOADER_URL": settings.DLOADER_URL,
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/conf/__init__.py", line 83, in __getattr__
+    val = getattr(_wrapped, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+ERROR 2025-09-14 23:02:31,103 log 39 123932539541184 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 23:02:31,105 basehttp 39 123932539541184 "GET / HTTP/1.1" 500 91032
+ERROR 2025-09-14 23:02:31,257 log 39 123932539541184 Internal Server Error: /favicon.ico
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 23:02:31,258 basehttp 39 123932539541184 "GET /favicon.ico HTTP/1.1" 500 90714
+ERROR 2025-09-14 23:02:38,651 log 39 123932539541184 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 23:02:38,652 basehttp 39 123932539541184 "HEAD / HTTP/1.1" 500 0
+INFO 2025-09-14 23:02:55,162 autoreload 39 123933378648960 /app/config/settings_base.py changed, reloading.
+INFO 2025-09-14 23:02:59,090 autoreload 59 135051813825408 Watching for file changes with StatReloader
+INFO 2025-09-14 23:03:12,217 autoreload 59 135051813825408 /app/config/settings_base.py changed, reloading.
+INFO 2025-09-14 23:03:16,183 autoreload 76 134172473764736 Watching for file changes with StatReloader
+INFO 2025-09-14 23:03:38,111 autoreload 39 139761846852480 Watching for file changes with StatReloader
+ERROR 2025-09-14 23:04:22,532 pretty_exception 39 139761006073536
+Exception: AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/template/backends/django.py:107 in render
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:169 in render
+  /usr/local/lib/python3.11/contextlib.py:137 in __enter__
+  /usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py:50 in _request_context_bind_template
+  /app/includes/extra_context.py:16 in common_urls
+  /usr/local/lib/python3.11/site-packages/django/conf/__init__.py:83 in __getattr__
+ERROR 2025-09-14 23:04:22,688 log 39 139761006073536 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/urls.py", line 19, in _view
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/views.py", line 476, in index
+    return render(request, "accounts/index.html", context=pagevars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/local/lib/python3.11/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py", line 50, in _request_context_bind_template
+    context = processor(self.request)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/includes/extra_context.py", line 16, in common_urls
+    "DLOADER_URL": settings.DLOADER_URL,
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/conf/__init__.py", line 83, in __getattr__
+    val = getattr(_wrapped, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+ERROR 2025-09-14 23:04:23,040 log 39 139761006073536 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 23:04:23,041 basehttp 39 139761006073536 "GET / HTTP/1.1" 500 90889
+ERROR 2025-09-14 23:04:23,183 log 39 139761006073536 Internal Server Error: /favicon.ico
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 23:04:23,185 basehttp 39 139761006073536 "GET /favicon.ico HTTP/1.1" 500 90714
+ERROR 2025-09-14 23:04:29,332 log 39 139761006073536 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/middleware.py", line 97, in __call__
+    rendered = toolbar.render_toolbar()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/toolbar.py", line 84, in render_toolbar
+    return render_to_string("debug_toolbar/base.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: debug_toolbar/base.html
+ERROR 2025-09-14 23:04:29,333 basehttp 39 139761006073536 "HEAD / HTTP/1.1" 500 0
+INFO 2025-09-14 23:04:53,904 autoreload 39 139761846852480 /app/config/settings.py changed, reloading.
+INFO 2025-09-14 23:04:58,050 autoreload 66 137665255287680 Watching for file changes with StatReloader
+INFO 2025-09-14 23:05:08,731 autoreload 66 137665255287680 /app/gchub_db/settings.py changed, reloading.
+INFO 2025-09-14 23:05:12,658 autoreload 83 139603636939648 Watching for file changes with StatReloader
+INFO 2025-09-14 23:05:42,682 autoreload 39 127958271159168 Watching for file changes with StatReloader
+ERROR 2025-09-14 23:06:10,655 pretty_exception 39 127957430359744
+Exception: AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/template/backends/django.py:107 in render
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:169 in render
+  /usr/local/lib/python3.11/contextlib.py:137 in __enter__
+  /usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py:50 in _request_context_bind_template
+  /app/includes/extra_context.py:16 in common_urls
+  /usr/local/lib/python3.11/site-packages/django/conf/__init__.py:83 in __getattr__
+ERROR 2025-09-14 23:06:10,805 log 39 127957430359744 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/urls.py", line 19, in _view
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/views.py", line 476, in index
+    return render(request, "accounts/index.html", context=pagevars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 169, in render
+    with context.bind_template(self):
+  File "/usr/local/lib/python3.11/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/debug_toolbar/panels/templates/panel.py", line 50, in _request_context_bind_template
+    context = processor(self.request)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/includes/extra_context.py", line 16, in common_urls
+    "DLOADER_URL": settings.DLOADER_URL,
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/conf/__init__.py", line 83, in __getattr__
+    val = getattr(_wrapped, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Settings' object has no attribute 'DLOADER_URL'
+ERROR 2025-09-14 23:06:11,264 basehttp 39 127957430359744 "GET / HTTP/1.1" 500 143990
+WARNING 2025-09-14 23:06:11,297 basehttp 39 127957430359744 "GET /static/debug_toolbar/css/toolbar.css HTTP/1.1" 404 2014
+WARNING 2025-09-14 23:06:11,302 basehttp 39 127957343401664 "GET /static/debug_toolbar/js/toolbar.js HTTP/1.1" 404 2008
+WARNING 2025-09-14 23:06:11,350 basehttp 39 127957343401664 "GET /static/debug_toolbar/css/print.css HTTP/1.1" 404 2008
+INFO 2025-09-14 23:06:11,459 basehttp 39 127957343401664 "GET /favicon.ico HTTP/1.1" 302 0
+ERROR 2025-09-14 23:06:11,465 pretty_exception 39 127957343401664
+Exception: Http404: “/app/media/favicon.ico” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:06:11,505 log 39 127957343401664 Not Found: /media/favicon.ico
+WARNING 2025-09-14 23:06:11,506 basehttp 39 127957343401664 "GET /media/favicon.ico HTTP/1.1" 404 98205
+INFO 2025-09-14 23:06:52,220 autoreload 39 127958271159168 /app/gchub_db/settings.py changed, reloading.
+INFO 2025-09-14 23:06:56,321 autoreload 72 123570163747712 Watching for file changes with StatReloader
+INFO 2025-09-14 23:07:30,984 autoreload 39 136241321458560 Watching for file changes with StatReloader
+INFO 2025-09-14 23:07:52,546 autoreload 39 136241321458560 /app/gchub_db/settings.py changed, reloading.
+INFO 2025-09-14 23:08:21,022 autoreload 45 135513800903552 Watching for file changes with StatReloader
+INFO 2025-09-14 23:09:22,034 autoreload 39 136113187306368 Watching for file changes with StatReloader
+INFO 2025-09-14 23:09:42,324 basehttp 39 136112278337216 "HEAD / HTTP/1.1" 302 0
+ERROR 2025-09-14 23:10:13,276 pretty_exception 39 136112278337216
+Exception: TemplateSyntaxError: 'debug_toolbar' is not a registered tag library. Must be one of:
+admin_list
+admin_modify
+admin_urls
+cache
+debugger_tags
+extra_space
+group_check
+highlighting
+humanize
+i18n
+indent_text
+item_links
+job_filters
+l10n
+log
+log_links
+manager_tools
+misc_tags
+random_cute
+static
+su_tags
+syntax_color
+tz
+widont
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:154 in __init__
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:196 in compile_nodelist
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:518 in parse
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:516 in parse
+  /usr/local/lib/python3.11/site-packages/django/template/defaulttags.py:1097 in load
+  /usr/local/lib/python3.11/site-packages/django/template/defaulttags.py:1037 in find_library
+ERROR 2025-09-14 23:10:13,594 log 39 136112278337216 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/template/defaulttags.py", line 1035, in find_library
+    return parser.libraries[name]
+           ~~~~~~~~~~~~~~~~^^^^^^
+KeyError: 'debug_toolbar'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/urls.py", line 19, in _view
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/views.py", line 476, in index
+    return render(request, "accounts/index.html", context=pagevars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/test/utils.py", line 114, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/test/utils.py", line 114, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader_tags.py", line 134, in render
+    compiled_parent = self.get_parent(context)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader_tags.py", line 131, in get_parent
+    return self.find_template(parent, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader_tags.py", line 109, in find_template
+    template, origin = context.template.engine.find_template(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 196, in compile_nodelist
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 518, in parse
+    raise self.error(token, e)
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 516, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/defaulttags.py", line 1097, in load
+    lib = find_library(parser, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/defaulttags.py", line 1037, in find_library
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'debug_toolbar' is not a registered tag library. Must be one of:
+admin_list
+admin_modify
+admin_urls
+cache
+debugger_tags
+extra_space
+group_check
+highlighting
+humanize
+i18n
+indent_text
+item_links
+job_filters
+l10n
+log
+log_links
+manager_tools
+misc_tags
+random_cute
+static
+su_tags
+syntax_color
+tz
+widont
+ERROR 2025-09-14 23:10:14,136 basehttp 39 136112278337216 "GET / HTTP/1.1" 500 254378
+WARNING 2025-09-14 23:10:14,168 basehttp 39 136112278337216 "GET /static/debug_toolbar/css/toolbar.css HTTP/1.1" 404 2014
+WARNING 2025-09-14 23:10:14,174 basehttp 39 136112261555904 "GET /static/debug_toolbar/js/toolbar.js HTTP/1.1" 404 2008
+WARNING 2025-09-14 23:10:14,215 basehttp 39 136112261555904 "GET /static/debug_toolbar/css/print.css HTTP/1.1" 404 2008
+INFO 2025-09-14 23:10:54,990 autoreload 39 136113187306368 /app/gchub_db/settings.py changed, reloading.
+INFO 2025-09-14 23:11:00,287 autoreload 60 134989751192448 Watching for file changes with StatReloader
+INFO 2025-09-14 23:11:15,184 autoreload 60 134989751192448 /app/gchub_db/settings.py changed, reloading.
+INFO 2025-09-14 23:11:19,580 autoreload 77 133523570510720 Watching for file changes with StatReloader
+INFO 2025-09-14 23:12:50,210 autoreload 39 138277443799936 Watching for file changes with StatReloader
+ERROR 2025-09-14 23:12:59,168 pretty_exception 39 138276532909760
+Exception: TemplateSyntaxError: 'debug_toolbar' is not a registered tag library. Must be one of:
+admin_list
+admin_modify
+admin_urls
+cache
+debugger_tags
+extra_space
+group_check
+highlighting
+humanize
+i18n
+indent_text
+item_links
+job_filters
+l10n
+log
+log_links
+manager_tools
+misc_tags
+random_cute
+static
+su_tags
+syntax_color
+tz
+widont
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:516 in parse
+  /usr/local/lib/python3.11/site-packages/django/template/defaulttags.py:962 in do_if
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:518 in parse
+  /usr/local/lib/python3.11/site-packages/django/template/base.py:516 in parse
+  /usr/local/lib/python3.11/site-packages/django/template/defaulttags.py:1097 in load
+  /usr/local/lib/python3.11/site-packages/django/template/defaulttags.py:1037 in find_library
+ERROR 2025-09-14 23:12:59,388 log 39 138276532909760 Internal Server Error: /
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/template/defaulttags.py", line 1035, in find_library
+    return parser.libraries[name]
+           ~~~~~~~~~~~~~~~~^^^^^^
+KeyError: 'debug_toolbar'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/urls.py", line 19, in _view
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/gchub_db/apps/accounts/views.py", line 476, in index
+    return render(request, "accounts/index.html", context=pagevars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/test/utils.py", line 114, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/test/utils.py", line 114, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader_tags.py", line 134, in render
+    compiled_parent = self.get_parent(context)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader_tags.py", line 131, in get_parent
+    return self.find_template(parent, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loader_tags.py", line 109, in find_template
+    template, origin = context.template.engine.find_template(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 196, in compile_nodelist
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 518, in parse
+    raise self.error(token, e)
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 516, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/defaulttags.py", line 962, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 518, in parse
+    raise self.error(token, e)
+  File "/usr/local/lib/python3.11/site-packages/django/template/base.py", line 516, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/defaulttags.py", line 1097, in load
+    lib = find_library(parser, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/template/defaulttags.py", line 1037, in find_library
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'debug_toolbar' is not a registered tag library. Must be one of:
+admin_list
+admin_modify
+admin_urls
+cache
+debugger_tags
+extra_space
+group_check
+highlighting
+humanize
+i18n
+indent_text
+item_links
+job_filters
+l10n
+log
+log_links
+manager_tools
+misc_tags
+random_cute
+static
+su_tags
+syntax_color
+tz
+widont
+ERROR 2025-09-14 23:12:59,977 basehttp 39 138276532909760 "GET / HTTP/1.1" 500 270393
+INFO 2025-09-14 23:12:59,997 basehttp 39 138276532909760 "GET /static/debug_toolbar/css/toolbar.css HTTP/1.1" 200 16675
+INFO 2025-09-14 23:12:59,999 basehttp 39 138276519274176 "GET /static/debug_toolbar/js/toolbar.js HTTP/1.1" 200 14601
+INFO 2025-09-14 23:13:00,027 basehttp 39 138276519274176 "GET /static/debug_toolbar/css/print.css HTTP/1.1" 200 43
+INFO 2025-09-14 23:13:00,530 basehttp 39 138276532909760 "GET /static/debug_toolbar/js/utils.js HTTP/1.1" 200 4742
+INFO 2025-09-14 23:14:26,819 autoreload 45 131251858152320 Watching for file changes with StatReloader
+INFO 2025-09-14 23:15:37,765 autoreload 45 131251858152320 /usr/local/lib/python3.11/site-packages/sqlparse/exceptions.py changed, reloading.
+INFO 2025-09-14 23:25:33,823 autoreload 40 131296873081728 Watching for file changes with StatReloader
+INFO 2025-09-14 23:26:05,417 basehttp 40 131296029234880 "GET / HTTP/1.1" 200 32530
+ERROR 2025-09-14 23:26:05,452 pretty_exception 40 131295942276800
+Exception: Http404: “/app/css/base.css” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:05,452 pretty_exception 40 131295933884096
+Exception: Http404: “/app/js/prototype.js” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:05,596 log 40 131295942276800 Not Found: /css/base.css
+WARNING 2025-09-14 23:26:05,596 log 40 131295933884096 Not Found: /js/prototype.js
+INFO 2025-09-14 23:26:05,597 basehttp 40 131296029234880 "GET /media/yui/build/base/base-min.css HTTP/1.1" 200 920
+WARNING 2025-09-14 23:26:05,597 basehttp 40 131295942276800 "GET /css/base.css HTTP/1.1" 404 98182
+WARNING 2025-09-14 23:26:05,597 basehttp 40 131295933884096 "GET /js/prototype.js HTTP/1.1" 404 98197
+ERROR 2025-09-14 23:26:05,605 pretty_exception 40 131296029234880
+Exception: Http404: “/app/js/general.js” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:05,605 pretty_exception 40 131295942276800
+Exception: Http404: “/app/css/tabview-custom-skin.css” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:05,711 log 40 131296029234880 Not Found: /js/general.js
+WARNING 2025-09-14 23:26:05,718 log 40 131295942276800 Not Found: /css/tabview-custom-skin.css
+WARNING 2025-09-14 23:26:05,719 basehttp 40 131296029234880 "GET /js/general.js HTTP/1.1" 404 98187
+WARNING 2025-09-14 23:26:05,719 basehttp 40 131295942276800 "GET /css/tabview-custom-skin.css HTTP/1.1" 404 98257
+INFO 2025-09-14 23:26:05,720 basehttp 40 131295933884096 "GET /media/yui/build/tabview/assets/skins/sam/tabview.css HTTP/1.1" 200 6458
+INFO 2025-09-14 23:26:05,784 basehttp 40 131295942276800 "GET /media/yui/build/element/element-min.js HTTP/1.1" 200 9251
+INFO 2025-09-14 23:26:05,785 basehttp 40 131295933884096 "GET /media/yui/build/tabview/tabview-min.js HTTP/1.1" 200 9938
+ERROR 2025-09-14 23:26:05,788 pretty_exception 40 131295933884096
+Exception: Http404: “/app/css/tabview-custom-skin.css” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+INFO 2025-09-14 23:26:05,805 basehttp 40 131296029234880 "GET /media/yui/build/yahoo-dom-event/yahoo-dom-event.js HTTP/1.1" 200 37697
+WARNING 2025-09-14 23:26:05,826 log 40 131295933884096 Not Found: /css/tabview-custom-skin.css
+ERROR 2025-09-14 23:26:05,828 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/gold2logo_sm.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:05,829 basehttp 40 131295933884096 "GET /css/tabview-custom-skin.css HTTP/1.1" 404 98255
+ERROR 2025-09-14 23:26:05,841 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/database_key.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:05,855 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/calendar.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:05,949 log 40 131295942276800 Not Found: /img/gold2logo_sm.png
+WARNING 2025-09-14 23:26:05,950 basehttp 40 131295942276800 "GET /img/gold2logo_sm.png HTTP/1.1" 404 98222
+WARNING 2025-09-14 23:26:05,955 log 40 131295925491392 Not Found: /img/icons/database_key.png
+WARNING 2025-09-14 23:26:05,960 log 40 131296029234880 Not Found: /img/icons/calendar.png
+WARNING 2025-09-14 23:26:05,962 basehttp 40 131295925491392 "GET /img/icons/database_key.png HTTP/1.1" 404 98252
+ERROR 2025-09-14 23:26:05,962 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/house.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:05,962 basehttp 40 131296029234880 "GET /img/icons/calendar.png HTTP/1.1" 404 98232
+WARNING 2025-09-14 23:26:06,000 log 40 131295942276800 Not Found: /img/icons/house.png
+WARNING 2025-09-14 23:26:06,001 basehttp 40 131295942276800 "GET /img/icons/house.png HTTP/1.1" 404 98215
+INFO 2025-09-14 23:26:06,021 basehttp 40 131296029234880 "GET /media/img/notepad_bg.jpg HTTP/1.1" 200 7448
+INFO 2025-09-14 23:26:06,022 basehttp 40 131295925491392 "GET /media/img/cup_mosiac.jpg HTTP/1.1" 200 8175
+ERROR 2025-09-14 23:26:06,027 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/zoom.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+INFO 2025-09-14 23:26:06,070 basehttp 40 131295942276800 "GET /media/img/calendar_bg.jpg HTTP/1.1" 200 2791
+ERROR 2025-09-14 23:26:06,073 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/report.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:06,114 log 40 131296029234880 Not Found: /img/icons/zoom.png
+WARNING 2025-09-14 23:26:06,115 basehttp 40 131296029234880 "GET /img/icons/zoom.png HTTP/1.1" 404 98210
+INFO 2025-09-14 23:26:06,115 basehttp 40 131295925491392 "GET /media/yui/build/assets/skins/sam/sprite.png HTTP/1.1" 200 3745
+WARNING 2025-09-14 23:26:06,121 log 40 131295942276800 Not Found: /img/icons/report.png
+ERROR 2025-09-14 23:26:06,124 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/paste_plain.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:06,124 basehttp 40 131295942276800 "GET /img/icons/report.png HTTP/1.1" 404 98220
+ERROR 2025-09-14 23:26:06,125 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/user.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:06,147 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/status_busy.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:06,242 log 40 131295942276800 Not Found: /img/icons/status_busy.png
+WARNING 2025-09-14 23:26:06,251 log 40 131296029234880 Not Found: /img/icons/paste_plain.png
+WARNING 2025-09-14 23:26:06,253 log 40 131295925491392 Not Found: /img/icons/user.png
+WARNING 2025-09-14 23:26:06,253 basehttp 40 131295942276800 "GET /img/icons/status_busy.png HTTP/1.1" 404 98247
+WARNING 2025-09-14 23:26:06,253 basehttp 40 131296029234880 "GET /img/icons/paste_plain.png HTTP/1.1" 404 98247
+WARNING 2025-09-14 23:26:06,254 basehttp 40 131295925491392 "GET /img/icons/user.png HTTP/1.1" 404 98212
+ERROR 2025-09-14 23:26:06,256 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/user_green.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:06,283 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/zoom.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:06,339 log 40 131296029234880 Not Found: /img/icons/zoom.png
+WARNING 2025-09-14 23:26:06,343 log 40 131295942276800 Not Found: /img/icons/user_green.png
+WARNING 2025-09-14 23:26:06,344 basehttp 40 131296029234880 "GET /img/icons/zoom.png HTTP/1.1" 404 98210
+WARNING 2025-09-14 23:26:06,344 basehttp 40 131295942276800 "GET /img/icons/user_green.png HTTP/1.1" 404 98240
+INFO 2025-09-14 23:26:06,344 basehttp 40 131295925491392 "GET /media/img/thundercuddles_bg.jpg HTTP/1.1" 200 8127
+ERROR 2025-09-14 23:26:06,351 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/add.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:06,351 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/text_list_numbers.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:06,352 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/folder_page.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:06,486 log 40 131295925491392 Not Found: /img/icons/text_list_numbers.png
+WARNING 2025-09-14 23:26:06,491 log 40 131295942276800 Not Found: /img/icons/folder_page.png
+WARNING 2025-09-14 23:26:06,495 log 40 131296029234880 Not Found: /img/icons/add.png
+WARNING 2025-09-14 23:26:06,496 basehttp 40 131295925491392 "GET /img/icons/text_list_numbers.png HTTP/1.1" 404 98277
+WARNING 2025-09-14 23:26:06,496 basehttp 40 131295942276800 "GET /img/icons/folder_page.png HTTP/1.1" 404 98247
+WARNING 2025-09-14 23:26:06,497 basehttp 40 131296029234880 "GET /img/icons/add.png HTTP/1.1" 404 98207
+ERROR 2025-09-14 23:26:06,503 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/basket_add.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:06,503 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/drive_magnify.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:06,516 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/table_refresh.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:06,626 log 40 131296029234880 Not Found: /img/icons/table_refresh.png
+WARNING 2025-09-14 23:26:06,630 log 40 131295933884096 Not Found: /img/icons/drive_magnify.png
+WARNING 2025-09-14 23:26:06,635 log 40 131295925491392 Not Found: /img/icons/basket_add.png
+WARNING 2025-09-14 23:26:06,635 basehttp 40 131296029234880 "GET /img/icons/table_refresh.png HTTP/1.1" 404 98257
+WARNING 2025-09-14 23:26:06,636 basehttp 40 131295933884096 "GET /img/icons/drive_magnify.png HTTP/1.1" 404 98257
+WARNING 2025-09-14 23:26:06,636 basehttp 40 131295925491392 "GET /img/icons/basket_add.png HTTP/1.1" 404 98242
+ERROR 2025-09-14 23:26:06,644 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/film_edit.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:06,644 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/report.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:06,645 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/pictures.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:06,772 log 40 131296029234880 Not Found: /img/icons/film_edit.png
+WARNING 2025-09-14 23:26:06,777 log 40 131295933884096 Not Found: /img/icons/pictures.png
+WARNING 2025-09-14 23:26:06,783 log 40 131295925491392 Not Found: /img/icons/report.png
+WARNING 2025-09-14 23:26:06,783 basehttp 40 131296029234880 "GET /img/icons/film_edit.png HTTP/1.1" 404 98237
+WARNING 2025-09-14 23:26:06,784 basehttp 40 131295933884096 "GET /img/icons/pictures.png HTTP/1.1" 404 98232
+WARNING 2025-09-14 23:26:06,784 basehttp 40 131295925491392 "GET /img/icons/report.png HTTP/1.1" 404 98222
+ERROR 2025-09-14 23:26:06,793 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/money.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:06,794 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/money_dollar.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:06,794 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/page_white_acrobat.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:06,969 log 40 131295933884096 Not Found: /img/icons/money_dollar.png
+WARNING 2025-09-14 23:26:06,979 log 40 131296029234880 Not Found: /img/icons/money.png
+WARNING 2025-09-14 23:26:06,985 basehttp 40 131295933884096 "GET /img/icons/money_dollar.png HTTP/1.1" 404 98252
+WARNING 2025-09-14 23:26:06,986 basehttp 40 131296029234880 "GET /img/icons/money.png HTTP/1.1" 404 98217
+WARNING 2025-09-14 23:26:06,987 log 40 131295925491392 Not Found: /img/icons/page_white_acrobat.png
+ERROR 2025-09-14 23:26:06,990 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/coins.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:06,990 basehttp 40 131295925491392 "GET /img/icons/page_white_acrobat.png HTTP/1.1" 404 98282
+ERROR 2025-09-14 23:26:07,024 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/box.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,029 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/telephone.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:07,106 log 40 131296029234880 Not Found: /img/icons/telephone.png
+WARNING 2025-09-14 23:26:07,110 log 40 131295933884096 Not Found: /img/icons/coins.png
+WARNING 2025-09-14 23:26:07,114 log 40 131295925491392 Not Found: /img/icons/box.png
+WARNING 2025-09-14 23:26:07,115 basehttp 40 131296029234880 "GET /img/icons/telephone.png HTTP/1.1" 404 98235
+WARNING 2025-09-14 23:26:07,116 basehttp 40 131295925491392 "GET /img/icons/box.png HTTP/1.1" 404 98207
+WARNING 2025-09-14 23:26:07,116 basehttp 40 131295933884096 "GET /img/icons/coins.png HTTP/1.1" 404 98217
+ERROR 2025-09-14 23:26:07,123 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/table_error.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,123 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/image_edit.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,123 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/brush.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:07,252 log 40 131296029234880 Not Found: /img/icons/table_error.png
+WARNING 2025-09-14 23:26:07,257 log 40 131295933884096 Not Found: /img/icons/brush.png
+WARNING 2025-09-14 23:26:07,261 log 40 131295925491392 Not Found: /img/icons/image_edit.png
+WARNING 2025-09-14 23:26:07,262 basehttp 40 131296029234880 "GET /img/icons/table_error.png HTTP/1.1" 404 98247
+WARNING 2025-09-14 23:26:07,262 basehttp 40 131295933884096 "GET /img/icons/brush.png HTTP/1.1" 404 98217
+WARNING 2025-09-14 23:26:07,263 basehttp 40 131295925491392 "GET /img/icons/image_edit.png HTTP/1.1" 404 98242
+ERROR 2025-09-14 23:26:07,269 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/database_edit.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,269 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/page_white_paste.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,269 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/flag_red.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:07,399 log 40 131296029234880 Not Found: /img/icons/database_edit.png
+WARNING 2025-09-14 23:26:07,403 log 40 131295925491392 Not Found: /img/icons/page_white_paste.png
+WARNING 2025-09-14 23:26:07,404 basehttp 40 131296029234880 "GET /img/icons/database_edit.png HTTP/1.1" 404 98257
+WARNING 2025-09-14 23:26:07,404 basehttp 40 131295925491392 "GET /img/icons/page_white_paste.png HTTP/1.1" 404 98272
+WARNING 2025-09-14 23:26:07,410 log 40 131295933884096 Not Found: /img/icons/flag_red.png
+ERROR 2025-09-14 23:26:07,414 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/report_user.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:07,414 basehttp 40 131295933884096 "GET /img/icons/flag_red.png HTTP/1.1" 404 98232
+ERROR 2025-09-14 23:26:07,414 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/calendar.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,432 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/music.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:07,529 log 40 131295925491392 Not Found: /img/icons/calendar.png
+WARNING 2025-09-14 23:26:07,534 log 40 131296029234880 Not Found: /img/icons/report_user.png
+WARNING 2025-09-14 23:26:07,540 log 40 131295933884096 Not Found: /img/icons/music.png
+WARNING 2025-09-14 23:26:07,540 basehttp 40 131295925491392 "GET /img/icons/calendar.png HTTP/1.1" 404 98232
+WARNING 2025-09-14 23:26:07,541 basehttp 40 131296029234880 "GET /img/icons/report_user.png HTTP/1.1" 404 98247
+WARNING 2025-09-14 23:26:07,541 basehttp 40 131295933884096 "GET /img/icons/music.png HTTP/1.1" 404 98217
+ERROR 2025-09-14 23:26:07,550 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/server_database.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,550 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/chart_curve.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,608 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/error.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:07,652 log 40 131296029234880 Not Found: /img/icons/server_database.png
+WARNING 2025-09-14 23:26:07,657 log 40 131295933884096 Not Found: /img/icons/error.png
+WARNING 2025-09-14 23:26:07,657 basehttp 40 131296029234880 "GET /img/icons/server_database.png HTTP/1.1" 404 98267
+WARNING 2025-09-14 23:26:07,658 basehttp 40 131295933884096 "GET /img/icons/error.png HTTP/1.1" 404 98215
+WARNING 2025-09-14 23:26:07,664 log 40 131295925491392 Not Found: /img/icons/chart_curve.png
+WARNING 2025-09-14 23:26:07,666 basehttp 40 131295925491392 "GET /img/icons/chart_curve.png HTTP/1.1" 404 98247
+ERROR 2025-09-14 23:26:07,666 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/rainbow.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,667 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/chart_line_edit.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,715 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/fedex_truck.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:07,783 log 40 131295933884096 Not Found: /img/icons/chart_line_edit.png
+WARNING 2025-09-14 23:26:07,788 log 40 131295925491392 Not Found: /img/icons/fedex_truck.png
+WARNING 2025-09-14 23:26:07,792 log 40 131296029234880 Not Found: /img/icons/rainbow.png
+WARNING 2025-09-14 23:26:07,793 basehttp 40 131295933884096 "GET /img/icons/chart_line_edit.png HTTP/1.1" 404 98267
+WARNING 2025-09-14 23:26:07,793 basehttp 40 131295925491392 "GET /img/icons/fedex_truck.png HTTP/1.1" 404 98247
+WARNING 2025-09-14 23:26:07,794 basehttp 40 131296029234880 "GET /img/icons/rainbow.png HTTP/1.1" 404 98227
+ERROR 2025-09-14 23:26:07,800 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/eye.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,801 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/clock.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-14 23:26:07,801 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/color_wheel.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:07,920 log 40 131295933884096 Not Found: /img/icons/clock.png
+WARNING 2025-09-14 23:26:07,925 log 40 131295925491392 Not Found: /img/icons/eye.png
+WARNING 2025-09-14 23:26:07,931 log 40 131296029234880 Not Found: /img/icons/color_wheel.png
+WARNING 2025-09-14 23:26:07,932 basehttp 40 131295933884096 "GET /img/icons/clock.png HTTP/1.1" 404 98217
+WARNING 2025-09-14 23:26:07,932 basehttp 40 131295925491392 "GET /img/icons/eye.png HTTP/1.1" 404 98207
+WARNING 2025-09-14 23:26:07,933 basehttp 40 131296029234880 "GET /img/icons/color_wheel.png HTTP/1.1" 404 98247
+ERROR 2025-09-14 23:26:07,937 pretty_exception 40 131295925491392
+Exception: Http404: “/app/css/print.css” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-14 23:26:07,973 log 40 131295925491392 Not Found: /css/print.css
+WARNING 2025-09-14 23:26:07,974 basehttp 40 131295925491392 "GET /css/print.css HTTP/1.1" 404 98185
+INFO 2025-09-14 23:26:37,701 basehttp 40 131295942276800 "HEAD / HTTP/1.1" 302 0
+INFO 2025-09-15 07:13:49,627 basehttp 40 131296029234880 "GET / HTTP/1.1" 200 32528
+ERROR 2025-09-15 07:13:49,670 pretty_exception 40 131296029234880
+Exception: Http404: “/app/css/base.css” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:49,686 pretty_exception 40 131295933884096
+Exception: Http404: “/app/js/prototype.js” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:49,701 pretty_exception 40 131295942276800
+Exception: Http404: “/app/js/general.js” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:49,704 pretty_exception 40 131295925491392
+Exception: Http404: “/app/css/tabview-custom-skin.css” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:49,717 pretty_exception 40 131295904511680
+Exception: Http404: “/app/img/gold2logo_sm.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+INFO 2025-09-15 07:13:49,744 basehttp 40 131295912904384 "GET /static/debug_toolbar/js/toolbar.js HTTP/1.1" 304 0
+ERROR 2025-09-15 07:13:49,834 pretty_exception 40 131295912904384
+Exception: Http404: “/app/img/icons/database_key.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:49,960 log 40 131296029234880 Not Found: /css/base.css
+WARNING 2025-09-15 07:13:49,964 log 40 131295933884096 Not Found: /js/prototype.js
+WARNING 2025-09-15 07:13:49,965 basehttp 40 131296029234880 "GET /css/base.css HTTP/1.1" 404 98182
+WARNING 2025-09-15 07:13:49,966 basehttp 40 131295933884096 "GET /js/prototype.js HTTP/1.1" 404 98197
+WARNING 2025-09-15 07:13:49,971 log 40 131295925491392 Not Found: /css/tabview-custom-skin.css
+WARNING 2025-09-15 07:13:49,976 log 40 131295912904384 Not Found: /img/icons/database_key.png
+WARNING 2025-09-15 07:13:49,980 log 40 131295942276800 Not Found: /js/general.js
+WARNING 2025-09-15 07:13:49,985 log 40 131295904511680 Not Found: /img/gold2logo_sm.png
+WARNING 2025-09-15 07:13:49,986 basehttp 40 131295912904384 "GET /img/icons/database_key.png HTTP/1.1" 404 98252
+WARNING 2025-09-15 07:13:49,986 basehttp 40 131295925491392 "GET /css/tabview-custom-skin.css HTTP/1.1" 404 98257
+WARNING 2025-09-15 07:13:49,988 basehttp 40 131295904511680 "GET /img/gold2logo_sm.png HTTP/1.1" 404 98222
+WARNING 2025-09-15 07:13:49,990 basehttp 40 131295942276800 "GET /js/general.js HTTP/1.1" 404 98187
+INFO 2025-09-15 07:13:49,995 basehttp 40 131295904511680 "GET /static/debug_toolbar/css/toolbar.css HTTP/1.1" 304 0
+ERROR 2025-09-15 07:13:49,995 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/calendar.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:49,996 pretty_exception 40 131295912904384
+Exception: Http404: “/app/css/tabview-custom-skin.css” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:50,073 log 40 131295912904384 Not Found: /css/tabview-custom-skin.css
+WARNING 2025-09-15 07:13:50,078 log 40 131295942276800 Not Found: /img/icons/calendar.png
+WARNING 2025-09-15 07:13:50,078 basehttp 40 131295912904384 "GET /css/tabview-custom-skin.css HTTP/1.1" 404 98255
+WARNING 2025-09-15 07:13:50,079 basehttp 40 131295942276800 "GET /img/icons/calendar.png HTTP/1.1" 404 98230
+ERROR 2025-09-15 07:13:50,086 pretty_exception 40 131295912904384
+Exception: Http404: “/app/img/icons/house.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:50,090 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/paste_plain.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:50,091 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/zoom.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:50,091 pretty_exception 40 131295904511680
+Exception: Http404: “/app/img/icons/report.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:50,091 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/user.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:50,097 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/status_busy.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:50,460 log 40 131295912904384 Not Found: /img/icons/house.png
+WARNING 2025-09-15 07:13:50,467 log 40 131296029234880 Not Found: /img/icons/status_busy.png
+WARNING 2025-09-15 07:13:50,473 basehttp 40 131295912904384 "GET /img/icons/house.png HTTP/1.1" 404 98217
+WARNING 2025-09-15 07:13:50,474 log 40 131295904511680 Not Found: /img/icons/report.png
+WARNING 2025-09-15 07:13:50,484 log 40 131295942276800 Not Found: /img/icons/zoom.png
+WARNING 2025-09-15 07:13:50,488 log 40 131295925491392 Not Found: /img/icons/paste_plain.png
+WARNING 2025-09-15 07:13:50,489 basehttp 40 131296029234880 "GET /img/icons/status_busy.png HTTP/1.1" 404 98247
+ERROR 2025-09-15 07:13:50,490 pretty_exception 40 131295912904384
+Exception: Http404: “/app/img/icons/user_green.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:50,491 basehttp 40 131295942276800 "GET /img/icons/zoom.png HTTP/1.1" 404 98212
+WARNING 2025-09-15 07:13:50,491 basehttp 40 131295904511680 "GET /img/icons/report.png HTTP/1.1" 404 98222
+WARNING 2025-09-15 07:13:50,492 basehttp 40 131295925491392 "GET /img/icons/paste_plain.png HTTP/1.1" 404 98247
+WARNING 2025-09-15 07:13:50,497 log 40 131295933884096 Not Found: /img/icons/user.png
+INFO 2025-09-15 07:13:50,498 basehttp 40 131296029234880 "GET /static/debug_toolbar/js/utils.js HTTP/1.1" 304 0
+ERROR 2025-09-15 07:13:50,512 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/folder_page.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:50,519 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/text_list_numbers.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:50,527 pretty_exception 40 131295904511680
+Exception: Http404: “/app/img/icons/add.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:50,528 basehttp 40 131295933884096 "GET /img/icons/user.png HTTP/1.1" 404 98212
+ERROR 2025-09-15 07:13:50,580 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/basket_add.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:50,585 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/drive_magnify.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:50,770 log 40 131295912904384 Not Found: /img/icons/user_green.png
+WARNING 2025-09-15 07:13:50,774 basehttp 40 131295912904384 "GET /img/icons/user_green.png HTTP/1.1" 404 98242
+ERROR 2025-09-15 07:13:50,780 pretty_exception 40 131295912904384
+Exception: Http404: “/app/img/icons/table_refresh.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:50,796 log 40 131295942276800 Not Found: /img/icons/folder_page.png
+WARNING 2025-09-15 07:13:50,810 log 40 131295933884096 Not Found: /img/icons/basket_add.png
+WARNING 2025-09-15 07:13:50,817 log 40 131295925491392 Not Found: /img/icons/text_list_numbers.png
+WARNING 2025-09-15 07:13:50,817 basehttp 40 131295942276800 "GET /img/icons/folder_page.png HTTP/1.1" 404 98247
+WARNING 2025-09-15 07:13:50,818 basehttp 40 131295933884096 "GET /img/icons/basket_add.png HTTP/1.1" 404 98242
+WARNING 2025-09-15 07:13:50,819 basehttp 40 131295925491392 "GET /img/icons/text_list_numbers.png HTTP/1.1" 404 98277
+WARNING 2025-09-15 07:13:50,826 log 40 131295904511680 Not Found: /img/icons/add.png
+ERROR 2025-09-15 07:13:50,829 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/pictures.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:50,829 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/page_white_acrobat.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:50,829 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/film_edit.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:50,829 basehttp 40 131295904511680 "GET /img/icons/add.png HTTP/1.1" 404 98207
+WARNING 2025-09-15 07:13:50,835 log 40 131296029234880 Not Found: /img/icons/drive_magnify.png
+WARNING 2025-09-15 07:13:50,885 basehttp 40 131296029234880 "GET /img/icons/drive_magnify.png HTTP/1.1" 404 98257
+ERROR 2025-09-15 07:13:50,912 pretty_exception 40 131295904511680
+Exception: Http404: “/app/img/icons/money_dollar.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:50,932 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/money.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,029 log 40 131295912904384 Not Found: /img/icons/table_refresh.png
+WARNING 2025-09-15 07:13:51,030 basehttp 40 131295912904384 "GET /img/icons/table_refresh.png HTTP/1.1" 404 98257
+WARNING 2025-09-15 07:13:51,037 log 40 131295933884096 Not Found: /img/icons/page_white_acrobat.png
+WARNING 2025-09-15 07:13:51,039 basehttp 40 131295933884096 "GET /img/icons/page_white_acrobat.png HTTP/1.1" 404 98282
+ERROR 2025-09-15 07:13:51,039 pretty_exception 40 131295912904384
+Exception: Http404: “/app/img/icons/coins.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,067 log 40 131295942276800 Not Found: /img/icons/pictures.png
+ERROR 2025-09-15 07:13:51,072 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/telephone.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,074 basehttp 40 131295942276800 "GET /img/icons/pictures.png HTTP/1.1" 404 98232
+ERROR 2025-09-15 07:13:51,102 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/box.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,108 log 40 131295904511680 Not Found: /img/icons/money_dollar.png
+WARNING 2025-09-15 07:13:51,114 log 40 131295925491392 Not Found: /img/icons/film_edit.png
+WARNING 2025-09-15 07:13:51,119 log 40 131296029234880 Not Found: /img/icons/money.png
+WARNING 2025-09-15 07:13:51,120 basehttp 40 131295925491392 "GET /img/icons/film_edit.png HTTP/1.1" 404 98237
+WARNING 2025-09-15 07:13:51,120 basehttp 40 131295904511680 "GET /img/icons/money_dollar.png HTTP/1.1" 404 98252
+WARNING 2025-09-15 07:13:51,131 basehttp 40 131296029234880 "GET /img/icons/money.png HTTP/1.1" 404 98217
+ERROR 2025-09-15 07:13:51,149 pretty_exception 40 131295904511680
+Exception: Http404: “/app/img/icons/image_edit.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:51,149 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/brush.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:51,151 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/table_error.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,291 log 40 131295912904384 Not Found: /img/icons/coins.png
+WARNING 2025-09-15 07:13:51,293 basehttp 40 131295912904384 "GET /img/icons/coins.png HTTP/1.1" 404 98217
+WARNING 2025-09-15 07:13:51,297 log 40 131295933884096 Not Found: /img/icons/telephone.png
+WARNING 2025-09-15 07:13:51,305 log 40 131296029234880 Not Found: /img/icons/table_error.png
+WARNING 2025-09-15 07:13:51,309 log 40 131295942276800 Not Found: /img/icons/box.png
+ERROR 2025-09-15 07:13:51,309 pretty_exception 40 131295912904384
+Exception: Http404: “/app/img/icons/database_edit.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,310 basehttp 40 131295933884096 "GET /img/icons/telephone.png HTTP/1.1" 404 98237
+WARNING 2025-09-15 07:13:51,310 basehttp 40 131296029234880 "GET /img/icons/table_error.png HTTP/1.1" 404 98247
+WARNING 2025-09-15 07:13:51,325 basehttp 40 131295942276800 "GET /img/icons/box.png HTTP/1.1" 404 98207
+WARNING 2025-09-15 07:13:51,345 log 40 131295925491392 Not Found: /img/icons/brush.png
+WARNING 2025-09-15 07:13:51,351 log 40 131295904511680 Not Found: /img/icons/image_edit.png
+ERROR 2025-09-15 07:13:51,353 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/page_white_paste.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:51,353 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/flag_red.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:51,354 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/calendar.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,354 basehttp 40 131295925491392 "GET /img/icons/brush.png HTTP/1.1" 404 98217
+WARNING 2025-09-15 07:13:51,355 basehttp 40 131295904511680 "GET /img/icons/image_edit.png HTTP/1.1" 404 98242
+ERROR 2025-09-15 07:13:51,420 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/report_user.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:51,449 pretty_exception 40 131295904511680
+Exception: Http404: “/app/img/icons/music.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,557 log 40 131295912904384 Not Found: /img/icons/database_edit.png
+WARNING 2025-09-15 07:13:51,559 basehttp 40 131295912904384 "GET /img/icons/database_edit.png HTTP/1.1" 404 98257
+WARNING 2025-09-15 07:13:51,567 log 40 131295933884096 Not Found: /img/icons/page_white_paste.png
+WARNING 2025-09-15 07:13:51,569 basehttp 40 131295933884096 "GET /img/icons/page_white_paste.png HTTP/1.1" 404 98272
+ERROR 2025-09-15 07:13:51,571 pretty_exception 40 131295912904384
+Exception: Http404: “/app/img/icons/server_database.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,582 log 40 131295925491392 Not Found: /img/icons/report_user.png
+WARNING 2025-09-15 07:13:51,582 log 40 131296029234880 Not Found: /img/icons/flag_red.png
+WARNING 2025-09-15 07:13:51,587 log 40 131295942276800 Not Found: /img/icons/calendar.png
+WARNING 2025-09-15 07:13:51,594 basehttp 40 131295925491392 "GET /img/icons/report_user.png HTTP/1.1" 404 98247
+ERROR 2025-09-15 07:13:51,604 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/chart_curve.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,620 basehttp 40 131296029234880 "GET /img/icons/flag_red.png HTTP/1.1" 404 98232
+WARNING 2025-09-15 07:13:51,621 basehttp 40 131295942276800 "GET /img/icons/calendar.png HTTP/1.1" 404 98232
+ERROR 2025-09-15 07:13:51,633 pretty_exception 40 131295925491392
+Exception: Http404: “/app/img/icons/error.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,650 log 40 131295904511680 Not Found: /img/icons/music.png
+ERROR 2025-09-15 07:13:51,672 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/chart_line_edit.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,677 basehttp 40 131295904511680 "GET /img/icons/music.png HTTP/1.1" 404 98217
+ERROR 2025-09-15 07:13:51,688 pretty_exception 40 131295942276800
+Exception: Http404: “/app/img/icons/rainbow.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:51,739 pretty_exception 40 131295904511680
+Exception: Http404: “/app/img/icons/fedex_truck.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,861 log 40 131296029234880 Not Found: /img/icons/chart_line_edit.png
+WARNING 2025-09-15 07:13:51,865 log 40 131295912904384 Not Found: /img/icons/server_database.png
+WARNING 2025-09-15 07:13:51,870 log 40 131295933884096 Not Found: /img/icons/chart_curve.png
+WARNING 2025-09-15 07:13:51,875 log 40 131295942276800 Not Found: /img/icons/rainbow.png
+WARNING 2025-09-15 07:13:51,876 basehttp 40 131296029234880 "GET /img/icons/chart_line_edit.png HTTP/1.1" 404 98267
+WARNING 2025-09-15 07:13:51,877 basehttp 40 131295912904384 "GET /img/icons/server_database.png HTTP/1.1" 404 98267
+WARNING 2025-09-15 07:13:51,877 basehttp 40 131295933884096 "GET /img/icons/chart_curve.png HTTP/1.1" 404 98247
+WARNING 2025-09-15 07:13:51,883 log 40 131295904511680 Not Found: /img/icons/fedex_truck.png
+WARNING 2025-09-15 07:13:51,883 basehttp 40 131295942276800 "GET /img/icons/rainbow.png HTTP/1.1" 404 98227
+WARNING 2025-09-15 07:13:51,888 log 40 131295925491392 Not Found: /img/icons/error.png
+ERROR 2025-09-15 07:13:51,892 pretty_exception 40 131296029234880
+Exception: Http404: “/app/img/icons/color_wheel.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:51,893 pretty_exception 40 131295912904384
+Exception: Http404: “/app/img/icons/clock.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:13:51,893 pretty_exception 40 131295933884096
+Exception: Http404: “/app/img/icons/eye.png” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:13:51,895 basehttp 40 131295904511680 "GET /img/icons/fedex_truck.png HTTP/1.1" 404 98247
+WARNING 2025-09-15 07:13:51,896 basehttp 40 131295925491392 "GET /img/icons/error.png HTTP/1.1" 404 98217
+ERROR 2025-09-15 07:13:51,898 pretty_exception 40 131295942276800
+Exception: Http404: “/app/css/print.css” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+INFO 2025-09-15 07:13:51,968 basehttp 40 131295904511680 "GET /static/debug_toolbar/css/print.css HTTP/1.1" 304 0
+WARNING 2025-09-15 07:13:52,113 log 40 131296029234880 Not Found: /img/icons/color_wheel.png
+WARNING 2025-09-15 07:13:52,126 log 40 131295912904384 Not Found: /img/icons/clock.png
+WARNING 2025-09-15 07:13:52,127 log 40 131295933884096 Not Found: /img/icons/eye.png
+WARNING 2025-09-15 07:13:52,127 basehttp 40 131296029234880 "GET /img/icons/color_wheel.png HTTP/1.1" 404 98247
+WARNING 2025-09-15 07:13:52,128 basehttp 40 131295912904384 "GET /img/icons/clock.png HTTP/1.1" 404 98217
+WARNING 2025-09-15 07:13:52,128 basehttp 40 131295933884096 "GET /img/icons/eye.png HTTP/1.1" 404 98207
+WARNING 2025-09-15 07:13:52,135 log 40 131295942276800 Not Found: /css/print.css
+WARNING 2025-09-15 07:13:52,136 basehttp 40 131295942276800 "GET /css/print.css HTTP/1.1" 404 98187
+ERROR 2025-09-15 07:14:03,338 pretty_exception 40 131295933884096
+Exception: Http404: “/app/css/base.css” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:14:03,338 pretty_exception 40 131295912904384
+Exception: Http404: “/app/css/print.css” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:14:03,338 pretty_exception 40 131295942276800
+Exception: Http404: “/app/css/tabview-custom-skin.css” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+ERROR 2025-09-15 07:14:03,367 pretty_exception 40 131296029234880
+Exception: Http404: “/app/.well-known/appspecific/com.chrome.devtools.json” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 07:14:03,564 log 40 131295933884096 Not Found: /css/base.css
+WARNING 2025-09-15 07:14:03,569 log 40 131295942276800 Not Found: /css/tabview-custom-skin.css
+WARNING 2025-09-15 07:14:03,573 log 40 131295912904384 Not Found: /css/print.css
+WARNING 2025-09-15 07:14:03,575 basehttp 40 131295933884096 "GET /css/base.css HTTP/1.1" 404 98182
+WARNING 2025-09-15 07:14:03,576 basehttp 40 131295942276800 "GET /css/tabview-custom-skin.css HTTP/1.1" 404 98257
+WARNING 2025-09-15 07:14:03,577 basehttp 40 131295912904384 "GET /css/print.css HTTP/1.1" 404 98187
+WARNING 2025-09-15 07:14:03,582 log 40 131296029234880 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-09-15 07:14:03,583 basehttp 40 131296029234880 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 98362
+INFO 2025-09-15 07:30:03,721 autoreload 40 131296873081728 /app/gchub_db/settings.py changed, reloading.
+INFO 2025-09-15 07:30:07,710 autoreload 166 125934889483136 Watching for file changes with StatReloader
+INFO 2025-09-15 07:30:56,015 autoreload 166 125934889483136 /app/gchub_db/settings.py changed, reloading.
+INFO 2025-09-15 07:30:59,794 autoreload 183 133556360428416 Watching for file changes with StatReloader
+INFO 2025-09-15 07:31:21,389 autoreload 60 140587116256128 Watching for file changes with StatReloader
+INFO 2025-09-15 07:32:22,709 basehttp 60 140586272085696 "GET / HTTP/1.1" 200 32866
+INFO 2025-09-15 07:32:22,806 basehttp 60 140585881036480 "GET /media/img/gold2logo_sm.png HTTP/1.1" 200 3734
+INFO 2025-09-15 07:32:22,807 basehttp 60 140585889429184 "GET /media/img/icons/database_key.png HTTP/1.1" 200 764
+INFO 2025-09-15 07:32:22,807 basehttp 60 140586259498688 "GET /media/css/tabview-custom-skin.css HTTP/1.1" 200 2771
+INFO 2025-09-15 07:32:22,815 basehttp 60 140586272085696 "GET /media/css/base.css HTTP/1.1" 200 21551
+INFO 2025-09-15 07:32:22,818 basehttp 60 140586241664704 "GET /media/js/general.js HTTP/1.1" 200 2281
+INFO 2025-09-15 07:32:22,839 basehttp 60 140586259498688 "GET /media/img/icons/calendar.png HTTP/1.1" 200 675
+INFO 2025-09-15 07:32:22,850 basehttp 60 140586250057408 "GET /media/js/prototype.js HTTP/1.1" 200 207391
+INFO 2025-09-15 07:32:22,885 basehttp 60 140586250057408 "GET /media/img/icons/house.png HTTP/1.1" 200 806
+INFO 2025-09-15 07:32:22,961 basehttp 60 140585881036480 "GET /media/img/icons/user.png HTTP/1.1" 200 741
+INFO 2025-09-15 07:32:22,961 basehttp 60 140586272085696 "GET /media/img/icons/zoom.png HTTP/1.1" 200 692
+INFO 2025-09-15 07:32:22,962 basehttp 60 140586241664704 "GET /media/img/icons/report.png HTTP/1.1" 200 649
+INFO 2025-09-15 07:32:22,964 basehttp 60 140585889429184 "GET /media/img/icons/paste_plain.png HTTP/1.1" 200 605
+INFO 2025-09-15 07:32:22,964 basehttp 60 140586250057408 "GET /media/img/icons/status_busy.png HTTP/1.1" 200 751
+INFO 2025-09-15 07:32:22,965 basehttp 60 140586259498688 "GET /media/img/icons/user_green.png HTTP/1.1" 200 722
+INFO 2025-09-15 07:32:23,000 basehttp 60 140585881036480 "GET /media/img/bg_grad.jpg HTTP/1.1" 200 342
+INFO 2025-09-15 07:32:23,022 basehttp 60 140586241664704 "GET /media/img/grad_bg.jpg HTTP/1.1" 200 379
+INFO 2025-09-15 07:32:23,023 basehttp 60 140585889429184 "GET /media/img/icons/pictures.png HTTP/1.1" 200 704
+INFO 2025-09-15 07:32:23,023 basehttp 60 140586250057408 "GET /media/img/icons/add.png HTTP/1.1" 200 733
+INFO 2025-09-15 07:32:23,034 basehttp 60 140586259498688 "GET /media/img/icons/page_white_acrobat.png HTTP/1.1" 200 591
+INFO 2025-09-15 07:32:23,036 basehttp 60 140586272085696 "GET /media/img/icons/error.png HTTP/1.1" 200 666
+INFO 2025-09-15 07:32:23,074 basehttp 60 140586250057408 "GET /media/img/icons/database_edit.png HTTP/1.1" 200 767
+INFO 2025-09-15 07:32:23,074 basehttp 60 140585881036480 "GET /media/img/icons/text_list_numbers.png HTTP/1.1" 200 357
+INFO 2025-09-15 07:32:23,127 basehttp 60 140586241664704 "GET /media/img/icons/music.png HTTP/1.1" 200 385
+INFO 2025-09-15 07:32:23,133 basehttp 60 140586250057408 "GET /media/img/icons/drive_magnify.png HTTP/1.1" 200 641
+INFO 2025-09-15 07:32:23,133 basehttp 60 140585889429184 "GET /media/img/icons/film_edit.png HTTP/1.1" 200 855
+INFO 2025-09-15 07:32:23,139 basehttp 60 140586272085696 "GET /media/img/icons/coins.png HTTP/1.1" 200 732
+INFO 2025-09-15 07:32:23,142 basehttp 60 140586259498688 "GET /media/img/icons/brush.png HTTP/1.1" 200 3396
+INFO 2025-09-15 07:32:23,170 basehttp 60 140585881036480 "GET /media/img/icons/box.png HTTP/1.1" 200 555
+INFO 2025-09-15 07:32:23,177 basehttp 60 140585889429184 "GET /media/img/icons/basket_add.png HTTP/1.1" 200 752
+INFO 2025-09-15 07:32:23,203 basehttp 60 140586259498688 "GET /media/img/icons/chart_line_edit.png HTTP/1.1" 200 718
+INFO 2025-09-15 07:32:23,205 basehttp 60 140586272085696 "GET /media/img/icons/color_wheel.png HTTP/1.1" 200 892
+INFO 2025-09-15 07:32:23,207 basehttp 60 140586241664704 "GET /media/img/icons/money.png HTTP/1.1" 200 738
+INFO 2025-09-15 07:32:23,252 basehttp 60 140586250057408 "GET /media/img/icons/money_dollar.png HTTP/1.1" 200 630
+INFO 2025-09-15 07:32:23,253 basehttp 60 140585889429184 "GET /media/img/icons/page_white_paste.png HTTP/1.1" 200 620
+INFO 2025-09-15 07:32:23,286 basehttp 60 140586259498688 "GET /media/img/icons/fedex_truck.png HTTP/1.1" 200 969
+INFO 2025-09-15 07:32:23,286 basehttp 60 140586272085696 "GET /media/img/icons/eye.png HTTP/1.1" 200 750
+INFO 2025-09-15 07:32:23,292 basehttp 60 140586241664704 "GET /media/img/icons/image_edit.png HTTP/1.1" 200 783
+INFO 2025-09-15 07:32:23,300 basehttp 60 140585881036480 "GET /media/img/icons/rainbow.png HTTP/1.1" 200 655
+INFO 2025-09-15 07:32:23,358 basehttp 60 140585889429184 "GET /media/img/icons/folder_page.png HTTP/1.1" 200 688
+INFO 2025-09-15 07:32:23,368 basehttp 60 140586272085696 "GET /media/img/icons/table_refresh.png HTTP/1.1" 200 795
+INFO 2025-09-15 07:32:23,368 basehttp 60 140586250057408 "GET /media/img/icons/report_user.png HTTP/1.1" 200 785
+INFO 2025-09-15 07:32:23,374 basehttp 60 140586241664704 "GET /media/img/icons/table_error.png HTTP/1.1" 200 687
+INFO 2025-09-15 07:32:23,377 basehttp 60 140586259498688 "GET /media/img/icons/telephone.png HTTP/1.1" 200 791
+INFO 2025-09-15 07:32:23,401 basehttp 60 140585881036480 "GET /media/img/icons/server_database.png HTTP/1.1" 200 666
+INFO 2025-09-15 07:32:23,409 basehttp 60 140586272085696 "GET /media/img/icons/flag_red.png HTTP/1.1" 200 665
+INFO 2025-09-15 07:32:23,424 basehttp 60 140586250057408 "GET /media/img/icons/clock.png HTTP/1.1" 200 882
+INFO 2025-09-15 07:32:23,426 basehttp 60 140586259498688 "GET /media/img/icons/chart_curve.png HTTP/1.1" 200 710
+INFO 2025-09-15 07:32:23,441 basehttp 60 140585889429184 "GET /media/css/print.css HTTP/1.1" 200 31
+INFO 2025-09-15 07:32:37,764 basehttp 60 140585889429184 "GET /__debug__/render_panel/?store_id=0d770ac39ec84d3ba360c99627f42677&panel_id=SettingsPanel HTTP/1.1" 200 120
+INFO 2025-09-15 07:32:43,111 basehttp 60 140585889429184 "GET / HTTP/1.1" 200 32864
+INFO 2025-09-15 07:32:44,888 basehttp 60 140585889429184 "GET /__debug__/render_panel/?store_id=9da1489f66c142bf807f51694cc27933&panel_id=SettingsPanel HTTP/1.1" 200 34925
+INFO 2025-09-15 07:32:46,312 basehttp 60 140585889429184 "GET /__debug__/render_panel/?store_id=9da1489f66c142bf807f51694cc27933&panel_id=HeadersPanel HTTP/1.1" 200 4509
+INFO 2025-09-15 07:32:48,083 basehttp 60 140585889429184 "GET /__debug__/render_panel/?store_id=9da1489f66c142bf807f51694cc27933&panel_id=TimerPanel HTTP/1.1" 200 1382
+INFO 2025-09-15 07:32:48,087 basehttp 60 140585889429184 "GET /static/debug_toolbar/js/timer.js HTTP/1.1" 200 3686
+INFO 2025-09-15 07:32:53,480 basehttp 60 140585889429184 "GET /__debug__/render_panel/?store_id=9da1489f66c142bf807f51694cc27933&panel_id=VersionsPanel HTTP/1.1" 200 986
+INFO 2025-09-15 07:32:54,597 basehttp 60 140585889429184 "GET /__debug__/render_panel/?store_id=9da1489f66c142bf807f51694cc27933&panel_id=HistoryPanel HTTP/1.1" 200 39933
+INFO 2025-09-15 07:32:54,601 basehttp 60 140585889429184 "GET /static/debug_toolbar/js/history.js HTTP/1.1" 200 3515
+INFO 2025-09-15 07:33:02,953 basehttp 60 140585889429184 "GET /__debug__/render_panel/?store_id=9da1489f66c142bf807f51694cc27933&panel_id=SQLPanel HTTP/1.1" 200 1366465
+INFO 2025-09-15 07:35:08,413 basehttp 60 140585872643776 "GET / HTTP/1.1" 302 0
+INFO 2025-09-15 07:37:46,183 basehttp 60 140585872643776 "HEAD /media/img/gold2logo_sm.png HTTP/1.1" 200 0
+INFO 2025-09-15 07:37:51,304 basehttp 60 140586241664704 "HEAD /media/img/icons/house.png HTTP/1.1" 200 0
+INFO 2025-09-15 07:37:51,331 basehttp 60 140586241664704 "HEAD /media/img/icons/zoom.png HTTP/1.1" 200 0
+INFO 2025-09-15 07:37:51,413 basehttp 60 140586241664704 "HEAD /media/js/prototype.js HTTP/1.1" 200 0
+INFO 2025-09-15 07:39:30,051 basehttp 60 140586241664704 "GET / HTTP/1.1" 302 0
+INFO 2025-09-15 07:41:53,203 basehttp 60 140586241664704 "GET /accounts/login/ HTTP/1.1" 200 38630
+INFO 2025-09-15 07:45:58,938 basehttp 60 140586241664704 "GET / HTTP/1.1" 302 0
+INFO 2025-09-15 07:46:01,438 basehttp 60 140586241664704 "HEAD / HTTP/1.1" 302 0
+INFO 2025-09-15 08:58:14,284 basehttp 60 140586241664704 "GET / HTTP/1.1" 200 33022
+INFO 2025-09-15 08:58:14,447 basehttp 60 140586241664704 "GET /favicon.ico HTTP/1.1" 302 0
+ERROR 2025-09-15 08:58:14,454 pretty_exception 60 140586241664704
+Exception: Http404: “/app/media/favicon.ico” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 08:58:14,495 log 60 140586241664704 Not Found: /media/favicon.ico
+WARNING 2025-09-15 08:58:14,495 basehttp 60 140586241664704 "GET /media/favicon.ico HTTP/1.1" 404 98211
+INFO 2025-09-15 08:58:24,990 basehttp 60 140586241664704 "GET /__debug__/render_panel/?store_id=a570744182304a20b6df80ad86dc3fa5&panel_id=TimerPanel HTTP/1.1" 200 1383
+INFO 2025-09-15 08:58:26,153 basehttp 60 140586241664704 "GET /__debug__/render_panel/?store_id=a570744182304a20b6df80ad86dc3fa5&panel_id=VersionsPanel HTTP/1.1" 200 986
+INFO 2025-09-15 08:58:27,026 basehttp 60 140586241664704 "GET /__debug__/render_panel/?store_id=a570744182304a20b6df80ad86dc3fa5&panel_id=HistoryPanel HTTP/1.1" 200 39729
+INFO 2025-09-15 08:58:28,640 basehttp 60 140586241664704 "GET /__debug__/render_panel/?store_id=a570744182304a20b6df80ad86dc3fa5&panel_id=SQLPanel HTTP/1.1" 200 1366461
+INFO 2025-09-15 11:54:19,757 basehttp 60 140586241664704 "GET / HTTP/1.1" 200 33022
+INFO 2025-09-15 11:54:19,800 basehttp 60 140586241664704 "GET /static/debug_toolbar/js/toolbar.js HTTP/1.1" 304 0
+INFO 2025-09-15 11:54:19,823 basehttp 60 140586241664704 "GET /static/debug_toolbar/css/toolbar.css HTTP/1.1" 304 0
+INFO 2025-09-15 11:54:19,860 basehttp 60 140585889429184 "GET /static/debug_toolbar/css/print.css HTTP/1.1" 304 0
+INFO 2025-09-15 11:54:19,874 basehttp 60 140586241664704 "GET /static/debug_toolbar/js/utils.js HTTP/1.1" 304 0
+INFO 2025-09-15 11:54:28,583 basehttp 60 140586241664704 "GET /job/search_results/ HTTP/1.1" 200 41122
+INFO 2025-09-15 11:54:28,641 basehttp 60 140586241664704 "GET /media/img/icons/resultset_first.png HTTP/1.1" 200 522
+INFO 2025-09-15 11:54:28,650 basehttp 60 140585889429184 "GET /media/img/icons/resultset_previous.png HTTP/1.1" 200 389
+INFO 2025-09-15 11:54:28,672 basehttp 60 140586272085696 "GET /media/img/icons/resultset_next.png HTTP/1.1" 200 395
+INFO 2025-09-15 11:54:28,694 basehttp 60 140585881036480 "GET /media/img/icons/resultset_last.png HTTP/1.1" 200 524
+INFO 2025-09-15 11:54:28,695 basehttp 60 140585872643776 "GET /media/img/icons/arrow_right.png HTTP/1.1" 200 349
+INFO 2025-09-15 11:54:28,700 basehttp 60 140586250057408 "GET /media/img/icons/arrow_refresh_small.png HTTP/1.1" 200 506
+INFO 2025-09-15 11:54:28,701 basehttp 60 140585889429184 "GET /media/img/icons/cross.png HTTP/1.1" 200 655
+INFO 2025-09-15 11:54:28,715 basehttp 60 140586272085696 "GET /media/img/icons/accept.png HTTP/1.1" 200 781
+INFO 2025-09-15 11:54:31,181 basehttp 60 140585889429184 "GET /workflow/job/92323/ HTTP/1.1" 200 49622
+INFO 2025-09-15 11:54:31,262 basehttp 60 140585881036480 "GET /media/css/workflow/job_detail.css HTTP/1.1" 200 2306
+INFO 2025-09-15 11:54:31,263 basehttp 60 140585872643776 "GET /media/yui/build/container/assets/container.css HTTP/1.1" 200 7118
+INFO 2025-09-15 11:54:31,269 basehttp 60 140586250057408 "GET /media/js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css HTTP/1.1" 200 32738
+INFO 2025-09-15 11:54:31,286 basehttp 60 140586241664704 "GET /media/yui/build/animation/animation-min.js HTTP/1.1" 200 13851
+INFO 2025-09-15 11:54:31,314 basehttp 60 140585881036480 "GET /media/css/spectrum/spectrum.css HTTP/1.1" 200 15427
+INFO 2025-09-15 11:54:31,354 basehttp 60 140586241664704 "GET /media/js/workflow/job_shipmanager.js HTTP/1.1" 200 4246
+INFO 2025-09-15 11:54:31,356 basehttp 60 140585889429184 "GET /media/js/jquery/js/jquery-1.8.3.js HTTP/1.1" 200 267739
+INFO 2025-09-15 11:54:31,359 basehttp 60 140586250057408 "GET /media/js/workflow/job_detail.js HTTP/1.1" 200 50614
+INFO 2025-09-15 11:54:31,367 basehttp 60 140585872643776 "GET /media/yui/build/container/container-min.js HTTP/1.1" 200 74966
+INFO 2025-09-15 11:54:31,375 basehttp 60 140585881036480 "GET /media/js/workflow/qc_manager.js HTTP/1.1" 200 1597
+INFO 2025-09-15 11:54:31,404 basehttp 60 140585889429184 "GET /media/js/fedex/fedex.js HTTP/1.1" 200 2118
+INFO 2025-09-15 11:54:31,410 basehttp 60 140586272085696 "GET /media/js/jquery/js/jquery-ui-1.9.2.custom.js HTTP/1.1" 200 465012
+INFO 2025-09-15 11:54:31,430 basehttp 60 140585881036480 "GET /media/css/drawdown/drawdown.css HTTP/1.1" 200 6569
+INFO 2025-09-15 11:54:31,438 basehttp 60 140586250057408 "GET /media/js/spectrum/spectrum.js HTTP/1.1" 200 79192
+INFO 2025-09-15 11:54:31,446 basehttp 60 140586241664704 "GET /media/js/drawdown/drawdown.js HTTP/1.1" 200 6360
+INFO 2025-09-15 11:54:31,460 basehttp 60 140585881036480 "GET /media/img/icons/pencil.png HTTP/1.1" 200 450
+INFO 2025-09-15 11:54:31,465 basehttp 60 140586241664704 "GET /media/img/icons/application_view_list.png HTTP/1.1" 200 473
+INFO 2025-09-15 11:54:31,538 basehttp 60 140585872643776 "GET /media/img/icons/date.png HTTP/1.1" 200 626
+INFO 2025-09-15 11:54:31,543 basehttp 60 140586250057408 "GET /media/img/icons/script.png HTTP/1.1" 200 748
+INFO 2025-09-15 11:54:31,543 basehttp 60 140586272085696 "GET /media/img/icons/comments_add.png HTTP/1.1" 200 648
+INFO 2025-09-15 11:54:31,550 basehttp 60 140586241664704 "GET /media/img/icons/folder.png HTTP/1.1" 200 537
+INFO 2025-09-15 11:54:31,554 basehttp 60 140585889429184 "GET /media/img/icons/picture_save_dimmed.png HTTP/1.1" 200 431
+INFO 2025-09-15 11:54:31,573 basehttp 60 140586250057408 "GET /media/img/icons/information.png HTTP/1.1" 200 778
+INFO 2025-09-15 11:54:31,602 basehttp 60 140586272085696 "GET /media/img/icons/date_edit.png HTTP/1.1" 200 799
+INFO 2025-09-15 11:54:31,602 basehttp 60 140585872643776 "GET /media/img/bg_button_span.gif HTTP/1.1" 200 1419
+INFO 2025-09-15 11:54:31,602 basehttp 60 140585889429184 "GET /media/img/icons/award_star_gold_2.png HTTP/1.1" 200 770
+INFO 2025-09-15 11:54:31,615 basehttp 60 140586250057408 "GET /media/img/icons/clock_add.png HTTP/1.1" 200 925
+INFO 2025-09-15 11:54:31,650 basehttp 60 140586241664704 "GET /media/img/icons/page_white_magnify.png HTTP/1.1" 200 554
+INFO 2025-09-15 11:54:31,667 basehttp 60 140586272085696 "GET /media/img/icons/page_gear.png HTTP/1.1" 200 833
+INFO 2025-09-15 11:54:31,689 basehttp 60 140585889429184 "GET /media/img/bg_button_a.gif HTTP/1.1" 200 577
+INFO 2025-09-15 11:54:31,690 basehttp 60 140586250057408 "GET /media/img/icons/page_white_acrobat_dimmed.png HTTP/1.1" 200 418
+INFO 2025-09-15 11:54:31,690 basehttp 60 140585872643776 "GET /media/img/icons/picture_edit_dimmed.png HTTP/1.1" 200 466
+INFO 2025-09-15 11:54:31,710 basehttp 60 140586272085696 "GET /media/img/icons/book_edit.png HTTP/1.1" 200 813
+INFO 2025-09-15 11:54:31,717 basehttp 60 140586241664704 "GET /media/img/icons/control_pause.png HTTP/1.1" 200 598
+INFO 2025-09-15 11:54:31,738 basehttp 60 140585881036480 "GET /joblog/92323/filtered/ HTTP/1.1" 200 17215
+INFO 2025-09-15 11:54:31,762 basehttp 60 140586272085696 "GET /media/img/icons/database_add.png HTTP/1.1" 200 658
+INFO 2025-09-15 11:54:31,785 basehttp 60 140585889429184 "GET /media/img/icons/folder_heart.png HTTP/1.1" 200 741
+INFO 2025-09-15 11:54:31,785 basehttp 60 140586250057408 "GET /media/img/icons/disk_multiple.png HTTP/1.1" 200 691
+INFO 2025-09-15 11:54:31,795 basehttp 60 140585881036480 "GET /media/img/icons/comments.png HTTP/1.1" 200 557
+INFO 2025-09-15 11:54:31,795 basehttp 60 140585872643776 "GET /media/img/icons/link_go.png HTTP/1.1" 200 655
+INFO 2025-09-15 11:54:32,769 basehttp 60 140585872643776 "GET /__debug__/render_panel/?store_id=2d4c831399f74153bb8d2deda43987dc&panel_id=HistoryPanel HTTP/1.1" 200 120
+INFO 2025-09-15 11:54:36,368 basehttp 60 140585872643776 "GET /__debug__/render_panel/?store_id=2d4c831399f74153bb8d2deda43987dc&panel_id=SQLPanel HTTP/1.1" 200 120
+INFO 2025-09-15 11:54:39,235 basehttp 60 140585872643776 "GET /workflow/job/92323/ HTTP/1.1" 200 49558
+INFO 2025-09-15 11:54:39,342 basehttp 60 140585872643776 "GET /joblog/92323/filtered/ HTTP/1.1" 200 17213
+INFO 2025-09-15 11:54:40,441 basehttp 60 140585872643776 "GET /__debug__/render_panel/?store_id=af50e41ca58246d6ba418d6aef97564d&panel_id=SQLPanel HTTP/1.1" 200 19690
+INFO 2025-09-15 12:09:48,338 basehttp 60 140585872643776 "GET / HTTP/1.1" 200 33022
+INFO 2025-09-15 12:09:50,676 basehttp 60 140585872643776 "GET /job/search_results/ HTTP/1.1" 200 41122
+INFO 2025-09-15 12:09:53,291 basehttp 60 140585872643776 "GET /workflow/job/92322/ HTTP/1.1" 200 49311
+INFO 2025-09-15 12:09:53,369 basehttp 60 140585872643776 "GET /media/img/icons/exclamation.png HTTP/1.1" 200 701
+INFO 2025-09-15 12:09:53,430 basehttp 60 140586250057408 "GET /joblog/92322/filtered/ HTTP/1.1" 200 16857
+INFO 2025-09-15 12:09:59,312 basehttp 60 140586250057408 "GET /__debug__/render_panel/?store_id=bdc3f49fac8a4252805e8f6ed6929518&panel_id=SQLPanel HTTP/1.1" 200 1268142
+INFO 2025-09-15 12:16:59,160 basehttp 60 140585872643776 "GET / HTTP/1.1" 200 33022
+INFO 2025-09-15 12:17:03,322 basehttp 60 140585872643776 "GET /__debug__/render_panel/?store_id=477c77295d6044e483d8305a7a171bf5&panel_id=SQLPanel HTTP/1.1" 200 1366460
+INFO 2025-09-15 12:18:21,265 basehttp 60 140585872643776 "POST /__debug__/sql_explain/ HTTP/1.1" 200 2249
+INFO 2025-09-15 12:18:30,483 basehttp 60 140585872643776 "GET /__debug__/render_panel/?store_id=477c77295d6044e483d8305a7a171bf5&panel_id=StaticFilesPanel HTTP/1.1" 200 29381
+INFO 2025-09-15 12:18:31,786 basehttp 60 140585872643776 "GET /__debug__/render_panel/?store_id=477c77295d6044e483d8305a7a171bf5&panel_id=TemplatesPanel HTTP/1.1" 200 78919
+INFO 2025-09-15 12:18:33,998 basehttp 60 140585872643776 "GET /__debug__/render_panel/?store_id=477c77295d6044e483d8305a7a171bf5&panel_id=CachePanel HTTP/1.1" 200 1413
+INFO 2025-09-15 12:18:34,790 basehttp 60 140585872643776 "GET /__debug__/render_panel/?store_id=477c77295d6044e483d8305a7a171bf5&panel_id=AlertsPanel HTTP/1.1" 200 66
+INFO 2025-09-15 12:18:35,806 basehttp 60 140585872643776 "GET /__debug__/render_panel/?store_id=477c77295d6044e483d8305a7a171bf5&panel_id=SignalsPanel HTTP/1.1" 200 2762
+INFO 2025-09-15 14:37:23,851 command 7 126108337785728 Visit me at http://0.0.0.0:5555
+INFO 2025-09-15 14:37:23,864 command 7 126108337785728 Broker: redis://redis:6379/0
+INFO 2025-09-15 14:37:23,869 command 7 126108337785728 Registered tasks:
+['bin.tasks.bin_test',
+ 'celery.accumulate',
+ 'celery.backend_cleanup',
+ 'celery.chain',
+ 'celery.chord',
+ 'celery.chord_unlock',
+ 'celery.chunks',
+ 'celery.group',
+ 'celery.map',
+ 'celery.starmap',
+ 'gchub_db.apps.accounts.tasks.hello_world',
+ 'src.celery_app.debug_task']
+INFO 2025-09-15 14:37:23,875 mixins 7 126107494835904 Connected to redis://redis:6379/0
+WARNING 2025-09-15 14:37:24,911 inspector 7 126107469657792 Inspect method registered failed
+WARNING 2025-09-15 14:37:24,912 inspector 7 126106950694592 Inspect method conf failed
+WARNING 2025-09-15 14:37:24,913 inspector 7 126107461265088 Inspect method scheduled failed
+WARNING 2025-09-15 14:37:24,914 inspector 7 126107444479680 Inspect method reserved failed
+WARNING 2025-09-15 14:37:24,915 inspector 7 126107436086976 Inspect method revoked failed
+WARNING 2025-09-15 14:37:24,916 inspector 7 126107452872384 Inspect method active failed
+WARNING 2025-09-15 14:37:24,916 inspector 7 126107478050496 Inspect method active_queues failed
+WARNING 2025-09-15 14:37:24,917 inspector 7 126107486443200 Inspect method stats failed
+INFO 2025-09-15 14:37:33,289 autoreload 39 127421003987840 Watching for file changes with StatReloader
+INFO 2025-09-15 14:40:14,807 basehttp 39 127420159940288 "GET / HTTP/1.1" 200 33024
+INFO 2025-09-15 14:40:14,929 basehttp 39 127420159940288 "GET /media/yui/build/base/base-min.css HTTP/1.1" 200 920
+INFO 2025-09-15 14:40:14,931 basehttp 39 127419927226048 "GET /media/yui/build/tabview/assets/skins/sam/tabview.css HTTP/1.1" 200 6458
+INFO 2025-09-15 14:40:14,931 basehttp 39 127419918833344 "GET /media/css/tabview-custom-skin.css HTTP/1.1" 200 2771
+INFO 2025-09-15 14:40:14,937 basehttp 39 127420147353280 "GET /media/css/base.css HTTP/1.1" 200 21551
+INFO 2025-09-15 14:40:14,944 basehttp 39 127420147353280 "GET /static/debug_toolbar/js/toolbar.js HTTP/1.1" 200 14601
+INFO 2025-09-15 14:40:14,958 basehttp 39 127419910440640 "GET /media/js/general.js HTTP/1.1" 200 2281
+INFO 2025-09-15 14:40:15,011 basehttp 39 127420147353280 "GET /media/img/gold2logo_sm.png HTTP/1.1" 200 3734
+INFO 2025-09-15 14:40:15,052 basehttp 39 127419927226048 "GET /media/yui/build/tabview/tabview-min.js HTTP/1.1" 200 9938
+INFO 2025-09-15 14:40:15,057 basehttp 39 127419918833344 "GET /media/yui/build/element/element-min.js HTTP/1.1" 200 9251
+INFO 2025-09-15 14:40:15,089 basehttp 39 127420159940288 "GET /media/yui/build/yahoo-dom-event/yahoo-dom-event.js HTTP/1.1" 200 37697
+INFO 2025-09-15 14:40:15,091 basehttp 39 127419910440640 "GET /media/img/icons/database_key.png HTTP/1.1" 200 764
+INFO 2025-09-15 14:40:15,092 basehttp 39 127420147353280 "GET /media/img/icons/calendar.png HTTP/1.1" 200 675
+INFO 2025-09-15 14:40:15,097 basehttp 39 127419910440640 "GET /static/debug_toolbar/css/toolbar.css HTTP/1.1" 200 16675
+INFO 2025-09-15 14:40:15,739 basehttp 39 127419935618752 "GET /media/js/prototype.js HTTP/1.1" 200 207391
+INFO 2025-09-15 14:40:15,797 basehttp 39 127419935618752 "GET /media/img/icons/house.png HTTP/1.1" 200 806
+INFO 2025-09-15 14:40:16,729 basehttp 39 127420159940288 "GET /media/img/icons/zoom.png HTTP/1.1" 200 692
+INFO 2025-09-15 14:40:16,733 basehttp 39 127420147353280 "GET /media/img/icons/status_busy.png HTTP/1.1" 200 751
+INFO 2025-09-15 14:40:16,737 basehttp 39 127419910440640 "GET /media/img/icons/paste_plain.png HTTP/1.1" 200 605
+INFO 2025-09-15 14:40:16,737 basehttp 39 127419918833344 "GET /media/img/icons/report.png HTTP/1.1" 200 649
+INFO 2025-09-15 14:40:16,743 basehttp 39 127419927226048 "GET /media/img/icons/user.png HTTP/1.1" 200 741
+INFO 2025-09-15 14:40:16,762 basehttp 39 127419935618752 "GET /media/img/icons/table_refresh.png HTTP/1.1" 200 795
+INFO 2025-09-15 14:40:16,827 basehttp 39 127420147353280 "GET /media/img/notepad_bg.jpg HTTP/1.1" 200 7448
+INFO 2025-09-15 14:40:16,835 basehttp 39 127419910440640 "GET /media/img/icons/drive_magnify.png HTTP/1.1" 200 641
+INFO 2025-09-15 14:40:16,846 basehttp 39 127420159940288 "GET /media/img/icons/error.png HTTP/1.1" 200 666
+INFO 2025-09-15 14:40:16,862 basehttp 39 127419927226048 "GET /media/img/icons/film_edit.png HTTP/1.1" 200 855
+INFO 2025-09-15 14:40:16,862 basehttp 39 127419935618752 "GET /media/img/icons/folder_page.png HTTP/1.1" 200 688
+INFO 2025-09-15 14:40:16,864 basehttp 39 127419918833344 "GET /media/img/bg_grad.jpg HTTP/1.1" 200 342
+INFO 2025-09-15 14:40:16,882 basehttp 39 127420147353280 "GET /media/img/icons/database_edit.png HTTP/1.1" 200 767
+INFO 2025-09-15 14:40:16,888 basehttp 39 127419927226048 "GET /media/img/icons/page_white_acrobat.png HTTP/1.1" 200 591
+INFO 2025-09-15 14:40:16,904 basehttp 39 127419910440640 "GET /media/img/icons/text_list_numbers.png HTTP/1.1" 200 357
+INFO 2025-09-15 14:40:16,916 basehttp 39 127420147353280 "GET /media/img/icons/music.png HTTP/1.1" 200 385
+INFO 2025-09-15 14:40:16,916 basehttp 39 127420159940288 "GET /media/img/icons/coins.png HTTP/1.1" 200 732
+INFO 2025-09-15 14:40:16,945 basehttp 39 127419918833344 "GET /media/img/icons/user_green.png HTTP/1.1" 200 722
+INFO 2025-09-15 14:40:16,949 basehttp 39 127419935618752 "GET /media/img/thundercuddles_bg.jpg HTTP/1.1" 200 8127
+INFO 2025-09-15 14:40:16,952 basehttp 39 127420159940288 "GET /media/img/grad_bg.jpg HTTP/1.1" 200 379
+INFO 2025-09-15 14:40:16,973 basehttp 39 127419927226048 "GET /media/img/cup_mosiac.jpg HTTP/1.1" 200 8175
+INFO 2025-09-15 14:40:16,973 basehttp 39 127419918833344 "GET /media/img/calendar_bg.jpg HTTP/1.1" 200 2791
+INFO 2025-09-15 14:40:16,989 basehttp 39 127419935618752 "GET /media/img/icons/pictures.png HTTP/1.1" 200 704
+INFO 2025-09-15 14:40:16,990 basehttp 39 127419910440640 "GET /media/img/icons/add.png HTTP/1.1" 200 733
+INFO 2025-09-15 14:40:17,003 basehttp 39 127420147353280 "GET /media/img/icons/brush.png HTTP/1.1" 200 3396
+INFO 2025-09-15 14:40:17,018 basehttp 39 127419918833344 "GET /media/img/icons/money.png HTTP/1.1" 200 738
+INFO 2025-09-15 14:40:17,025 basehttp 39 127419927226048 "GET /media/img/icons/box.png HTTP/1.1" 200 555
+INFO 2025-09-15 14:40:17,035 basehttp 39 127419910440640 "GET /media/img/icons/color_wheel.png HTTP/1.1" 200 892
+INFO 2025-09-15 14:40:17,051 basehttp 39 127420147353280 "GET /media/img/icons/page_white_paste.png HTTP/1.1" 200 620
+INFO 2025-09-15 14:40:17,051 basehttp 39 127419918833344 "GET /media/img/icons/fedex_truck.png HTTP/1.1" 200 969
+INFO 2025-09-15 14:40:17,052 basehttp 39 127420159940288 "GET /media/img/icons/chart_line_edit.png HTTP/1.1" 200 718
+INFO 2025-09-15 14:40:17,091 basehttp 39 127419910440640 "GET /media/img/icons/eye.png HTTP/1.1" 200 750
+INFO 2025-09-15 14:40:17,091 basehttp 39 127419935618752 "GET /media/img/icons/image_edit.png HTTP/1.1" 200 783
+INFO 2025-09-15 14:40:17,091 basehttp 39 127419918833344 "GET /media/img/icons/rainbow.png HTTP/1.1" 200 655
+INFO 2025-09-15 14:40:17,093 basehttp 39 127420159940288 "GET /media/img/icons/telephone.png HTTP/1.1" 200 791
+INFO 2025-09-15 14:40:17,112 basehttp 39 127419927226048 "GET /media/img/icons/table_error.png HTTP/1.1" 200 687
+INFO 2025-09-15 14:40:17,127 basehttp 39 127419910440640 "GET /media/img/icons/basket_add.png HTTP/1.1" 200 752
+INFO 2025-09-15 14:40:17,144 basehttp 39 127420147353280 "GET /media/img/icons/server_database.png HTTP/1.1" 200 666
+INFO 2025-09-15 14:40:17,144 basehttp 39 127420159940288 "GET /media/img/icons/money_dollar.png HTTP/1.1" 200 630
+INFO 2025-09-15 14:40:17,144 basehttp 39 127419935618752 "GET /media/img/icons/report_user.png HTTP/1.1" 200 785
+INFO 2025-09-15 14:40:17,156 basehttp 39 127419927226048 "GET /static/debug_toolbar/js/utils.js HTTP/1.1" 200 4742
+INFO 2025-09-15 14:40:17,166 basehttp 39 127419918833344 "GET /media/img/icons/clock.png HTTP/1.1" 200 882
+INFO 2025-09-15 14:40:17,177 basehttp 39 127419910440640 "GET /media/img/icons/flag_red.png HTTP/1.1" 200 665
+INFO 2025-09-15 14:40:17,178 basehttp 39 127419935618752 "GET /media/img/icons/chart_curve.png HTTP/1.1" 200 710
+INFO 2025-09-15 14:40:17,180 basehttp 39 127419935618752 "GET /static/debug_toolbar/css/print.css HTTP/1.1" 200 43
+INFO 2025-09-15 14:40:17,202 basehttp 39 127419918833344 "GET /media/css/print.css HTTP/1.1" 200 31
+INFO 2025-09-15 14:40:17,265 basehttp 39 127419918833344 "GET /favicon.ico HTTP/1.1" 302 0
+ERROR 2025-09-15 14:40:17,312 pretty_exception 39 127419918833344
+Exception: Http404: “/app/media/favicon.ico” does not exist
+Trace (most recent frames):
+  /usr/local/lib/python3.11/site-packages/django/core/handlers/base.py:197 in _get_response
+  /usr/local/lib/python3.11/site-packages/django/views/static.py:51 in serve
+WARNING 2025-09-15 14:40:17,348 log 39 127419918833344 Not Found: /media/favicon.ico
+WARNING 2025-09-15 14:40:17,349 basehttp 39 127419918833344 "GET /media/favicon.ico HTTP/1.1" 404 98211
+INFO 2025-09-15 14:40:19,177 basehttp 39 127419918833344 "GET /bev_billing/invoice/queue/ HTTP/1.1" 200 32873
+INFO 2025-09-15 14:40:19,271 basehttp 39 127419927226048 "GET /media/yui/build/menu/assets/skins/sam/menu.css HTTP/1.1" 200 5043
+INFO 2025-09-15 14:40:19,272 basehttp 39 127419918833344 "GET /media/yui/build/container/assets/container.css HTTP/1.1" 200 7118
+INFO 2025-09-15 14:40:19,348 basehttp 39 127419927226048 "GET /media/img/icons/resultset_previous.png HTTP/1.1" 200 389
+INFO 2025-09-15 14:40:19,349 basehttp 39 127419918833344 "GET /media/img/icons/resultset_first.png HTTP/1.1" 200 522
+INFO 2025-09-15 14:40:19,352 basehttp 39 127419935618752 "GET /media/yui/build/animation/animation-min.js HTTP/1.1" 200 13851
+INFO 2025-09-15 14:40:19,356 basehttp 39 127419910440640 "GET /media/yui/build/container/container-min.js HTTP/1.1" 200 74966
+INFO 2025-09-15 14:40:19,365 basehttp 39 127420159940288 "GET /media/yui/build/container/container_core.js HTTP/1.1" 200 187493
+INFO 2025-09-15 14:40:19,368 basehttp 39 127420147353280 "GET /media/yui/build/menu/menu.js HTTP/1.1" 200 240425
+INFO 2025-09-15 14:40:19,413 basehttp 39 127420159940288 "GET /media/img/icons/resultset_last.png HTTP/1.1" 200 524
+INFO 2025-09-15 14:40:19,413 basehttp 39 127419910440640 "GET /media/img/icons/accept.png HTTP/1.1" 200 781
+INFO 2025-09-15 14:40:19,419 basehttp 39 127420147353280 "GET /media/img/icons/resultset_next.png HTTP/1.1" 200 395
+INFO 2025-09-15 14:40:19,422 basehttp 39 127419935618752 "GET /media/yui/build/assets/skins/sam/sprite.png HTTP/1.1" 200 3745
+INFO 2025-09-15 14:40:23,080 basehttp 39 127420159940288 "GET /__debug__/render_panel/?store_id=8b179a32e331485fb0c1b7389188af38&panel_id=HeadersPanel HTTP/1.1" 200 4549
+INFO 2025-09-15 14:40:24,175 basehttp 39 127420147353280 "GET /workflow/job/92322/ HTTP/1.1" 200 49312
+INFO 2025-09-15 14:40:24,270 basehttp 39 127420159940288 "GET /media/css/workflow/job_detail.css HTTP/1.1" 200 2306
+INFO 2025-09-15 14:40:24,281 basehttp 39 127419935618752 "GET /media/css/spectrum/spectrum.css HTTP/1.1" 200 15427
+INFO 2025-09-15 14:40:24,282 basehttp 39 127420147353280 "GET /media/js/jquery/css/smoothness/jquery-ui-1.9.2.custom.css HTTP/1.1" 200 32738
+INFO 2025-09-15 14:40:24,343 basehttp 39 127419935618752 "GET /media/js/workflow/job_detail.js HTTP/1.1" 200 50614
+INFO 2025-09-15 14:40:24,395 basehttp 39 127419935618752 "GET /media/js/workflow/job_shipmanager.js HTTP/1.1" 200 4246
+INFO 2025-09-15 14:40:24,403 basehttp 39 127420159940288 "GET /media/js/jquery/js/jquery-1.8.3.js HTTP/1.1" 200 267739
+INFO 2025-09-15 14:40:24,432 basehttp 39 127420147353280 "GET /media/js/jquery/js/jquery-ui-1.9.2.custom.js HTTP/1.1" 200 465012
+INFO 2025-09-15 14:40:24,454 basehttp 39 127420159940288 "GET /media/js/workflow/qc_manager.js HTTP/1.1" 200 1597
+INFO 2025-09-15 14:40:24,480 basehttp 39 127420147353280 "GET /media/js/fedex/fedex.js HTTP/1.1" 200 2118
+INFO 2025-09-15 14:40:24,502 basehttp 39 127420159940288 "GET /media/css/drawdown/drawdown.css HTTP/1.1" 200 6569
+INFO 2025-09-15 14:40:24,504 basehttp 39 127419910440640 "GET /media/js/drawdown/drawdown.js HTTP/1.1" 200 6360
+INFO 2025-09-15 14:40:24,507 basehttp 39 127419935618752 "GET /media/js/spectrum/spectrum.js HTTP/1.1" 200 79192
+INFO 2025-09-15 14:40:24,523 basehttp 39 127420159940288 "GET /media/img/icons/pencil.png HTTP/1.1" 200 450
+INFO 2025-09-15 14:40:24,629 basehttp 39 127420159940288 "GET /media/img/bg_button_a.gif HTTP/1.1" 200 577
+INFO 2025-09-15 14:40:24,630 basehttp 39 127420147353280 "GET /media/img/icons/exclamation.png HTTP/1.1" 200 701
+INFO 2025-09-15 14:40:24,630 basehttp 39 127419910440640 "GET /media/img/bg_button_span.gif HTTP/1.1" 200 1419
+INFO 2025-09-15 14:40:24,661 basehttp 39 127419910440640 "GET /media/img/icons/comments_add.png HTTP/1.1" 200 648
+INFO 2025-09-15 14:40:24,669 basehttp 39 127420147353280 "GET /media/img/icons/script.png HTTP/1.1" 200 748
+INFO 2025-09-15 14:40:24,683 basehttp 39 127419935618752 "GET /joblog/92322/filtered/ HTTP/1.1" 200 16859
+INFO 2025-09-15 14:40:24,702 basehttp 39 127420147353280 "GET /media/img/icons/date.png HTTP/1.1" 200 626
+INFO 2025-09-15 14:40:24,710 basehttp 39 127420159940288 "GET /media/img/icons/picture_save_dimmed.png HTTP/1.1" 200 431
+INFO 2025-09-15 14:40:24,710 basehttp 39 127419935618752 "GET /media/img/icons/comments.png HTTP/1.1" 200 557
+INFO 2025-09-15 14:40:24,735 basehttp 39 127419910440640 "GET /media/img/icons/control_pause.png HTTP/1.1" 200 598
+INFO 2025-09-15 14:40:24,771 basehttp 39 127420147353280 "GET /media/img/icons/book_edit.png HTTP/1.1" 200 813
+INFO 2025-09-15 14:40:24,776 basehttp 39 127420159940288 "GET /media/img/icons/page_white_magnify.png HTTP/1.1" 200 554
+INFO 2025-09-15 14:40:24,803 basehttp 39 127419910440640 "GET /media/img/icons/date_edit.png HTTP/1.1" 200 799
+INFO 2025-09-15 14:40:24,804 basehttp 39 127420147353280 "GET /media/img/icons/page_gear.png HTTP/1.1" 200 833
+INFO 2025-09-15 14:40:24,814 basehttp 39 127419935618752 "GET /__debug__/render_panel/?store_id=8b179a32e331485fb0c1b7389188af38&panel_id=RequestPanel HTTP/1.1" 200 120
+INFO 2025-09-15 14:40:24,832 basehttp 39 127420147353280 "GET /media/img/icons/award_star_gold_2.png HTTP/1.1" 200 770
+INFO 2025-09-15 14:40:24,832 basehttp 39 127419910440640 "GET /media/img/icons/folder.png HTTP/1.1" 200 537
+INFO 2025-09-15 14:40:24,846 basehttp 39 127420159940288 "GET /media/img/icons/clock_add.png HTTP/1.1" 200 925
+INFO 2025-09-15 14:40:24,852 basehttp 39 127420147353280 "GET /media/img/icons/information.png HTTP/1.1" 200 778
+INFO 2025-09-15 14:40:24,868 basehttp 39 127420159940288 "GET /media/img/icons/disk_multiple.png HTTP/1.1" 200 691
+INFO 2025-09-15 14:40:24,873 basehttp 39 127420147353280 "GET /media/img/icons/folder_heart.png HTTP/1.1" 200 741
+INFO 2025-09-15 14:40:24,894 basehttp 39 127420147353280 "GET /media/img/icons/link_go.png HTTP/1.1" 200 655
+INFO 2025-09-15 14:40:24,899 basehttp 39 127419910440640 "GET /media/img/icons/database_add.png HTTP/1.1" 200 658
+INFO 2025-09-15 14:40:26,616 basehttp 39 127420147353280 "GET /__debug__/render_panel/?store_id=8b179a32e331485fb0c1b7389188af38&panel_id=TimerPanel HTTP/1.1" 200 120
+INFO 2025-09-15 14:40:26,980 basehttp 39 127419910440640 "GET /workflow/job/92323/ HTTP/1.1" 200 49622
+INFO 2025-09-15 14:40:27,094 basehttp 39 127419910440640 "GET /media/img/icons/application_view_list.png HTTP/1.1" 200 473
+INFO 2025-09-15 14:40:27,147 basehttp 39 127420147353280 "GET /joblog/92323/filtered/ HTTP/1.1" 200 17213
+INFO 2025-09-15 14:40:27,156 basehttp 39 127419910440640 "GET /media/img/icons/page_white_acrobat_dimmed.png HTTP/1.1" 200 418
+INFO 2025-09-15 14:40:27,157 basehttp 39 127420159940288 "GET /media/img/icons/picture_edit_dimmed.png HTTP/1.1" 200 466
+INFO 2025-09-15 14:40:27,436 basehttp 39 127419910440640 "GET /__debug__/render_panel/?store_id=8b179a32e331485fb0c1b7389188af38&panel_id=SQLPanel HTTP/1.1" 200 120
+INFO 2025-09-15 14:40:31,370 basehttp 39 127419910440640 "GET /bev_billing/invoice/queue/ HTTP/1.1" 200 32873
+INFO 2025-09-15 14:40:33,738 basehttp 39 127419910440640 "GET /__debug__/render_panel/?store_id=3eb1ed1dcea7473baafcc56d3c1c9a58&panel_id=SQLPanel HTTP/1.1" 200 3287926

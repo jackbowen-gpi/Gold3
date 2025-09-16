@@ -137,7 +137,9 @@ services:
       - "9100:9100"
 
   wiki:
-    image: mediawiki:1.39
+    build:
+      context: .
+      dockerfile: Dockerfile.wiki
     ports:
       - "8080:80"
     volumes:
@@ -156,10 +158,14 @@ services:
       POSTGRES_DB: gchub_dev
     command: >
       sh -c "
+        echo 'Installing PostgreSQL client...' &&
+        apt-get update && apt-get install -y postgresql-client &&
+        echo 'Checking PHP extensions...' &&
+        php -m | grep -E '(pgsql|mbstring|xml|curl)' || echo 'Some PHP extensions may be missing' &&
         echo 'Setting up MediaWiki database...' &&
         sleep 15 &&
-        PGPASSWORD=gchub psql -h db -U gchub -d gchub_dev -c \"CREATE USER IF NOT EXISTS wiki_user WITH PASSWORD 'wiki_password';\" &&
-        PGPASSWORD=gchub psql -h db -U gchub -d gchub_dev -c \"CREATE DATABASE IF NOT EXISTS wiki_db OWNER wiki_user;\" &&
+        PGPASSWORD=gchub psql -h db -U gchub -d gchub_dev -c \"CREATE USER wiki_user WITH PASSWORD 'wiki_password';\" || echo 'User may already exist' &&
+        PGPASSWORD=gchub psql -h db -U gchub -d gchub_dev -c \"CREATE DATABASE wiki_db OWNER wiki_user;\" || echo 'Database may already exist' &&
         PGPASSWORD=gchub psql -h db -U gchub -d gchub_dev -c \"GRANT ALL PRIVILEGES ON DATABASE wiki_db TO wiki_user;\" &&
         echo 'Database setup complete. Starting MediaWiki...' &&
         apache2-foreground

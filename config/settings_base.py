@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "formtools",
     "django_celery_beat",
+    # "debug_toolbar",  # Django Debug Toolbar - temporarily disabled
     # Project apps
     "gchub_db.apps.accounts",
     "gchub_db.apps.legacy_support",
@@ -71,6 +72,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # "debug_toolbar.middleware.DebugToolbarMiddleware",  # Django Debug Toolbar - temporarily disabled
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -88,6 +90,8 @@ TEMPLATES = [
         "DIRS": [
             os.path.join(BASE_DIR, "templates"),
             os.path.join(BASE_DIR, "html"),
+            # Add debug_toolbar templates directory
+            "/usr/local/lib/python3.11/site-packages/debug_toolbar/templates",
         ],
         "APP_DIRS": True,
         "OPTIONS": {
