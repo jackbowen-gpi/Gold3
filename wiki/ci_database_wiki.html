@@ -1,0 +1,111 @@
+__NOTOC__ = CI/CD Pipeline and Database Architecture = '''Complete Documentation
+for GOLD3 CI/CD and Database Architecture''' == Overview == This document covers
+the CI/CD pipeline configuration and database architecture decisions for the
+GOLD3 Django application, including recent fixes for parallel testing conflicts
+and documentation of the PostgreSQL database structure. == CI/CD Pipeline
+Configuration == === GitHub Actions Matrix Testing === The CI pipeline uses a
+matrix strategy to test across multiple Python versions simultaneously:
+
+<syntaxhighlight lang="yaml">
+  strategy: matrix: python-version: ["3.11", "3.12", "3.13"]
+</syntaxhighlight>
+
+==== Database Isolation Fix ==== '''Problem''': Multiple Python versions running
+in parallel were using the same database name (<code>gchub_test</code>), causing
+migration conflicts and "relation already exists" errors. '''Solution''':
+Implemented unique database names per Python version:
+
+<syntaxhighlight lang="yaml">
+  # Before (causing conflicts) echo "TEST_PG_NAME=gchub_test" >> $GITHUB_ENV #
+  After (unique per job) echo "TEST_PG_NAME=gchub_test_${{ matrix.python-version
+  }}" >> $GITHUB_ENV
+</syntaxhighlight>
+
+'''Result''': Each Python version now gets its own isolated database: * Python
+3.11 → <code>gchub_test_3.11</code> * Python 3.12 →
+<code>gchub_test_3.12</code> * Python 3.13 → <code>gchub_test_3.13</code>
+
+=== CI Workflow Steps === # '''Setup Python''' - Install specified Python
+version # '''Cache Dependencies''' - Speed up pip installs # '''Install System
+Dependencies''' - PostgreSQL client libraries # '''Install Python Packages''' -
+From requirements files # '''Configure Database''' - Set unique database name
+per job # '''Reset Database''' - Clean state for each test run # '''Run
+Migrations''' - Apply Django schema changes # '''Run Tests''' - Execute test
+suite with coverage # '''Security Scans''' - Bandit and Safety vulnerability
+checks === Benefits of Multi-Version Testing === * '''Compatibility
+Assurance''': Validates Django 5.2.6 works across Python versions *
+'''Future-Proofing''': Catches issues before production deployment *
+'''Dependency Validation''': Ensures all packages work with different Python
+versions * '''Performance Insights''': Identifies performance differences
+between versions * '''Migration Planning''': Smooth transition path for Python
+upgrades == Database Architecture == === PostgreSQL vs MSSQL Architecture ===
+The GOLD3 application uses '''PostgreSQL as the primary database''' with limited
+MSSQL integration for external systems. ==== PostgreSQL (Primary Database) ====
+'''Architecture Approach''': Django ORM + Standard SQL * ✅ '''Django
+Migrations''': Standard schema management * ✅ '''Django ORM''': Model-based
+database operations * ✅ '''Raw SQL''': Limited usage for complex queries * ❌
+'''No Stored Procedures''': Not used in PostgreSQL * ❌ '''No Database
+Functions''': Not implemented * ❌ '''No Triggers''': Not utilized ==== MSSQL
+(External Integration) ==== '''Architecture Approach''': Raw SQL queries for
+external data access Located in <code>gchub_db/apps/workflow/etools.py</code>:
+
+<syntaxhighlight lang="python">
+  # External MSSQL database connection cursor.execute(""" SELECT TOP 5 * FROM
+  tb_FSAR_Data_SampArtReq WHERE Job_Status = 'New' """)
+</syntaxhighlight>
+
+=== Database Objects Analysis === ==== No PostgreSQL Stored Procedures ====
+After comprehensive codebase analysis, '''zero PostgreSQL stored procedures'''
+were found: * '''Django Models''': Handle business logic in Python * '''Django
+Managers''': Custom query methods * '''Django Signals''': Event-driven
+operations * '''Raw SQL''': Only for external MSSQL integration ==== Migration
+Strategy ====
+
+<syntaxhighlight lang="python">
+  # Example migration creating PlantBevController model operations = [
+  migrations.CreateModel( name="PlantBevController", fields=[ ("id",
+  models.BigAutoField(primary_key=True)), ("plant",
+  models.ForeignKey("workflow.plant")), ("user",
+  models.ForeignKey(settings.AUTH_USER_MODEL)), ], options={ "db_table":
+  "workflow_plant_bev_controller", }, ), ]
+</syntaxhighlight>
+
+=== Database Configuration === ==== Test Settings
+(<code>gchub_db/test_settings.py</code>) ====
+
+<syntaxhighlight lang="python">
+  # Environment-based database configuration TEST_PG_NAME =
+  os.environ.get("TEST_PG_NAME") if TEST_PG_NAME: DATABASES = { "default": {
+  "ENGINE": "django.db.backends.postgresql", "NAME": TEST_PG_NAME, "USER":
+  TEST_PG_USER, "PASSWORD": TEST_PG_PASSWORD, "HOST": TEST_PG_HOST, "PORT":
+  TEST_PG_PORT, "TEST": {"NAME": TEST_PG_NAME}, } }
+</syntaxhighlight>
+
+==== Production Settings ==== * PostgreSQL 15 with connection pooling * Database
+backups and replication * Monitoring and performance optimization * Security
+hardening (SSL, authentication) == Development Workflow == === Local Development
+Setup === # '''Database''': PostgreSQL 15 via Docker # '''Python''': Version
+3.11+ (matches CI matrix) # '''Dependencies''': Managed via requirements-dev.txt
+# '''Migrations''': Django makemigrations/migrate # '''Testing''': pytest with
+coverage reporting === CI/CD Integration === * '''Trigger''': Push/PR to main/jb
+branches * '''Services''': PostgreSQL 15 container per job * '''Caching''': pip
+dependencies and system packages * '''Artifacts''': Coverage reports and
+security scans * '''Notifications''': GitHub status checks == Monitoring and
+Maintenance == === Database Health Checks === * Connection pool monitoring *
+Query performance analysis * Migration status verification * Backup integrity
+validation === CI/CD Metrics === * Test execution time per Python version *
+Coverage percentage trends * Security scan results * Migration success rates ==
+Best Practices == === Database Development === # '''Use Django ORM''' for
+standard operations # '''Avoid raw SQL''' unless necessary # '''Test
+migrations''' on all Python versions # '''Document schema changes''' thoroughly
+# '''Monitor query performance''' regularly === CI/CD Optimization === #
+'''Parallel execution''' with isolated databases # '''Dependency caching''' for
+faster builds # '''Security scanning''' on every commit # '''Coverage
+reporting''' for quality metrics # '''Matrix testing''' for compatibility
+assurance == Related Documentation == * [[Database Schema Documentation]] -
+Detailed table structures * [[Django Apps Documentation]] - Application modules
+* [[API Documentation]] - REST endpoints * [[Security Features]] -
+Authentication and authorization * [[Testing & Quality Assurance]] - Test
+coverage and QA processes ---- ''Last updated: September 16, 2025''<br />
+''CI Fix implemented: Unique database names per Python version''<br />
+''Database documentation: PostgreSQL ORM architecture confirmed''

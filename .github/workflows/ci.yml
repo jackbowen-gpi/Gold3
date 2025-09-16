@@ -76,7 +76,7 @@ jobs:
 
       - name: Configure test Postgres env
         run: |
-          echo "TEST_PG_NAME=gchub_test" >> $GITHUB_ENV
+          echo "TEST_PG_NAME=gchub_test_${{ matrix.python-version }}" >> $GITHUB_ENV
           echo "TEST_PG_USER=gchub" >> $GITHUB_ENV
           echo "TEST_PG_PASSWORD=gchub" >> $GITHUB_ENV
           echo "TEST_PG_HOST=127.0.0.1" >> $GITHUB_ENV
