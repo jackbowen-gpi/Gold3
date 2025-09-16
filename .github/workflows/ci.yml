@@ -41,11 +41,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpq-dev libxml2-dev libxslt-dev libffi-dev libssl-dev
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f config/requirements-dev.txt ]; then pip install -r config/requirements-dev.txt; fi
+          if [ -f config/requirements.txt ]; then pip install -r config/requirements.txt; fi
         env:
           PIP_DISABLE_PIP_VERSION_CHECK: 1
 
@@ -71,8 +77,8 @@ jobs:
       - name: Configure test Postgres env
         run: |
           echo "TEST_PG_NAME=gchub_test" >> $GITHUB_ENV
-          echo "TEST_PG_USER=postgres" >> $GITHUB_ENV
-          echo "TEST_PG_PASSWORD=postgres" >> $GITHUB_ENV
+          echo "TEST_PG_USER=gchub" >> $GITHUB_ENV
+          echo "TEST_PG_PASSWORD=gchub" >> $GITHUB_ENV
           echo "TEST_PG_HOST=127.0.0.1" >> $GITHUB_ENV
           echo "TEST_PG_PORT=5432" >> $GITHUB_ENV
 
