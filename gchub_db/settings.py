@@ -5,14 +5,14 @@ import pprint
 import sys
 
 # Import the main settings configuration
-from config.settings import (
+from config.settings import (  # type: ignore[attr-defined]
     ALLOWED_HOSTS,
     DEBUG,
-    EMAIL_BACKEND,
+    EMAIL_BACKEND,  # type: ignore[attr-defined]
     EMAIL_HOST,
     INTERNAL_IPS,
     MIDDLEWARE,
-)  # type: ignore[assignment]
+)
 
 # SECRET_KEY for Django (required for all Django applications)
 SECRET_KEY = "dev-secret-key-change-in-production-12345678901234567890"
@@ -188,7 +188,7 @@ if DEBUG:
                 globals()["MIDDLEWARE"].insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
         else:
             # Define MIDDLEWARE if not imported
-            MIDDLEWARE = [
+            MIDDLEWARE = [  # type: ignore[assignment]
                 "debug_toolbar.middleware.DebugToolbarMiddleware",
                 "django.middleware.security.SecurityMiddleware",
                 "django.contrib.sessions.middleware.SessionMiddleware",
@@ -206,7 +206,7 @@ EMAIL_GCHUB = "gchub@localhost"
 
 try:
     # Import specific variables from local_settings to avoid type conflicts
-    from config.local_settings import (
+    from config.local_settings import (  # type: ignore[attr-defined]
         ALLOWED_HOSTS,
         AUTO_FTP_ENABLED,
         BEVERAGE_DROP_FOLDER,
@@ -243,7 +243,7 @@ except ImportError:
     QAD_ENABLED = False
     AUTO_FTP_ENABLED = False
     FS_ACCESS_ENABLED = False
-    STATIC_ROOT = None
+    STATIC_ROOT = None  # type: ignore[assignment]
     # Define missing settings for development
     WORKFLOW_ROOT_DIR = "/tmp"
     PRODUCTION_DIR = "/tmp/Production"

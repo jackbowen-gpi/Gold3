@@ -2,15 +2,15 @@ r"""
 Module src\celery_app.py
 """
 
-import os
 import logging
+import os
 
 # Ensure a default settings module is available; actual django.setup()
 # is performed by the container startup wrappers so importing this module
 # doesn't trigger Django app population during package import.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gchub_db.settings")
 
-from celery import Celery  # type: ignore[import-not-found]
+from celery import Celery  # type: ignore[import-untyped]
 
 # Explicitly import tasks from bin package since it's not a Django app.
 # Do this after Django is set up in the container entrypoint to avoid
@@ -37,8 +37,8 @@ if env_broker and not getattr(app.conf, "broker_url", None):
 app.autodiscover_tasks()
 
 
-@app.task(bind=True)
-def debug_task(self):
+@app.task(bind=True)  # type: ignore[misc]
+def debug_task(self) -> None:  # type: ignore[no-untyped-def]
     logger = logging.getLogger(__name__)
     logger.info(f"Request: {self.request!r}")
     print(f"Request: {self.request!r}")
