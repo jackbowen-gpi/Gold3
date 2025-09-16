@@ -13,7 +13,12 @@ import sys
 from pathlib import Path
 
 # Import base settings that are common to all environments
-from config.settings_base import DEBUG, STATIC_URL
+from config.settings_base import ALLOWED_HOSTS, DEBUG, STATIC_URL
+
+# SECRET_KEY for Django (required for all Django applications)
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "dev-secret-key-change-in-production-12345678901234567890"
+)
 
 # Database configuration
 DATABASES = {
@@ -26,6 +31,32 @@ DATABASES = {
         "PORT": os.environ.get("DEV_DB_PORT", "5432"),
     }
 }
+
+# Email configuration
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # Default to console backend for development
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() == "true"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+
+# Middleware configuration
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",  # Django Debug Toolbar
+]
+
+# Internal IPs for debug toolbar
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+]
 
 # Application definition
 INSTALLED_APPS = [

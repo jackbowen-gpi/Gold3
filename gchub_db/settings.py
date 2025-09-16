@@ -14,6 +14,9 @@ from config.settings import (
     MIDDLEWARE,
 )  # type: ignore[assignment]
 
+# SECRET_KEY for Django (required for all Django applications)
+SECRET_KEY = "dev-secret-key-change-in-production-12345678901234567890"
+
 # Database configuration
 DATABASES = {
     "default": {
