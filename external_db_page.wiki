@@ -1,0 +1,752 @@
+= External Database Integration =
+
+{| class="wikitable" style="float:right; margin-left:1em; width:300px;"
+|-
+! colspan="2" | External Databases
+|-
+| '''PostgreSQL Container''' || gchub_db-postgres-dev-1
+|-
+| '''PostgreSQL Port''' || 5433 (external)
+|-
+| '''MSSQL Integration''' || pyodbc + ETOOLS
+|-
+| '''Connection Method''' || ODBC DSN
+|-
+| '''Development Mode''' || Mock data support
+|-
+| '''Data Synchronization''' || Manual/On-demand
+|-
+| '''Security''' || Encrypted connections
+|}
+
+== Overview ==
+
+GOLD3 integrates with multiple external database systems to support both development workflows and production data access. The system connects to an external PostgreSQL container for primary data storage and integrates with Microsoft SQL Server (MSSQL) systems through the ETOOLS interface for specialized business operations.
+
+== PostgreSQL External Container ==
+
+=== Container Configuration ===
+
+'''Target Container Details:'''
+* '''Container ID''': c202e6b9c60b7cf3415be98762f602c3f861cd7b382e903a04763549573c2086
+* '''Container Name''': gchub_db-postgres-dev-1
+* '''Host Port''': 5433 (mapped from container port 5432)
+* '''Database''': gchub_dev
+* '''Username''': postgres
+* '''Password''': postgres
+
+=== Django Configuration ===
+
+'''Database Settings (settings_common.py):'''
+<syntaxhighlight lang="python">
+DATABASES_RAW_DEV = {
+    "ENGINE": os.environ.get("DEV_DB_ENGINE", "django.db.backends.postgresql"),
+    "NAME": os.environ.get("DEV_DB_NAME", "gchub_dev"),
+    "USER": os.environ.get("DEV_DB_USER", "postgres"),
+    "PASSWORD": os.environ.get("DEV_DB_PASSWORD", "postgres"),
+    "HOST": os.environ.get("DEV_DB_HOST", "127.0.0.1"),
+    "PORT": os.environ.get("DEV_DB_PORT", "5433"),
+    "OPTIONS": {
+        "connect_timeout": 10,
+        "sslmode": "prefer",  # Use SSL when available
+    },
+    "CONN_MAX_AGE": 600,
+    "CONN_HEALTH_CHECKS": True,
+}
+</syntaxhighlight>
+
+=== Docker Compose Integration ===
+
+'''Service Configuration:'''
+<syntaxhighlight lang="yaml">
+services:
+  web:
+    build: .
+    environment:
+      - DEV_DB_HOST=host.docker.internal
+      - DEV_DB_PORT=5433
+      - DEV_DB_NAME=gchub_dev
+      - DEV_DB_USER=postgres
+      - DEV_DB_PASSWORD=postgres
+    depends_on:
+      # Removed dependency on local 'db' service
+    networks:
+      - gold3
+
+  celery:
+    build: .
+    environment:
+      - DEV_DB_HOST=host.docker.internal
+      - DEV_DB_PORT=5433
+      - DEV_DB_NAME=gchub_dev
+      - DEV_DB_USER=postgres
+      - DEV_DB_PASSWORD=postgres
+    depends_on:
+      - redis
+      # Removed dependency on local 'db' service
+</syntaxhighlight>
+
+=== Environment Variables ===
+
+'''Configuration Overrides:'''
+<syntaxhighlight lang="bash">
+# Database connection
+DEV_DB_HOST=127.0.0.1          # Database host
+DEV_DB_PORT=5433               # External container port
+DEV_DB_NAME=gchub_dev          # Database name
+DEV_DB_USER=postgres           # Database user
+DEV_DB_PASSWORD=postgres       # Database password
+DEV_DB_ENGINE=django.db.backends.postgresql  # Database engine
+
+# Connection settings
+DEV_DB_CONN_MAX_AGE=600        # Connection lifetime
+DEV_DB_CONN_HEALTH_CHECKS=True # Health checks enabled
+</syntaxhighlight>
+
+== MSSQL ETOOLS Integration ==
+
+=== Architecture Overview ===
+
+'''ETOOLS System Integration:'''
+* '''Purpose''': Business workflow management and job tracking
+* '''Technology''': Microsoft SQL Server with ODBC connectivity
+* '''Connection''': pyodbc library with DSN configuration
+* '''Data Flow''': Read-only access to external business systems
+
+=== Data Flow ===
+
+<syntaxhighlight lang="mermaid">
+graph TD
+    A[ETOOLS MSSQL] --> B[ODBC DSN]
+    B --> C[pyodbc Connection]
+    C --> D[GOLD3 Django App]
+    D --> E[Job Processing]
+    D --> F[Data Synchronization]
+
+    G[Mock Data] --> H[Development Mode]
+    H --> D
+
+    I[Business Rules] --> J[Data Validation]
+    J --> E
+</syntaxhighlight>
+
+=== Connection Configuration ===
+
+'''ODBC DSN Setup:'''
+<syntaxhighlight lang="ini">
+# /etc/odbc.ini or ~/.odbc.ini
+[ETOOLS_DSN]
+Driver = ODBC Driver 18 for SQL Server
+Server = etools-server.company.com
+Database = ETOOLS_Prod
+Trusted_Connection = yes
+Encrypt = yes
+TrustServerCertificate = no
+</syntaxhighlight>
+
+'''Django Settings:'''
+<syntaxhighlight lang="python">
+# settings.py
+ETOOLS_ENABLED = os.getenv('ETOOLS_ENABLED', 'False').lower() == 'true'
+ETOOLS_ODBC_DSN = os.getenv('ETOOLS_ODBC_DSN', 'ETOOLS_DSN')
+
+# Development mode settings
+if not ETOOLS_ENABLED:
+    # Use mock data for development
+    ETOOLS_MOCK_DATA = True
+</syntaxhighlight>
+
+=== ETOOLS Module Structure ===
+
+'''Core Components:'''
+<syntaxhighlight lang="python">
+# gchub_db/apps/workflow/etools.py
+
+class ETOOLSIntegration:
+    """Main ETOOLS integration class"""
+
+    def __init__(self):
+        self.enabled = getattr(settings, 'ETOOLS_ENABLED', False)
+        self.dsn = getattr(settings, 'ETOOLS_ODBC_DSN', 'ETOOLS_DSN')
+
+    def get_connection(self):
+        """Get database connection"""
+        if not self.enabled:
+            return MockCursor(), None
+        return pyodbc.connect(self.dsn)
+
+    def get_new_jobs(self):
+        """Retrieve new jobs from ETOOLS"""
+        cursor, conn = self.get_connection()
+        try:
+            cursor.execute("""
+                SELECT TOP 5 *
+                FROM tb_FSAR_Data_SampArtReq
+                WHERE Job_Status = 'New'
+                ORDER BY Request_ID ASC
+            """)
+            return cursor.fetchall()
+        finally:
+            if conn:
+                conn.close()
+</syntaxhighlight>
+
+=== Data Models ===
+
+'''ETOOLS Job Structure:'''
+<syntaxhighlight lang="sql">
+-- tb_FSAR_Data_SampArtReq table structure
+CREATE TABLE tb_FSAR_Data_SampArtReq (
+    Request_ID int PRIMARY KEY,
+    Customer_Name nvarchar(255),
+    Project_Description nvarchar(1000),
+    Job_Status nvarchar(50),  -- 'New', 'Active', 'Complete'
+    Request_Date datetime,
+    Due_Date datetime,
+    Contact_Name nvarchar(255),
+    Contact_Email nvarchar(255),
+    Contact_Phone nvarchar(50),
+    Notes nvarchar(2000),
+    -- Additional item fields (up to ETOOLS_MAX_ITEMS)
+    Item1 nvarchar(100),
+    Item2 nvarchar(100),
+    -- ... up to Item9
+);
+</syntaxhighlight>
+
+'''Status Values:'''
+* '''New''': Jobs awaiting processing
+* '''Active''': Jobs currently being worked on
+* '''Complete''': Finished jobs
+
+=== Development Mode ===
+
+'''Mock Data Implementation:'''
+<syntaxhighlight lang="python">
+class MockCursor:
+    """Mock cursor for development when ETOOLS is disabled"""
+
+    def __init__(self, data=None, description=None):
+        self.data = data or []
+        self.description = description or []
+        self._fetched = False
+
+    def execute(self, query):
+        # Log query for debugging
+        print(f"Mock ETOOLS Query: {query}")
+
+    def fetchone(self):
+        if not self._fetched and self.data:
+            self._fetched = True
+            return self.data[0]
+        return None
+
+    def fetchall(self):
+        return self.data
+
+class MockRow:
+    """Mock row object for development"""
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+</syntaxhighlight>
+
+'''Sample Mock Data:'''
+<syntaxhighlight lang="python">
+def get_mock_job_data(request_id):
+    """Generate mock job data for development"""
+    return MockRow(
+        Request_ID=request_id,
+        Customer_Name="Mock Customer Corp",
+        Project_Description="Mock Project Description for Development",
+        Job_Status="New",
+        Request_Date="2025-09-07",
+        Due_Date="2025-09-14",
+        Contact_Name="John Doe",
+        Contact_Email="john.doe@mockcustomer.com",
+        Contact_Phone="555-1234",
+        Notes="This is mock ETOOLS data for development environment",
+    )
+</syntaxhighlight>
+
+== Data Synchronization ==
+
+=== Synchronization Process ===
+
+'''Job Import Workflow:'''
+<syntaxhighlight lang="mermaid">
+graph TD
+    A[ETOOLS Query] --> B[Data Validation]
+    B --> C[Django Model Creation]
+    C --> D[Status Update]
+    D --> E[ETOOLS Status Sync]
+
+    F[Error Handling] --> G[Logging]
+    G --> H[Notification]
+    H --> I[Manual Review]
+</syntaxhighlight>
+
+'''Synchronization Steps:'''
+1. Query ETOOLS for new jobs
+2. Validate data integrity
+3. Create/update Django Job records
+4. Update ETOOLS job status
+5. Handle errors and notifications
+
+=== Data Mapping ===
+
+'''Field Mapping:'''
+<syntaxhighlight lang="python">
+ETOOLS_TO_DJANGO_MAPPING = {
+    'Request_ID': 'etools_request_id',
+    'Customer_Name': 'customer_name',
+    'Project_Description': 'description',
+    'Job_Status': 'status',
+    'Request_Date': 'created_date',
+    'Due_Date': 'due_date',
+    'Contact_Name': 'contact_name',
+    'Contact_Email': 'contact_email',
+    'Contact_Phone': 'contact_phone',
+    'Notes': 'notes',
+}
+
+STATUS_MAPPING = {
+    'New': 'pending',
+    'Active': 'active',
+    'Complete': 'completed',
+}
+</syntaxhighlight>
+
+=== Error Handling ===
+
+'''Synchronization Errors:'''
+<syntaxhighlight lang="python">
+class ETOOLSSyncError(Exception):
+    """Base exception for ETOOLS synchronization errors"""
+    pass
+
+class ETOOLSConnectionError(ETOOLSSyncError):
+    """Connection-related errors"""
+    pass
+
+class ETOOLSDataError(ETOOLSSyncError):
+    """Data validation errors"""
+    pass
+
+def handle_sync_error(error, job_data):
+    """Handle synchronization errors"""
+    logger.error(f"ETOOLS sync error: {error}")
+
+    # Create error record
+    SyncError.objects.create(
+        error_type=type(error).__name__,
+        error_message=str(error),
+        job_data=job_data,
+        timestamp=timezone.now()
+    )
+
+    # Send notification
+    send_sync_error_notification(error, job_data)
+</syntaxhighlight>
+
+== Security and Access Control ==
+
+=== Connection Security ===
+
+'''PostgreSQL Security:'''
+<syntaxhighlight lang="python">
+# settings.py
+DATABASES = {
+    'default': {
+        'OPTIONS': {
+            'sslmode': 'require',  # Require SSL
+            'sslcert': '/path/to/client.crt',
+            'sslkey': '/path/to/client.key',
+            'sslrootcert': '/path/to/ca.crt',
+        }
+    }
+}
+</syntaxhighlight>
+
+'''MSSQL Security:'''
+<syntaxhighlight lang="ini">
+# odbc.ini
+[ETOOLS_DSN]
+Driver = ODBC Driver 18 for SQL Server
+Server = etools-server.company.com
+Database = ETOOLS_Prod
+Trusted_Connection = yes
+Encrypt = yes
+TrustServerCertificate = no
+Connection Timeout = 30
+</syntaxhighlight>
+
+=== Access Control ===
+
+'''Database Permissions:'''
+* '''PostgreSQL''': Read/write access to application data
+* '''MSSQL''': Read-only access to ETOOLS data
+* '''Development''': Full access to mock data
+
+'''User Roles:'''
+<syntaxhighlight lang="sql">
+-- PostgreSQL roles
+CREATE ROLE gold3_app WITH LOGIN PASSWORD 'secure_password';
+GRANT CONNECT ON DATABASE gchub_dev TO gold3_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO gold3_app;
+
+-- MSSQL permissions (read-only)
+GRANT SELECT ON tb_FSAR_Data_SampArtReq TO gold3_etools;
+</syntaxhighlight>
+
+== Monitoring and Troubleshooting ==
+
+=== Connection Monitoring ===
+
+'''Health Checks:'''
+<syntaxhighlight lang="python">
+def check_database_connections():
+    """Check all external database connections"""
+
+    results = {}
+
+    # Check PostgreSQL
+    try:
+        with connections['default'].cursor() as cursor:
+            cursor.execute("SELECT 1")
+        results['postgresql'] = 'healthy'
+    except Exception as e:
+        results['postgresql'] = f'error: {e}'
+
+    # Check ETOOLS
+    try:
+        if settings.ETOOLS_ENABLED:
+            cursor, conn = get_etools_connection()
+            cursor.execute("SELECT 1")
+            conn.close()
+            results['etools'] = 'healthy'
+        else:
+            results['etools'] = 'disabled (mock mode)'
+    except Exception as e:
+        results['etools'] = f'error: {e}'
+
+    return results
+</syntaxhighlight>
+
+=== Common Issues ===
+
+==== PostgreSQL Connection Issues ====
+
+'''Symptoms:'''
+* "Connection refused" errors
+* Timeout errors
+* Authentication failures
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check container status
+docker ps | grep gchub_db-postgres-dev-1
+
+# Test connectivity
+psql -h 127.0.0.1 -p 5433 -U postgres -d gchub_dev -c "SELECT version();"
+
+# Check port accessibility
+netstat -an | findstr 5433
+
+# Verify credentials
+docker exec gchub_db-postgres-dev-1 psql -U postgres -d gchub_dev -c "SELECT current_user;"
+</syntaxhighlight>
+
+==== ETOOLS Connection Issues ====
+
+'''Symptoms:'''
+* ODBC connection errors
+* DSN not found errors
+* Authentication failures
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check ODBC configuration
+odbcinst -q -d
+
+# Test DSN connection
+isql ETOOLS_DSN
+
+# Verify ODBC drivers
+odbcinst -q -d | grep "SQL Server"
+
+# Check ETOOLS settings
+python manage.py shell -c "from django.conf import settings; print(settings.ETOOLS_ODBC_DSN)"
+</syntaxhighlight>
+
+==== Data Synchronization Issues ====
+
+'''Symptoms:'''
+* Jobs not appearing in Django
+* Synchronization errors
+* Data inconsistencies
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check ETOOLS status
+python manage.py shell -c "from django.conf import settings; print(settings.ETOOLS_ENABLED)"
+
+# Test ETOOLS connection
+python manage.py shell -c "from gchub_db.apps.workflow.etools import get_server_version; print(get_server_version())"
+
+# Run synchronization manually
+python manage.py sync_etools_jobs
+
+# Check synchronization logs
+tail -f logs/etools_sync.log
+</syntaxhighlight>
+
+== Performance Optimization ==
+
+=== Connection Pooling ===
+
+'''PostgreSQL Connection Pooling:'''
+<syntaxhighlight lang="python">
+DATABASES = {
+    'default': {
+        'CONN_MAX_AGE': 600,  # 10 minutes
+        'CONN_HEALTH_CHECKS': True,
+        'OPTIONS': {
+            'connect_timeout': 10,
+            'keepalives': 1,
+            'keepalives_idle': 30,
+            'keepalives_interval': 10,
+            'keepalives_count': 5,
+        }
+    }
+}
+</syntaxhighlight>
+
+'''ETOOLS Connection Optimization:'''
+<syntaxhighlight lang="python">
+# Connection pooling for ETOOLS
+import pyodbc
+
+connection_string = (
+    "DSN=ETOOLS_DSN;"
+    "Connection Timeout=30;"
+    "Command Timeout=60;"
+    "Pooling=True;"
+    "Max Pool Size=10;"
+    "Min Pool Size=1;"
+)
+</syntaxhighlight>
+
+=== Query Optimization ===
+
+'''Efficient ETOOLS Queries:'''
+<syntaxhighlight lang="sql">
+-- Use appropriate indexes
+CREATE INDEX idx_job_status_date ON tb_FSAR_Data_SampArtReq (Job_Status, Request_Date);
+
+-- Limit result sets
+SELECT TOP 50 * FROM tb_FSAR_Data_SampArtReq
+WHERE Job_Status = 'New'
+ORDER BY Request_Date DESC;
+
+-- Use parameterized queries
+SELECT * FROM tb_FSAR_Data_SampArtReq
+WHERE Request_ID = ? AND Job_Status = ?;
+</syntaxhighlight>
+
+=== Caching Strategies ===
+
+'''Data Caching:'''
+<syntaxhighlight lang="python">
+from django.core.cache import cache
+
+def get_etools_job_cached(request_id):
+    """Get ETOOLS job with caching"""
+    cache_key = f"etools_job_{request_id}"
+
+    # Try cache first
+    job_data = cache.get(cache_key)
+    if job_data:
+        return job_data
+
+    # Fetch from ETOOLS
+    job_data = get_etools_job(request_id)
+
+    # Cache for 1 hour
+    cache.set(cache_key, job_data, 3600)
+
+    return job_data
+</syntaxhighlight>
+
+== Backup and Recovery ==
+
+=== PostgreSQL Backup ===
+
+'''Container Backup:'''
+<syntaxhighlight lang="bash">
+# Backup external PostgreSQL container
+docker exec gchub_db-postgres-dev-1 pg_dump -U postgres gchub_dev > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Compressed backup
+docker exec gchub_db-postgres-dev-1 pg_dump -U postgres gchub_dev | gzip > backup_$(date +%Y%m%d_%H%M%S).sql.gz
+</syntaxhighlight>
+
+'''Automated Backup:'''
+<syntaxhighlight lang="bash">
+#!/bin/bash
+# Daily backup script
+BACKUP_DIR="/opt/gold3-backups"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+mkdir -p $BACKUP_DIR
+
+# PostgreSQL backup
+docker exec gchub_db-postgres-dev-1 pg_dump -U postgres gchub_dev > $BACKUP_DIR/pg_backup_$TIMESTAMP.sql
+
+# ETOOLS data export (if needed)
+# Add ETOOLS export commands here
+
+# Cleanup old backups (keep last 30 days)
+find $BACKUP_DIR -name "pg_backup_*.sql" -mtime +30 -delete
+</syntaxhighlight>
+
+=== Recovery Procedures ===
+
+'''PostgreSQL Recovery:'''
+<syntaxhighlight lang="bash">
+# Restore from backup
+cat backup_file.sql | docker exec -i gchub_db-postgres-dev-1 psql -U postgres gchub_dev
+
+# Verify restoration
+docker exec gchub_db-postgres-dev-1 psql -U postgres gchub_dev -c "SELECT count(*) FROM auth_user;"
+</syntaxhighlight>
+
+'''ETOOLS Data Recovery:'''
+* ETOOLS data is read-only
+* Recovery involves re-synchronizing from source
+* Use backup snapshots for point-in-time recovery
+
+== Development Workflow ==
+
+=== Local Development Setup ===
+
+'''Environment Configuration:'''
+<syntaxhighlight lang="bash">
+# Disable ETOOLS for development
+export ETOOLS_ENABLED=False
+
+# Use mock data
+export ETOOLS_MOCK_DATA=True
+
+# Configure external PostgreSQL
+export DEV_DB_HOST=127.0.0.1
+export DEV_DB_PORT=5433
+export DEV_DB_NAME=gchub_dev
+export DEV_DB_USER=postgres
+export DEV_DB_PASSWORD=postgres
+</syntaxhighlight>
+
+'''Development Commands:'''
+<syntaxhighlight lang="bash">
+# Start services without local database
+docker-compose -f config/docker-compose.yml up web redis celery
+
+# Test database connection
+python manage.py dbshell
+
+# Run with mock ETOOLS data
+python manage.py shell -c "from gchub_db.apps.workflow.etools import get_new_jobs; print(get_new_jobs())"
+</syntaxhighlight>
+
+=== Testing External Connections ===
+
+'''Connection Tests:'''
+<syntaxhighlight lang="python">
+# test_external_db.py
+import pytest
+from django.test import TestCase
+from django.db import connections
+from gchub_db.apps.workflow.etools import ETOOLSIntegration
+
+class ExternalDatabaseTest(TestCase):
+
+    def test_postgresql_connection(self):
+        """Test PostgreSQL connection"""
+        try:
+            with connections['default'].cursor() as cursor:
+                cursor.execute("SELECT 1")
+            self.assertTrue(True)
+        except Exception as e:
+            self.fail(f"PostgreSQL connection failed: {e}")
+
+    def test_etools_connection(self):
+        """Test ETOOLS connection"""
+        etools = ETOOLSIntegration()
+
+        if etools.enabled:
+            try:
+                cursor, conn = etools.get_connection()
+                cursor.execute("SELECT 1")
+                conn.close()
+                self.assertTrue(True)
+            except Exception as e:
+                self.fail(f"ETOOLS connection failed: {e}")
+        else:
+            # Mock mode
+            self.assertTrue(True)
+</syntaxhighlight>
+
+== Best Practices ==
+
+=== Database Integration ===
+
+'''Connection Management:'''
+* Use connection pooling
+* Implement proper error handling
+* Monitor connection health
+* Use appropriate timeouts
+
+'''Data Synchronization:'''
+* Implement idempotent operations
+* Handle duplicate data gracefully
+* Log synchronization activities
+* Monitor data consistency
+
+'''Security:'''
+* Use encrypted connections
+* Implement proper authentication
+* Limit database permissions
+* Regular security audits
+
+=== Development Practices ===
+
+'''Mock Data Usage:'''
+* Use mock data for development
+* Keep mock data realistic
+* Test with real data periodically
+* Document mock data limitations
+
+'''Error Handling:'''
+* Implement comprehensive error handling
+* Log errors with context
+* Provide meaningful error messages
+* Implement retry mechanisms
+
+'''Performance:'''
+* Optimize queries
+* Use appropriate indexing
+* Implement caching
+* Monitor performance metrics
+
+== Related Documentation ==
+
+* [[PostgreSQL Database|PostgreSQL Database Architecture]]
+* [[Django Development|Django Application Framework]]
+* [[Docker Infrastructure|Container Architecture]]
+* [[Data Masking|Data Protection and Masking]]
+* [[Monitoring Setup|System Monitoring]]
+
+---
+
+''Last updated: September 16, 2025''</content>
+<parameter name="filePath">c:\Dev\Gold3\external_db_page.wiki

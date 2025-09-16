@@ -1,0 +1,860 @@
+= Development Tools and Environment =
+
+{| class="wikitable" style="float:right; margin-left=1em; width=300px;"
+|-
+! colspan="2" | Development Stack
+|-
+| '''Framework''' || Django 5.2.6
+|-
+| '''Python''' || 3.11 - 3.13
+|-
+| '''Database''' || PostgreSQL 15
+|-
+| '''Cache''' || Redis 7
+|-
+| '''Task Queue''' || Celery + Redis
+|-
+| '''Linting''' || Ruff
+|-
+| '''Testing''' || pytest + Coverage
+|-
+| '''Formatting''' || Black + isort
+|}
+
+== Overview ==
+
+GOLD3's development environment is equipped with a comprehensive set of tools for code quality, testing, debugging, and productivity. The stack includes Django Extensions, Django Debug Toolbar, Ruff linting, pytest testing, and various development utilities.
+
+== Core Development Tools ==
+
+=== Django Extensions ===
+
+'''Version:''' 4.1
+'''Purpose:''' Enhanced Django development utilities and management commands
+
+==== Key Features ====
+
+{| class="wikitable"
+|-
+! Command !! Purpose !! Usage
+|-
+| '''shell_plus''' || Enhanced Django shell with auto-imported models || <code>python manage.py shell_plus</code>
+|-
+| '''runserver_plus''' || Development server with Werkzeug debugger || <code>python manage.py runserver_plus</code>
+|-
+| '''graph_models''' || Generate model relationship diagrams || <code>python manage.py graph_models -a -o models.png</code>
+|-
+| '''show_urls''' || Display all URL patterns || <code>python manage.py show_urls</code>
+|-
+| '''validate_templates''' || Check template syntax || <code>python manage.py validate_templates</code>
+|-
+| '''clear_cache''' || Clear Django cache || <code>python manage.py clear_cache</code>
+|-
+| '''print_settings''' || Display Django settings || <code>python manage.py print_settings</code>
+|-
+| '''reset_db''' || Reset database (caution!) || <code>python manage.py reset_db</code>
+|}
+
+==== Configuration ====
+
+'''settings.py:'''
+<syntaxhighlight lang="python">
+INSTALLED_APPS = [
+    # ... other apps ...
+    'django_extensions',
+    # ... more apps ...
+]
+</syntaxhighlight>
+
+==== Advanced Usage ====
+
+'''Enhanced Shell Features:'''
+<syntaxhighlight lang="python">
+# Auto-imported models
+>>> User.objects.all()
+>>> Job.objects.filter(status='active')
+
+# Useful imports available
+>>> from django.utils import timezone
+>>> from django.db.models import Q, Count
+
+# Database queries with timing
+>>> from django.db import connection
+>>> connection.queries[-1]
+</syntaxhighlight>
+
+'''Model Graph Generation:'''
+<syntaxhighlight lang="bash">
+# Generate PNG diagram of all models
+python manage.py graph_models -a -o models.png
+
+# Generate diagram for specific apps
+python manage.py graph_models workflow accounts -o workflow_models.png
+
+# Include inheritance relationships
+python manage.py graph_models --inheritance -o inheritance.png
+</syntaxhighlight>
+
+=== Django Debug Toolbar ===
+
+'''Version:''' 4.4.6
+'''Purpose:''' Real-time debugging and performance monitoring
+
+==== Available Panels ====
+
+{| class="wikitable"
+|-
+! Panel !! Purpose !! Information Provided
+|-
+| '''SQL''' || Database query analysis || Query count, execution time, EXPLAIN output
+|-
+| '''Timer''' || Request performance || Total time, Python time, database time
+|-
+| '''Settings''' || Django configuration || All settings with values
+|-
+| '''Headers''' || HTTP information || Request/response headers
+|-
+| '''Request''' || Request data || GET, POST, cookies, session data
+|-
+| '''Templates''' || Template debugging || Templates used, context variables
+|-
+| '''Cache''' || Cache performance || Hit/miss ratios, cache calls
+|-
+| '''Signals''' || Signal monitoring || Django signals fired
+|-
+| '''Logging''' || Application logs || Log output during request
+|-
+| '''Versions''' || Package versions || Installed package versions
+|-
+| '''Static Files''' || Asset information || Static file serving details
+|}
+
+==== Configuration ====
+
+'''settings.py:'''
+<syntaxhighlight lang="python">
+INSTALLED_APPS = [
+    # ... other apps ...
+    'debug_toolbar',
+]
+
+MIDDLEWARE = [
+    # Must be early in middleware chain
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # ... other middleware ...
+]
+
+# Only show toolbar for local development
+if DEBUG:
+    INTERNAL_IPS = [
+        '127.0.0.1',
+        'localhost',
+    ]
+</syntaxhighlight>
+
+'''urls.py:'''
+<syntaxhighlight lang="python">
+# Django Debug Toolbar URLs
+if getattr(settings, 'DEBUG', False):
+    try:
+        import debug_toolbar
+        urlpatterns.insert(0, path('__debug__/', include(debug_toolbar.urls)))
+    except ImportError:
+        pass
+</syntaxhighlight>
+
+==== Usage ====
+
+'''Accessing the Toolbar:'''
+* Toolbar appears as dark panel on right side of page
+* Only visible when <code>DEBUG = True</code>
+* Only accessible from IP addresses in <code>INTERNAL_IPS</code>
+* Click panels to expand detailed information
+
+'''Performance Analysis:'''
+* '''SQL Panel''': Identify N+1 query problems
+* '''Timer Panel''': Find performance bottlenecks
+* '''Cache Panel''': Monitor cache effectiveness
+* '''Templates Panel''': Check template rendering time
+
+== Code Quality Tools ==
+
+=== Ruff Linter ===
+
+'''Purpose:''' Fast Python linter and formatter
+'''Configuration:''' ruff.toml and pyproject.toml
+
+==== Configuration Files ====
+
+'''pyproject.toml:'''
+<syntaxhighlight lang="toml">
+[tool.ruff]
+line-length = 140
+exclude = [
+    "includes/**",  # Third-party libraries
+    "gchub_db/includes/**",  # Third-party libraries in app directory
+    "venv/**",  # Virtual environment
+    ".venv/**",  # Virtual environment
+    "__pycache__/**",  # Python cache
+    "*.pyc",  # Compiled Python files
+    ".git/**",  # Git directory
+    "node_modules/**",  # Node.js dependencies
+    "build/**",  # Build directory
+    "dist/**",  # Distribution directory
+    ".pytest_cache/**",  # Pytest cache
+    ".tox/**",  # Tox environments
+    ".coverage",  # Coverage reports
+    "htmlcov/**",  # Coverage HTML reports
+]
+
+[tool.ruff.lint]
+select = ["E", "F"]
+# Only run serious error checks: E (pycodestyle errors) and F (pyflakes).
+
+[tool.ruff.lint.per-file-ignores]
+# Allow legacy scripts to skip docstring rules and some import placement checks
+"scripts/*" = ["D100", "D101", "D102", "D103", "D107", "E402", "E501"]
+"gchub_db/src/**" = ["D100", "D101", "D102", "D103"]
+</syntaxhighlight>
+
+'''ruff.toml:'''
+<syntaxhighlight lang="toml">
+line-length = 135
+exclude = [".venv", "media", "node_modules", "logs", "gchub_db/gchub_db"]
+
+[lint]
+select = ["F", "E"]
+extend-ignore = ["D203", "D213"]
+
+[lint.per-file-ignores]
+# Allow legacy and vendored code to bypass many style and docstring checks.
+"includes/**" = ["D", "C", "B", "N"]
+"local_settings.py" = ["E501", "D100"]
+"manage.py" = ["D100"]
+"middleware/**" = ["D", "C", "B", "N"]
+</syntaxhighlight>
+
+==== Usage ====
+
+'''Basic Commands:'''
+<syntaxhighlight lang="bash">
+# Check all files
+ruff check .
+
+# Check specific file
+ruff check gchub_db/settings.py
+
+# Auto-fix issues
+ruff check --fix .
+
+# Format code
+ruff format .
+
+# Check and format
+ruff check --fix --unsafe-fixes .
+</syntaxhighlight>
+
+'''Integration with Pre-commit:'''
+<syntaxhighlight lang="yaml">
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+</syntaxhighlight>
+
+=== Black Code Formatter ===
+
+'''Configuration:''' pyproject.toml
+'''Line Length:''' 140 characters
+
+'''Configuration:'''
+<syntaxhighlight lang="toml">
+[tool.black]
+line-length = 140
+target-version = ['py311']
+</syntaxhighlight>
+
+'''Usage:'''
+<syntaxhighlight lang="bash">
+# Format all files
+black .
+
+# Format specific file
+black gchub_db/models.py
+
+# Check formatting without changes
+black --check .
+
+# Format with color output
+black --color .
+</syntaxhighlight>
+
+=== isort Import Sorter ===
+
+'''Configuration:''' pyproject.toml
+'''Profile:''' black
+
+'''Configuration:'''
+<syntaxhighlight lang="toml">
+[tool.isort]
+profile = 'black'
+</syntaxhighlight>
+
+'''Usage:'''
+<syntaxhighlight lang="bash">
+# Sort imports in all files
+isort .
+
+# Sort specific file
+isort gchub_db/views.py
+
+# Check without changes
+isort --check-only .
+
+# Show diff
+isort --diff .
+</syntaxhighlight>
+
+== Testing Framework ==
+
+=== pytest Configuration ===
+
+'''Configuration File:''' pytest.ini
+
+'''pytest.ini:'''
+<syntaxhighlight lang="ini">
+[pytest]
+python_files = tests.py test_*.py *_tests.py
+addopts = --strict-config --disable-warnings --tb=short --cov=. --cov-report=html --cov-report=term-missing --cov-report=xml
+DJANGO_SETTINGS_MODULE = gchub_db.test_settings
+django_find_project = true
+django_debug_mode = true
+testpaths = tests gchub_db/tests
+norecursedirs = backups backend bin includes xml_io .history .venv .git .github __pycache__ .mypy_cache .pytest_cache .ruff_cache
+</syntaxhighlight>
+
+=== Coverage Configuration ===
+
+'''Coverage Settings:'''
+<syntaxhighlight lang="ini">
+[coverage:run]
+source =
+    gchub_db  # Main Django application package
+    apps      # Django apps with business logic
+
+omit =
+    */tests/*
+    */test_*.py
+    */conftest.py
+    */migrations/*
+    */__pycache__/*
+    */fixtures/*
+    *.pyc
+    bin/*
+    scripts/*
+    tools/*
+    daemons/*
+</syntaxhighlight>
+
+=== Test Structure ===
+
+'''Test Organization:'''
+<syntaxhighlight lang="python">
+# tests/
+# ├── __init__.py
+# ├── conftest.py          # pytest fixtures and configuration
+# ├── test_models.py       # Model tests
+# ├── test_views.py        # View tests
+# ├── test_forms.py        # Form tests
+# ├── integration/
+# │   ├── test_workflow.py
+# │   └── test_api.py
+# └── smoke/
+#     ├── test_basic.py
+#     └── test_database.py
+</syntaxhighlight>
+
+'''Sample Test File:'''
+<syntaxhighlight lang="python">
+import pytest
+from django.test import TestCase
+from django.urls import reverse
+from apps.workflow.models import Job
+
+class JobModelTest(TestCase):
+    def setUp(self):
+        self.job = Job.objects.create(
+            title="Test Job",
+            status="pending"
+        )
+
+    def test_job_creation(self):
+        """Test job creation"""
+        self.assertEqual(self.job.title, "Test Job")
+        self.assertEqual(self.job.status, "pending")
+
+    def test_job_str_method(self):
+        """Test string representation"""
+        self.assertEqual(str(self.job), "Test Job (pending)")
+
+class JobViewTest(TestCase):
+    def test_job_list_view(self):
+        """Test job list view"""
+        response = self.client.get(reverse('job_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'workflow/job_list.html')
+</syntaxhighlight>
+
+=== Running Tests ===
+
+'''Basic Commands:'''
+<syntaxhighlight lang="bash">
+# Run all tests
+pytest
+
+# Run specific test file
+pytest tests/test_models.py
+
+# Run specific test class
+pytest tests/test_models.py::JobModelTest
+
+# Run specific test method
+pytest tests/test_models.py::JobModelTest::test_job_creation
+
+# Run with coverage
+pytest --cov=gchub_db
+
+# Run with verbose output
+pytest -v
+
+# Run failed tests only
+pytest --lf
+</syntaxhighlight>
+
+'''Advanced Options:'''
+<syntaxhighlight lang="bash">
+# Run tests in parallel
+pytest -n auto
+
+# Generate HTML coverage report
+pytest --cov-report=html
+
+# Debug failing tests
+pytest --pdb
+
+# Run tests matching pattern
+pytest -k "test_job"
+
+# Run tests marked with specific marker
+pytest -m "slow"
+</syntaxhighlight>
+
+== Project Configuration ==
+
+=== pyproject.toml ===
+
+'''Build System:'''
+<syntaxhighlight lang="toml">
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+</syntaxhighlight>
+
+'''Project Metadata:'''
+<syntaxhighlight lang="toml">
+[project]
+name = "gchub_db"
+version = "0.0.0"
+description = "Legacy gchub_db project shim for editable installs"
+authors = [ { name = "dev", email = "dev@example.com" } ]
+</syntaxhighlight>
+
+'''Poetry Configuration:'''
+<syntaxhighlight lang="toml">
+[tool.poetry]
+name = "gold"
+version = "0.1.0"
+description = "Gold (gchub_db) Django project dependency manifest for Poetry"
+authors = ["dev@example.local"]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.14"
+Django = "5.2.6"
+
+[tool.poetry.dev-dependencies]
+black = "^24.3"
+pytest = "^7.4"
+</syntaxhighlight>
+
+=== Dependency Management ===
+
+'''Requirements Files:'''
+* '''config/requirements.txt''' - Production dependencies
+* '''config/requirements-dev.txt''' - Development dependencies
+* '''pyproject.toml''' - Poetry dependencies (transitional)
+
+'''Key Dependencies:'''
+<syntaxhighlight lang="python">
+# Core Django
+Django==5.2.6
+
+# Database
+psycopg2-binary==2.9.7
+
+# Task Queue
+celery==5.3.4
+django-celery-beat==2.5.0
+
+# Development Tools
+django-extensions==4.1.0
+django-debug-toolbar==4.4.6
+
+# Code Quality
+ruff==0.1.0
+black==24.3.0
+isort==5.12.0
+
+# Testing
+pytest==7.4.0
+pytest-django==4.7.0
+coverage==7.4.0
+</syntaxhighlight>
+
+== Development Workflow ==
+
+=== Environment Setup ===
+
+'''Local Development:'''
+<syntaxhighlight lang="bash">
+# Clone repository
+git clone <repository-url>
+cd gold3
+
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# or
+.venv\Scripts\activate     # Windows
+
+# Install dependencies
+pip install -r config/requirements.txt
+pip install -r config/requirements-dev.txt
+
+# Copy environment file
+cp .env.example .env
+
+# Run migrations
+python manage.py migrate
+
+# Create superuser
+python manage.py createsuperuser
+
+# Start development server
+python manage.py runserver_plus
+</syntaxhighlight>
+
+=== Docker Development ===
+
+'''Using Docker Compose:'''
+<syntaxhighlight lang="bash">
+# Start all services
+docker-compose up -d
+
+# Run migrations
+docker-compose exec web python manage.py migrate
+
+# Create superuser
+docker-compose exec web python manage.py createsuperuser
+
+# Run tests
+docker-compose exec web pytest
+
+# Access shell
+docker-compose exec web python manage.py shell_plus
+</syntaxhighlight>
+
+=== Code Quality Workflow ===
+
+'''Pre-commit Setup:'''
+<syntaxhighlight lang="yaml">
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+        language_version: python3
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+</syntaxhighlight>
+
+'''Running Pre-commit:'''
+<syntaxhighlight lang="bash">
+# Install pre-commit
+pip install pre-commit
+
+# Install hooks
+pre-commit install
+
+# Run on all files
+pre-commit run --all-files
+
+# Run specific hook
+pre-commit run black --all-files
+</syntaxhighlight>
+
+== Debugging and Troubleshooting ==
+
+=== Django Debug Toolbar Issues ===
+
+'''Toolbar Not Appearing:'''
+<syntaxhighlight lang="python">
+# Check DEBUG setting
+DEBUG = True
+
+# Check INTERNAL_IPS
+INTERNAL_IPS = [
+    '127.0.0.1',
+    'localhost',
+]
+
+# Check middleware order
+MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',  # Must be early
+    # ... other middleware ...
+]
+</syntaxhighlight>
+
+'''Toolbar Not Working:'''
+<syntaxhighlight lang="bash">
+# Check package installation
+pip list | grep debug-toolbar
+
+# Check URL configuration
+python manage.py show_urls | grep __debug__
+
+# Check browser console for JavaScript errors
+</syntaxhighlight>
+
+=== Testing Issues ===
+
+'''Test Discovery Problems:'''
+<syntaxhighlight lang="bash">
+# Check test file naming
+# Files must match: tests.py, test_*.py, *_tests.py
+
+# Check test class naming
+# Classes must start with 'Test'
+
+# Check test method naming
+# Methods must start with 'test_'
+
+# Run with verbose discovery
+pytest --collect-only -v
+</syntaxhighlight>
+
+'''Database Issues:'''
+<syntaxhighlight lang="bash">
+# Check test database configuration
+python manage.py diffsettings | grep DATABASE
+
+# Reset test database
+pytest --create-db
+
+# Use keepdb to speed up tests
+pytest --keepdb
+</syntaxhighlight>
+
+=== Code Quality Issues ===
+
+'''Ruff Configuration Conflicts:'''
+<syntaxhighlight lang="bash">
+# Check configuration files
+ruff check --show-settings
+
+# Override configuration
+ruff check --config ruff.toml
+
+# Check specific rules
+ruff check --select F401  # Unused imports
+</syntaxhighlight>
+
+'''Import Sorting Issues:'''
+<syntaxhighlight lang="bash">
+# Check isort configuration
+isort --show-config
+
+# Fix import order
+isort --profile black file.py
+
+# Check for conflicts with black
+black file.py && isort file.py
+</syntaxhighlight>
+
+== Performance Optimization ==
+
+=== Development Server Optimization ===
+
+'''Django Extensions Runserver Plus:'''
+<syntaxhighlight lang="bash">
+# Enhanced development server
+python manage.py runserver_plus
+
+# With specific port
+python manage.py runserver_plus 0.0.0.0:8000
+
+# With SSL
+python manage.py runserver_plus --cert-file cert.pem --key-file key.pem
+</syntaxhighlight>
+
+=== Testing Optimization ===
+
+'''Parallel Test Execution:'''
+<syntaxhighlight lang="bash">
+# Run tests in parallel
+pytest -n auto
+
+# Specify number of workers
+pytest -n 4
+
+# Disable parallel for debugging
+pytest -s
+</syntaxhighlight>
+
+'''Database Optimization:'''
+<syntaxhighlight lang="bash">
+# Keep test database between runs
+pytest --keepdb
+
+# Reuse database for faster runs
+pytest --reuse-db
+
+# Create fresh database
+pytest --create-db
+</syntaxhighlight>
+
+=== Code Quality Optimization ===
+
+'''Fast Linting:'''
+<syntaxhighlight lang="bash">
+# Only check changed files
+ruff check $(git diff --name-only)
+
+# Cache results
+ruff check --cache-dir .ruff_cache
+
+# Check specific directories
+ruff check gchub_db/
+</syntaxhighlight>
+
+'''Fast Formatting:'''
+<syntaxhighlight lang="bash">
+# Format only Python files
+black *.py
+
+# Format with parallel processing
+black --workers 4 .
+
+# Check format without changes
+black --check --diff .
+</syntaxhighlight>
+
+== Integration with IDEs ==
+
+=== VS Code Configuration ===
+
+'''settings.json:'''
+<syntaxhighlight lang="json">
+{
+    "python.linting.enabled": true,
+    "python.linting.ruffEnabled": true,
+    "python.formatting.provider": "black",
+    "python.sortImports.args": ["--profile", "black"],
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": ["--no-cov"],
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    }
+}
+</syntaxhighlight>
+
+=== PyCharm Configuration ===
+
+'''External Tools Setup:'''
+* '''Ruff''': Configure as external tool for linting
+* '''Black''': Configure as external tool for formatting
+* '''pytest''': Configure as test runner
+* '''Django Debug Toolbar''': Enable in run configuration
+
+== Best Practices ==
+
+=== Code Quality ===
+
+'''Linting Standards:'''
+* Run ruff before committing
+* Fix all F (pyflakes) and E (syntax) errors
+* Use black for consistent formatting
+* Use isort for organized imports
+* Configure pre-commit hooks
+
+'''Testing Standards:'''
+* Write tests for all new features
+* Maintain >80% code coverage
+* Use descriptive test names
+* Test edge cases and error conditions
+* Use fixtures for reusable test data
+
+=== Development Workflow ===
+
+'''Daily Workflow:'''
+* Pull latest changes
+* Run tests locally
+* Make changes with tests
+* Run linting and formatting
+* Test changes thoroughly
+* Create descriptive commit messages
+* Push changes and create PR
+
+'''Code Review Checklist:'''
+* [ ] Tests pass
+* [ ] Code is linted
+* [ ] Code is formatted
+* [ ] Documentation updated
+* [ ] No security issues
+* [ ] Performance considerations addressed
+
+== Related Documentation ==
+
+* [[Main Page|Project Overview]]
+* [[Django Development|Django Application Framework]]
+* [[PostgreSQL Database|Database Architecture]]
+* [[Celery Task Processing|Background Task Processing]]
+* [[Docker Infrastructure|Container Architecture]]
+
+---
+
+''Last updated: September 16, 2025''</content>
+<parameter name="filePath">c:\Dev\Gold3\dev_tools_page.wiki

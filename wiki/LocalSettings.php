@@ -212,3 +212,17 @@ $wgUseSiteJs = true;
 
 ## Disable link preload headers
 $wgLinkHeader = false;
+
+## Sidebar configuration
+$wgSidebar = array(
+    'navigation' => array(
+        'Documentation' => 'Wiki_Navigation',
+        'Table of Contents' => 'Table_of_Contents',
+        '*' => 'mainpage-description',
+        'recentchanges-url' => 'RecentChanges',
+        'randompage-url' => 'Random',
+        'helppage' => 'Help:Contents'
+    ),
+    'TOOLBOX',
+    'LANGUAGES'
+);

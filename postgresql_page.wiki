@@ -1,0 +1,798 @@
+= PostgreSQL Database Architecture =
+
+{| class="wikitable" style="float:right; margin-left:1em; width:300px;"
+|-
+! colspan="2" | PostgreSQL Configuration
+|-
+| '''Service Name''' || db
+|-
+| '''Database Engine''' || PostgreSQL 15
+|-
+| '''Default Database''' || gchub_dev
+|-
+| '''Default User''' || gchub
+|-
+| '''Default Password''' || gchub
+|-
+| '''Port (External)''' || 5438
+|-
+| '''Port (Internal)''' || 5432
+|-
+| '''ORM''' || Django ORM
+|-
+| '''Migrations''' || Django Migrations
+|}
+
+== Overview ==
+
+PostgreSQL serves as the primary relational database for GOLD3, providing robust data storage, complex queries, and transactional integrity. The application uses Django's ORM exclusively, avoiding stored procedures and database functions in favor of Python-based business logic.
+
+== Architecture ==
+
+=== Database Design Philosophy ===
+
+{| class="wikitable"
+|-
+! Approach !! GOLD3 Implementation !! Traditional RDBMS
+|-
+| '''Stored Procedures''' || ❌ Not used || ✅ Common
+|-
+| '''Database Functions''' || ❌ Not used || ✅ Common
+|-
+| '''Triggers''' || ❌ Not used || ✅ Common
+|-
+| '''Business Logic''' || ✅ Python/Django || ❌ Database
+|-
+| '''Schema Changes''' || ✅ Django Migrations || ❌ Manual DDL
+|-
+| '''Testing''' || ✅ Python Unit Tests || ❌ Database Tests
+|}
+
+=== Data Flow ===
+
+<syntaxhighlight lang="mermaid">
+graph TD
+    A[Django Application] --> B[Django ORM]
+    B --> C[PostgreSQL Database]
+    C --> D[Query Execution]
+    D --> E[Result Processing]
+    E --> F[Application Logic]
+
+    G[Django Admin] --> B
+    H[Management Commands] --> B
+    I[Background Tasks] --> B
+
+    J[Django Migrations] --> K[Schema Changes]
+    K --> C
+</syntaxhighlight>
+
+== Configuration ==
+
+=== Docker Compose Setup ===
+
+'''PostgreSQL Service:'''
+<syntaxhighlight lang="yaml">
+db:
+  image: postgres:15
+  environment:
+    POSTGRES_DB: gchub_dev
+    POSTGRES_USER: gchub
+    POSTGRES_PASSWORD: gchub
+  ports:
+    - "5438:5432"  # External access on port 5438
+  volumes:
+    - pgdata:/var/lib/postgresql/data
+  networks:
+    - gold3
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U gchub -d gchub_dev"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+</syntaxhighlight>
+
+=== Django Database Configuration ===
+
+'''settings.py Database Configuration:'''
+<syntaxhighlight lang="python">
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DEV_DB_NAME", "gchub_dev"),
+        "USER": os.environ.get("DEV_DB_USER", "gchub"),
+        "PASSWORD": os.environ.get("DEV_DB_PASSWORD", "gchub"),
+        "HOST": os.environ.get("DEV_DB_HOST", "db"),
+        "PORT": os.environ.get("DEV_DB_PORT", "5432"),
+        "OPTIONS": {
+            "connect_timeout": 10,
+            "options": "-c timezone=UTC"
+        },
+        "CONN_MAX_AGE": 600,  # Connection pooling
+        "CONN_HEALTH_CHECKS": True,
+    }
+}
+</syntaxhighlight>
+
+=== Connection Pooling ===
+
+'''Database Connection Settings:'''
+<syntaxhighlight lang="python">
+# Connection pooling configuration
+DATABASES["default"].update({
+    "CONN_MAX_AGE": 600,  # Keep connections alive for 10 minutes
+    "CONN_HEALTH_CHECKS": True,  # Check connection health
+    "OPTIONS": {
+        "connect_timeout": 10,
+        "options": "-c timezone=UTC"
+    }
+})
+</syntaxhighlight>
+
+== Schema Architecture ==
+
+=== Django Apps and Models ===
+
+{| class="wikitable"
+|-
+! Django App !! Purpose !! Key Models !! Database Tables
+|-
+| '''accounts''' || User management || User, Profile || accounts_user, accounts_profile
+|-
+| '''workflow''' || Business processes || Job, Task, Workflow || workflow_job, workflow_task
+|-
+| '''item_catalog''' || Product catalog || Item, Category || item_catalog_item, item_catalog_category
+|-
+| '''joblog''' || Job tracking || JobLog, Status || joblog_joblog, joblog_status
+|-
+| '''qc''' || Quality control || QCRecord, Test || qc_qcrecord, qc_test
+|-
+| '''performance''' || Performance metrics || Metric, Report || performance_metric, performance_report
+|-
+| '''address''' || Address management || Address, Location || address_address, address_location
+|-
+| '''calendar''' || Scheduling || Event, Calendar || calendar_event, calendar_calendar
+|}
+
+=== Database Objects ===
+
+==== Tables ====
+
+'''Standard Django Tables:'''
+* django_migrations - Migration tracking
+* django_content_type - Model metadata
+* django_session - User sessions
+* auth_user - User accounts
+* auth_group - User groups
+* auth_permission - Permissions
+
+'''Application Tables:'''
+* workflow_plant_bev_controller - Plant beverage control
+* item_catalog_item - Product catalog items
+* joblog_joblog - Job execution logs
+* qc_qcrecord - Quality control records
+
+==== Indexes ====
+
+'''Automatic Indexes:'''
+* Primary key indexes (automatically created)
+* Foreign key indexes (automatically created)
+* Unique constraint indexes (automatically created)
+
+'''Custom Indexes (via Migrations):'''
+<syntaxhighlight lang="python">
+# Migration creating custom indexes
+class Migration(migrations.Migration):
+    operations = [
+        migrations.AddIndex(
+            model_name='job',
+            index=models.Index(
+                fields=['status', 'created_date'],
+                name='job_status_created_idx'
+            ),
+        ),
+        migrations.AddIndex(
+            model_name='item',
+            index=models.Index(
+                fields=['category', 'active'],
+                name='item_category_active_idx'
+            ),
+        ),
+    ]
+</syntaxhighlight>
+
+==== Constraints ====
+
+'''Model-Level Constraints:'''
+<syntaxhighlight lang="python">
+class Job(models.Model):
+    plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['plant', 'user'],
+                name='unique_plant_user_job'
+            ),
+            models.CheckConstraint(
+                check=models.Q(status__in=['pending', 'active', 'completed']),
+                name='valid_job_status'
+            )
+        ]
+</syntaxhighlight>
+
+== Django ORM Usage ==
+
+=== Model Definition ===
+
+'''Example Model:'''
+<syntaxhighlight lang="python">
+# models.py
+from django.db import models
+from django.contrib.auth.models import User
+
+class Job(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('active', 'Active'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_jobs')
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='assigned_jobs')
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_date']
+        indexes = [
+            models.Index(fields=['status', 'created_date']),
+            models.Index(fields=['assigned_to', 'status']),
+        ]
+
+    def __str__(self):
+        return f"{self.title} ({self.status})"
+</syntaxhighlight>
+
+=== Query Operations ===
+
+'''Basic Queries:'''
+<syntaxhighlight lang="python">
+# Get all active jobs
+active_jobs = Job.objects.filter(status='active')
+
+# Get jobs for specific user
+user_jobs = Job.objects.filter(assigned_to=user)
+
+# Get jobs created in last 7 days
+recent_jobs = Job.objects.filter(created_date__gte=timezone.now() - timedelta(days=7))
+
+# Complex query with Q objects
+complex_jobs = Job.objects.filter(
+    Q(status='active') & Q(due_date__lte=timezone.now())
+)
+</syntaxhighlight>
+
+'''Advanced Queries:'''
+<syntaxhighlight lang="python">
+# Aggregation queries
+from django.db.models import Count, Avg
+
+job_stats = Job.objects.aggregate(
+    total_jobs=Count('id'),
+    active_jobs=Count('id', filter=Q(status='active')),
+    avg_completion_time=Avg('completion_time')
+)
+
+# Group by queries
+jobs_by_status = Job.objects.values('status').annotate(
+    count=Count('id')
+).order_by('-count')
+
+# Select related for optimization
+jobs_with_users = Job.objects.select_related('created_by', 'assigned_to').filter(status='active')
+</syntaxhighlight>
+
+=== Raw SQL Queries ===
+
+'''When to Use Raw SQL:'''
+* Complex reporting queries
+* Performance-critical operations
+* Database-specific features
+* Legacy system integration
+
+'''Raw SQL Example:'''
+<syntaxhighlight lang="python">
+from django.db import connection
+
+def get_job_summary():
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT
+                status,
+                COUNT(*) as count,
+                AVG(EXTRACT(EPOCH FROM (updated_date - created_date))/3600) as avg_hours
+            FROM workflow_job
+            WHERE created_date >= %s
+            GROUP BY status
+            ORDER BY count DESC
+        """, [timezone.now() - timedelta(days=30)])
+
+        results = cursor.fetchall()
+    return results
+</syntaxhighlight>
+
+== Migrations ==
+
+=== Migration Files ===
+
+'''Migration Structure:'''
+<syntaxhighlight lang="python">
+# 0049_plantbevcontroller_and_more.py
+from django.db import migrations, models
+
+class Migration(migrations.Migration):
+    dependencies = [
+        ('workflow', '0048_previous_migration'),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='PlantBevController',
+            fields=[
+                ('id', models.AutoField(primary_key=True)),
+                ('plant_id', models.CharField(max_length=10)),
+                ('controller_type', models.CharField(max_length=50)),
+                ('status', models.CharField(max_length=20, default='active')),
+                ('created_date', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'db_table': 'workflow_plant_bev_controller',
+            },
+        ),
+        migrations.AddIndex(
+            model_name='plantbevcontroller',
+            index=models.Index(fields=['plant_id', 'status'], name='plant_status_idx'),
+        ),
+    ]
+</syntaxhighlight>
+
+=== Migration Commands ===
+
+'''Common Migration Operations:'''
+<syntaxhighlight lang="bash">
+# Create new migration
+python manage.py makemigrations
+
+# Apply migrations
+python manage.py migrate
+
+# Show migration status
+python manage.py showmigrations
+
+# Create empty migration
+python manage.py makemigrations --empty app_name
+
+# Squash migrations
+python manage.py squashmigrations app_name 0001 0010
+</syntaxhighlight>
+
+=== Migration Best Practices ===
+
+'''Migration Guidelines:'''
+* '''Atomic Operations''': Each migration should be reversible
+* '''Descriptive Names''': Use clear migration names
+* '''Dependencies''': Properly declare migration dependencies
+* '''Testing''': Test migrations on copy of production data
+* '''Backups''': Always backup before applying migrations
+
+== Performance Optimization ==
+
+=== Query Optimization ===
+
+'''Select Related and Prefetch Related:'''
+<syntaxhighlight lang="python">
+# Inefficient - N+1 queries
+jobs = Job.objects.all()
+for job in jobs:
+    print(job.created_by.username)  # Additional query per job
+
+# Optimized - Single query
+jobs = Job.objects.select_related('created_by').all()
+for job in jobs:
+    print(job.created_by.username)  # No additional queries
+</syntaxhighlight>
+
+'''Prefetch Related for Many-to-Many:'''
+<syntaxhighlight lang="python">
+# For many-to-many relationships
+jobs = Job.objects.prefetch_related('tags').all()
+for job in jobs:
+    tags = list(job.tags.all())  # Single query for all tags
+</syntaxhighlight>
+
+=== Indexing Strategy ===
+
+'''Index Types:'''
+* '''B-tree''': Default, good for equality and range queries
+* '''Hash''': Fast equality lookups
+* '''GIN''': General inverted index for arrays and full-text
+* '''GiST''': Generalized search tree for geometric data
+
+'''Index Creation:'''
+<syntaxhighlight lang="python">
+# Single column index
+models.Index(fields=['status'])
+
+# Multiple column index
+models.Index(fields=['status', 'created_date'])
+
+# Functional index
+models.Index(fields=[models.functions.Upper('title')])
+
+# Partial index
+models.Index(fields=['status'], condition=Q(status='active'))
+</syntaxhighlight>
+
+=== Connection Optimization ===
+
+'''Connection Pooling:'''
+<syntaxhighlight lang="python">
+DATABASES = {
+    'default': {
+        'CONN_MAX_AGE': 600,  # 10 minutes
+        'CONN_HEALTH_CHECKS': True,
+        'OPTIONS': {
+            'connect_timeout': 10,
+            'keepalives': 1,
+            'keepalives_idle': 30,
+            'keepalives_interval': 10,
+            'keepalives_count': 5,
+        }
+    }
+}
+</syntaxhighlight>
+
+== Monitoring and Maintenance ==
+
+=== Database Monitoring ===
+
+'''Key Metrics to Monitor:'''
+<syntaxhighlight lang="sql">
+-- Active connections
+SELECT count(*) FROM pg_stat_activity WHERE state = 'active';
+
+-- Table sizes
+SELECT schemaname, tablename, pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as size
+FROM pg_tables
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+
+-- Index usage
+SELECT schemaname, tablename, indexname, idx_scan, idx_tup_read, idx_tup_fetch
+FROM pg_stat_user_indexes
+ORDER BY idx_scan DESC;
+
+-- Slow queries
+SELECT query, calls, total_time, mean_time, rows
+FROM pg_stat_statements
+ORDER BY total_time DESC
+LIMIT 10;
+</syntaxhighlight>
+
+=== Maintenance Tasks ===
+
+'''Vacuum and Analyze:'''
+<syntaxhighlight lang="sql">
+-- Vacuum specific table
+VACUUM ANALYZE workflow_job;
+
+-- Vacuum entire database
+VACUUM ANALYZE;
+
+-- Aggressive vacuum (requires exclusive lock)
+VACUUM FULL workflow_job;
+</syntaxhighlight>
+
+'''Index Maintenance:'''
+<syntaxhighlight lang="sql">
+-- Reindex specific index
+REINDEX INDEX workflow_job_status_created_idx;
+
+-- Reindex table
+REINDEX TABLE workflow_job;
+
+-- Concurrent reindex (no exclusive lock)
+REINDEX INDEX CONCURRENTLY workflow_job_status_created_idx;
+</syntaxhighlight>
+
+=== Backup and Recovery ===
+
+'''Backup Strategies:'''
+<syntaxhighlight lang="bash">
+# Logical backup (pg_dump)
+pg_dump -h localhost -U gchub -d gchub_dev > backup.sql
+
+# Compressed backup
+pg_dump -h localhost -U gchub -d gchub_dev | gzip > backup.sql.gz
+
+# Custom format backup
+pg_dump -h localhost -U gchub -d gchub_dev -Fc > backup.dump
+
+# Continuous archiving (WAL)
+# Configure wal_level = replica in postgresql.conf
+# Configure archive_command
+</syntaxhighlight>
+
+'''Restore from Backup:'''
+<syntaxhighlight lang="bash">
+# Restore from SQL dump
+psql -h localhost -U gchub -d gchub_dev < backup.sql
+
+# Restore from custom format
+pg_restore -h localhost -U gchub -d gchub_dev backup.dump
+
+# Point-in-time recovery
+# Configure recovery.conf
+# Start PostgreSQL in recovery mode
+</syntaxhighlight>
+
+== Security ==
+
+=== Access Control ===
+
+'''User Roles and Permissions:'''
+<syntaxhighlight lang="sql">
+-- Create application user
+CREATE USER gchub_app WITH PASSWORD 'secure_password';
+GRANT CONNECT ON DATABASE gchub_dev TO gchub_app;
+
+-- Grant schema permissions
+GRANT USAGE ON SCHEMA public TO gchub_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO gchub_app;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO gchub_app;
+
+-- Grant future permissions
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO gchub_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE ON SEQUENCES TO gchub_app;
+</syntaxhighlight>
+
+=== Data Encryption ===
+
+'''Encryption at Rest:'''
+* Configure PostgreSQL with encryption
+* Use encrypted filesystems
+* Implement transparent data encryption
+
+'''Encryption in Transit:'''
+<syntaxhighlight lang="ini">
+# postgresql.conf
+ssl = on
+ssl_cert_file = '/etc/ssl/certs/postgresql.crt'
+ssl_key_file = '/etc/ssl/private/postgresql.key'
+ssl_ca_file = '/etc/ssl/certs/ca.crt'
+</syntaxhighlight>
+
+=== Audit Logging ===
+
+'''Audit Configuration:'''
+<syntaxhighlight lang="sql">
+-- Enable audit logging
+CREATE EXTENSION pgaudit;
+
+-- Configure audit logging
+ALTER SYSTEM SET pgaudit.log = 'ddl,role,read,write';
+ALTER SYSTEM SET pgaudit.log_catalog = off;
+ALTER SYSTEM SET pgaudit.log_level = log;
+ALTER SYSTEM SET pgaudit.log_parameter = on;
+</syntaxhighlight>
+
+== Troubleshooting ==
+
+=== Common Issues ===
+
+==== Connection Issues ====
+
+'''Symptoms:'''
+* "Connection refused" errors
+* "FATAL: too many connections" errors
+* Timeout errors
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check PostgreSQL status
+docker-compose ps db
+
+# Check logs
+docker-compose logs db
+
+# Check connections
+psql -h localhost -U gchub -d gchub_dev -c "SELECT count(*) FROM pg_stat_activity;"
+
+# Restart service
+docker-compose restart db
+</syntaxhighlight>
+
+==== Performance Issues ====
+
+'''Symptoms:'''
+* Slow queries
+* High CPU usage
+* Memory exhaustion
+
+'''Solutions:'''
+<syntaxhighlight lang="sql">
+-- Analyze query performance
+EXPLAIN ANALYZE SELECT * FROM workflow_job WHERE status = 'active';
+
+-- Check for missing indexes
+SELECT schemaname, tablename, attname, n_distinct, correlation
+FROM pg_stats
+WHERE schemaname = 'public' AND tablename = 'workflow_job';
+
+-- Update statistics
+ANALYZE workflow_job;
+</syntaxhighlight>
+
+==== Lock Conflicts ====
+
+'''Symptoms:'''
+* Queries hanging
+* "Lock wait timeout" errors
+* Deadlock detection
+
+'''Solutions:'''
+<syntaxhighlight lang="sql">
+-- Check active locks
+SELECT
+    activity.pid,
+    activity.usename,
+    activity.query,
+    blocking.pid AS blocking_pid,
+    blocking.query AS blocking_query
+FROM pg_stat_activity AS activity
+JOIN pg_stat_activity AS blocking ON blocking.pid = ANY(pg_blocking_pids(activity.pid));
+
+-- Kill blocking query
+SELECT pg_cancel_backend(blocking_pid);
+
+-- Terminate if necessary
+SELECT pg_terminate_backend(blocking_pid);
+</syntaxhighlight>
+
+==== Disk Space Issues ====
+
+'''Symptoms:'''
+* "No space left on device" errors
+* Database unresponsive
+* Failed writes
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check disk usage
+df -h
+
+# Check PostgreSQL disk usage
+du -sh /var/lib/postgresql/data
+
+# Vacuum to reclaim space
+psql -h localhost -U gchub -d gchub_dev -c "VACUUM FULL;"
+
+# Resize volume if needed
+docker-compose down
+# Resize volume
+docker-compose up -d
+</syntaxhighlight>
+
+== Development Workflow ==
+
+=== Local Development ===
+
+'''Development Setup:'''
+<syntaxhighlight lang="bash">
+# Start PostgreSQL
+docker-compose up -d db
+
+# Run migrations
+python manage.py migrate
+
+# Create superuser
+python manage.py createsuperuser
+
+# Load fixtures
+python manage.py loaddata fixtures/sample_data.json
+</syntaxhighlight>
+
+=== Testing ===
+
+'''Test Database Configuration:'''
+<syntaxhighlight lang="python">
+# test_settings.py
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'gchub_test',
+        'USER': 'gchub',
+        'PASSWORD': 'gchub',
+        'HOST': 'db',
+        'PORT': '5432',
+    }
+}
+</syntaxhighlight>
+
+'''Running Tests:'''
+<syntaxhighlight lang="bash">
+# Run all tests
+python manage.py test
+
+# Run specific app tests
+python manage.py test workflow
+
+# Run with coverage
+coverage run manage.py test
+coverage report
+</syntaxhighlight>
+
+== Best Practices ==
+
+=== Schema Design ===
+
+'''Normalization:'''
+* Use appropriate normal forms (3NF typically)
+* Avoid redundant data
+* Use foreign keys for referential integrity
+* Consider denormalization for performance if needed
+
+'''Naming Conventions:'''
+* Use lowercase with underscores (snake_case)
+* Use descriptive names
+* Prefix related tables (workflow_job, workflow_task)
+* Use consistent abbreviations
+
+=== Performance Guidelines ===
+
+'''Query Optimization:'''
+* Use EXPLAIN ANALYZE to understand query plans
+* Create appropriate indexes
+* Use select_related and prefetch_related
+* Avoid N+1 query problems
+* Use database views for complex queries
+
+'''Indexing Strategy:'''
+* Index foreign keys automatically
+* Index columns used in WHERE clauses
+* Consider composite indexes for multiple conditions
+* Monitor index usage and remove unused indexes
+
+=== Maintenance ===
+
+'''Regular Tasks:'''
+* Monitor disk space usage
+* Update table statistics regularly
+* Vacuum tables to reclaim space
+* Backup database regularly
+* Monitor performance metrics
+
+'''Monitoring:'''
+* Set up alerts for key metrics
+* Monitor query performance
+* Track connection usage
+* Monitor replication lag (if applicable)
+
+== Related Documentation ==
+
+* [[Main Page|Project Overview]]
+* [[Django Development|Django Application Framework]]
+* [[Docker Infrastructure|Container Architecture]]
+* [[Data Masking|Data Protection and Masking]]
+* [[Monitoring Setup|System Monitoring]]
+
+---
+
+''Last updated: September 16, 2025''</content>
+<parameter name="filePath">c:\Dev\Gold3\postgresql_page.wiki

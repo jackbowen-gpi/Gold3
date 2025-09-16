@@ -1,0 +1,539 @@
+= GOLD3 Documentation Table of Contents =
+
+{| class="wikitable" style="width:100%; margin-bottom:1em;"
+|-
+! colspan="3" | GOLD3 Project Documentation Index
+|-
+| '''Version:''' 1.0 || '''Last Updated:''' September 16, 2025 || '''Status:''' Complete
+|-
+| '''Total Pages:''' 13 || '''Total Sections:''' 45+ || '''Diagrams:''' 25+
+|}
+
+== Executive Summary ==
+
+This comprehensive documentation covers the GOLD3 project, a Django-based web application with containerized infrastructure, distributed task processing, and extensive monitoring capabilities. The documentation includes detailed setup instructions, architecture overviews, operational procedures, and development guidelines.
+
+=== Key Features Documented ===
+* '''Containerized Infrastructure''': Docker Compose orchestration with 10+ services
+* '''Database Systems''': PostgreSQL primary, MSSQL ETOOLS integration, external PostgreSQL
+* '''Task Processing''': Celery distributed workers with Redis message broker
+* '''Monitoring Stack''': Prometheus metrics, Grafana visualization, Flower task monitoring
+* '''Development Tools''': Comprehensive code quality, testing, and debugging tools
+* '''Data Protection''': Enterprise-grade data masking and compliance procedures
+
+== Table of Contents ==
+
+=== 1. Project Foundation ===
+
+==== 1.1 [[Main Page|Project Overview]] ====
+* Architecture overview and system design
+* Technology stack and dependencies
+* Development principles and best practices
+* Project structure and organization
+* Getting started guide
+
+==== 1.2 [[Development Infrastructure|Development Environment]] ====
+* Local development setup
+* Docker container configuration
+* Service orchestration with Docker Compose
+* Environment variables and configuration
+* Development workflow
+
+==== 1.3 [[Docker Infrastructure|Docker Infrastructure]] ====
+* Container architecture and design
+* Service definitions and networking
+* Volume management and persistence
+* Security considerations
+* Deployment procedures
+
+=== 2. Database Systems ===
+
+==== 2.1 [[PostgreSQL Database|PostgreSQL Database]] ====
+* Database architecture and schema design
+* Django ORM integration and usage
+* Connection management and pooling
+* Performance optimization techniques
+* Backup and recovery procedures
+* Migration management
+
+==== 2.2 [[External Database Integration|External Database Integration]] ====
+* External PostgreSQL container setup
+* MSSQL ETOOLS integration
+* ODBC DSN configuration
+* Data synchronization workflows
+* Development mode and mock data
+* Connection security and access control
+
+==== 2.3 [[Data Masking|Data Masking]] ====
+* Data protection procedures
+* Compliance requirements (GDPR, HIPAA)
+* Masking implementation strategies
+* Testing and validation
+* Audit trails and reporting
+* Performance considerations
+
+=== 3. Task Processing System ===
+
+==== 3.1 [[Celery Task Processing|Celery Task Processing]] ====
+* Worker configuration and deployment
+* Beat scheduler setup and management
+* Task development patterns
+* Error handling and retry mechanisms
+* Performance tuning and optimization
+* Monitoring and debugging
+
+==== 3.2 [[Redis Configuration|Redis Configuration]] ====
+* Cache configuration and usage
+* Message broker setup
+* Persistence options and durability
+* Performance tuning parameters
+* Monitoring and maintenance
+* Security considerations
+
+==== 3.3 [[Flower Monitoring|Flower Monitoring Dashboard]] ====
+* Real-time task monitoring
+* Worker statistics and performance
+* Task inspection and debugging
+* REST API integration
+* WebSocket real-time updates
+* Security and access control
+
+=== 4. Monitoring and Observability ===
+
+==== 4.1 [[Prometheus Monitoring|Prometheus Monitoring]] ====
+* Metrics collection architecture
+* Service discovery configuration
+* Alerting rules and notifications
+* Query language (PromQL)
+* Integration with application metrics
+* Performance and scaling
+
+==== 4.2 [[Grafana Dashboards|Grafana Dashboards]] ====
+* Dashboard creation and design
+* Data source configuration
+* Visualization panels and widgets
+* Alerting and notification setup
+* User management and permissions
+* Best practices for dashboard design
+
+=== 5. Development Tools ===
+
+==== 5.1 [[Development Tools|Development Tools]] ====
+* Django Extensions integration
+* Django Debug Toolbar setup
+* Code quality tools (Ruff, Black, isort)
+* Testing framework (pytest)
+* IDE integration and configuration
+* Debugging techniques
+
+=== 6. Operations and Maintenance ===
+
+==== 6.1 Deployment Procedures ====
+* Production deployment checklist
+* Environment configuration
+* Service startup and verification
+* Rollback procedures
+* Performance monitoring
+
+==== 6.2 Backup and Recovery ====
+* Database backup strategies
+* Configuration backup
+* Disaster recovery procedures
+* Data restoration testing
+* Backup verification
+
+==== 6.3 Troubleshooting ====
+* Common issues and solutions
+* Debug procedures
+* Log analysis techniques
+* Performance diagnosis
+* Recovery procedures
+
+== Architecture Diagrams ==
+
+=== System Architecture ===
+
+<syntaxhighlight lang="mermaid">
+graph TB
+    subgraph "Web Tier"
+        A[Web Application]
+        B[Nginx Proxy]
+    end
+
+    subgraph "Application Tier"
+        C[Django Application]
+        D[Celery Workers]
+        E[Celery Beat]
+    end
+
+    subgraph "Data Tier"
+        F[PostgreSQL]
+        G[Redis Cache]
+        H[External MSSQL]
+        I[External PostgreSQL]
+    end
+
+    subgraph "Monitoring Tier"
+        J[Prometheus]
+        K[Grafana]
+        L[Flower]
+    end
+
+    A --> B
+    B --> C
+    C --> F
+    C --> G
+    C --> D
+    E --> D
+    D --> G
+    C --> H
+    C --> I
+    J --> C
+    J --> D
+    J --> F
+    J --> G
+    K --> J
+    L --> D
+    L --> G
+</syntaxhighlight>
+
+=== Data Flow Architecture ===
+
+<syntaxhighlight lang="mermaid">
+graph LR
+    A[User Request] --> B[Load Balancer]
+    B --> C[Django App]
+    C --> D{Data Type?}
+
+    D -->|Internal| E[PostgreSQL]
+    D -->|Cached| F[Redis]
+    D -->|External| G[MSSQL ETOOLS]
+    D -->|Async| H[Celery Queue]
+
+    H --> I[Celery Worker]
+    I --> J{Result Type?}
+    J -->|Store| E
+    J -->|Cache| F
+    J -->|External| G
+
+    K[Monitoring] --> L[Prometheus]
+    L --> M[Grafana]
+    I --> N[Flower]
+</syntaxhighlight>
+
+=== Development Workflow ===
+
+<syntaxhighlight lang="mermaid">
+graph LR
+    A[Developer] --> B[Git Repository]
+    B --> C[Local Development]
+    C --> D[Docker Compose]
+    D --> E[Django App]
+    D --> F[PostgreSQL]
+    D --> G[Redis]
+    D --> H[Celery]
+
+    I[Code Quality] --> J[Ruff]
+    I --> K[Black]
+    I --> L[isort]
+    I --> M[pytest]
+
+    N[Debugging] --> O[Debug Toolbar]
+    N --> P[Flower]
+    N --> Q[Grafana]
+
+    R[Deployment] --> S[Docker Stack]
+    S --> T[Production]
+</syntaxhighlight>
+
+== Quick Reference Tables ==
+
+=== Service Ports and Endpoints ===
+
+{| class="wikitable"
+|-
+! Service !! Internal Port !! External Port !! Description
+|-
+| Django Application || 8000 || 8080 || Main web application
+|-
+| PostgreSQL || 5432 || N/A || Primary database
+|-
+| Redis || 6379 || N/A || Cache and message broker
+|-
+| Celery Flower || 5555 || 5555 || Task monitoring dashboard
+|-
+| Prometheus || 9090 || 9090 || Metrics collection
+|-
+| Grafana || 3000 || 3000 || Visualization dashboard
+|-
+| Wiki || 80 || 8081 || Documentation platform
+|-
+| External PostgreSQL || 5433 || N/A || Development database
+|}
+
+=== Environment Variables ===
+
+{| class="wikitable"
+|-
+! Variable !! Description !! Default !! Required
+|-
+| DJANGO_SETTINGS_MODULE || Django settings module || settings || Yes
+|-
+| DATABASE_URL || PostgreSQL connection string || postgresql://... || Yes
+|-
+| REDIS_URL || Redis connection string || redis://redis:6379 || Yes
+|-
+| CELERY_BROKER_URL || Celery broker URL || redis://redis:6379/0 || Yes
+|-
+| CELERY_RESULT_BACKEND || Celery results backend || redis://redis:6379/1 || Yes
+|-
+| PROMETHEUS_URL || Prometheus server URL || http://prometheus:9090 || No
+|-
+| GRAFANA_URL || Grafana server URL || http://grafana:3000 || No
+|-
+| ETOOLS_DSN || MSSQL ETOOLS DSN || N/A || No
+|}
+
+=== File Structure ===
+
+{| class="wikitable"
+|-
+! Directory !! Purpose !! Key Files
+|-
+| / || Project root || manage.py, docker-compose.yml
+|-
+| apps/ || Django applications || accounts/, workflow/, etc.
+|-
+| config/ || Configuration files || settings.py, urls.py
+|-
+| staticfiles/ || Static assets || CSS, JS, images
+|-
+| templates/ || Django templates || HTML templates
+|-
+| tests/ || Test files || pytest files
+|-
+| docs/ || Documentation || README files
+|-
+| scripts/ || Utility scripts || Deployment scripts
+|-
+| fixtures/ || Test data || JSON fixtures
+|}
+
+== Cross-Reference Index ==
+
+=== By Technology ===
+
+==== Django ====
+* [[Main Page|Architecture]]
+* [[PostgreSQL Database|ORM]]
+* [[Development Tools|Debug Toolbar]]
+* [[Celery Task Processing|Background Tasks]]
+* [[Data Masking|Security]]
+
+==== Docker ====
+* [[Development Infrastructure|Setup]]
+* [[Docker Infrastructure|Architecture]]
+* [[PostgreSQL Database|Database Container]]
+* [[Redis Configuration|Cache Container]]
+* [[Prometheus Monitoring|Monitoring Stack]]
+
+==== PostgreSQL ====
+* [[PostgreSQL Database|Primary Database]]
+* [[External Database Integration|External Container]]
+* [[Development Tools|Connection Testing]]
+* [[Docker Infrastructure|Container Setup]]
+
+==== Redis ====
+* [[Redis Configuration|Cache]]
+* [[Celery Task Processing|Message Broker]]
+* [[Flower Monitoring|Task Results]]
+* [[Development Tools|Session Storage]]
+
+==== Celery ====
+* [[Celery Task Processing|Workers]]
+* [[Flower Monitoring|Monitoring]]
+* [[Redis Configuration|Broker]]
+* [[Prometheus Monitoring|Metrics]]
+
+==== Prometheus ====
+* [[Prometheus Monitoring|Collection]]
+* [[Grafana Dashboards|Data Source]]
+* [[Docker Infrastructure|Stack]]
+* [[Development Tools|Performance]]
+
+==== Grafana ====
+* [[Grafana Dashboards|Visualization]]
+* [[Prometheus Monitoring|Source]]
+* [[Docker Infrastructure|Dashboard]]
+* [[Development Tools|Metrics]]
+
+=== By Function ===
+
+==== Development ====
+* [[Development Infrastructure|Environment]]
+* [[Development Tools|Quality]]
+* [[Docker Infrastructure|Local]]
+* [[PostgreSQL Database|Database]]
+* [[External Database Integration|Mock Data]]
+
+==== Testing ====
+* [[Development Tools|Framework]]
+* [[PostgreSQL Database|Database Tests]]
+* [[Celery Task Processing|Task Tests]]
+* [[External Database Integration|Integration Tests]]
+
+==== Deployment ====
+* [[Docker Infrastructure|Containers]]
+* [[Development Infrastructure|Orchestration]]
+* [[PostgreSQL Database|Database]]
+* [[Redis Configuration|Cache]]
+
+==== Monitoring ====
+* [[Prometheus Monitoring|Metrics]]
+* [[Grafana Dashboards|Visualization]]
+* [[Flower Monitoring|Tasks]]
+* [[Redis Configuration|Cache]]
+* [[PostgreSQL Database|Database]]
+
+==== Security ====
+* [[Data Masking|Protection]]
+* [[External Database Integration|Access]]
+* [[Docker Infrastructure|Container Security]]
+* [[Development Tools|Secure Development]]
+
+== Learning Paths ==
+
+=== Beginner Path ===
+# [[Main Page|Project Overview]]
+# [[Development Infrastructure|Development Setup]]
+# [[Docker Infrastructure|Running the Application]]
+# [[Development Tools|Development Workflow]]
+
+=== Intermediate Path ===
+# [[PostgreSQL Database|Database Architecture]]
+# [[Celery Task Processing|Task Processing]]
+# [[Redis Configuration|Caching]]
+# [[Data Masking|Data Protection]]
+
+=== Advanced Path ===
+# [[Prometheus Monitoring|Monitoring]]
+# [[Grafana Dashboards|Visualization]]
+# [[External Database Integration|External Integration]]
+# [[Flower Monitoring|Task Monitoring]]
+
+== Maintenance and Updates ==
+
+=== Documentation Standards ===
+
+'''Page Structure Requirements:'''
+* Clear, descriptive title
+* Executive summary or overview
+* Table of contents for long pages
+* Detailed sections with proper headers
+* Code examples with syntax highlighting
+* Cross-references to related pages
+* Troubleshooting sections
+* Best practices and recommendations
+
+'''Content Guidelines:'''
+* Use consistent terminology throughout
+* Include practical, working examples
+* Provide troubleshooting information
+* Link to related documentation pages
+* Keep content current and accurate
+* Use Mermaid diagrams for architecture visualization
+
+=== Update Procedures ===
+
+'''Regular Maintenance:'''
+# Review pages for outdated information
+# Update examples with current best practices
+# Verify all links and cross-references
+# Test code examples for functionality
+# Update architecture diagrams as needed
+
+'''Version Control:'''
+# Document changes in page history
+# Use meaningful edit summaries
+# Maintain changelog for major updates
+# Archive outdated information appropriately
+
+=== Quality Assurance ===
+
+'''Review Checklist:'''
+* [ ] Information is current and accurate
+* [ ] Examples work as documented
+* [ ] Cross-references are functional
+* [ ] Code syntax highlighting is correct
+* [ ] Diagrams render properly
+* [ ] Troubleshooting information is comprehensive
+* [ ] Page follows documentation standards
+
+== Appendices ==
+
+=== Appendix A: Glossary ===
+
+{| class="wikitable"
+|-
+! Term !! Definition
+|-
+| Django || Python web framework used for the application
+|-
+| Celery || Distributed task queue system
+|-
+| Redis || In-memory data structure store used for caching and messaging
+|-
+| PostgreSQL || Open-source relational database
+|-
+| Prometheus || Monitoring and alerting toolkit
+|-
+| Grafana || Multi-platform open-source analytics and monitoring solution
+|-
+| Docker || Platform for developing, shipping, and running applications in containers
+|-
+| ORM || Object-Relational Mapping - technique for converting data between incompatible systems
+|-
+| DSN || Data Source Name - string that identifies a database connection
+|-
+| ODBC || Open Database Connectivity - standard API for accessing database management systems
+|}
+
+=== Appendix B: Troubleshooting Quick Reference ===
+
+'''Common Issues:'''
+* '''Database Connection Failed''': Check DATABASE_URL environment variable
+* '''Redis Connection Error''': Verify Redis service is running on port 6379
+* '''Celery Worker Not Starting''': Check CELERY_BROKER_URL configuration
+* '''Prometheus Not Collecting Metrics''': Verify service discovery configuration
+* '''Grafana Dashboard Not Loading''': Check data source configuration
+
+'''Debug Commands:'''
+* Database: <code>python manage.py dbshell</code>
+* Cache: <code>redis-cli ping</code>
+* Tasks: <code>celery -A config inspect active</code>
+* Metrics: <code>curl http://localhost:9090/api/v1/query?query=up</code>
+
+=== Appendix C: Performance Benchmarks ===
+
+'''Database Performance:'''
+* Read operations: < 10ms average
+* Write operations: < 50ms average
+* Complex queries: < 100ms average
+* Connection pool: 20 connections
+
+'''Cache Performance:'''
+* Cache hit rate: > 95%
+* Response time: < 1ms
+* Memory usage: < 1GB
+* Eviction rate: < 5%
+
+'''Task Processing:'''
+* Task throughput: 1000+ tasks/minute
+* Queue depth: < 100 tasks
+* Worker utilization: 80-90%
+* Error rate: < 1%
+
+---
+
+''This table of contents provides a comprehensive index to the GOLD3 project documentation. For detailed information on any topic, click the linked page titles above.''</content>
+<parameter name="filePath">c:\Dev\Gold3\wiki_table_of_contents.wiki

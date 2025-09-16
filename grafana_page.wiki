@@ -1,0 +1,659 @@
+= Grafana Dashboards and Visualization =
+
+{| class="wikitable" style="float:right; margin-left:1em; width:300px;"
+|-
+! colspan="2" | Grafana Configuration
+|-
+| '''Service Name''' || grafana
+|-
+| '''Port''' || 3000
+|-
+| '''Default User''' || admin
+|-
+| '''Default Password''' || admin (change immediately)
+|-
+| '''Data Source''' || Prometheus
+|-
+| '''Theme''' || Light (configurable)
+|}
+
+== Overview ==
+
+Grafana is the visualization layer for GOLD3's monitoring stack, providing interactive dashboards for metrics visualization, alerting, and data exploration using Prometheus as the primary data source.
+
+== Architecture ==
+
+=== Components ===
+
+{| class="wikitable"
+|-
+! Component !! Purpose !! Configuration !! Location
+|-
+| '''Grafana Server''' || Web interface & API || grafana/grafana.ini || Container
+|-
+| '''Data Sources''' || Metric data connections || provisioning/datasources/ || Config files
+|-
+| '''Dashboards''' || Visualizations || provisioning/dashboards/ || JSON files
+|-
+| '''Plugins''' || Extended functionality || plugins/ || Auto-installed
+|-
+| '''Users & Teams''' || Access control || Database || SQLite/PostgreSQL
+|}
+
+=== Data Flow ===
+
+<syntaxhighlight lang="mermaid">
+graph TD
+    A[Prometheus] --> B[Grafana Data Source]
+    B --> C[Query Engine]
+    C --> D[Dashboard Panels]
+    D --> E[Visualization Layer]
+    E --> F[User Interface]
+    F --> G[API Endpoints]
+    G --> H[External Tools]
+</syntaxhighlight>
+
+== Configuration ==
+
+=== Docker Compose Setup ===
+
+'''Grafana Service:'''
+<syntaxhighlight lang="yaml">
+grafana:
+  image: grafana/grafana:latest
+  ports:
+    - "3000:3000"
+  volumes:
+    - grafana-storage:/var/lib/grafana
+    - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+  environment:
+    - GF_SECURITY_ADMIN_PASSWORD=admin
+    - GF_USERS_ALLOW_SIGN_UP=false
+    - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-worldmap-panel
+  networks:
+    - monitoring
+  depends_on:
+    - prometheus
+</syntaxhighlight>
+
+=== Data Source Provisioning ===
+
+'''datasources.yml:'''
+<syntaxhighlight lang="yaml">
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+
+  - name: PostgreSQL
+    type: postgres
+    url: db:5432
+    database: gchub_dev
+    user: gchub
+    secureJsonData:
+      password: gchub
+    jsonData:
+      sslmode: disable
+      maxOpenConns: 100
+      maxIdleConns: 10
+      connMaxLifetime: 14400
+
+  - name: Redis
+    type: redis-datasource
+    url: redis:6379
+    editable: true
+</syntaxhighlight>
+
+=== Dashboard Provisioning ===
+
+'''dashboards.yml:'''
+<syntaxhighlight lang="yaml">
+apiVersion: 1
+
+providers:
+  - name: 'gold3-dashboards'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+</syntaxhighlight>
+
+== Dashboard Creation ==
+
+=== System Overview Dashboard ===
+
+'''Key Panels:'''
+* '''System Health''': Overall system status with uptime and basic metrics
+* '''Resource Usage''': CPU, memory, disk, and network utilization
+* '''Service Status''': Status of all Docker services
+* '''Error Rates''': Application and system error tracking
+
+'''Sample Queries:'''
+<syntaxhighlight lang="json">
+{
+  "targets": [
+    {
+      "expr": "up",
+      "legendFormat": "{{job}}",
+      "refId": "A"
+    }
+  ],
+  "title": "Service Health",
+  "type": "stat"
+}
+</syntaxhighlight>
+
+=== Application Performance Dashboard ===
+
+'''HTTP Metrics:'''
+<syntaxhighlight lang="promql">
+# Request rate by endpoint
+rate(django_http_requests_total_by_view_transport_method[5m])
+
+# Response time percentiles
+histogram_quantile(0.95, rate(django_http_requests_latency_seconds_bucket[5m]))
+
+# Error rate
+rate(django_http_requests_total_by_view_transport_method{status=~"5.."}[5m]) / rate(django_http_requests_total_by_view_transport_method[5m])
+</syntaxhighlight>
+
+'''Database Metrics:'''
+<syntaxhighlight lang="promql">
+# Query count
+rate(django_db_execute_total[5m])
+
+# Connection count
+django_db_connections_total
+
+# Query duration
+histogram_quantile(0.95, rate(django_db_query_duration_seconds_bucket[5m]))
+</syntaxhighlight>
+
+=== Celery Monitoring Dashboard ===
+
+'''Task Metrics:'''
+<syntaxhighlight lang="promql">
+# Active tasks
+celery_active_tasks
+
+# Queued tasks
+celery_queued_tasks
+
+# Task success rate
+rate(celery_tasks_total[5m]) / rate(celery_tasks_total[5m])
+
+# Task execution time
+rate(celery_task_runtime_seconds_sum[5m]) / rate(celery_task_runtime_seconds_count[5m])
+</syntaxhighlight>
+
+'''Worker Metrics:'''
+<syntaxhighlight lang="promql">
+# Worker status
+celery_worker_up
+
+# Worker CPU usage
+rate(celery_worker_cpu_seconds_total[5m])
+
+# Worker memory usage
+celery_worker_rss
+</syntaxhighlight>
+
+== Panel Types and Usage ==
+
+=== Time Series Panels ===
+
+'''Best for:''' Metrics over time, trends, historical data
+
+'''Configuration:'''
+* '''Query''': PromQL expression
+* '''Legend''': Label formatting with {{variable}} syntax
+* '''Axes''': Y-axis units, scale, and formatting
+* '''Thresholds''': Visual thresholds for alerts
+* '''Overrides''': Field-specific customizations
+
+=== Stat Panels ===
+
+'''Best for:''' Current values, KPIs, status indicators
+
+'''Configuration:'''
+* '''Field''': Value field selection
+* '''Thresholds''': Color-coded value ranges
+* '''Value Options''': Unit display, decimal places
+* '''Stat Styles''': Auto, value-only, or name-value pairs
+
+=== Table Panels ===
+
+'''Best for:''' Detailed data, comparisons, raw values
+
+'''Configuration:'''
+* '''Field''': Column selection and ordering
+* '''Overrides''': Column-specific formatting
+* '''Thresholds''': Row or cell highlighting
+* '''Links''': Drill-down capabilities
+
+=== Gauge Panels ===
+
+'''Best for:''' Percentage values, utilization metrics
+
+'''Configuration:'''
+* '''Field''': Value field
+* '''Thresholds''': Color ranges (red/yellow/green)
+* '''Value Options''': Min/max values, units
+* '''Orientation''': Horizontal or vertical layout
+
+== Alerting ==
+
+=== Alert Rules ===
+
+'''Creating Alerts:'''
+* Navigate to '''Alerting''' → '''Alert rules'''
+* Click '''Create alert rule'''
+* Define query and conditions
+* Set evaluation interval
+* Configure notifications
+
+'''Example Alert Rule:'''
+<syntaxhighlight lang="json">
+{
+  "name": "High CPU Usage",
+  "query": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100) > 80",
+  "for": "5m",
+  "labels": {
+    "severity": "warning"
+  },
+  "annotations": {
+    "summary": "High CPU usage detected",
+    "description": "CPU usage is {{ $value }}%"
+  }
+}
+</syntaxhighlight>
+
+=== Notification Channels ===
+
+'''Email Notifications:'''
+<syntaxhighlight lang="json">
+{
+  "name": "email-notifications",
+  "type": "email",
+  "settings": {
+    "addresses": "admin@gold3.local",
+    "singleEmail": false
+  }
+}
+</syntaxhighlight>
+
+'''Slack Integration:'''
+<syntaxhighlight lang="json">
+{
+  "name": "slack-alerts",
+  "type": "slack",
+  "settings": {
+    "url": "https://hooks.slack.com/services/...",
+    "recipient": "#alerts",
+    "username": "Grafana"
+  }
+}
+</syntaxhighlight>
+
+== User Management ==
+
+=== Organizations ===
+
+'''Multi-tenancy Setup:'''
+* '''Organizations''': Separate data and users
+* '''Teams''': Group users within organizations
+* '''Roles''': Viewer, Editor, Admin permissions
+
+=== Authentication ===
+
+'''Built-in Authentication:'''
+* Local users with password
+* LDAP/Active Directory integration
+* OAuth providers (Google, GitHub, etc.)
+
+'''LDAP Configuration:'''
+<syntaxhighlight lang="ini">
+[auth.ldap]
+enabled = true
+config_file = /etc/grafana/ldap.toml
+allow_sign_up = true
+</syntaxhighlight>
+
+=== Permissions ===
+
+'''Dashboard Permissions:'''
+* '''View''': Read-only access
+* '''Edit''': Modify dashboard content
+* '''Admin''': Full control including permissions
+
+'''Data Source Permissions:'''
+* '''Query''': Execute queries
+* '''Admin''': Modify data source settings
+
+== Advanced Features ==
+
+=== Variables and Templates ===
+
+'''Dashboard Variables:'''
+<syntaxhighlight lang="json">
+{
+  "name": "instance",
+  "type": "query",
+  "query": "label_values(instance)",
+  "datasource": "Prometheus"
+}
+</syntaxhighlight>
+
+'''Template Usage:'''
+* Use '''$instance''' in queries for dynamic filtering
+* Create reusable dashboard templates
+* Support for multi-value variables
+
+=== Annotations ===
+
+'''Event Annotations:'''
+<syntaxhighlight lang="json">
+{
+  "name": "Deployments",
+  "datasource": "Prometheus",
+  "query": "up{job=\"gold3-web\"} == 0",
+  "iconColor": "red",
+  "text": "Service restarted"
+}
+</syntaxhighlight>
+
+=== Plugins and Extensions ===
+
+'''Essential Plugins:'''
+* '''Pie Chart''': grafana-piechart-panel
+* '''World Map''': grafana-worldmap-panel
+* '''Status Map''': flant-statusmap-panel
+* '''Business Charts''': volkovlabs-business-table-panel
+
+'''Installation:'''
+<syntaxhighlight lang="bash">
+# Via environment variable
+GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-worldmap-panel
+
+# Via API
+curl -X POST http://admin:admin@localhost:3000/api/plugins/grafana-piechart-panel/install
+</syntaxhighlight>
+
+== Performance Optimization ==
+
+=== Query Optimization ===
+
+'''Efficient Queries:'''
+<syntaxhighlight lang="promql">
+# Good: Specific time range
+rate(http_requests_total[5m])
+
+# Good: Label filtering
+http_requests_total{status="200"}
+
+# Good: Aggregation
+sum(rate(http_requests_total[5m])) by (method)
+
+# Avoid: Too broad
+http_requests_total
+</syntaxhighlight>
+
+=== Dashboard Optimization ===
+
+'''Performance Best Practices:'''
+* '''Query Reduction''': Use fewer queries per panel
+* '''Time Range Limits''': Reasonable default time ranges
+* '''Refresh Intervals''': Appropriate update frequencies
+* '''Panel Limits''': Limit panels per dashboard
+* '''Caching''': Enable query caching where possible
+
+=== Resource Management ===
+
+'''Grafana Configuration:'''
+<syntaxhighlight lang="ini">
+[server]
+http_port = 3000
+
+[database]
+type = sqlite3
+path = grafana.db
+
+[session]
+provider = memory
+
+[log]
+level = info
+</syntaxhighlight>
+
+== Troubleshooting ==
+
+=== Common Issues ===
+
+==== Cannot Access Grafana ====
+
+'''Symptoms:'''
+* Connection refused errors
+* Blank page or loading issues
+* Authentication problems
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check service status
+docker-compose ps grafana
+
+# View logs
+docker-compose logs grafana
+
+# Test connectivity
+curl -I http://localhost:3000
+
+# Reset admin password
+docker-compose exec grafana grafana-cli admin reset-admin-password admin
+</syntaxhighlight>
+
+==== Data Source Connection Failed ====
+
+'''Symptoms:'''
+* "Data source not working" errors
+* Empty panels in dashboards
+* Query errors in panel editor
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Test Prometheus connectivity
+curl -f http://localhost:9090/api/v1/query?query=up
+
+# Check data source configuration
+curl http://admin:admin@localhost:3000/api/datasources
+
+# Verify network connectivity
+docker-compose exec grafana ping prometheus
+</syntaxhighlight>
+
+==== Dashboard Not Loading ====
+
+'''Symptoms:'''
+* Dashboard shows "Loading..." indefinitely
+* Panels display "No data"
+* Query timeouts
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check provisioning configuration
+docker-compose exec grafana cat /etc/grafana/provisioning/dashboards/dashboards.yml
+
+# Validate dashboard JSON
+python -m json.tool /var/lib/grafana/dashboards/system-overview.json
+
+# Check Grafana logs for errors
+docker-compose logs grafana | grep -i error
+</syntaxhighlight>
+
+==== Permission Issues ====
+
+'''Symptoms:'''
+* "Access denied" errors
+* Cannot save dashboards
+* Missing menu options
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check user permissions
+curl http://admin:admin@localhost:3000/api/user
+
+# Verify organization role
+curl http://admin:admin@localhost:3000/api/user/orgs
+
+# Reset permissions if needed
+# Access Admin -> Users -> Edit User -> Update permissions
+</syntaxhighlight>
+
+== Security Best Practices ==
+
+=== Access Control ===
+
+'''Authentication:'''
+* Disable anonymous access in production
+* Use strong passwords and password policies
+* Enable multi-factor authentication
+* Implement session timeouts
+
+'''Authorization:'''
+* Use role-based access control
+* Implement least privilege principle
+* Regular permission audits
+* Separate development and production instances
+
+=== Network Security ===
+
+'''Reverse Proxy:'''
+<syntaxhighlight lang="nginx">
+server {
+    listen 80;
+    server_name grafana.gold3.local;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+</syntaxhighlight>
+
+'''SSL/TLS:'''
+* Enable HTTPS in production
+* Use valid SSL certificates
+* Configure secure headers
+* Regular certificate renewal
+
+== Backup and Recovery ==
+
+=== Configuration Backup ===
+
+'''Backup Script:'''
+<syntaxhighlight lang="bash">
+#!/bin/bash
+BACKUP_DIR="/opt/grafana-backup/$(date +%Y%m%d_%H%M%S)"
+mkdir -p $BACKUP_DIR
+
+# Backup database
+docker-compose exec grafana sqlite3 /var/lib/grafana/grafana.db .dump > $BACKUP_DIR/grafana.sql
+
+# Backup dashboards
+cp -r grafana/dashboards $BACKUP_DIR/
+
+# Backup data sources
+cp -r grafana/provisioning $BACKUP_DIR/
+
+# Create archive
+tar czf $BACKUP_DIR.tar.gz $BACKUP_DIR
+</syntaxhighlight>
+
+=== Disaster Recovery ===
+
+'''Recovery Process:'''
+<syntaxhighlight lang="bash">
+# Stop Grafana
+docker-compose stop grafana
+
+# Restore database
+docker-compose exec -T grafana sqlite3 /var/lib/grafana/grafana.db < backup/grafana.sql
+
+# Restore configuration
+cp -r backup/provisioning/* grafana/provisioning/
+
+# Start Grafana
+docker-compose start grafana
+</syntaxhighlight>
+
+== Integration Examples ==
+
+=== Custom Dashboard Creation ===
+
+'''System Health Dashboard JSON:'''
+<syntaxhighlight lang="json">
+{
+  "dashboard": {
+    "title": "System Health",
+    "tags": ["gold3", "system"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "Service Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up",
+            "legendFormat": "{{job}}"
+          }
+        ]
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}
+</syntaxhighlight>
+
+=== API Integration ===
+
+'''Dashboard Management via API:'''
+<syntaxhighlight lang="bash">
+# List dashboards
+curl http://admin:admin@localhost:3000/api/search
+
+# Create dashboard
+curl -X POST http://admin:admin@localhost:3000/api/dashboards/db \
+  -H "Content-Type: application/json" \
+  -d @dashboard.json
+
+# Update data source
+curl -X PUT http://admin:admin@localhost:3000/api/datasources/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Prometheus","url":"http://prometheus:9090"}'
+</syntaxhighlight>
+
+== Related Documentation ==
+
+* [[Main Page|Project Overview]]
+* [[Prometheus Monitoring|Prometheus Metrics Collection]]
+* [[Docker Infrastructure|Container Architecture]]
+* [[Monitoring Setup|Complete Monitoring Stack]]
+* [[Alerting Configuration|Alert Management]]
+
+---
+
+''Last updated: September 16, 2025''</content>
+<parameter name="filePath">c:\Dev\Gold3\grafana_page.wiki

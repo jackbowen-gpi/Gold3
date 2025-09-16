@@ -1,0 +1,609 @@
+= Prometheus Monitoring Setup =
+
+{| class="wikitable" style="float:right; margin-left:1em; width:300px;"
+|-
+! colspan="2" | Prometheus Configuration
+|-
+| '''Service Name''' || prometheus
+|-
+| '''Port''' || 9090
+|-
+| '''Version''' || Latest stable
+|-
+| '''Data Retention''' || 15 days (default)
+|-
+| '''Scrape Interval''' || 15 seconds (default)
+|-
+| '''Storage''' || Local filesystem
+|}
+
+== Overview ==
+
+Prometheus is the core metrics collection system for GOLD3, responsible for gathering time-series data from all services and making it available for monitoring, alerting, and visualization through Grafana.
+
+== Architecture ==
+
+=== Components ===
+
+{| class="wikitable"
+|-
+! Component !! Purpose !! Endpoint !! Data Type
+|-
+| '''Prometheus Server''' || Metrics collection & storage || /metrics || Internal metrics
+|-
+| '''Node Exporter''' || System metrics || /metrics || OS metrics
+|-
+| '''Flower Exporter''' || Celery task metrics || /metrics || Task metrics
+|-
+| '''Django Prometheus''' || Application metrics || /metrics || App metrics
+|-
+| '''Grafana''' || Visualization || - || Dashboard queries
+|}
+
+=== Data Flow ===
+
+<syntaxhighlight lang="mermaid">
+graph TD
+    A[Services] --> B[Metrics Endpoints]
+    B --> C[Prometheus Server]
+    C --> D[Time Series DB]
+    D --> E[Grafana]
+    E --> F[Dashboards]
+    C --> G[Alert Manager]
+    G --> H[Notifications]
+</syntaxhighlight>
+
+== Configuration ==
+
+=== Docker Compose Setup ===
+
+'''Prometheus Service:'''
+<syntaxhighlight lang="yaml">
+prometheus:
+  image: prom/prometheus:latest
+  ports:
+    - "9090:9090"
+  volumes:
+    - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    - prometheus-data:/prometheus
+  command:
+    - '--config.file=/etc/prometheus/prometheus.yml'
+    - '--storage.tsdb.path=/prometheus'
+    - '--web.console.libraries=/etc/prometheus/console_libraries'
+    - '--web.console.templates=/etc/prometheus/consoles'
+    - '--storage.tsdb.retention.time=200h'
+    - '--web.enable-lifecycle'
+  networks:
+    - monitoring
+</syntaxhighlight>
+
+=== Prometheus Configuration File ===
+
+'''prometheus.yml:'''
+<syntaxhighlight lang="yaml">
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'flower'
+    static_configs:
+      - targets: ['flower:5555']
+
+  - job_name: 'gold3-web'
+    static_configs:
+      - targets: ['web:8000']
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['db:5432']
+</syntaxhighlight>
+
+=== Service-Specific Metrics ===
+
+==== Django Application Metrics ====
+
+'''Django Prometheus Configuration:'''
+<syntaxhighlight lang="python">
+# settings.py
+INSTALLED_APPS = [
+    # ... other apps
+    'django_prometheus',
+]
+
+MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
+]
+
+# Metrics endpoint
+PROMETHEUS_METRICS_EXPORT_PORT = 8000
+PROMETHEUS_METRICS_EXPORT_ADDRESS = '0.0.0.0'
+</syntaxhighlight>
+
+'''Available Django Metrics:'''
+* '''Request Count''': Total HTTP requests by endpoint
+* '''Response Time''': Request duration percentiles
+* '''Database Queries''': Query count and duration
+* '''Cache Performance''': Cache hit/miss ratios
+* '''Error Rates''': HTTP error response counts
+
+==== Celery/Flower Metrics ====
+
+'''Flower Metrics Endpoint:'''
+* '''URL''': http://localhost:5555/metrics
+* '''Authentication''': None (development)
+* '''Update Interval''': 30 seconds
+
+'''Key Celery Metrics:'''
+* '''Active Tasks''': Currently executing tasks
+* '''Queued Tasks''': Tasks waiting in queue
+* '''Failed Tasks''': Tasks that failed execution
+* '''Task Duration''': Average task execution time
+* '''Worker Status''': Active/idle worker processes
+
+==== System Metrics (Node Exporter) ====
+
+'''Node Exporter Configuration:'''
+<syntaxhighlight lang="yaml">
+node-exporter:
+  image: prom/node-exporter:latest
+  ports:
+    - "9100:9100"
+  volumes:
+    - /proc:/host/proc:ro
+    - /sys:/host/sys:ro
+    - /:/rootfs:ro
+  command:
+    - '--path.procfs=/host/proc'
+    - '--path.rootfs=/rootfs'
+    - '--path.sysfs=/host/sys'
+    - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+  networks:
+    - monitoring
+</syntaxhighlight>
+
+'''System Metrics Collected:'''
+* '''CPU Usage''': Per-core and total CPU utilization
+* '''Memory Usage''': RAM and swap usage statistics
+* '''Disk I/O''': Read/write operations and throughput
+* '''Network I/O''': Network interface statistics
+* '''Filesystem Usage''': Disk space and inode usage
+* '''System Load''': 1, 5, and 15-minute load averages
+
+== Management & Operations ==
+
+=== Starting Monitoring Stack ===
+
+'''Complete Monitoring Setup:'''
+<syntaxhighlight lang="powershell">
+# Start all monitoring services
+docker-compose up -d prometheus grafana node-exporter
+
+# Start Flower for Celery monitoring
+docker-compose up -d flower
+
+# Enable Django metrics (if not already enabled)
+# Add django-prometheus to requirements and restart web service
+docker-compose restart web
+</syntaxhighlight>
+
+=== Accessing Interfaces ===
+
+{| class="wikitable"
+|-
+! Service !! URL !! Purpose !! Credentials
+|-
+| '''Prometheus''' || http://localhost:9090 || Metrics querying || None
+|-
+| '''Grafana''' || http://localhost:3000 || Dashboards || admin/admin
+|-
+| '''Flower''' || http://localhost:5555 || Celery monitoring || None
+|-
+| '''Node Exporter''' || http://localhost:9100/metrics || Raw metrics || None
+|}
+
+=== Health Checks ===
+
+'''Service Health Verification:'''
+<syntaxhighlight lang="powershell">
+# Check Prometheus targets
+curl -s http://localhost:9090/api/v1/targets | jq '.data.activeTargets[].health'
+
+# Verify metrics collection
+curl -s http://localhost:9090/api/v1/query?query=up
+
+# Check Grafana connectivity
+curl -s http://localhost:3000/api/health
+
+# Verify Node Exporter
+curl -s http://localhost:9100/metrics | head -10
+</syntaxhighlight>
+
+== Querying Metrics ==
+
+=== PromQL Basics ===
+
+'''Common Query Patterns:'''
+
+{| class="wikitable"
+|-
+! Query Type !! Example !! Description
+|-
+| '''Instant Query''' || up || Current status of all targets
+|-
+| '''Range Query''' || up[5m] || Status over last 5 minutes
+|-
+| '''Aggregation''' || sum(rate(http_requests_total[5m])) || Total request rate
+|-
+| '''Filtering''' || up{job="gold3-web"} || Filter by job label
+|-
+| '''Functions''' || rate(http_requests_total[5m]) || Per-second rate
+|}
+
+=== Essential Queries ===
+
+'''System Health:'''
+<syntaxhighlight lang="promql">
+# Overall system health
+up
+
+# CPU usage percentage
+100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+
+# Memory usage
+1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)
+
+# Disk usage
+(1 - node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100
+</syntaxhighlight>
+
+'''Application Metrics:'''
+<syntaxhighlight lang="promql">
+# HTTP request rate
+rate(django_http_requests_total_by_view_transport_method[5m])
+
+# Request duration (95th percentile)
+histogram_quantile(0.95, rate(django_http_requests_total_by_view_transport_method[5m]))
+
+# Database query count
+rate(django_db_execute_total[5m])
+
+# Celery task rate
+rate(celery_tasks_total[5m])
+</syntaxhighlight>
+
+'''Celery Monitoring:'''
+<syntaxhighlight lang="promql">
+# Active Celery tasks
+celery_active_tasks
+
+# Queued tasks
+celery_queued_tasks
+
+# Failed tasks
+rate(celery_tasks_failed_total[5m])
+
+# Task execution time
+rate(celery_task_runtime_seconds_sum[5m]) / rate(celery_task_runtime_seconds_count[5m])
+</syntaxhighlight>
+
+== Alerting ==
+
+=== Alert Manager Setup ===
+
+'''Docker Compose Configuration:'''
+<syntaxhighlight lang="yaml">
+alertmanager:
+  image: prom/alertmanager:latest
+  ports:
+    - "9093:9093"
+  volumes:
+    - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+  command:
+    - '--config.file=/etc/alertmanager/alertmanager.yml'
+  networks:
+    - monitoring
+</syntaxhighlight>
+
+=== Alert Rules ===
+
+'''alert_rules.yml:'''
+<syntaxhighlight lang="yaml">
+groups:
+  - name: gold3
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value }}%"
+
+      - alert: HighMemoryUsage
+        expr: 1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 0.9
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value }}%"
+
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} has been down for more than 1 minute"
+</syntaxhighlight>
+
+=== Notification Channels ===
+
+'''Email Notifications:'''
+<syntaxhighlight lang="yaml">
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'alerts@gold3.local'
+  smtp_auth_username: 'alerts@gold3.local'
+  smtp_auth_password: 'your-password'
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'email-alerts'
+
+receivers:
+  - name: 'email-alerts'
+    email_configs:
+      - to: 'admin@gold3.local'
+</syntaxhighlight>
+
+== Troubleshooting ==
+
+=== Common Issues ===
+
+==== Targets Not Scraping ====
+
+'''Symptoms:'''
+* Targets show as "down" in Prometheus UI
+* No metrics data for specific services
+* "connection refused" errors in logs
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check service status
+docker-compose ps prometheus
+
+# Verify target endpoints
+curl -f http://localhost:8000/metrics
+curl -f http://localhost:9100/metrics
+
+# Check Prometheus configuration
+docker-compose exec prometheus cat /etc/prometheus/prometheus.yml
+
+# Restart Prometheus
+docker-compose restart prometheus
+</syntaxhighlight>
+
+==== Missing Metrics ====
+
+'''Symptoms:'''
+* Expected metrics not appearing in queries
+* Grafana panels showing "No data"
+* Metrics endpoint returning errors
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Verify metrics endpoint
+curl http://localhost:8000/metrics | head -20
+
+# Check Django Prometheus setup
+docker-compose exec web python manage.py shell -c "import django_prometheus; print('Django Prometheus installed')"
+
+# Restart web service
+docker-compose restart web
+</syntaxhighlight>
+
+==== High Resource Usage ====
+
+'''Symptoms:'''
+* Prometheus using excessive CPU/memory
+* Slow query responses
+* Storage growing rapidly
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check resource usage
+docker-compose exec prometheus top
+
+# Reduce retention period
+docker-compose exec prometheus sed -i 's/retention.time=200h/retention.time=30d/' /etc/prometheus/prometheus.yml
+
+# Add resource limits
+# Update docker-compose.yml with resource constraints
+</syntaxhighlight>
+
+==== Grafana Connection Issues ====
+
+'''Symptoms:'''
+* Grafana cannot connect to Prometheus
+* "Data source not working" errors
+* Empty dashboards
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Test Prometheus connectivity from Grafana
+docker-compose exec grafana curl -f http://prometheus:9090/api/v1/query?query=up
+
+# Check Grafana data source configuration
+# Access Grafana UI -> Configuration -> Data Sources -> Prometheus
+
+# Verify network connectivity
+docker-compose exec grafana ping prometheus
+</syntaxhighlight>
+
+== Performance Tuning ==
+
+=== Prometheus Optimization ===
+
+'''Configuration Tuning:'''
+<syntaxhighlight lang="yaml">
+global:
+  scrape_interval: 30s  # Increase from 15s for lower resource usage
+  evaluation_interval: 30s
+
+# Reduce retention for development
+storage:
+  tsdb:
+    retention: 7d  # Reduce from default 15d
+</syntaxhighlight>
+
+'''Resource Limits:'''
+<syntaxhighlight lang="yaml">
+prometheus:
+  deploy:
+    resources:
+      limits:
+        memory: 1G
+        cpus: '0.5'
+      reservations:
+        memory: 512M
+        cpus: '0.25'
+</syntaxhighlight>
+
+=== Query Optimization ===
+
+'''Efficient Query Patterns:'''
+<syntaxhighlight lang="promql">
+# Good: Specific metric with time range
+rate(http_requests_total{job="gold3-web"}[5m])
+
+# Bad: Too broad
+rate(http_requests_total[5m])
+
+# Good: Pre-aggregated
+sum(rate(http_requests_total[5m])) by (method)
+
+# Good: With label filtering
+http_requests_total{status="500"}
+</syntaxhighlight>
+
+== Security Considerations ==
+
+=== Access Control ===
+
+'''Network Security:'''
+* Run Prometheus behind reverse proxy in production
+* Use authentication for sensitive environments
+* Restrict access to metrics endpoints
+
+'''Data Protection:'''
+* Encrypt communication between services
+* Secure storage of sensitive configuration
+* Regular security updates of Prometheus components
+
+=== Best Practices ===
+
+* '''Principle of Least Privilege''': Limit access to monitoring data
+* '''Network Segmentation''': Isolate monitoring network
+* '''Regular Audits''': Review access logs and configurations
+* '''Backup Security''': Secure Prometheus data backups
+
+== Integration Examples ==
+
+=== Django Application Integration ===
+
+'''Complete Setup:'''
+<syntaxhighlight lang="python">
+# requirements.txt
+django-prometheus==2.3.1
+
+# settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django_prometheus',  # Add this
+    # ... your apps
+]
+
+MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
+    # ... other middleware
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
+]
+
+# Custom metrics
+from prometheus_client import Counter, Histogram
+
+REQUEST_COUNT = Counter('gold3_requests_total', 'Total requests', ['method', 'endpoint'])
+RESPONSE_TIME = Histogram('gold3_response_time_seconds', 'Response time', ['method', 'endpoint'])
+</syntaxhighlight>
+
+=== Custom Exporters ===
+
+'''Simple Custom Exporter:'''
+<syntaxhighlight lang="python">
+#!/usr/bin/env python3
+from prometheus_client import start_http_server, Gauge
+import time
+import psutil
+
+# Create metrics
+cpu_usage = Gauge('gold3_cpu_usage_percent', 'CPU usage percentage')
+memory_usage = Gauge('gold3_memory_usage_percent', 'Memory usage percentage')
+
+def collect_metrics():
+    cpu_usage.set(psutil.cpu_percent(interval=1))
+    memory_usage.set(psutil.virtual_memory().percent)
+
+if __name__ == '__main__':
+    start_http_server(8001)
+    while True:
+        collect_metrics()
+        time.sleep(30)
+</syntaxhighlight>
+
+== Related Documentation ==
+
+* [[Main Page|Project Overview]]
+* [[Grafana Dashboards|Grafana Visualization]]
+* [[Celery Configuration|Celery Task Processing]]
+* [[Docker Infrastructure|Container Architecture]]
+* [[Monitoring Setup|Complete Monitoring Stack]]
+
+---
+
+''Last updated: September 16, 2025''</content>
+<parameter name="filePath">c:\Dev\Gold3\prometheus_page.wiki

@@ -1,0 +1,653 @@
+= Flower Monitoring Dashboard =
+
+{| class="wikitable" style="float:right; margin-left:1em; width:300px;"
+|-
+! colspan="2" | Flower Configuration
+|-
+| '''Service Name''' || flower
+|-
+| '''Port''' || 5555
+|-
+| '''Framework''' || Flower (Celery)
+|-
+| '''Broker''' || Redis
+|-
+| '''Authentication''' || None (development)
+|-
+| '''Real-time Updates''' || WebSocket
+|-
+| '''Data Retention''' || Memory-based
+|-
+| '''UI Theme''' || Bootstrap-based
+|}
+
+== Overview ==
+
+Flower is a real-time web-based monitoring tool for Celery, providing insights into task execution, worker status, and broker activity. It serves as the primary monitoring interface for GOLD3's distributed task processing system.
+
+== Architecture ==
+
+=== Components ===
+
+{| class="wikitable"
+|-
+! Component !! Purpose !! Technology !! Location
+|-
+| '''Flower Server''' || Web interface & API || Python/Flower || Container
+|-
+| '''Celery Events''' || Task execution data || Celery Events || Redis
+|-
+| '''WebSocket''' || Real-time updates || WebSocket || Browser
+|-
+| '''REST API''' || Programmatic access || JSON API || HTTP endpoints
+|-
+| '''Broker Monitor''' || Queue inspection || Redis || flower:6379
+|-
+| '''Worker Inspector''' || Worker statistics || Celery || flower:6379
+|}
+
+=== Data Flow ===
+
+<syntaxhighlight lang="mermaid">
+graph TD
+    A[Celery Worker] --> B[Task Events]
+    B --> C[Redis Broker]
+    C --> D[Flower Monitor]
+    D --> E[Web Dashboard]
+    E --> F[Browser Client]
+    F --> G[WebSocket Updates]
+
+    H[Celery Beat] --> I[Scheduled Tasks]
+    I --> C
+
+    J[REST API] --> K[External Tools]
+    J --> L[Monitoring Systems]
+</syntaxhighlight>
+
+== Configuration ==
+
+=== Docker Compose Setup ===
+
+'''Flower Service:'''
+<syntaxhighlight lang="yaml">
+flower:
+  image: mher/flower:latest
+  ports:
+    - "5555:5555"
+  environment:
+    - CELERY_BROKER_URL=redis://redis:6379/0
+    - FLOWER_BASIC_AUTH=user:password  # Optional authentication
+    - FLOWER_PORT=5555
+    - FLOWER_ADDRESS=0.0.0.0
+  depends_on:
+    - redis
+    - celery
+  networks:
+    - gold3
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:5555"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+</syntaxhighlight>
+
+=== Environment Variables ===
+
+'''Core Configuration:'''
+<syntaxhighlight lang="bash">
+# Required
+CELERY_BROKER_URL=redis://redis:6379/0
+
+# Optional
+FLOWER_BASIC_AUTH=admin:password123
+FLOWER_PORT=5555
+FLOWER_ADDRESS=0.0.0.0
+FLOWER_DB=/app/flower.db  # SQLite for persistent data
+FLOWER_PERSISTENT=True
+FLOWER_MAX_WORKERS=5000
+FLOWER_MAX_TASKS=10000
+</syntaxhighlight>
+
+=== Advanced Configuration ===
+
+'''Production Settings:'''
+<syntaxhighlight lang="python">
+# flowerconfig.py
+broker_url = 'redis://redis:6379/0'
+result_backend = 'redis://redis:6379/0'
+
+# Authentication
+basic_auth = ['admin:password123']
+
+# Persistence
+persistent = True
+db = '/app/flower.db'
+
+# Performance
+max_workers = 5000
+max_tasks = 10000
+
+# Security
+cookie_secret = 'your-secret-key'
+</syntaxhighlight>
+
+== Dashboard Interface ==
+
+=== Main Dashboard ===
+
+'''Overview Metrics:'''
+* '''Active Tasks''': Currently executing tasks
+* '''Scheduled Tasks''': Tasks waiting in queue
+* '''Active Workers''': Connected worker processes
+* '''Broker Info''': Redis connection status
+
+'''Real-time Charts:'''
+* Task execution timeline
+* Worker CPU/memory usage
+* Queue length over time
+* Error rate monitoring
+
+=== Workers Tab ===
+
+'''Worker Information:'''
+* '''Status''': Active, offline, or disconnected
+* '''Active Tasks''': Currently processing tasks
+* '''Completed Tasks''': Successfully finished tasks
+* '''Failed Tasks''': Tasks that encountered errors
+* '''Scheduled Tasks''': Tasks assigned but not started
+
+'''Performance Metrics:'''
+* '''CPU Usage''': Worker process CPU consumption
+* '''Memory Usage''': RAM utilization
+* '''Task Throughput''': Tasks per minute
+* '''Uptime''': Time since worker started
+
+=== Tasks Tab ===
+
+'''Task States:'''
+{| class="wikitable"
+|-
+! State !! Description !! Color !! Action
+|-
+| '''PENDING''' || Task queued, waiting for worker || Gray || None
+|-
+| '''STARTED''' || Task execution begun || Yellow || Monitor
+|-
+| '''RETRY''' || Task failed, scheduled for retry || Orange || Check logs
+|-
+| '''SUCCESS''' || Task completed successfully || Green || Review results
+|-
+| '''FAILURE''' || Task failed permanently || Red || Debug error
+|-
+| '''REVOKED''' || Task cancelled by user/system || Purple || Check reason
+|}
+
+'''Task Details:'''
+* '''UUID''': Unique task identifier
+* '''Name''': Task function name
+* '''Args''': Task arguments
+* '''Started''': Execution start time
+* '''Runtime''': Execution duration
+* '''Worker''': Assigned worker name
+* '''Result''': Task return value or error
+
+=== Broker Tab ===
+
+'''Queue Information:'''
+* '''Queue Name''': Celery queue identifier
+* '''Active''': Tasks being processed
+* '''Reserved''': Tasks assigned to workers
+* '''Scheduled''': Tasks with future execution time
+
+'''Broker Statistics:'''
+* '''Connections''': Active Redis connections
+* '''Memory Usage''': Redis memory consumption
+* '''Key Count''': Number of Redis keys
+* '''Uptime''': Redis server uptime
+
+== Monitoring Features ==
+
+=== Real-time Updates ===
+
+'''Live Data:'''
+* Automatic dashboard refresh every 5 seconds
+* WebSocket-based real-time notifications
+* Live task state transitions
+* Instant worker status updates
+
+'''Event Streaming:'''
+<syntaxhighlight lang="python">
+# Enable event capturing in Celery
+app = Celery('gold3')
+app.conf.worker_send_task_events = True
+app.conf.task_send_sent_event = True
+</syntaxhighlight>
+
+=== Task Inspection ===
+
+'''Task Details View:'''
+* Complete task execution history
+* Input arguments and keyword arguments
+* Execution traceback for failed tasks
+* Worker assignment information
+* Timing information (queued, started, completed)
+
+'''Task Filtering:'''
+* Filter by task name
+* Filter by worker
+* Filter by state
+* Filter by time range
+* Search by task UUID
+
+=== Worker Management ===
+
+'''Worker Control:'''
+* View worker process information
+* Monitor worker health status
+* Restart unresponsive workers
+* Shutdown workers gracefully
+
+'''Worker Statistics:'''
+* Tasks processed per minute
+* Average task execution time
+* Memory usage trends
+* CPU utilization graphs
+
+== API Integration ==
+
+=== REST API Endpoints ===
+
+'''Task Management:'''
+<syntaxhighlight lang="bash">
+# Get task information
+curl http://localhost:5555/api/task/info/<task_id>
+
+# Get worker statistics
+curl http://localhost:5555/api/workers
+
+# Get queue information
+curl http://localhost:5555/api/queues
+
+# Get broker information
+curl http://localhost:5555/api/broker
+</syntaxhighlight>
+
+'''Programmatic Access:'''
+<syntaxhighlight lang="python">
+import requests
+
+# Get active tasks
+response = requests.get('http://localhost:5555/api/tasks')
+active_tasks = response.json()
+
+# Get worker stats
+response = requests.get('http://localhost:5555/api/workers')
+workers = response.json()
+
+# Revoke a task
+requests.post(f'http://localhost:5555/api/task/revoke/{task_id}')
+</syntaxhighlight>
+
+=== Integration Examples ===
+
+'''Prometheus Metrics:'''
+<syntaxhighlight lang="python">
+# flower-exporter for Prometheus
+from flower_exporter import FlowerExporter
+
+exporter = FlowerExporter(
+    flower_url='http://localhost:5555',
+    prometheus_port=8000
+)
+exporter.start()
+</syntaxhighlight>
+
+'''Custom Monitoring:'''
+<syntaxhighlight lang="python">
+import time
+import requests
+from prometheus_client import Gauge, start_http_server
+
+# Prometheus metrics
+active_tasks = Gauge('celery_active_tasks', 'Number of active tasks')
+failed_tasks = Gauge('celery_failed_tasks', 'Number of failed tasks')
+
+def collect_flower_metrics():
+    try:
+        response = requests.get('http://localhost:5555/api/tasks')
+        data = response.json()
+
+        active_count = len([t for t in data.values() if t.get('state') == 'STARTED'])
+        failed_count = len([t for t in data.values() if t.get('state') == 'FAILURE'])
+
+        active_tasks.set(active_count)
+        failed_tasks.set(failed_count)
+
+    except Exception as e:
+        print(f"Error collecting metrics: {e}")
+
+if __name__ == '__main__':
+    start_http_server(8000)
+    while True:
+        collect_flower_metrics()
+        time.sleep(30)
+</syntaxhighlight>
+
+== Security Considerations ==
+
+=== Authentication ===
+
+'''Basic Authentication:'''
+<syntaxhighlight lang="bash">
+# Environment variable
+FLOWER_BASIC_AUTH=admin:secure_password
+
+# Multiple users
+FLOWER_BASIC_AUTH=user1:pass1,user2:pass2
+</syntaxhighlight>
+
+'''Reverse Proxy:'''
+<syntaxhighlight lang="nginx">
+server {
+    listen 80;
+    server_name flower.gold3.local;
+
+    location / {
+        proxy_pass http://localhost:5555;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        # Basic auth at proxy level
+        auth_basic "Flower Access";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+    }
+}
+</syntaxhighlight>
+
+=== Network Security ===
+
+'''Access Control:'''
+* Bind to localhost in production
+* Use firewall rules to restrict access
+* Implement VPN for remote access
+* Use HTTPS with valid certificates
+
+'''Container Security:'''
+<syntaxhighlight lang="yaml">
+flower:
+  image: mher/flower:latest
+  user: "1000:1000"  # Non-root user
+  read_only: true
+  tmpfs:
+    - /tmp
+  security_opt:
+    - no-new-privileges:true
+</syntaxhighlight>
+
+== Performance Optimization ==
+
+=== Memory Management ===
+
+'''Configuration Tuning:'''
+<syntaxhighlight lang="bash">
+# Limit memory usage
+FLOWER_MAX_WORKERS=1000
+FLOWER_MAX_TASKS=5000
+
+# Enable persistence to reduce memory usage
+FLOWER_PERSISTENT=True
+FLOWER_DB=/app/flower.db
+</syntaxhighlight>
+
+'''Database Cleanup:'''
+<syntaxhighlight lang="sql">
+-- Clean old task data (SQLite)
+DELETE FROM task WHERE received < datetime('now', '-30 days');
+DELETE FROM worker WHERE active = 0 AND last_update < datetime('now', '-1 day');
+
+-- Vacuum database
+VACUUM;
+</syntaxhighlight>
+
+=== Caching and Persistence ===
+
+'''Persistent Storage:'''
+<syntaxhighlight lang="yaml">
+flower:
+  volumes:
+    - flower_data:/app/data
+  environment:
+    - FLOWER_DB=/app/data/flower.db
+    - FLOWER_PERSISTENT=True
+</syntaxhighlight>
+
+'''Redis Caching:'''
+* Use Redis for temporary data storage
+* Configure appropriate TTL values
+* Monitor Redis memory usage
+* Implement Redis persistence
+
+== Troubleshooting ==
+
+=== Common Issues ===
+
+==== Flower Not Showing Workers ====
+
+'''Symptoms:'''
+* Dashboard shows no active workers
+* Worker statistics are empty
+* Task information is missing
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check Celery configuration
+docker-compose exec celery env | grep CELERY_BROKER_URL
+
+# Verify Redis connectivity
+docker-compose exec flower redis-cli -h redis ping
+
+# Check worker event configuration
+docker-compose exec celery celery -A celery_app inspect stats
+
+# Restart Flower service
+docker-compose restart flower
+</syntaxhighlight>
+
+==== Tasks Not Appearing ====
+
+'''Symptoms:'''
+* Tasks are executing but not visible in Flower
+* Task history is empty
+* Real-time updates not working
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Enable Celery events
+# In celery_app.py
+app.conf.worker_send_task_events = True
+app.conf.task_send_sent_event = True
+
+# Restart workers
+docker-compose up -d --no-deps --force-recreate celery
+
+# Check event capture
+docker-compose logs flower | grep event
+</syntaxhighlight>
+
+==== Performance Issues ====
+
+'''Symptoms:'''
+* Dashboard loading slowly
+* Real-time updates delayed
+* Memory usage high
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Adjust update intervals
+FLOWER_UPDATE_INTERVAL=10  # seconds
+
+# Limit data retention
+FLOWER_MAX_WORKERS=1000
+FLOWER_MAX_TASKS=5000
+
+# Enable persistence
+FLOWER_PERSISTENT=True
+
+# Monitor resource usage
+docker-compose exec flower ps aux | grep flower
+</syntaxhighlight>
+
+==== Connection Issues ====
+
+'''Symptoms:'''
+* Flower cannot connect to broker
+* "Connection refused" errors
+* Empty broker information
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check broker URL
+echo $CELERY_BROKER_URL
+
+# Test broker connectivity
+docker-compose exec flower redis-cli -h redis -p 6379 ping
+
+# Verify network connectivity
+docker-compose exec flower nc -zv redis 6379
+
+# Check broker logs
+docker-compose logs redis
+</syntaxhighlight>
+
+==== Authentication Problems ====
+
+'''Symptoms:'''
+* Login page not appearing
+* Authentication errors
+* Access denied messages
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check authentication configuration
+echo $FLOWER_BASIC_AUTH
+
+# Verify format (user:password)
+# Correct: admin:password123
+# Incorrect: admin:password123,user:pass
+
+# Restart service after configuration changes
+docker-compose up -d --no-deps --force-recreate flower
+</syntaxhighlight>
+
+== Advanced Features ==
+
+=== Custom Plugins ===
+
+'''Flower Extensions:'''
+<syntaxhighlight lang="python">
+# custom_plugin.py
+from flower.views import BaseHandler
+
+class CustomView(BaseHandler):
+    def get(self):
+        self.write("Custom Flower Plugin")
+
+# Register plugin
+FLOWER_PLUGINS = ['custom_plugin']
+</syntaxhighlight>
+
+=== Event Callbacks ===
+
+'''Custom Event Handling:'''
+<syntaxhighlight lang="python">
+from flower.events import Events
+
+def on_task_received(event):
+    print(f"Task received: {event['uuid']}")
+
+def on_task_succeeded(event):
+    print(f"Task succeeded: {event['uuid']}")
+
+# Register callbacks
+events = Events()
+events.on_task_received = on_task_received
+events.on_task_succeeded = on_task_succeeded
+</syntaxhighlight>
+
+=== Monitoring Integration ===
+
+'''Health Check Endpoint:'''
+<syntaxhighlight lang="python">
+# Custom health check
+@app.route('/health')
+def health_check():
+    try:
+        # Check Redis connectivity
+        redis.ping()
+        # Check worker connectivity
+        workers = get_workers()
+        return {'status': 'healthy', 'workers': len(workers)}
+    except Exception as e:
+        return {'status': 'unhealthy', 'error': str(e)}, 503
+</syntaxhighlight>
+
+'''Metrics Export:'''
+<syntaxhighlight lang="python">
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+
+@app.route('/metrics')
+def metrics():
+    # Export Flower metrics in Prometheus format
+    return generate_latest(), 200, {'Content-Type': CONTENT_TYPE_LATEST}
+</syntaxhighlight>
+
+== Backup and Recovery ==
+
+=== Configuration Backup ===
+
+'''Backup Script:'''
+<syntaxhighlight lang="bash">
+#!/bin/bash
+BACKUP_DIR="/opt/flower-backup/$(date +%Y%m%d_%H%M%S)"
+mkdir -p $BACKUP_DIR
+
+# Backup configuration
+docker-compose exec flower env > $BACKUP_DIR/environment.txt
+
+# Backup persistent data
+docker cp $(docker-compose ps -q flower):/app/flower.db $BACKUP_DIR/
+
+# Create archive
+tar czf $BACKUP_DIR.tar.gz $BACKUP_DIR
+</syntaxhighlight>
+
+=== Disaster Recovery ===
+
+'''Recovery Process:'''
+<syntaxhighlight lang="bash">
+# Stop Flower service
+docker-compose stop flower
+
+# Restore database
+docker cp backup/flower.db $(docker-compose ps -q flower):/app/flower.db
+
+# Restore configuration
+cp backup/environment.txt .env
+
+# Start service
+docker-compose up -d flower
+</syntaxhighlight>
+
+== Related Documentation ==
+
+* [[Celery Task Processing|Celery Task Processing System]]
+* [[Redis Configuration|Redis Message Broker]]
+* [[Prometheus Monitoring|Prometheus Metrics Collection]]
+* [[Grafana Dashboards|Grafana Visualization]]
+* [[Docker Infrastructure|Container Architecture]]
+
+---
+
+''Last updated: September 16, 2025''</content>
+<parameter name="filePath">c:\Dev\Gold3\flower_page.wiki

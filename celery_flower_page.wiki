@@ -1,0 +1,813 @@
+= Celery Task Processing System =
+
+{| class="wikitable" style="float:right; margin-left:1em; width:300px;"
+|-
+! colspan="2" | Celery Services
+|-
+| '''Worker Service''' || celery
+|-
+| '''Scheduler Service''' || celery-beat
+|-
+| '''Monitor Service''' || flower
+|-
+| '''Worker Port''' || N/A
+|-
+| '''Scheduler Port''' || N/A
+|-
+| '''Monitor Port''' || 5555
+|-
+| '''Broker''' || Redis
+|-
+| '''Result Backend''' || Redis
+|}
+
+== Overview ==
+
+Celery is GOLD3's distributed task queue system that enables asynchronous processing of background tasks, scheduled jobs, and long-running operations. The system consists of workers, a scheduler (Celery Beat), and a monitoring dashboard (Flower).
+
+== Architecture ==
+
+=== Components ===
+
+{| class="wikitable"
+|-
+! Component !! Purpose !! Technology !! Configuration
+|-
+| '''Celery Worker''' || Task execution || Python/Celery || celery_app.py
+|-
+| '''Celery Beat''' || Task scheduling || django-celery-beat || DatabaseScheduler
+|-
+| '''Flower''' || Monitoring UI || Flower || Web Dashboard
+|-
+| '''Redis''' || Message broker || Redis || CELERY_BROKER_URL
+|-
+| '''Django''' || Task discovery || Django Apps || Autodiscovery
+|}
+
+=== Data Flow ===
+
+<syntaxhighlight lang="mermaid">
+graph TD
+    A[Django Application] --> B[Task Publication]
+    B --> C[Redis Broker]
+    C --> D[Celery Worker]
+    D --> E[Task Execution]
+    E --> F[Result Storage]
+    F --> G[Result Retrieval]
+
+    H[Celery Beat] --> I[Scheduled Tasks]
+    I --> C
+
+    J[Flower] --> K[Worker Monitoring]
+    J --> L[Task Inspection]
+    J --> M[Broker Stats]
+</syntaxhighlight>
+
+== Configuration ==
+
+=== Docker Compose Services ===
+
+'''Celery Worker:'''
+<syntaxhighlight lang="yaml">
+celery:
+  build: .
+  command: scripts/start-celery-worker.sh
+  volumes:
+    - .:/app
+    - /app/__pycache__
+  environment:
+    - CELERY_BROKER_URL=redis://redis:6379/0
+    - DJANGO_SETTINGS_MODULE=gchub_db.settings
+    - ENABLE_CELERY_BEAT=0
+  depends_on:
+    - redis
+    - web
+  networks:
+    - gold3
+</syntaxhighlight>
+
+'''Celery Beat Scheduler:'''
+<syntaxhighlight lang="yaml">
+celery-beat:
+  build: .
+  command: scripts/wait-and-start-celery-beat.sh
+  volumes:
+    - .:/app
+    - /app/__pycache__
+  environment:
+    - CELERY_BROKER_URL=redis://redis:6379/0
+    - DJANGO_SETTINGS_MODULE=gchub_db.settings
+    - ENABLE_CELERY_BEAT=1
+    - WAIT_TIMEOUT=300
+    - WAIT_INTERVAL=5
+  depends_on:
+    - redis
+    - web
+  networks:
+    - gold3
+</syntaxhighlight>
+
+'''Flower Monitoring:'''
+<syntaxhighlight lang="yaml">
+flower:
+  image: mher/flower:latest
+  ports:
+    - "5555:5555"
+  environment:
+    - CELERY_BROKER_URL=redis://redis:6379/0
+  depends_on:
+    - redis
+  networks:
+    - gold3
+</syntaxhighlight>
+
+=== Application Configuration ===
+
+'''celery_app.py:'''
+<syntaxhighlight lang="python">
+import os
+from celery import Celery
+from django.conf import settings
+
+# Set the default Django settings module
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gchub_db.settings')
+
+# Create the Celery app instance
+app = Celery('gold3')
+
+# Using a string here means the worker doesn't have to serialize
+# the configuration object to child processes.
+app.config_from_object('django.conf:settings', namespace='CELERY')
+
+# Autodiscover tasks from all registered Django app configs.
+app.autodiscover_tasks()
+
+@app.task(bind=True)
+def debug_task(self):
+    print(f'Request: {self.request!r}')
+</syntaxhighlight>
+
+'''Django Settings (settings.py):'''
+<syntaxhighlight lang="python">
+# Celery Configuration
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://redis:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# Celery Beat Configuration
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# Task routing
+CELERY_TASK_ROUTES = {
+    'bin.tasks.*': {'queue': 'bin'},
+    'apps.*.tasks.*': {'queue': 'django'},
+}
+
+# Task execution settings
+CELERY_TASK_TIME_LIMIT = 3600  # 1 hour
+CELERY_TASK_SOFT_TIME_LIMIT = 3300  # 55 minutes
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 1000
+CELERY_WORKER_CONCURRENCY = 4
+</syntaxhighlight>
+
+== Task Development ==
+
+=== Creating Tasks ===
+
+'''Basic Task Structure:'''
+<syntaxhighlight lang="python">
+# tasks.py in any Django app
+from celery import shared_task
+from django.core.mail import send_mail
+
+@shared_task
+def send_notification_email(user_id, message):
+    """Send notification email to user"""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    user = User.objects.get(id=user_id)
+
+    send_mail(
+        'Notification',
+        message,
+        'noreply@gold3.local',
+        [user.email],
+        fail_silently=False,
+    )
+
+    return f"Email sent to {user.email}"
+</syntaxhighlight>
+
+'''Repository-level Tasks (bin/tasks.py):'''
+<syntaxhighlight lang="python">
+from celery_app import app
+
+@app.task
+def bin_test():
+    """Test task for bin package"""
+    print("Bin test task executed successfully")
+    return "bin_test_completed"
+
+@app.task
+def data_processing_task(data_id):
+    """Process data asynchronously"""
+    # Implementation here
+    pass
+</syntaxhighlight>
+
+=== Task Registration ===
+
+'''Autodiscovery Configuration:'''
+* Tasks in Django apps are automatically discovered
+* Repository-level tasks in `bin/` package require manual registration
+* Use `@shared_task` decorator for app-level tasks
+* Use `@app.task` decorator for repository-level tasks
+
+=== Task States ===
+
+{| class="wikitable"
+|-
+! State !! Description !! Color (Flower)
+|-
+| '''PENDING''' || Task waiting in queue || Gray
+|-
+| '''STARTED''' || Task execution begun || Yellow
+|-
+| '''RETRY''' || Task failed, will retry || Orange
+|-
+| '''SUCCESS''' || Task completed successfully || Green
+|-
+| '''FAILURE''' || Task failed permanently || Red
+|-
+| '''REVOKED''' || Task cancelled || Purple
+|}
+
+== Scheduling Tasks ==
+
+=== Periodic Tasks via Admin ===
+
+'''Creating Scheduled Tasks:'''
+* Access Django Admin at `/admin/`
+* Navigate to '''Django Celery Beat''' → '''Periodic tasks'''
+* Create new periodic task with:
+  * '''Name''': Descriptive task name
+  * '''Task''': Dotted path to task function
+  * '''Interval/Crontab''': Schedule definition
+  * '''Enabled''': Task activation status
+
+'''Schedule Types:'''
+* '''Interval''': Every X minutes/hours/days
+* '''Crontab''': Unix cron format (minute hour day month weekday)
+* '''Solar''': Time-based on solar events
+
+=== Programmatic Task Creation ===
+
+'''Creating Tasks Programmatically:'''
+<syntaxhighlight lang="python">
+from django_celery_beat.models import IntervalSchedule, PeriodicTask, CrontabSchedule
+
+# Create interval schedule (every 30 minutes)
+interval, _ = IntervalSchedule.objects.get_or_create(
+    every=30,
+    period=IntervalSchedule.MINUTES
+)
+
+# Create periodic task
+task = PeriodicTask.objects.create(
+    interval=interval,
+    name='data_cleanup',
+    task='apps.cleanup.tasks.cleanup_old_data',
+    enabled=True
+)
+
+# Create crontab schedule (daily at 2 AM)
+crontab = CrontabSchedule.objects.create(
+    minute='0',
+    hour='2',
+    day_of_week='*',
+    day_of_month='*',
+    month_of_year='*'
+)
+
+# Create daily task
+daily_task = PeriodicTask.objects.create(
+    crontab=crontab,
+    name='daily_backup',
+    task='bin.tasks.daily_backup',
+    enabled=True
+)
+</syntaxhighlight>
+
+== Monitoring and Management ==
+
+=== Flower Dashboard ===
+
+'''Accessing Flower:'''
+* URL: http://localhost:5555
+* Default authentication: None required
+* Real-time monitoring of workers and tasks
+
+'''Flower Features:'''
+* '''Dashboard''': Overview of workers, tasks, and broker
+* '''Workers''': Individual worker status and statistics
+* '''Tasks''': Task execution history and details
+* '''Broker''': Redis queue information
+* '''Monitor''': Real-time task monitoring
+
+'''Key Metrics in Flower:'''
+<syntaxhighlight lang="promql">
+# Active tasks
+celery_active_tasks
+
+# Queued tasks
+celery_queued_tasks
+
+# Task success rate
+rate(celery_tasks_total[5m]) / rate(celery_tasks_total[5m])
+
+# Worker status
+celery_worker_up
+</syntaxhighlight>
+
+=== Worker Management ===
+
+'''Starting Workers:'''
+<syntaxhighlight lang="bash">
+# Start worker
+docker-compose up -d celery
+
+# Start with specific concurrency
+docker-compose exec celery celery -A celery_app worker --concurrency=4
+
+# Start with specific queues
+docker-compose exec celery celery -A celery_app worker --queues=django,bin
+</syntaxhighlight>
+
+'''Worker Logs:'''
+<syntaxhighlight lang="bash">
+# Follow worker logs
+docker-compose logs -f celery
+
+# View recent logs
+docker-compose logs --tail=100 celery
+</syntaxhighlight>
+
+=== Task Inspection ===
+
+'''Listing Registered Tasks:'''
+<syntaxhighlight lang="bash">
+# List all registered tasks
+docker-compose exec celery celery -A celery_app inspect registered
+
+# List active tasks
+docker-compose exec celery celery -A celery_app inspect active
+
+# List scheduled tasks
+docker-compose exec celery celery -A celery_app inspect scheduled
+</syntaxhighlight>
+
+'''Task Statistics:'''
+<syntaxhighlight lang="bash">
+# Get worker statistics
+docker-compose exec celery celery -A celery_app inspect stats
+
+# Get broker information
+docker-compose exec celery celery -A celery_app inspect broker
+</syntaxhighlight>
+
+== Startup and Initialization ==
+
+=== Startup Scripts ===
+
+'''Worker Startup (scripts/start-celery-worker.sh):'''
+<syntaxhighlight lang="bash">
+#!/bin/bash
+set -e
+
+# Wait for web service readiness
+while [ ! -f /app/.web_ready ]; do
+  echo "Waiting for web service..."
+  sleep 1
+done
+
+# Initialize Django
+cd /app
+export PYTHONPATH="${PYTHONPATH}:/app"
+python -c "import django; django.setup()"
+
+# Start Celery worker
+exec celery -A celery_app worker --loglevel=info
+</syntaxhighlight>
+
+'''Beat Startup (scripts/wait-and-start-celery-beat.sh):'''
+<syntaxhighlight lang="bash">
+#!/bin/bash
+set -e
+
+# Configuration
+WAIT_TIMEOUT=${WAIT_TIMEOUT:-300}
+WAIT_INTERVAL=${WAIT_INTERVAL:-1}
+
+# Wait for web service readiness
+elapsed=0
+while [ ! -f /app/.web_ready ]; do
+  if [ $WAIT_TIMEOUT -gt 0 ] && [ $elapsed -ge $WAIT_TIMEOUT ]; then
+    echo "Timeout waiting for web readiness"
+    exit 1
+  fi
+  echo "Waiting for web service... ($elapsed/$WAIT_TIMEOUT)"
+  sleep $WAIT_INTERVAL
+  elapsed=$((elapsed + WAIT_INTERVAL))
+done
+
+# Initialize Django
+cd /app
+export PYTHONPATH="${PYTHONPATH}:/app"
+python -c "import django; django.setup()"
+
+# Configure beat scheduler
+export CELERYBEAT_SCHEDULER="src.lazy_beat_scheduler:LazyDatabaseScheduler"
+
+# Start Celery Beat
+exec celery -A celery_app beat --loglevel=info --scheduler=$CELERYBEAT_SCHEDULER
+</syntaxhighlight>
+
+=== Lazy Scheduler ===
+
+'''src/lazy_beat_scheduler.py:'''
+<syntaxhighlight lang="python">
+from django_celery_beat.schedulers import DatabaseScheduler
+
+class LazyDatabaseScheduler(DatabaseScheduler):
+    """
+    Lazy database scheduler that only imports django_celery_beat
+    models when the scheduler is actually created, not at module import time.
+    """
+
+    def __init__(self, *args, **kwargs):
+        # Delay the import until scheduler instantiation
+        super().__init__(*args, **kwargs)
+</syntaxhighlight>
+
+=== Worker Settings Shim ===
+
+'''gchub_db/worker_settings.py:'''
+<syntaxhighlight lang="python">
+import os
+
+# Read environment variable to control django_celery_beat inclusion
+ENABLE_CELERY_BEAT = os.getenv('ENABLE_CELERY_BEAT', '0').lower() in ('1', 'true', 'yes', 'on')
+
+if not ENABLE_CELERY_BEAT:
+    # Remove django_celery_beat from INSTALLED_APPS for workers
+    try:
+        INSTALLED_APPS.remove('django_celery_beat')
+    except ValueError:
+        pass  # Already removed or not present
+</syntaxhighlight>
+
+== Best Practices ==
+
+=== Task Design ===
+
+'''Idempotent Tasks:'''
+* Design tasks to be safely re-executed
+* Use unique identifiers to prevent duplicate processing
+* Implement proper error handling and retries
+
+'''Task Granularity:'''
+* Keep tasks focused on single responsibilities
+* Avoid long-running tasks that block workers
+* Use task chaining for complex workflows
+
+'''Error Handling:'''
+<syntaxhighlight lang="python">
+@app.task(bind=True, max_retries=3)
+def robust_task(self, data):
+    try:
+        # Task implementation
+        process_data(data)
+        return "success"
+    except Exception as exc:
+        # Log error
+        logger.error(f"Task failed: {exc}")
+
+        # Retry with exponential backoff
+        if self.request.retries < self.max_retries:
+            delay = 2 ** self.request.retries
+            raise self.retry(countdown=delay, exc=exc)
+
+        # Final failure
+        raise exc
+</syntaxhighlight>
+
+=== Performance Optimization ===
+
+'''Worker Configuration:'''
+* '''Concurrency''': Match worker count to CPU cores
+* '''Prefetch''': Adjust prefetch multiplier based on task duration
+* '''Time Limits''': Set appropriate soft and hard time limits
+* '''Memory Management''': Restart workers after N tasks
+
+'''Queue Management:'''
+* '''Task Routing''': Use separate queues for different task types
+* '''Priority Queues''': Implement priority-based task processing
+* '''Rate Limiting''': Control task execution rates
+
+=== Monitoring and Alerting ===
+
+'''Key Metrics to Monitor:'''
+<syntaxhighlight lang="promql">
+# Worker health
+up{job="celery-worker"}
+
+# Queue length
+celery_queued_tasks
+
+# Task failure rate
+rate(celery_tasks_total{state="FAILURE"}[5m])
+
+# Task execution time
+histogram_quantile(0.95, rate(celery_task_runtime_seconds_bucket[5m]))
+</syntaxhighlight>
+
+'''Alerting Rules:'''
+<syntaxhighlight lang="yaml">
+groups:
+  - name: celery
+    rules:
+      - alert: CeleryWorkerDown
+        expr: up{job="celery-worker"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Celery worker is down"
+
+      - alert: CeleryQueueGrowing
+        expr: celery_queued_tasks > 100
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Celery queue is growing rapidly"
+</syntaxhighlight>
+
+== Troubleshooting ==
+
+=== Common Issues ===
+
+==== Worker Not Connecting to Broker ====
+
+'''Symptoms:'''
+* Worker logs show connection errors
+* Tasks remain in PENDING state
+* Flower shows no active workers
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check broker URL
+docker-compose exec celery env | grep CELERY_BROKER_URL
+
+# Test Redis connectivity
+docker-compose exec celery redis-cli -h redis ping
+
+# Verify Redis service
+docker-compose ps redis
+</syntaxhighlight>
+
+==== Tasks Not Being Discovered ====
+
+'''Symptoms:'''
+* Task not found errors
+* Autodiscovery warnings in logs
+* Tasks not appearing in Flower
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Force worker restart to rediscover tasks
+docker-compose up -d --no-deps --force-recreate celery
+
+# Check task registration
+docker-compose exec celery celery -A celery_app inspect registered
+
+# Verify task module imports
+docker-compose exec celery python -c "from bin.tasks import bin_test; print('Import successful')"
+</syntaxhighlight>
+
+==== Scheduled Tasks Not Running ====
+
+'''Symptoms:'''
+* Periodic tasks not executing
+* No entries in task execution history
+* Beat scheduler appears running but inactive
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Check beat scheduler status
+docker-compose logs celery-beat
+
+# Verify database scheduler setup
+docker-compose exec web python manage.py shell -c "from django_celery_beat.models import PeriodicTask; print(PeriodicTask.objects.all())"
+
+# Restart beat scheduler
+docker-compose up -d --no-deps --force-recreate celery-beat
+</syntaxhighlight>
+
+==== Memory Issues ====
+
+'''Symptoms:'''
+* Worker processes consuming excessive memory
+* Out of memory errors
+* Worker restarts
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Configure memory limits
+docker-compose exec celery celery -A celery_app worker --max-memory-per-child=200000
+
+# Monitor worker memory
+docker-compose exec celery ps aux | grep celery
+
+# Adjust max tasks per child
+export CELERY_WORKER_MAX_TASKS_PER_CHILD=500
+</syntaxhighlight>
+
+==== Task Timeouts ====
+
+'''Symptoms:'''
+* Tasks failing with timeout errors
+* Soft time limit exceeded warnings
+* Worker process termination
+
+'''Solutions:'''
+<syntaxhighlight lang="bash">
+# Adjust time limits in settings
+CELERY_TASK_TIME_LIMIT = 7200  # 2 hours
+CELERY_TASK_SOFT_TIME_LIMIT = 6900  # 1.95 hours
+
+# Implement task chunking for large operations
+@app.task
+def process_large_dataset(dataset_id):
+    # Break into smaller chunks
+    chunks = get_data_chunks(dataset_id)
+    for chunk in chunks:
+        process_chunk.delay(chunk)
+</syntaxhighlight>
+
+== Security Considerations ==
+
+=== Broker Security ===
+
+'''Redis Security:'''
+* Use Redis authentication
+* Configure Redis ACLs
+* Encrypt Redis traffic in production
+* Isolate Redis network access
+
+'''Task Security:'''
+* Validate task input parameters
+* Implement task authorization
+* Use secure serialization
+* Monitor task execution patterns
+
+=== Operational Security ===
+
+'''Access Control:'''
+* Restrict Flower dashboard access
+* Implement authentication for monitoring
+* Use secure broker connections
+* Regular security updates
+
+'''Logging and Auditing:'''
+* Enable comprehensive task logging
+* Monitor task execution patterns
+* Implement audit trails
+* Regular log rotation
+
+== Integration Examples ==
+
+=== Django Integration ===
+
+'''Calling Tasks from Views:'''
+<syntaxhighlight lang="python">
+from django.http import JsonResponse
+from .tasks import send_notification_email
+
+def send_notification(request):
+    user_id = request.POST.get('user_id')
+    message = request.POST.get('message')
+
+    # Call task asynchronously
+    task = send_notification_email.delay(user_id, message)
+
+    return JsonResponse({
+        'task_id': task.id,
+        'status': 'Task queued'
+    })
+</syntaxhighlight>
+
+'''Task Result Handling:'''
+<syntaxhighlight lang="python">
+from celery.result import AsyncResult
+
+def check_task_status(request, task_id):
+    result = AsyncResult(task_id)
+    response_data = {
+        'task_id': task_id,
+        'status': result.status,
+    }
+
+    if result.ready():
+        response_data['result'] = result.result
+    else:
+        response_data['current'] = result.info
+
+    return JsonResponse(response_data)
+</syntaxhighlight>
+
+=== Error Handling and Retry ===
+
+'''Advanced Error Handling:'''
+<syntaxhighlight lang="python">
+from celery.exceptions import MaxRetriesExceededError
+
+@app.task(bind=True, max_retries=3, autoretry_for=(ConnectionError,))
+def api_call_task(self, url, data):
+    try:
+        response = requests.post(url, json=data, timeout=30)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as exc:
+        if self.request.retries < self.max_retries:
+            # Exponential backoff
+            delay = 2 ** self.request.retries
+            raise self.retry(countdown=delay, exc=exc)
+        else:
+            # Send alert for permanent failure
+            alert_failure(url, data, exc)
+            raise MaxRetriesExceededError(f"Failed to call {url} after {self.max_retries} retries")
+</syntaxhighlight>
+
+=== Task Chaining and Workflows ===
+
+'''Task Chains:'''
+<syntaxhighlight lang="python">
+from celery import chain
+
+@app.task
+def extract_data(source):
+    # Extract data from source
+    return extracted_data
+
+@app.task
+def transform_data(data):
+    # Transform the data
+    return transformed_data
+
+@app.task
+def load_data(data):
+    # Load data to destination
+    return "Data loaded successfully"
+
+# Create task chain
+workflow = chain(
+    extract_data.s('database'),
+    transform_data.s(),
+    load_data.s()
+)
+
+# Execute workflow
+result = workflow.delay()
+</syntaxhighlight>
+
+'''Group Tasks:'''
+<syntaxhighlight lang="python">
+from celery import group
+
+@app.task
+def process_item(item):
+    # Process individual item
+    return f"Processed {item}"
+
+# Process multiple items in parallel
+items = ['item1', 'item2', 'item3']
+group_task = group(process_item.s(item) for item in items)
+results = group_task.delay()
+</syntaxhighlight>
+
+== Related Documentation ==
+
+* [[Main Page|Project Overview]]
+* [[Redis Configuration|Redis Message Broker]]
+* [[Grafana Dashboards|Monitoring and Visualization]]
+* [[Prometheus Monitoring|Metrics Collection]]
+* [[Docker Infrastructure|Container Architecture]]
+
+---
+
+''Last updated: September 16, 2025''</content>
+<parameter name="filePath">c:\Dev\Gold3\celery_flower_page.wiki
