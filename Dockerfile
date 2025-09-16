@@ -8,14 +8,21 @@ ENV PYTHONUNBUFFERED 1
 # Set work directory
 WORKDIR /app
 
-# Install system dependencies (including ODBC for pyodbc)
+# Install system dependencies (including ODBC for pyodbc and PrinceXML for PDF generation)
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
     g++ \
     libpq-dev \
     unixodbc-dev \
+    wget \
     && rm -rf /var/lib/apt/lists/*
+
+# Install PrinceXML for high-quality PDF generation
+RUN wget -O prince.deb https://www.princexml.com/download/prince_15.2-1_debian11_amd64.deb \
+    && dpkg -i prince.deb \
+    && rm prince.deb \
+    && apt-get update && apt-get install -f -y
 
 # Install Python dependencies
 COPY config/requirements.txt ./

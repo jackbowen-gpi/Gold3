@@ -42,7 +42,7 @@ All services are defined in `docker-compose.yml`:
 
 To start everything:
 ```sh
-docker-compose -f ../../config/docker-compose.yml up --build
+docker-compose -f config/docker-compose.yml up --build
 ```
 
 ## Adding Tasks
@@ -66,7 +66,7 @@ def my_task():
 ## Troubleshooting
 - Make sure Redis is running and accessible.
 - Check logs for errors in the Celery and Celery Beat containers.
-- Use `docker-compose -f ../../config/docker-compose.yml logs celery` and `docker-compose -f ../../config/docker-compose.yml logs celery-beat` for debugging.
+- Use `docker-compose -f config/docker-compose.yml logs celery` and `docker-compose -f config/docker-compose.yml logs celery-beat` for debugging.
 
 ---
 

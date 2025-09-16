@@ -1,0 +1,290 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "defaultValue": "gold3-dev-rg",
+      "metadata": {
+        "description": "Name of the resource group"
+      }
+    },
+    "acrName": {
+      "type": "string",
+      "defaultValue": "gold3devacr",
+      "metadata": {
+        "description": "Name of the Azure Container Registry"
+      }
+    },
+    "dbAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for PostgreSQL admin user"
+      }
+    },
+    "secretKey": {
+      "type": "string",
+      "defaultValue": "your-super-secret-key-here-change-this-in-production",
+      "metadata": {
+        "description": "Django secret key"
+      }
+    }
+  },
+  "variables": {
+    "dbName": "gold3-dev-db",
+    "redisName": "gold3-dev-redis",
+    "containerEnvName": "gold3-dev-env",
+    "webAppName": "gold3-web",
+    "wikiAppName": "gold3-wiki",
+    "acrLoginServer": "[concat(parameters('acrName'), '.azurecr.io')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2023-07-01",
+      "name": "[parameters('acrName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Basic"
+      },
+      "properties": {
+        "adminUserEnabled": true
+      }
+    },
+    {
+      "type": "Microsoft.DBforPostgreSQL/flexibleServers",
+      "apiVersion": "2022-12-01",
+      "name": "[variables('dbName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_B1ms",
+        "tier": "Burstable"
+      },
+      "properties": {
+        "version": "15",
+        "administratorLogin": "gold3admin",
+        "administratorLoginPassword": "[parameters('dbAdminPassword')]",
+        "storage": {
+          "storageSizeGB": 32
+        },
+        "backup": {
+          "backupRetentionDays": 7,
+          "geoRedundantBackup": "Disabled"
+        },
+        "highAvailability": {
+          "mode": "Disabled"
+        },
+        "maintenanceWindow": {
+          "customWindow": "Disabled",
+          "dayOfWeek": 0,
+          "startHour": 0,
+          "startMinute": 0
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Cache/redis",
+      "apiVersion": "2023-04-01",
+      "name": "[variables('redisName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "Basic",
+          "family": "C",
+          "capacity": 0
+        },
+        "enableNonSslPort": false,
+        "minimumTlsVersion": "1.2"
+      }
+    },
+    {
+      "type": "Microsoft.App/managedEnvironments",
+      "apiVersion": "2023-05-01",
+      "name": "[variables('containerEnvName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "daprAIInstrumentationKey": "",
+        "appLogsConfiguration": {
+          "destination": "log-analytics"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2023-05-01",
+      "name": "[variables('webAppName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', variables('containerEnvName'))]",
+        "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', variables('dbName'))]",
+        "[resourceId('Microsoft.Cache/redis', variables('redisName'))]"
+      ],
+      "properties": {
+        "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', variables('containerEnvName'))]",
+        "configuration": {
+          "secrets": [
+            {
+              "name": "db-password",
+              "value": "[parameters('dbAdminPassword')]"
+            }
+          ],
+          "activeRevisionsMode": "Single",
+          "ingress": {
+            "external": true,
+            "targetPort": 8000,
+            "transport": "Auto",
+            "traffic": [
+              {
+                "weight": 100,
+                "revisionName": null
+              }
+            ]
+          }
+        },
+        "template": {
+          "containers": [
+            {
+              "name": "gold3-web",
+              "image": "[concat(variables('acrLoginServer'), '/gold3-web:latest')]",
+              "resources": {
+                "cpu": 0.5,
+                "memory": "1Gi"
+              },
+              "env": [
+                {
+                  "name": "DEBUG",
+                  "value": "False"
+                },
+                {
+                  "name": "DJANGO_SETTINGS_MODULE",
+                  "value": "gchub_db.settings"
+                },
+                {
+                  "name": "SECRET_KEY",
+                  "value": "[parameters('secretKey')]"
+                },
+                {
+                  "name": "ALLOWED_HOSTS",
+                  "value": "[concat(variables('webAppName'), '.containerapp.azure.com')]"
+                },
+                {
+                  "name": "DEV_DB_HOST",
+                  "value": "[reference(resourceId('Microsoft.DBforPostgreSQL/flexibleServers', variables('dbName'))).fullyQualifiedDomainName]"
+                },
+                {
+                  "name": "DEV_DB_PORT",
+                  "value": "5432"
+                },
+                {
+                  "name": "DEV_DB_NAME",
+                  "value": "postgres"
+                },
+                {
+                  "name": "DEV_DB_USER",
+                  "value": "gold3admin"
+                },
+                {
+                  "name": "DEV_DB_PASSWORD",
+                  "secretRef": "db-password"
+                },
+                {
+                  "name": "REDIS_URL",
+                  "value": "[concat('redis://', reference(resourceId('Microsoft.Cache/redis', variables('redisName'))).hostName, ':6380,password=', listKeys(resourceId('Microsoft.Cache/redis', variables('redisName')), '2023-04-01').primaryKey, ',ssl=True')]"
+                },
+                {
+                  "name": "CELERY_BROKER_URL",
+                  "value": "[concat('redis://', reference(resourceId('Microsoft.Cache/redis', variables('redisName'))).hostName, ':6380,password=', listKeys(resourceId('Microsoft.Cache/redis', variables('redisName')), '2023-04-01').primaryKey, ',ssl=True')]"
+                }
+              ]
+            }
+          ],
+          "scale": {
+            "minReplicas": 1,
+            "maxReplicas": 3,
+            "rules": [
+              {
+                "name": "http-scaling",
+                "http": {
+                  "metadata": {
+                    "concurrentRequests": "10"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2023-05-01",
+      "name": "[variables('wikiAppName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', variables('containerEnvName'))]"
+      ],
+      "properties": {
+        "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', variables('containerEnvName'))]",
+        "configuration": {
+          "activeRevisionsMode": "Single",
+          "ingress": {
+            "external": true,
+            "targetPort": 80,
+            "transport": "Auto",
+            "traffic": [
+              {
+                "weight": 100,
+                "revisionName": null
+              }
+            ]
+          }
+        },
+        "template": {
+          "containers": [
+            {
+              "name": "gold3-wiki",
+              "image": "[concat(variables('acrLoginServer'), '/gold3-wiki:latest')]",
+              "resources": {
+                "cpu": 0.25,
+                "memory": "0.5Gi"
+              }
+            }
+          ],
+          "scale": {
+            "minReplicas": 1,
+            "maxReplicas": 1
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "webAppUrl": {
+      "type": "string",
+      "value": "[concat('https://', reference(resourceId('Microsoft.App/containerApps', variables('webAppName'))).configuration.ingress.fqdn)]"
+    },
+    "wikiAppUrl": {
+      "type": "string",
+      "value": "[concat('https://', reference(resourceId('Microsoft.App/containerApps', variables('wikiAppName'))).configuration.ingress.fqdn)]"
+    },
+    "acrLoginServer": {
+      "type": "string",
+      "value": "[variables('acrLoginServer')]"
+    },
+    "dbHost": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.DBforPostgreSQL/flexibleServers', variables('dbName'))).fullyQualifiedDomainName]"
+    },
+    "redisHost": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Cache/redis', variables('redisName'))).hostName]"
+    }
+  }
+}

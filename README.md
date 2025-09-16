@@ -76,14 +76,14 @@ python -m venv .venv
 python -m pip install --upgrade pip
 
 # Quick development setup (installs dev dependencies + pre-commit hooks)
-.\make.ps1 setup-dev
+.\scripts\make.ps1 setup-dev
 
 # Or install manually:
 pip install -r config/requirements.txt
 
 # Or use the convenience script:
-.\activate_venv.bat  # Windows Command Prompt
-.\activate_venv.ps1  # Windows PowerShell
+.\scripts\activate_venv.bat  # Windows Command Prompt
+.\scripts\activate_venv.ps1  # Windows PowerShell
 
 # 2. Database setup
 docker compose -f .\dev\docker-compose.yml up -d postgres
@@ -1027,8 +1027,10 @@ GOLD3/
 │   │   ├── accounts/         # User management
 │   │   ├── workflow/         # Job workflows
 │   │   └── item_catalog/     # Item management
-│   ├── settings.py           # Django settings
 │   └── urls.py               # URL routing
+├── 📁 config/                 # Configuration files
+│   ├── settings.py           # Django settings
+│   └── .env                  # Environment variables
 ├── 📁 scripts/                # Automation scripts
 │   ├── start_dev_server.ps1 # Automated setup
 │   └── cleanup_project.ps1   # Project cleanup
@@ -1047,7 +1049,7 @@ GOLD3/
 
 - **Real-time Metrics**: Job completion rates, user activity, system performance
 - **Interactive Charts**: D3.js or Chart.js integration for data visualization
-- **Export Capabilities**: PDF/Excel report generation
+- **Export Capabilities**: PDF/Excel report generation (PrinceXML for professional PDFs)
 - **Custom Dashboards**: User-configurable analytics views
 
 #### **2. API-First Architecture**
