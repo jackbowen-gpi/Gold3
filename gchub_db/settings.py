@@ -17,6 +17,10 @@ from config.settings import (
 # SECRET_KEY for Django (required for all Django applications)
 SECRET_KEY = "dev-secret-key-change-in-production-12345678901234567890"
 
+# Security settings
+# Allow frames from same origin in development
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 # Database configuration
 DATABASES = {
     "default": {

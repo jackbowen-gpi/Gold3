@@ -2,9 +2,9 @@ name: CI - Python tests
 
 on:
   push:
-    branches: [ main, jb ]
+    branches: [main, jb]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
@@ -19,7 +19,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U postgres -d gchub_test" \
+          --health-cmd="pg_isready -U postgres -d gchub_test"
           --health-interval=5s --health-timeout=5s --health-retries=20
     strategy:
       matrix:
